@@ -6,6 +6,7 @@
 	"compatibility_flags": ["nodejs_compat"],
 	"main": "./src/server.ts",
 	"observability": { "enabled": true },
+	"triggers": { "crons": [] },
 	"upload_source_maps": true,
 	"kv_namespaces": [{ "binding": "SEASON_KV", "id": "633469db86874a8995c6a05239e3288f" }]
 }
