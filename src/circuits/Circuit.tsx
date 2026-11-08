@@ -9,7 +9,7 @@ import type { Theme } from '#/shell/theme.ts'
 
 import { lapProfile } from './lap.ts'
 import { allCircuits } from './registry.ts'
-import { contour, isSector, mattify, PALETTE, screen, SECTORS } from './shaders.ts'
+import { groundOf, isSector, mattify, PALETTE, screen, SECTORS } from './shaders.ts'
 
 const LAP_SECONDS = 14
 const TRAIL = 8
@@ -81,12 +81,9 @@ function Scene({ model, theme, layout, restart, fill, running, pins, tag, onLap,
     })
 
     const extent = track.getSize(new THREE.Vector3())
-    const ground = contour(theme, Math.max(extent.x, extent.z))
+    const ground = groundOf(gltf.scene, theme, Math.max(extent.x, extent.z))
 
     materials.delete('ground')
-    gltf.scene.traverse((o) => {
-      if (o instanceof THREE.Mesh && o.name === 'ground') o.material = ground.material
-    })
     const markers: THREE.Object3D[] = []
 
     gltf.scene.traverse((o) => {

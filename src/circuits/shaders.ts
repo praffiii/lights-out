@@ -132,7 +132,7 @@ const groundFragment = `
 
 export type Contour = { material: THREE.ShaderMaterial; setTheme: (theme: Theme) => void }
 
-export function contour(theme: Theme, span: number): Contour {
+function contour(theme: Theme, span: number): Contour {
   const uniforms = {
     uGround: { value: new THREE.Color() },
     uLine: { value: new THREE.Color() },
@@ -150,7 +150,20 @@ export function contour(theme: Theme, span: number): Contour {
 
   setTheme(theme)
 
-  return { material: new THREE.ShaderMaterial({ vertexShader: groundVertex, fragmentShader: groundFragment, uniforms }), setTheme }
+  return { material: new THREE.ShaderMaterial({ name: 'ground', vertexShader: groundVertex, fragmentShader: groundFragment, uniforms }), setTheme }
+}
+
+const grounds = new WeakMap<THREE.Object3D, Contour>()
+
+export function groundOf(scene: THREE.Object3D, theme: Theme, span: number): Contour {
+  const ground = grounds.get(scene) ?? contour(theme, span)
+
+  grounds.set(scene, ground)
+  scene.traverse((o) => {
+    if (o instanceof THREE.Mesh && o.name === 'ground') o.material = ground.material
+  })
+
+  return ground
 }
 
 const v = new THREE.Vector3()
