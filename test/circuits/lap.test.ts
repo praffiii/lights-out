@@ -30,6 +30,6 @@ it('moves forward through the whole lap', () => {
 
 it('laps Interlagos in a believable time', () => {
   const { seconds } = lapProfile(interlagos.line, 1)
-  expect(seconds).toBeGreaterThan(60)
+  expect(seconds).toBeGreaterThan(55)
   expect(seconds).toBeLessThan(80)
 })

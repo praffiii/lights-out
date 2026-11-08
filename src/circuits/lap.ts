@@ -4,7 +4,7 @@ const TOP_SPEED = 92
 const GRIP = 44
 const ACCEL = 11
 const BRAKE = 38
-const SPAN = 5
+const CURVATURE_WINDOW = 6
 
 const flat = (a: LinePoint, b: LinePoint) => Math.hypot(b.x - a.x, b.z - a.z)
 
@@ -15,8 +15,8 @@ export const lapProfile = (line: ReadonlyArray<LinePoint>, metresPerUnit: number
   const dist = line.map((p, i) => flat(p, at(i + 1)) * metresPerUnit)
 
   const speedSq = line.map((p, i) => {
-    const a = at(i - SPAN)
-    const b = at(i + SPAN)
+    const a = at(i - CURVATURE_WINDOW)
+    const b = at(i + CURVATURE_WINDOW)
     const cross = Math.abs((p.x - a.x) * (b.z - a.z) - (p.z - a.z) * (b.x - a.x))
     const sides = flat(a, p) * flat(p, b) * flat(a, b)
     const curvature = sides === 0 ? 0 : (2 * cross) / (sides * metresPerUnit)
