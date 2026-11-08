@@ -62,6 +62,11 @@ function Scene({ model, theme, layout, fill, tilt, running, pins, tag, onLap, on
   const scene = useThree((s) => s.scene)
   const clock = useRef(0)
   const stale = useRef(true)
+  const callbacks = useRef({ onLap, onLapProgress, onReady })
+
+  useLayoutEffect(() => {
+    callbacks.current = { onLap, onLapProgress, onReady }
+  }, [onLap, onLapProgress, onReady])
 
   const { materials, ground, markers, rest, light } = useMemo(() => {
     const info = infoFor(model)
@@ -206,6 +211,8 @@ function Scene({ model, theme, layout, fill, tilt, running, pins, tag, onLap, on
     const tick = (time: number, dt: number) => {
       if (!compiled) return
 
+      if (camera instanceof THREE.PerspectiveCamera && camera.aspect !== (layout === 'wide' ? size.width / size.height : REST_ASPECT)) stale.current = true
+
       const go = running.current && !REDUCED
       const moved = fill.current !== lastFill || tilt.current !== lastTilt
 
@@ -238,22 +245,27 @@ function Scene({ model, theme, layout, fill, tilt, running, pins, tag, onLap, on
         const t = clock.current / LAP_SECONDS
         const u = rest.lap.uAt(t)
 
-        if (u < previousU) onLap()
+        if (u < previousU) callbacks.current.onLap()
 
         previousU = u
-        onLapProgress(t - Math.floor(t))
+        callbacks.current.onLapProgress(t - Math.floor(t))
       }
 
       if (!REDUCED) {
         const index = rest.lap.uAt(clock.current / LAP_SECONDS) * n
 
         light.head.position.copy(sample(index, spot))
-        light.trail.forEach((m, i) => void m.position.copy(sample(index - TRAIL_STEP * (i + 1), next)))
+
+        for (const [i, m] of light.trail.entries()) m.position.copy(sample(index - TRAIL_STEP * (i + 1), next))
 
         const el = tag.current
         const at = el && screen(light.head, camera, size.width, size.height)
 
-        if (el && at) el.style.transform = `translate(${at[0] + TAG_OFFSET[0]}px, ${at[1] + TAG_OFFSET[1]}px)`
+        if (el) {
+          el.style.visibility = at ? '' : 'hidden'
+
+          if (at) el.style.transform = `translate(${at[0] + TAG_OFFSET[0]}px, ${at[1] + TAG_OFFSET[1]}px)`
+        }
       }
 
       for (const o of markers) {
@@ -267,14 +279,14 @@ function Scene({ model, theme, layout, fill, tilt, running, pins, tag, onLap, on
 
       if (first) {
         first = false
-        onReady()
+        callbacks.current.onReady()
       }
     }
 
     gsap.ticker.add(tick)
 
     return () => gsap.ticker.remove(tick)
-  }, [materials, markers, rest, light, camera, size, layout, advance, gl, scene, fill, tilt, running, pins, tag, onLap, onLapProgress, onReady])
+  }, [materials, markers, rest, light, camera, size, layout, advance, gl, scene, fill, tilt, running, pins, tag])
 
   return (
     <>
