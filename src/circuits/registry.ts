@@ -1,8 +1,17 @@
+import ae2009Line from './lines/ae-2009.json'
 import ae2009 from './pins/ae-2009.json'
+import au1953Line from './lines/au-1953.json'
 import au1953 from './pins/au-1953.json'
+import br1940Line from './lines/br-1940.json'
 import br1940 from './pins/br-1940.json'
+import qa2004Line from './lines/qa-2004.json'
 import qa2004 from './pins/qa-2004.json'
+import us2023Line from './lines/us-2023.json'
 import us2023 from './pins/us-2023.json'
+
+export type LinePoint = { u: number; x: number; y: number; z: number }
+
+export type Crop = readonly [x0: number, y0: number, x1: number, y1: number]
 
 export type Pin = { turn: number; x: number; y: number }
 
@@ -23,6 +32,8 @@ export type CircuitInfo = {
   corner?: { turn: number; name: string }
   facts: CircuitFacts
   pins: ReadonlyArray<Pin>
+  line: ReadonlyArray<LinePoint>
+  crop: Crop
 }
 
 const pinsOf = (json: Record<string, ReadonlyArray<number> | null>): ReadonlyArray<Pin> =>
@@ -35,6 +46,12 @@ const pinsOf = (json: Record<string, ReadonlyArray<number> | null>): ReadonlyArr
     })
     .sort((a, b) => a.turn - b.turn)
 
+const cropOf = ({ crop: [x0, y0, x1, y1] }: { crop: ReadonlyArray<number> }): Crop => {
+  if (x0 === undefined || y0 === undefined || x1 === undefined || y1 === undefined) throw new Error('pins json has no crop')
+
+  return [x0, y0, x1, y1]
+}
+
 const CIRCUITS = {
   interlagos: {
     model: 'br-1940',
@@ -44,6 +61,8 @@ const CIRCUITS = {
     corner: { turn: 1, name: 'S do Senna' },
     facts: { firstGp: 1973, lengthKm: '4.309', laps: 71, distanceKm: '305.879', turns: 15, direction: 'anticlockwise' },
     pins: pinsOf(br1940),
+    line: br1940Line,
+    crop: cropOf(br1940),
   },
   vegas: {
     model: 'us-2023',
@@ -53,6 +72,8 @@ const CIRCUITS = {
     corner: { turn: 7, name: 'Sphere chicane' },
     facts: { firstGp: 2023, lengthKm: '6.201', laps: 50, distanceKm: '309.958', turns: 17, direction: 'anticlockwise' },
     pins: pinsOf(us2023),
+    line: us2023Line,
+    crop: cropOf(us2023),
   },
   losail: {
     model: 'qa-2004',
@@ -61,6 +82,8 @@ const CIRCUITS = {
     tz: 'Asia/Qatar',
     facts: { firstGp: 2021, lengthKm: '5.419', laps: 57, distanceKm: '308.611', turns: 16, direction: 'clockwise' },
     pins: pinsOf(qa2004),
+    line: qa2004Line,
+    crop: cropOf(qa2004),
   },
   yas_marina: {
     model: 'ae-2009',
@@ -69,6 +92,8 @@ const CIRCUITS = {
     tz: 'Asia/Dubai',
     facts: { firstGp: 2009, lengthKm: '5.281', laps: 58, distanceKm: '306.188', turns: 16, direction: 'anticlockwise' },
     pins: pinsOf(ae2009),
+    line: ae2009Line,
+    crop: cropOf(ae2009),
   },
   albert_park: {
     model: 'au-1953',
@@ -77,9 +102,13 @@ const CIRCUITS = {
     tz: 'Australia/Melbourne',
     facts: { firstGp: 1996, lengthKm: '5.278', laps: 58, distanceKm: '306.124', turns: 14, direction: 'clockwise' },
     pins: pinsOf(au1953),
+    line: au1953Line,
+    crop: cropOf(au1953),
   },
 } satisfies Record<string, CircuitInfo>
 
 const byId = new Map<string, CircuitInfo>(Object.entries(CIRCUITS))
 
 export const circuitFor = (circuitId: string) => byId.get(circuitId)
+
+export const allCircuits = () => [...byId.values()]
