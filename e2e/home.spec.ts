@@ -9,7 +9,7 @@ const whenLoaderLifts = async (page: Page) => {
 
       if (document.querySelector('.loader')) return false
 
-      const band = document.querySelector('.weekend-sec')
+      const band = document.querySelector('.hero .stage')
 
       return { at: performance.now(), canvas: band?.querySelector('canvas') !== null && band !== null, poster: band?.querySelector<HTMLImageElement>('.poster')?.hidden === true, full: sessionStorage.getItem('full') === '1' }
     },
@@ -87,7 +87,7 @@ test('renders Home without the box or band when the season API is warming', asyn
 
   expect(lifted.at).toBeLessThan(2600)
   await expect(page.locator('.weekend')).toHaveCount(0)
-  await expect(page.locator('.weekend-sec')).toHaveCount(0)
+  await expect(page.locator('.hero .stage')).toHaveCount(0)
 
   await scrollToEnd(page)
 
@@ -122,12 +122,12 @@ test('holds the lights for a late circuit, then lifts on time with the poster gr
 
   expect(lifted).toMatchObject({ full: false, poster: false })
   expect(lifted.at).toBeLessThan(2600)
-  await expect(page.locator('.weekend-sec .track')).toHaveAttribute('data-waiting', '')
+  await expect(page.locator('.hero .stage')).toHaveAttribute('data-waiting', '')
 
   release()
 
-  await expect(page.locator('.weekend-sec canvas')).toHaveCount(1)
-  await expect(page.locator('.weekend-sec .poster')).toBeHidden()
+  await expect(page.locator('.hero canvas')).toHaveCount(1)
+  await expect(page.locator('.hero .poster')).toBeHidden()
   expect(errors).toEqual([])
 })
 
@@ -148,11 +148,11 @@ for (const [name, breakIt] of [
     const lifted = await whenLoaderLifts(page)
 
     expect(lifted.at).toBeLessThan(2600)
-    await page.locator('.weekend-sec').scrollIntoViewIfNeeded()
+    await page.locator('.hero .stage').scrollIntoViewIfNeeded()
     await page.waitForTimeout(1500)
     await expect(page.locator('.hero h1')).toBeAttached()
-    await expect(page.locator('.weekend-sec .poster')).toBeVisible()
-    await expect(page.locator('.weekend-sec .track')).not.toHaveAttribute('data-waiting', '')
+    await expect(page.locator('.hero .poster')).toBeVisible()
+    await expect(page.locator('.hero .stage')).not.toHaveAttribute('data-waiting', '')
     await expect(page.locator('footer')).toContainText('Lights Out is an unofficial fan project.')
     expect(errors.filter((e) => e.startsWith('pageerror') && !e.includes('Could not load /circuits/'))).toEqual([])
   })
@@ -161,7 +161,7 @@ for (const [name, breakIt] of [
 test('preloads only the hero photo, not the hidden menu photos', async ({ request }) => {
   const html = await (await request.get('/')).text()
 
-  expect([...html.matchAll(/<link rel="preload" as="image" href="([^"]+)"/g)].map((m) => m[1])).toEqual(['/img/hero-light.jpg'])
+  expect([...html.matchAll(/<link rel="preload" as="image" href="([^"]+)"/g)].map((m) => m[1])).toEqual(['/img/cars/pia.webp'])
 })
 
 test('keeps animated text readable by screen readers', async ({ page, errors }) => {

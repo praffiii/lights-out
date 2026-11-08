@@ -1,4 +1,4 @@
-import { type RefObject, useRef, useState } from 'react'
+import { type RefObject, useEffect, useRef, useState } from 'react'
 import { preload } from 'react-dom'
 
 import { REDUCED, roll, useGSAP, wipe } from '#/motion/motion.ts'
@@ -19,7 +19,9 @@ export function Tracker({ at, onPick, lap, paused, onPause }: TrackerProps) {
   const out = shown.out === null ? undefined : CARS[shown.out]
   const next = CARS[(at + 1) % CARS.length]
 
-  if (next) preload(next.src, { as: 'image' })
+  useEffect(() => {
+    if (next) preload(next.src, { as: 'image' })
+  }, [next])
 
   useGSAP(
     () => {
@@ -53,7 +55,7 @@ export function Tracker({ at, onPick, lap, paused, onPause }: TrackerProps) {
           </figure>
         )}
         <figure className="shot" key={now.code} data-in="">
-          <img src={now.src} alt={`${now.driver}'s ${now.team} ${now.car}`} width={1600} height={800} />
+          <img src={now.src} alt={`${now.driver}'s ${now.team} ${now.car}`} width={1600} height={800} fetchPriority="high" />
           <figcaption>
             <a href={now.commons} target="_blank" rel="noreferrer">
               {now.credit}
@@ -79,7 +81,7 @@ export function Tracker({ at, onPick, lap, paused, onPause }: TrackerProps) {
       <div className="caption">
         <p className="on" key={at}>{`On track · ${pad(at + 1)} / ${CARS.length}`}</p>
         <p className="driver">{now.driver}</p>
-        <p className="car">
+        <p className="model">
           {now.team} {now.car}
         </p>
       </div>

@@ -13,8 +13,8 @@ import { contour, isSector, mattify, PALETTE, screen, SECTORS } from './shaders.
 
 const LAP_SECONDS = 14
 const TRAIL = 8
-const TRAIL_STEP = 3
-const LIGHT_RADIUS = 1.6
+const TRAIL_STEP = 0.6
+const LIGHT_RADIUS = 5
 const REST_ASPECT = 16 / 10
 const SHIFT_X = -0.06
 const SHIFT_Y = 0.07
@@ -118,7 +118,15 @@ function Scene({ model, theme, layout, fill, tilt, running, pins, tag, onLap, on
 
     const geometry = new THREE.SphereGeometry(LIGHT_RADIUS, 16, 12)
     const head = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial())
-    const trail = Array.from({ length: TRAIL }, (_, i) => new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.7 - 0.08 * i })))
+
+    const trail = Array.from({ length: TRAIL }, (_, i) => {
+      const dot = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.7 - 0.08 * i }))
+
+      dot.scale.setScalar(0.55 - 0.05 * i)
+
+      return dot
+    })
+
     const group = new THREE.Group()
 
     group.add(head, ...trail)
