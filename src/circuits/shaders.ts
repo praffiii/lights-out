@@ -93,10 +93,15 @@ const STEP = 3
 const PHASE = 0.37
 const FADE_RADIUS = 0.75
 const HAZE_BASE = 2.7
+const STRENGTH = 0.55
+const CROWD_FROM = 0.15
+const CROWD_TO = 0.5
 
 const groundVertex = `
   varying vec3 vWorld;
+  varying vec3 vUp;
   void main() {
+    vUp = normalize(mat3(modelMatrix) * normal);
     vec4 world = modelMatrix * vec4(position, 1.0);
     vWorld = world.xyz;
     gl_Position = projectionMatrix * viewMatrix * world;
@@ -108,12 +113,16 @@ const groundFragment = `
   uniform vec3 uHaze;
   uniform float uSpan;
   varying vec3 vWorld;
+  varying vec3 vUp;
   void main() {
     float h = vWorld.y;
     float f = fract((h + ${STEP.toFixed(1)} * ${PHASE.toFixed(2)}) / ${STEP.toFixed(1)});
-    float line = 1.0 - smoothstep(0.0, fwidth(h / ${STEP.toFixed(1)}) * 1.2, min(f, 1.0 - f));
+    float w = max(fwidth(h / ${STEP.toFixed(1)}), 1e-4);
+    float line = 1.0 - smoothstep(0.0, w * 1.2, min(f, 1.0 - f));
+    line *= 1.0 - smoothstep(${CROWD_FROM.toFixed(2)}, ${CROWD_TO.toFixed(2)}, w);
+    line *= clamp(((1.0 - abs(normalize(vUp).y)) - 0.0004) / (0.002 - 0.0004), 0.0, 1.0);
     float fade = pow(1.0 - min(length(vWorld.xz) / (uSpan * ${FADE_RADIUS.toFixed(2)}), 1.0), 1.6);
-    vec3 c = mix(uGround, uLine, line * fade);
+    vec3 c = mix(uGround, uLine, line * fade * ${STRENGTH.toFixed(2)});
     float near = uSpan * ${HAZE_BASE.toFixed(1)} * 0.7;
     float far = uSpan * ${HAZE_BASE.toFixed(1)} * 1.9;
     float haze = pow(clamp((distance(cameraPosition, vWorld) - near) / (far - near), 0.0, 1.0), 1.4);
