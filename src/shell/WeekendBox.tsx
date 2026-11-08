@@ -1,11 +1,12 @@
 import { type KeyboardEvent, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 
 import { circuitFor } from '#/circuits/registry.ts'
+import { useSecond } from '#/motion/client.ts'
 import { gsap, REDUCED } from '#/motion/motion.ts'
 import type { Race } from '#/season/jolpica-schema.ts'
 import type { SeasonSnapshot } from '#/season/snapshot-schema.ts'
 import { useSeason } from '#/season/use-season.ts'
-import { boxCopy, boxState, gpName, latestStart, pickRace, SESSION_LABEL, sessionDay, when } from '#/season/weekend.ts'
+import { boxCopy, boxState, countdown, gpName, latestStart, pickRace, SESSION_LABEL, sessionDay, when } from '#/season/weekend.ts'
 
 import { Soon } from './Go.tsx'
 import { opposite, useTheme } from './theme.ts'
@@ -18,29 +19,6 @@ const STEPS = new Map([
   ['ArrowRight', 1],
   ['ArrowLeft', -1],
 ])
-
-function useSecond() {
-  const [now, setNow] = useState(() => new Date())
-
-  useEffect(() => {
-    let last = Math.floor(Date.now() / 1000)
-
-    const tick = () => {
-      const second = Math.floor(Date.now() / 1000)
-
-      if (second === last) return
-
-      last = second
-      setNow(new Date())
-    }
-
-    gsap.ticker.add(tick)
-
-    return () => gsap.ticker.remove(tick)
-  }, [])
-
-  return now
-}
 
 export function WeekendBox() {
   const season = useSeason()
@@ -232,7 +210,6 @@ function NextTab({ snapshot, now }: { snapshot: SeasonSnapshot; now: Date }) {
   const tz = trackZone(next.race)
   const at = tz ? when(next.session.startsAt, tz) : null
   const day = tz ? sessionDay(next.session, tz) : null
-  const left = Math.floor((Date.parse(next.session.startsAt) - t) / 1000)
 
   return (
     <>
@@ -243,14 +220,9 @@ function NextTab({ snapshot, now }: { snapshot: SeasonSnapshot; now: Date }) {
       </p>
       {next.session.timeConfirmed && (
         <div className="count">
-          {[
-            ['days', left / 86_400],
-            ['hr', (left % 86_400) / 3600],
-            ['min', (left % 3600) / 60],
-            ['sec', left % 60],
-          ].map(([unit, n]) => (
+          {countdown(Date.parse(next.session.startsAt) - t).map(([unit, n]) => (
             <div key={unit}>
-              <strong>{String(Math.floor(Number(n))).padStart(2, '0')}</strong>
+              <strong>{n}</strong>
               <span className="mono">{unit}</span>
             </div>
           ))}

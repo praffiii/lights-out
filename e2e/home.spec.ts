@@ -175,3 +175,35 @@ test('keeps animated text readable by screen readers', async ({ page, errors }) 
 
   expect(errors).toEqual([])
 })
+
+test('the footer lights come on one by one, then go out together', async ({ page, errors }) => {
+  await page.goto('/')
+  await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
+  await page.locator('.next-race').waitFor()
+  await page.locator('.next-race .lights').evaluate((row) => {
+    const lights = [...row.children]
+    const log: string[] = []
+
+    new MutationObserver((records) => {
+      for (const r of records) if (r.target instanceof Element) log.push(`${r.oldValue === 'on' ? 'off' : 'on'}${lights.indexOf(r.target)}`)
+      row.setAttribute('data-log', log.join(' '))
+    }).observe(row, { subtree: true, attributeFilter: ['class'], attributeOldValue: true })
+  })
+  await page.locator('.next-race').scrollIntoViewIfNeeded()
+  await expect(page.locator('.next-race .lights')).toHaveAttribute('data-log', 'on0 on1 on2 on3 on4 off0 off1 off2 off3 off4', { timeout: 10_000 })
+  await expect(page.locator('.next-race .lights i.on')).toHaveCount(0)
+  await expect(page.locator('.next-race .count b')).toHaveCount(4)
+  await expect(page.locator('.next-race .count b').first()).toHaveText('02')
+  expect(errors).toEqual([])
+})
+
+test('keeps the footer lights off under reduced motion', async ({ page, errors }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/')
+  await page.locator('.next-race').scrollIntoViewIfNeeded()
+  await page.waitForTimeout(1500)
+
+  await expect(page.locator('.next-race .lights i')).toHaveCount(5)
+  await expect(page.locator('.next-race .lights i.on')).toHaveCount(0)
+  expect(errors).toEqual([])
+})

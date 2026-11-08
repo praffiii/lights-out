@@ -169,3 +169,32 @@ export function when(iso: string, timeZone: string) {
 }
 
 export const sessionDay = (session: Session, timeZone: string) => when(session.startsAt, session.timeConfirmed ? timeZone : 'UTC').day
+
+export type NextStart = { race: Race; round: number; of: number; startsAt: string; confirmed: boolean }
+
+export function nextLightsOut(snapshot: SeasonSnapshot, now: Date): NextStart | null {
+  const t = now.getTime()
+
+  return (
+    [snapshot.calendar, snapshot.nextCalendar]
+      .flatMap((calendar) =>
+        calendar.flatMap((race) => {
+          const start = race.sessions.find((session) => session.name === 'Race')
+
+          return start && latestStart(start) > t ? [{ race, round: race.round, of: calendar.length, startsAt: start.startsAt, confirmed: start.timeConfirmed }] : []
+        }),
+      )
+      .sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt))[0] ?? null
+  )
+}
+
+export function countdown(ms: number) {
+  const s = Math.max(0, Math.floor(ms / 1000))
+
+  return [
+    ['days', two(s / 86_400)],
+    ['hrs', two((s % 86_400) / 3600)],
+    ['min', two((s % 3600) / 60)],
+    ['sec', two(s % 60)],
+  ] as const
+}
