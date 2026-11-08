@@ -129,7 +129,7 @@ function Strip({ snapshot }: { snapshot: SeasonSnapshot }) {
   const root = useRef<HTMLDivElement>(null)
   const next = nextLightsOut(snapshot, now)
   const tz = next ? circuitFor(next.race.circuit.circuitId)?.tz : undefined
-  const at = next && tz ? when(next.startsAt, tz) : null
+  const at = next && tz ? when(next.startsAt, next.confirmed ? tz : 'UTC') : null
   const time = next?.confirmed && at ? `${at.day} · ${at.track} local` : at ? `${at.day} · time TBC` : 'Time TBC'
 
   useGSAP(

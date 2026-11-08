@@ -49,6 +49,19 @@ it('counts down to the next lights out at the track', async () => {
   expect(container.querySelectorAll('.next-race .lights i')).toHaveLength(5)
 })
 
+it('keeps the race day of an unconfirmed start on its calendar date', async () => {
+  const at = '2026-11-06T15:00:00Z'
+  const snapshot = await snapshotAt(at)
+
+  const calendar = snapshot.calendar.map((race) =>
+    race.round === 20 ? { ...race, sessions: race.sessions.map((s) => (s.name === 'Race' ? { ...s, startsAt: '2026-11-08T00:00:00Z', timeConfirmed: false } : s)) } : race,
+  )
+
+  const { container } = renderAt(at, { ...snapshot, calendar })
+
+  expect(text(container, '.next-race .meta')).toBe('Interlagos · round 20 of 23 · Sun 8 Nov · time TBC')
+})
+
 it('says the season is over when no race is left', async () => {
   const at = '2026-12-20T00:00:00Z'
   const { container } = renderAt(at, await snapshotAt(at))
