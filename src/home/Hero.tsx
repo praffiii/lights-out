@@ -90,7 +90,6 @@ export function Hero() {
   const root = useRef<HTMLElement>(null)
   const lap = useRef<HTMLElement>(null)
   const fill = useRef(REDUCED ? 1 : 0)
-  const tilt = useRef(0)
   const running = useRef(false)
   const [at, setAt] = useState(0)
   const [paused, setPaused] = useState(false)
@@ -174,8 +173,6 @@ export function Hero() {
 
       ScrollTrigger.create({ trigger: el, start: 'top bottom', end: 'bottom top', onToggle: (s) => setOnScreen(s.isActive) })
 
-      if (!REDUCED) ScrollTrigger.create({ trigger: el, start: 'top top', end: 'bottom top', scrub: true, onUpdate: (s) => void (tilt.current = s.progress) })
-
       return off
     },
     { scope: root },
@@ -186,7 +183,7 @@ export function Hero() {
   return (
     <section className="hero" ref={root} aria-labelledby="h1">
       <div className="hero-frame">
-        {circuit && <Stage {...circuit} car={car} at={at} fill={fill} tilt={tilt} running={running} glReady={glReady} glFailed={glFailed} onLap={advance} onLapProgress={onLapProgress} onReady={onReady} onFail={onFail} />}
+        {circuit && <Stage {...circuit} car={car} at={at} fill={fill} running={running} glReady={glReady} glFailed={glFailed} onLap={advance} onLapProgress={onLapProgress} onReady={onReady} onFail={onFail} />}
         <div className="hero-copy">
           <p className="meta mono muted">{HERO.meta}</p>
           <h1 id="h1">
@@ -212,7 +209,6 @@ type StageProps = {
   car: Car | undefined
   at: number
   fill: { current: number }
-  tilt: { current: number }
   running: { current: boolean }
   glReady: boolean
   glFailed: boolean
@@ -222,7 +218,7 @@ type StageProps = {
   onFail: () => void
 }
 
-function Stage({ info, car, at, fill, tilt, running, glReady, glFailed, onLap, onLapProgress, onReady, onFail }: StageProps) {
+function Stage({ info, car, at, fill, running, glReady, glFailed, onLap, onLapProgress, onReady, onFail }: StageProps) {
   const { theme } = useTheme()
   const mounted = useMounted()
   const narrow = useNarrow()
@@ -254,7 +250,6 @@ function Stage({ info, car, at, fill, tilt, running, glReady, glFailed, onLap, o
                 layout={narrow ? 'narrow' : 'wide'}
                 restart={at}
                 fill={fill}
-                tilt={tilt}
                 running={running}
                 pins={pins}
                 tag={tag}

@@ -92,6 +92,29 @@ test('keeps the lap running on a phone when the circuit arrives after the page l
   expect(errors).toEqual([])
 })
 
+const t1InStage = (page: Page) =>
+  page.evaluate(() => {
+    const pin = document.querySelector('[data-pin="turn-1"]')?.getBoundingClientRect()
+    const stage = document.querySelector('.hero .stage')?.getBoundingClientRect()
+
+    return pin && stage ? [Math.round(pin.x - stage.x), Math.round(pin.y - stage.y)] : null
+  })
+
+test('the track holds its framing while the page scrolls', async ({ page, errors }) => {
+  test.setTimeout(90_000)
+  await page.goto('/')
+  await lifted(page)
+  await expect(page.locator('.hero .stage[data-gl]')).toHaveCount(1)
+  await page.clock.runFor(300)
+
+  const before = await t1InStage(page)
+
+  await page.evaluate(() => scrollTo(0, 400))
+  await page.clock.runFor(600)
+  expect(await t1InStage(page)).toEqual(before)
+  expect(errors).toEqual([])
+})
+
 for (const width of [320, 390, 760, 1470]) {
   test(`has no horizontal overflow and keeps the T1 pin above the tag at ${width}px`, async ({ page, errors }) => {
     await page.setViewportSize({ width, height: 844 })

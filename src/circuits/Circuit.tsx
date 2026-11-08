@@ -18,12 +18,7 @@ const LIGHT_RADIUS = 5
 const REST_ASPECT = 16 / 10
 const SHIFT_X = -0.06
 const SHIFT_Y = 0.07
-const TILT_PITCH = THREE.MathUtils.degToRad(55)
-const TILT_ZOOM = 0.85
-const TILT_SLIDE = 0.6
 const TAG_OFFSET = [-8, 8] as const
-
-const ease = (t: number) => 1 - (1 - t) ** 3
 
 const meshopt = (loader: GLTFLoader) => void loader.setMeshoptDecoder(MeshoptDecoder)
 
@@ -37,7 +32,6 @@ type Props = {
   layout: 'wide' | 'narrow'
   restart: number
   fill: RefObject<number>
-  tilt: RefObject<number>
   running: RefObject<boolean>
   pins: RefObject<HTMLDivElement | null>
   tag: RefObject<HTMLElement | null>
@@ -54,7 +48,7 @@ const infoFor = (model: string) => {
   return info
 }
 
-function Scene({ model, theme, layout, restart, fill, tilt, running, pins, tag, onLap, onLapProgress, onReady }: Props) {
+function Scene({ model, theme, layout, restart, fill, running, pins, tag, onLap, onLapProgress, onReady }: Props) {
   const gltf = useLoader(GLTFLoader, modelUrl(model), meshopt)
   const camera = useThree((s) => s.camera)
   const size = useThree((s) => s.size)
@@ -107,16 +101,10 @@ function Scene({ model, theme, layout, restart, fill, tilt, running, pins, tag, 
     const forward = source.getWorldDirection(new THREE.Vector3())
     const centre = track.getCenter(new THREE.Vector3())
     const aim = at.clone().addScaledVector(forward, centre.clone().sub(at).dot(forward))
-    const offset = at.clone().sub(aim)
-    const start = gltf.scene.getObjectByName('start')
-    const startAt = start ? start.getWorldPosition(new THREE.Vector3()) : aim.clone()
 
     const rest = {
+      at,
       aim,
-      startAt,
-      distance: offset.length(),
-      pitch: Math.atan2(offset.y, Math.hypot(offset.x, offset.z)),
-      azimuth: Math.atan2(offset.x, offset.z),
       fov: source.fov,
       far: source.far,
       crop: info.crop,
@@ -191,9 +179,11 @@ function Scene({ model, theme, layout, restart, fill, tilt, running, pins, tag, 
       }
 
       camera.updateProjectionMatrix()
+      camera.position.copy(rest.at)
+      camera.lookAt(rest.aim)
+      camera.updateMatrixWorld()
     }
 
-    const target = new THREE.Vector3()
     const spot = new THREE.Vector3()
     const next = new THREE.Vector3()
     const { line } = rest
@@ -217,7 +207,6 @@ function Scene({ model, theme, layout, restart, fill, tilt, running, pins, tag, 
     let first = true
     let compiled = false
     let lastFill = -1
-    let lastTilt = -1
 
     void gl.compileAsync(scene, camera).then(() => {
       compiled = true
@@ -229,7 +218,7 @@ function Scene({ model, theme, layout, restart, fill, tilt, running, pins, tag, 
       if (camera instanceof THREE.PerspectiveCamera && camera.aspect !== (layout === 'wide' ? size.width / size.height : REST_ASPECT)) stale.current = true
 
       const go = running.current && !REDUCED
-      const moved = fill.current !== lastFill || tilt.current !== lastTilt
+      const moved = fill.current !== lastFill
 
       if (!go && !moved && !stale.current) return
 
@@ -237,22 +226,9 @@ function Scene({ model, theme, layout, restart, fill, tilt, running, pins, tag, 
 
       stale.current = false
       lastFill = fill.current
-      lastTilt = tilt.current
 
       for (const [name, m] of materials) if (isSector(name)) m.uniforms.uTo.value = fill.current
 
-      const e = ease(Math.min(1, Math.max(0, tilt.current)))
-      const pitch = rest.pitch + (TILT_PITCH - rest.pitch) * e
-      const distance = rest.distance * (1 - (1 - TILT_ZOOM) * e)
-
-      target.copy(rest.aim).lerp(rest.startAt, TILT_SLIDE * e)
-      camera.position.set(
-        target.x + distance * Math.cos(pitch) * Math.sin(rest.azimuth),
-        target.y + distance * Math.sin(pitch),
-        target.z + distance * Math.cos(pitch) * Math.cos(rest.azimuth),
-      )
-      camera.lookAt(target)
-      camera.updateMatrixWorld()
 
       if (go) {
         clock.current += Math.min(dt / 1000, 0.1)
@@ -301,7 +277,7 @@ function Scene({ model, theme, layout, restart, fill, tilt, running, pins, tag, 
     gsap.ticker.add(tick)
 
     return () => gsap.ticker.remove(tick)
-  }, [materials, markers, rest, light, camera, size, layout, advance, gl, scene, fill, tilt, running, pins, tag])
+  }, [materials, markers, rest, light, camera, size, layout, advance, gl, scene, fill, running, pins, tag])
 
   return (
     <>
