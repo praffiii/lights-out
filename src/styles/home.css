@@ -125,3 +125,11 @@ a:hover > .arr, a:hover .arr { translate: 4px 0; }
 @media (prefers-reduced-motion: reduce) {
   .scroll-cue i { animation: none; }
 }
+
+.tracker .shots { position: relative; aspect-ratio: 2; }
+.tracker .shot { position: absolute; inset: 0; margin: 0; overflow: hidden; }
+.tracker .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tracker .ticks { display: flex; gap: 4px; }
+.tracker .tick { position: relative; flex: 1; height: 12px; padding: 0; border: 0; background: none; cursor: pointer; }
+.tracker .tick::before { content: ''; position: absolute; left: 0; right: 0; top: 5px; height: 2px; background: currentColor; opacity: 0.25; }
+.tracker .lap { position: absolute; left: 0; right: 0; top: 5px; height: 2px; transform: scaleX(0); transform-origin: left; }
