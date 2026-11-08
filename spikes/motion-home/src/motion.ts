@@ -1,6 +1,7 @@
 /**
- * The motion system in one place: plugins, the two eases, reduced motion, the page-enter signal and the
- * small reusable moves every section is built from. Everything runs on GSAP's ticker (Lenis included).
+ * The motion system in one place. One signature move, the sector bar, at every scale: a thin purple line runs
+ * under a line of text (a sector completing on a timing screen), thickens into a block, and pulls away to the
+ * right leaving the content behind. Numbers roll like a timing tower. Everything runs on GSAP's ticker.
  */
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
@@ -39,96 +40,122 @@ export function leave() {
   delete document.documentElement.dataset.entered
 }
 
-const whenIn = (el: Element, start = 'top 85%') => ({ trigger: el, start, once: true })
+/**
+ * Play a reveal the first time its start is reached, and never reverse it. Not `once: true`: a once-trigger kills
+ * itself when its end is passed, and when the page loads already scrolled down (the browser restores the position)
+ * that kill lands inside ScrollTrigger's refresh loop, which then reads a missing trigger and crashes the page.
+ */
+export const ONCE = { toggleActions: 'play none none none' } as const
 
-/** Display lines rise from behind a mask, 60 ms apart. The headline move. */
-export function rise(el: HTMLElement, opts: { delay?: number; scroll?: boolean } = {}) {
+type When = { delay?: number; scroll?: boolean; trigger?: Element; start?: string }
+const timeline = (el: Element, o: When) =>
+  gsap.timeline({
+    delay: o.delay ?? 0,
+    scrollTrigger: o.scroll === false ? undefined : { trigger: o.trigger ?? el, start: o.start ?? 'top 88%', ...ONCE },
+  })
+
+/** The bar element inside `el` (made once, so a re-run never stacks two). */
+export const ensureBar = (el: Element) =>
+  el.querySelector(':scope > .bar') ?? el.appendChild(Object.assign(document.createElement('i'), { className: 'bar' }))
+
+/** The bar's three beats on one target: draw thin along the baseline, thicken, show the content, pull away. */
+export function bar(tl: gsap.core.Timeline, el: Element, content: gsap.TweenTarget, at: number, draw = 0.4) {
+  tl.fromTo(el, { scaleX: 0, scaleY: 0.08, transformOrigin: 'left bottom' }, { scaleX: 1, duration: draw, ease: 'launch' }, at)
+    .to(el, { scaleY: 1, duration: 0.16 }, at + draw - 0.04)
+    .set(content, { visibility: 'inherit' }, at + draw + 0.12)
+    .set(el, { transformOrigin: 'right bottom' }, at + draw + 0.12)
+    .to(el, { scaleX: 0, duration: 0.42, ease: 'launch' }, at + draw + 0.12)
+}
+
+/** Text: every line gets its own bar, 80 ms after the line above, so a paragraph arrives as a staircase. */
+export function sweep(el: HTMLElement, o: When = {}) {
   if (REDUCED) return
+  let tl: gsap.core.Timeline | undefined
+  let started = false
   SplitText.create(el, {
-    type: 'lines',
-    mask: 'lines',
+    type: 'lines,words',
+    linesClass: 'sl',
     autoSplit: true,
-    onSplit: (self) =>
-      gsap.from(self.lines, {
-        yPercent: 110,
-        duration: 1.1,
-        stagger: 0.06,
-        delay: opts.delay ?? 0,
-        scrollTrigger: opts.scroll === false ? undefined : whenIn(el),
-      }),
+    // A re-split (fonts landing, a resize) rebuilds the lines with fresh, visible words. If the sweep had already
+    // begun, keep them visible rather than replaying it or freezing half way.
+    onSplit: (self) => {
+      tl?.scrollTrigger?.kill()
+      tl?.kill()
+      if (started) return
+      gsap.set(self.words, { visibility: 'hidden' })
+      const t = (tl = timeline(el, o).eventCallback('onStart', () => void (started = true)))
+      self.lines.forEach((line, i) => {
+        const b = document.createElement('i')
+        b.className = 'bar'
+        b.setAttribute('aria-hidden', 'true')
+        line.append(b)
+        bar(t, b, self.words.filter((w) => line.contains(w)), i * 0.08)
+      })
+    },
   })
 }
 
-/** Mono labels type on like a timing feed: a clip that steps forward one character at a time, purple caret at its edge. */
-export function typeOn(el: HTMLElement, opts: { delay?: number; scroll?: boolean } = {}) {
+/** Photos: the bar crosses the whole frame, the photo lands behind it (settling from 1.18×), then drifts. */
+export function reveal(el: HTMLElement, o: When & { drift?: boolean } = {}) {
   if (REDUCED) return
-  const chars = Math.max(1, el.textContent?.length ?? 1)
-  el.classList.add('typing')
-  gsap.fromTo(
-    el,
-    { '--type': 0 },
-    {
-      '--type': 1,
-      duration: Math.min(0.9, chars * 0.022),
-      ease: `steps(${chars})`,
-      delay: opts.delay ?? 0,
-      scrollTrigger: opts.scroll === false ? undefined : whenIn(el, 'top 92%'),
-      onComplete: () => el.classList.remove('typing'),
-    },
-  )
+  const img = el.querySelector('img')
+  if (!img) return
+  const b = ensureBar(el)
+  gsap.set(img, { visibility: 'hidden' })
+  const tl = timeline(el, { start: 'top 82%', ...o })
+  bar(tl, b, img, 0, 0.55)
+  tl.fromTo(img, { scale: 1.18 }, { scale: 1, duration: 1.4 }, 0.67)
+  if (o.drift !== false)
+    gsap.fromTo(img, { yPercent: -5 }, { yPercent: 5, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } })
+}
+
+/** A small solid thing (a chip, a caption plate): hidden until the bar has crossed it. */
+export function block(el: HTMLElement, o: When = {}) {
+  if (REDUCED) return
+  const b = ensureBar(el)
+  gsap.set(el, { visibility: 'hidden' })
+  bar(timeline(el, o), b, el, 0, 0.35)
 }
 
 /** Hairlines draw from the left, like a sector bar filling. */
-export function draw(els: Element[] | NodeListOf<Element>, trigger: Element, axis: 'x' | 'y' = 'x') {
+export function draw(els: Element[] | NodeListOf<Element>, trigger: Element) {
   if (REDUCED) return
-  gsap.from(els, {
-    [axis === 'x' ? 'scaleX' : 'scaleY']: 0,
-    transformOrigin: axis === 'x' ? 'left center' : 'center top',
-    duration: 1.2,
-    stagger: 0.06,
-    scrollTrigger: whenIn(trigger),
-  })
+  gsap.from(els, { scaleX: 0, transformOrigin: 'left center', duration: 1.2, stagger: 0.06, scrollTrigger: { trigger, start: 'top 85%', ...ONCE } })
 }
 
-/** Numbers count up like a live readout. Tabular figures keep the width still while they run. */
-export function countUp(el: HTMLElement, opts: { from?: number; decimals?: number; group?: boolean } = {}) {
-  const text = el.textContent ?? ''
-  const match = text.match(/[\d,.]+/)
-  if (REDUCED || !match) return
-  const to = Number(match[0].replace(/,/g, ''))
-  const decimals = opts.decimals ?? (match[0].split('.')[1]?.length ?? 0)
-  const fmt = (v: number) =>
-    text.replace(
-      match[0],
-      opts.group ? v.toLocaleString('en-GB', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) : v.toFixed(decimals),
-    )
-  const box = { v: opts.from ?? 0 }
-  el.textContent = fmt(box.v)
-  gsap.to(box, {
-    v: to,
-    duration: 1.6,
-    scrollTrigger: whenIn(el, 'top 90%'),
-    onUpdate: () => void (el.textContent = fmt(box.v)),
-  })
-}
-
-/** Photos are revealed by a wipe, left to right, like a sector bar on a timing screen; then they drift slower than the page. */
-export function wipe(el: HTMLElement, opts: { delay?: number; scroll?: boolean; drift?: boolean; from?: 'left' | 'bottom' } = {}) {
-  if (REDUCED) return
-  const hidden = opts.from === 'bottom' ? 'inset(100% 0% 0% 0%)' : 'inset(0% 100% 0% 0%)'
-  gsap.fromTo(
-    el,
-    { clipPath: hidden },
-    {
-      clipPath: 'inset(0% 0% 0% 0%)',
-      duration: 1.3,
-      ease: 'launch',
-      delay: opts.delay ?? 0,
-      scrollTrigger: opts.scroll === false ? undefined : whenIn(el, 'top 80%'),
-    },
-  )
-  const img = el.querySelector('img')
-  if (img && opts.drift !== false) {
-    gsap.fromTo(img, { yPercent: -6 }, { yPercent: 6, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } })
+/**
+ * Numbers roll into place like a timing tower: each digit is a column that spins through a full lap and lands,
+ * left column first. `from` keeps leading digits still (a year rolls 1950 → 1973, not from 0000).
+ */
+export function roll(el: HTMLElement, o: { from?: number } = {}) {
+  const text = (el.dataset.text ??= el.textContent ?? '')
+  const digits = text.replace(/[^\d]/g, '')
+  if (REDUCED || !digits) return
+  const from = String(o.from ?? 0).padStart(digits.length, '0').slice(-digits.length)
+  el.setAttribute('aria-label', text)
+  el.textContent = ''
+  const span = (className: string, textContent = '') => Object.assign(document.createElement('span'), { className, textContent })
+  const strips: { strip: HTMLElement; n: number }[] = []
+  let d = 0
+  for (const ch of text) {
+    if (!/\d/.test(ch)) {
+      el.append(span('ch', ch === ' ' ? '\u00a0' : ch))
+      continue
+    }
+    const f = Number(from[d])
+    const t = Number(ch)
+    const n = f === t && o.from !== undefined ? 0 : 10 + ((t - f + 10) % 10)
+    const col = span('dg')
+    const strip = span('strip')
+    for (let k = 0; k <= n; k++) strip.append(span('', String((f + k) % 10)))
+    col.append(strip)
+    el.append(col)
+    strips.push({ strip, n })
+    d++
   }
+  for (const child of el.children) child.setAttribute('aria-hidden', 'true')
+  const tl = timeline(el, { start: 'top 90%' })
+  strips.forEach(({ strip, n }, i) => {
+    if (n) tl.fromTo(strip, { yPercent: 0 }, { yPercent: (-100 * n) / (n + 1), duration: 1.1 + i * 0.12, ease: 'power3.inOut' }, 0)
+  })
 }

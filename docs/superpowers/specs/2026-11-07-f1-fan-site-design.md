@@ -112,11 +112,22 @@ History is woven in: a car's evolution, a legend's story, a classic corner's pas
 
 **Which rulebook:** the site teaches the regulations of the season it follows. Today that is the 2026 rules: active aerodynamics with straight and corner modes, overtake mode, and the 2026 power-unit split with no MGU-H. Older rules, such as DRS, are taught as history. Every caption must be checked against the current regulations before it ships.
 
-## 8. Releases
+## 8. Build order: one Figma design at a time
 
-The site ships in phases. Getting something live early beats finishing everything first.
+**Changed by Praffi on 2026-11-08.** The release split below (Release 1, then 2 to 5) is replaced. Each approved Figma design is built and shipped on its own, with its own plan:
 
-### Release 1: intro, How F1 works, and This season
+1. **Home**, together with the shell every page shares (loader, header and weekend box, menu, footer). Plan: `docs/superpowers/plans/2026-11-08-home.md`, on top of `2026-11-07-foundation-season-data.md`.
+2. **The intro** (storyboard in DESIGN.md). It plays before Home on the first visit. **[my call]** on its place in the order.
+3. **This season.**
+4. **How F1 works:** the index, then one chapter at a time.
+5. **The car**, **the engine**, **the tracks** (index and circuit page), **the people** (index and driver page).
+6. **Glossary, credits, 404.**
+
+Praffi can reorder anything after Home. Links to a design that isn't built yet show "Soon".
+
+The history of what was in each release is kept below for its content (which topics, which glossary scope).
+
+### Former Release 1: intro, How F1 works, and This season
 
 **How F1 works, starter set [my call]:**
 - **Racecraft:** overtaking into a braking zone, the divebomb, slipstream and overtake mode, defending, the switchback.
@@ -130,7 +141,7 @@ The rest of section 7 follows later.
 
 **Timing:** the 2026 season ends in early December. The 2027 season starts in March. Launching before March makes the season-opener countdown a natural hook. This is a target, not a deadline.
 
-### Later releases, in this order
+### Former later releases, in this order
 
 1. The car
 2. The engine
@@ -203,7 +214,7 @@ The concrete visual design has not been explored or agreed yet. It is the first 
 
 ### 10.4 Known technical risks
 
-- **React version:** React Three Fiber v9 requires React ≥19.0 and <19.4. At setup, check which React version TanStack Start pulls in. Then either pin React into that range or move to R3F v10. Release 1 has no 3D, so this blocks only the car and engine releases.
+- **React version:** React Three Fiber v9 requires React ≥19.0 and <19.4. At setup, check which React version TanStack Start pulls in. Then either pin React into that range or move to R3F v10. Home has the circuit in 3D, so the Home plan pins React to `~19.3.1`, as the motion spike does.
 - **Jolpica outage or stale data:** the route should serve the last good cached response if Jolpica is down, rather than an error.
 - **Free-tier CPU limit:** keep the season route's CPU work small, mostly decoding and shaping data.
 - **Edge caching on the free tier:** verify how caching behaves before building the season route.

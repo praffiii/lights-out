@@ -37,7 +37,7 @@ What is gone: no atmospheric 3D environments (the rejected night straight), no g
   - Editorial stories (a driver's Monza win) are written once, like articles, and reuse the same assets.
 - **The car.** A `bpy` model with every part as its own mesh: front wing, nose, halo, sidepods, engine cover, floor, rear wing and four wheels. You rotate it and take it apart by scrolling or dragging. Fallback: MaG80's CC-BY car, credited.
 - **Racecraft replays are a live-timing map, not 3D (Praffi, 2026-11-07, late).** The photoreal Blender replay was tried and dropped: next to real Commons photos it read "too cartoon" (flat paint, no decals, soft CG trackside). Real photography carries the drama of a pass; the replay explains it the way F1's own live timing does. Two dots move along the real layout, driven by scroll, beside the telemetry.
-  - How it is built (spike: `spikes/circuit-3d/blender/replay.py`). `npm run replay` runs the shared simulation (`story.py`) and writes `src/replay.json` in seconds: the lap and the replay stretch as SVG paths, the detection line, turn labels and, per frame, each car's numbers and map position. No rendering.
+  - How it is built (spike: `spikes/circuit-3d/blender/replay.py`). `bun run replay` runs the shared simulation (`story.py`) and writes `src/replay.json` in seconds: the lap and the replay stretch as SVG paths, the detection line, turn labels and, per frame, each car's numbers and map position. No rendering.
   - The map frames the stretch from Turn 12 to Turn 1. Lanes are drawn 4x wider than real so side by side reads at map scale; everything else is to scale.
   - It themes with the page like any other diagram, so the signature section's opposite theme applies.
 - **What stays 2D (my call, to confirm):** text, numbers, tables, the timing tower and the UI chrome. They are data, and they stay real HTML for accessibility and search.
@@ -45,7 +45,7 @@ What is gone: no atmospheric 3D environments (the rejected night straight), no g
 
 Both themes ship, as Praffi decided on 2026-11-07. The site follows the visitor's system setting and has a toggle. Every screen is designed in both themes.
 
-**The header is one row (Header B, approved by Praffi on 2026-11-08).** It has no bands, fill or hairline. The logo dots and wordmark sit on the left, the weekend box in the centre, and "Menu" on the right. There are no centre links, because the Menu overlay lists the pages.
+**The header is one row (Header B, approved by Praffi on 2026-11-08).** It has no bands, fill or hairline at the top of a page. While you scroll down it steps aside; when it returns on scroll up it takes the page colour as a fill so it stays legible over photos (Praffi, 2026-11-08). The logo dots and wordmark sit on the left, the weekend box in the centre, and "Menu" on the right. There are no centre links, because the Menu overlay lists the pages.
 
 The weekend box is a broadcast-style timing graphic, 32px tall: an ink box with a 4px purple edge, and Martian Mono at 11px in capitals. It turns paper in the dark theme. The box shows one state at a time and picks it itself:
 - Before a session: "São Paulo GP | Practice 3 in 02:14:07".
@@ -162,7 +162,7 @@ Two runner-up concepts lend parts to this one:
 | `accent` | Sector purple | `#A43BFF` | "Fastest". The one thing to look at right now. Use it rarely |
 | `signal-green` | Personal best | `#2BD45E` | Only with its F1 meaning |
 | `signal-yellow` | Caution | `#F5C400` | Only with its F1 meaning (slower, yellow flag) |
-| `curtain` | Start-light red | `#FF1E1E` | Only for the start lights and the page-transition curtain |
+| `curtain` | Start-light red | `#FF1E1E` | Only for the start lights (loader, intro, logo dots) |
 
 Genericness check: "near-black with one red accent" is an AI default. Red here is limited to the start lights. The everyday accent is sector purple, and each color carries its F1 meaning.
 
@@ -170,7 +170,7 @@ Genericness check: "near-black with one red accent" is an AI default. Red here i
 
 - **Display and text: Archivo** (Google, OFL), a variable font with width 62 to 125 and weight 100 to 900.
   - Display: weight 800 to 900, tracking about −0.03em, leading 0.85 to 0.95.
-  - Scroll velocity drives `wdth`: 62 at rest (condensed), 100 at cruise, 125 flat out. It snaps back with the brake ease.
+  - Scroll velocity drives `wdth` on display type: 100 at rest (as in every mock), up to 112 flat out, settling back with the brake ease (Praffi, 2026-11-08). The 62 → 100 launch is kept for two moments only: the footer wordmark and the intro's "Lights out".
 - **Numbers: Martian Mono** (Google, OFL). Tabular figures for lap times, speed, gaps and standings.
 - **Scale:** mega `clamp(4rem, 1.2rem + 14vw, 16rem)`, xl `clamp(2.5rem, 1.4rem + 4.8vw, 6rem)`, l `clamp(1.75rem, 1.3rem + 1.9vw, 3rem)`, m `clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem)`, body `clamp(1rem, 0.95rem + 0.2vw, 1.125rem)`, s 0.875rem, xs 0.75rem.
 
@@ -194,8 +194,8 @@ Everything is square-cornered. Only things that roll or light up are round: whee
   - `launch` = `cubic-bezier(0.8, 0, 0.15, 1)`: hold, then a violent start.
   - `brake` = `cubic-bezier(0.05, 0.7, 0.1, 1)`: fast arrival, long settle.
 - **Durations:** UI 240ms, elements 600–900ms, scenes 1.2–1.6s. Stagger 30–60ms.
-- **One clock.** A single smoothed scroll-velocity value drives Archivo `wdth`, motion blur (scaleX/skew), the speed readout (km/h), the gear number, and engine pitch.
-- **Page transition:** a sector-time sweep with the curtain color. It must finish in under 0.8s.
+- **One clock.** Everything ticks from GSAP's ticker (Lenis, ScrollTrigger, the 3D canvas). On every page, scroll velocity drives Archivo `wdth`. Motion blur, the speed readout (km/h), the gear number and engine pitch belong to the 25 s intro only (Praffi, 2026-11-08).
+- **Page transition:** a thin purple sector line sweeps across the top while the next headline arrives behind it (Praffi chose this over a red curtain, 2026-11-08). It must finish in under 0.8s. Full per-page motion: `docs/motion-map.md`.
 - **Reduced motion:** no stretching and no blur. The intro becomes a static frame of the lights out, and all content stays visible.
 
 ## 3D, 2D and sound

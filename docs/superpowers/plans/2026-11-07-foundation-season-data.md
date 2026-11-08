@@ -1,4 +1,4 @@
-# Release 1 · Part 1: Foundation and Season Data Implementation Plan
+# Foundation and Season Data Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -11,13 +11,11 @@
 - The browser decodes it with the same schema through TanStack Query.
 - Jolpica never sees visitor traffic.
 
-**Tech Stack:** TypeScript, Bun, TanStack Start, TanStack Router, TanStack Query, Effect v4 (`effect`, `effect/http`), Cloudflare Workers with KV and Cron Triggers, Vitest.
+**Tech Stack:** TypeScript, Bun, TanStack Start, TanStack Router, TanStack Query, Effect v4 (`effect`, `effect/http`), Cloudflare Workers with KV and Cron Triggers, `bun test` (Bun's built-in runner; tests import from `bun:test`).
 
 **Spec:** `docs/superpowers/specs/2026-11-07-f1-fan-site-design.md`
 
-**Scope note:** Release 1 is split into two plans.
-- **Part 1 (this plan)** covers the foundation and season data. Nothing in it depends on the visual design.
-- **Part 2** covers the intro, the How F1 works replays, the glossary UI, and the season page UI. It is planned after the design direction (palette, type, motion language, intro storyboard) has been shown to Praffi and approved, as spec §11 requires.
+**Scope note:** The site is built one Figma design at a time (spec §8). This plan is the base they all stand on: the app, the season data and the API. Nothing in it depends on the visual design. Home (`2026-11-08-home.md`) is the first design built on it, and it runs this plan first. The first deploy happens at the end of the Home plan, not here.
 
 ## Global Constraints
 
@@ -27,8 +25,11 @@
 - **Respect Jolpica.** Base URL `https://api.jolpi.ca/ergast/f1`. Jolpica is called only from the cron job, never per visitor. Pass `?limit=100` on every list call.
 - **Effect v4 imports.** Use `import { Effect, Schema, Schedule, Layer, Context } from "effect"` and `import { HttpClient, FetchHttpClient } from "effect/http"`. Check names against Context7 `/websites/effect_website_v4` before writing new APIs.
 - **No `any`.** Do not use lazy `unknown` or `Record<string, unknown>` either. Derive types from schemas (`typeof X.Type`).
+- **No comments in code (Praffi, 2026-11-08).** None in TypeScript, TSX, CSS or Python: no `//`, no `/* */`, no JSDoc, no Python `#` or docstrings, and no `@ts-expect-error`, `@ts-ignore` or `oxlint-disable` directives. Code says what it does through names and types. A reason worth keeping goes into a test name, `DESIGN.md`, `docs/motion-map.md`, or the commit message.
+- **No type assertions.** `x as T` and `<T>x` are banned; `as const` and `satisfies` are fine. Narrow with a schema decode, `instanceof` or a typed API, such as `querySelector<HTMLElement>()`.
+- **Lint is part of done.** `bun run lint` (Oxlint with anti-slop, plus the comment check) must pass before each commit.
 - **Footer disclaimer, exact copy:** "Lights Out is an unofficial fan project. Not affiliated with Formula 1, FOM or any team."
-- **Commits.** Use conventional commit titles in present tense. End each commit message with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- **Commits.** Use the commit titles given in each task, with no `Co-Authored-By` trailer (Praffi, 2026-11-08, for this work).
 - **Confirm outward-facing actions first.** Ask Praffi before running any Cloudflare action: `wrangler login`, `kv namespace create`, or `deploy`.
 
 ## Review Focus
@@ -47,7 +48,7 @@
 src/
   server.ts                    # custom Worker entry: fetch (TanStack) + scheduled (cron)
   routes/__root.tsx            # root layout, footer disclaimer
-  routes/index.tsx             # placeholder home (Part 2 replaces)
+  routes/index.tsx             # placeholder home (the Home plan replaces it)
   routes/api/season.ts         # GET /api/season server route
   season/jolpica-schema.ts     # Effect Schemas for raw Jolpica responses
   season/snapshot-schema.ts    # SeasonSnapshot schema (shared server ⇄ client)
@@ -59,6 +60,13 @@ src/
 test/
   fixtures/jolpica/*.json      # recorded Jolpica responses
   season/*.test.ts
+  lint/no-comments.test.ts     # RuleTester cases for the comment ban
+tools/
+  oxlint/anti-slop/            # vendored dmmulroy/anti-slop src/, MIT
+  oxlint/lights-out/index.ts   # our plugin: the no-comments rule
+  no_comments.py               # the comment ban for Python and CSS
+oxlint.config.ts
+bunfig.toml
 wrangler.jsonc
 ```
 
@@ -76,7 +84,7 @@ wrangler.jsonc
   - The `Env` type includes `SEASON_KV: KVNamespace`.
 
 - [ ] **Step 1: Scaffold in place.** Run `bun create cloudflare@latest . --framework=tanstack-start`. If it refuses the non-empty directory, scaffold into `../lights-out-tmp` and move everything except `.git` into this repo, keeping `docs/`. Use Bun as the package manager.
-- [ ] **Step 2: Record the React version.** Run `bun pm ls react`. Write the version on one line in `docs/notes.md`, together with the React Three Fiber v9 range (`>=19 <19.4`). This only informs Part 2 and blocks nothing here.
+- [ ] **Step 2: Record the React version.** Run `bun pm ls react`. Write the version on one line in `docs/notes.md`, together with the React Three Fiber v9 range (`>=19 <19.4`). The Home plan pins React to `~19.3.1` for the circuit 3D; if the scaffold pulls 19.4 or later, pin it here already.
 - [ ] **Step 3: Configure Wrangler.** In `wrangler.jsonc`:
   - set `"main": "./src/server.ts"`;
   - add `"triggers": { "crons": ["*/30 * * * *"] }`;
@@ -87,10 +95,30 @@ wrangler.jsonc
 - [ ] **Step 4: Write the Worker entry.** `src/server.ts` follows the Cloudflare TanStack Start custom-entrypoint pattern: `fetch: handler.fetch`, plus an empty `scheduled`.
 - [ ] **Step 5: Turn on prerendering.** Set `tanstackStart({ prerender: { enabled: true, crawlLinks: true } })` in `vite.config.ts`, and exclude `/api/*` from prerendering with a `filter`.
 - [ ] **Step 6: Add the footer.** Add the exact disclaimer copy from Global Constraints to the footer in `__root.tsx`. Leave it unstyled.
-- [ ] **Step 7: Write the failing test.** `test/build.test.ts` → `it("prerenders the home page with the disclaimer")`. It reads the built `index.html` from the client output directory and asserts that the file exists and contains `"unofficial fan project"`. Add `"test": "vitest run"` and `"build"` scripts.
+- [ ] **Step 7: Write the failing test.** `test/build.test.ts` → `it("prerenders the home page with the disclaimer")`. It reads the built `index.html` from the client output directory and asserts that the file exists and contains `"unofficial fan project"`. Add a `"test": "bun test"` script, and a `bunfig.toml` with `[test] root = "./test"` so `bun test` never picks up Playwright's `e2e/*.spec.ts`.
 - [ ] **Step 8: Run the build and the test.** Run `bun run build && bun run test`. Expected: PASS.
-- [ ] **Step 9: Check the Worker locally.** Run `bun run dev`, open `/`, and confirm the page renders with the footer.
-- [ ] **Step 10: Commit.** `chore: scaffold TanStack Start app on Cloudflare Workers with prerendering`
+- [ ] **Step 9: Vendor anti-slop.**
+  - Copy `src/` of https://github.com/dmmulroy/anti-slop at commit `13909c9e07590f5a85d93c62712259fe14a883f7` into `tools/oxlint/anti-slop/`, whole, including `vendor/` and its `LICENSE`. Add `tools/oxlint/anti-slop/UPSTREAM.md` with the repo URL, the commit and the MIT licence.
+  - Use the manual install from its README, not the `npx skills` installer.
+  - Run `bun add -d -E oxlint@1.78.0 @oxlint/plugins@1.78.0`, the versions anti-slop pins. Keep both exact and move them together.
+- [ ] **Step 10: Write the comment ban and its failing test.**
+  - `test/lint/no-comments.test.ts` uses `RuleTester` from `oxlint/plugins-dev` on rule `lights-out/no-comments`, with `lang: "tsx"`.
+  - Valid: `const a = 1;`, `const url = "https://example.com";`, `const re = /\/\*/;`, `const jsx = <div title="// not a comment" />;`.
+  - Invalid, one error each: `// note`, `/* block */`, `/** jsdoc */ const a = 1;`, `// @ts-expect-error`, `// oxlint-disable-next-line`, `const jsx = <div>{/* hidden */}</div>;`.
+
+  Run `bun test test/lint`. Expected: FAIL (rule not found).
+- [ ] **Step 11: Implement the rule and the config.**
+  - `tools/oxlint/lights-out/index.ts` exports `eslintCompatPlugin({ meta: { name: "lights-out" }, rules: { "no-comments": … } })`. Its `createOnce` reports every entry of `context.sourceCode.getAllComments()` on `Program`.
+  - `oxlint.config.ts` follows anti-slop's README:
+    - its `ignorePatterns` for agent folders, plus `tools/oxlint/anti-slop/**`, `spikes/**`, `dist/**`, `.wrangler/**` and generated files (`worker-configuration.d.ts`, `src/routeTree.gen.ts`);
+    - both anti-slop plugins (generic and Effect) plus `lights-out`;
+    - every rule from its README at `"error"`, except `require-safety-comment-for-type-assertion`, which is turned off because it requires comments;
+    - `typescript/consistent-type-assertions: ["error", { assertionStyle: "never" }]` and `lights-out/no-comments: "error"`.
+  - `tools/no_comments.py` exits 1 and prints `path:line` for every Python `#` comment or docstring (`tokenize` plus `ast`) and every CSS `/* */` outside a string, under `src/` and `blender/`.
+  - Add `"lint": "oxlint && python3 -I tools/no_comments.py"`.
+  - Run `bun test test/lint && bun run lint`. Expected: PASS. Also add `const a = 1 as number;` to a scratch file and check that `bun run lint` fails on it, `as const` passes, and `// hi` fails. Then delete the scratch file.
+- [ ] **Step 12: Check the Worker locally.** Run `bun run dev`, open `/`, and confirm the page renders with the footer.
+- [ ] **Step 13: Commit.** `chore: scaffold TanStack Start app on Cloudflare Workers with prerendering, anti-slop and no comments`
 
 ### Task 2: Jolpica schemas
 
@@ -186,11 +214,11 @@ Use `Schema.FiniteFromString` for every numeric string. Build each `Session` fro
   - `returns nextSession null when next season is not published`: `races(2027)` is empty, so the result is `null`.
   - `falls back to last season's standings when the new season has none`: `driverStandings(2027)` returns `null`, so `driverStandings.season === 2026`.
   - `latest.sprint is null on a non-sprint weekend`.
-  - `fails with JolpicaError when any endpoint fails`: the `races` method fails, so the Effect fails with `_tag === "JolpicaError"`.
+  - `fails with JolpicaError when any endpoint fails`: the `races` method fails, so the Effect fails with an error for which `Predicate.isTagged("JolpicaError")` is true. Anti-slop's Effect rules ban comparing `_tag` by hand.
 - [ ] **Step 2: Run the tests to see them fail.** Expected: FAIL.
 - [ ] **Step 3: Implement** `snapshot-schema.ts`, `jolpica-client.ts`, and `build-snapshot.ts`, per Interfaces.
 - [ ] **Step 4: Run the tests again.** Expected: PASS.
-- [ ] **Step 5: Add a retry test for the client.** Name it `jolpica client retries a 429 then succeeds`. Provide `JolpicaClient.layer` over a fake `HttpClient` (`HttpClient.make`) that returns 429 once, then the fixture. Assert that the call succeeds and the fake was called twice. Use `TestClock` (or the v4 equivalent) so the test does not sleep for real.
+- [ ] **Step 5: Add a retry test for the client.** Name it `jolpica client retries a 429 then succeeds`. Provide `JolpicaClient.layer` over a fake `HttpClient` (`HttpClient.make`) that returns 429 once, then the fixture. Assert that the call succeeds and the fake was called twice. Use Effect's `TestClock` (or the v4 equivalent), not the test runner's timers, so the test does not sleep for real.
 - [ ] **Step 6: Run the tests.** Expected: PASS.
 - [ ] **Step 7: Commit.** `feat(season): season snapshot builds from Jolpica with off-season fallbacks`
 
@@ -239,7 +267,7 @@ Use `Schema.FiniteFromString` for every numeric string. Build each `Session` fro
 
 **Files:**
 - Create: `src/season/use-season.ts`
-- Modify: `src/routes/index.tsx` (a temporary debug readout: next session name and leader, unstyled; Part 2 replaces it)
+- Modify: `src/routes/index.tsx` (a temporary debug readout: next session name and leader, unstyled; the Home plan replaces it)
 - Test: `test/season/use-season.test.ts`
 
 **Interfaces:**
@@ -257,7 +285,7 @@ Use `Schema.FiniteFromString` for every numeric string. Build each `Session` fro
   - `rejects a snapshot missing season`
 - [ ] **Step 2: Run the tests to see them fail, then implement, then run them again.** Expected: FAIL, then PASS.
 - [ ] **Step 3: Check it in dev.** Run `bun run dev`, trigger the cron, and load `/`. The debug readout should show the real next session.
-- [ ] **Step 4: STOP and ask Praffi** before any of the Cloudflare steps below. They need Praffi's account.
+- [ ] **Step 4: STOP and ask Praffi** before any of the Cloudflare steps below. They need Praffi's account. When this plan runs as the Home plan's prerequisite, skip Steps 4–5 here: the Home plan's Task 7 runs them once Home is ready.
   1. Run `wrangler login`.
   2. Run `wrangler kv namespace create SEASON_KV` and put the id in `wrangler.jsonc`.
   3. Run `bun run deploy`.
@@ -271,4 +299,4 @@ Use `Schema.FiniteFromString` for every numeric string. Build each `Session` fro
 
 ## After this plan
 
-Before Part 2's plan is written, run the design step: show Praffi the design direction and the intro storyboard (spec §9 and §11). Then plan Part 2: the intro, How F1 works (the 15 topics in spec §8), the glossary hover, the season page UI, and the credits page.
+Run the Home plan (`2026-11-08-home.md`). Every later design gets its own plan, in the order in spec §8.

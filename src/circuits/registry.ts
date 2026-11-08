@@ -1,0 +1,85 @@
+import ae2009 from './pins/ae-2009.json'
+import au1953 from './pins/au-1953.json'
+import br1940 from './pins/br-1940.json'
+import qa2004 from './pins/qa-2004.json'
+import us2023 from './pins/us-2023.json'
+
+export type Pin = { turn: number; x: number; y: number }
+
+export type CircuitFacts = {
+  firstGp: number
+  lengthKm: string
+  laps: number
+  distanceKm: string
+  turns: number
+  direction: 'clockwise' | 'anticlockwise'
+}
+
+export type CircuitInfo = {
+  model: string
+  name: string
+  gp: string
+  tz: string
+  corner?: { turn: number; name: string }
+  facts: CircuitFacts
+  pins: ReadonlyArray<Pin>
+}
+
+const pinsOf = (json: Record<string, ReadonlyArray<number> | null>): ReadonlyArray<Pin> =>
+  Object.entries(json)
+    .flatMap(([name, at]) => {
+      const turn = Number(name.replace('turn-', ''))
+      const [x, y] = at ?? []
+
+      return name.startsWith('turn-') && x !== undefined && y !== undefined ? [{ turn, x, y }] : []
+    })
+    .sort((a, b) => a.turn - b.turn)
+
+const CIRCUITS = {
+  interlagos: {
+    model: 'br-1940',
+    name: 'Interlagos',
+    gp: 'São Paulo GP',
+    tz: 'America/Sao_Paulo',
+    corner: { turn: 1, name: 'S do Senna' },
+    facts: { firstGp: 1973, lengthKm: '4.309', laps: 71, distanceKm: '305.879', turns: 15, direction: 'anticlockwise' },
+    pins: pinsOf(br1940),
+  },
+  vegas: {
+    model: 'us-2023',
+    name: 'Las Vegas',
+    gp: 'Las Vegas GP',
+    tz: 'America/Los_Angeles',
+    corner: { turn: 7, name: 'Sphere chicane' },
+    facts: { firstGp: 2023, lengthKm: '6.201', laps: 50, distanceKm: '309.958', turns: 17, direction: 'anticlockwise' },
+    pins: pinsOf(us2023),
+  },
+  losail: {
+    model: 'qa-2004',
+    name: 'Lusail',
+    gp: 'Qatar GP',
+    tz: 'Asia/Qatar',
+    facts: { firstGp: 2021, lengthKm: '5.419', laps: 57, distanceKm: '308.611', turns: 16, direction: 'clockwise' },
+    pins: pinsOf(qa2004),
+  },
+  yas_marina: {
+    model: 'ae-2009',
+    name: 'Yas Marina',
+    gp: 'Abu Dhabi GP',
+    tz: 'Asia/Dubai',
+    facts: { firstGp: 2009, lengthKm: '5.281', laps: 58, distanceKm: '306.188', turns: 16, direction: 'anticlockwise' },
+    pins: pinsOf(ae2009),
+  },
+  albert_park: {
+    model: 'au-1953',
+    name: 'Albert Park',
+    gp: 'Australian GP',
+    tz: 'Australia/Melbourne',
+    facts: { firstGp: 1996, lengthKm: '5.278', laps: 58, distanceKm: '306.124', turns: 14, direction: 'clockwise' },
+    pins: pinsOf(au1953),
+  },
+} satisfies Record<string, CircuitInfo>
+
+const byId = new Map<string, CircuitInfo>(Object.entries(CIRCUITS))
+
+export const circuitFor = (circuitId: string) => byId.get(circuitId)
