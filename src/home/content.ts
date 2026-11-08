@@ -13,6 +13,7 @@ export const PHOTOS = {
   tyres: { src: '/img/tyres.jpg', place: 'Pirelli tyres, slicks to wets', credit: 'Photo Hullian111 · CC BY-SA 4.0' },
   williams: { src: '/img/williams.jpg', place: 'Williams FW48 · Shanghai, 2026', credit: 'Photo Liauzh · CC BY 4.0' },
   brm: { src: '/img/y1973.jpg', place: 'BRM mechanics · Anderstorp, 1973', credit: 'Photo Markku Lepola · CC BY 4.0' },
+  startLights: { src: '/img/start-lights.jpg', place: 'Start lights · Melbourne, 2026 · cropped', credit: 'Photo Yu Chu Chin · CC BY-SA 4.0' },
 } satisfies Record<string, Photo>
 
 export type ChapterPath = Extract<To, `/chapters/${string}`>

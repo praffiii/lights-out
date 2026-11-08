@@ -1,7 +1,7 @@
 import { afterEach, expect, it } from 'bun:test'
 import { Effect } from 'effect'
 
-import { boxCopy, boxState, pickRace, sessionDay, when } from '../../src/season/weekend.ts'
+import { boxCopy, boxState, countdown, nextLightsOut, pickRace, sessionDay, when } from '../../src/season/weekend.ts'
 import type { SeasonSnapshot } from '../../src/season/snapshot-schema.ts'
 import { calendar2026 } from './fake-jolpica.ts'
 import { snapshotAt } from './snapshot.ts'
@@ -144,4 +144,25 @@ it('keeps the weekend open through the whole day of an unconfirmed race', async 
 it('names the UTC day of an unconfirmed session, not the day before at the track', () => {
   expect(sessionDay({ name: 'Qualifying', startsAt: '2026-11-07T00:00:00Z', timeConfirmed: false }, 'America/Sao_Paulo')).toBe('Sat 7 Nov')
   expect(sessionDay({ name: 'Qualifying', startsAt: '2026-11-07T18:00:00Z', timeConfirmed: true }, 'America/Sao_Paulo')).toBe('Sat 7 Nov')
+})
+
+it('finds the next lights out across both calendars', async () => {
+  const next = async (iso: string, overrides: Parameters<typeof snapshotAt>[1] = {}) => nextLightsOut(await snapshotAt(iso, overrides), new Date(iso))
+
+  expect(await next('2026-11-06T15:00:00Z')).toMatchObject({ round: 20, of: 23, startsAt: '2026-11-08T17:00:00Z', confirmed: true })
+  expect((await next('2026-11-08T17:00:01Z'))?.race.circuit.circuitId).toBe('vegas')
+  expect(await next('2026-12-20T00:00:00Z')).toBeNull()
+  expect(
+    await next('2026-12-20T00:00:00Z', { races: (season) => Effect.succeed(season === 2027 ? { season: 2027, races: albertPark2027 } : calendar2026) }),
+  ).toMatchObject({ round: 1, of: 1 })
+})
+
+it('splits a countdown into days, hours, minutes and seconds', () => {
+  expect(countdown(((2 * 24 + 2) * 3600 + 5 * 60 + 9) * 1000)).toEqual([
+    ['days', '02'],
+    ['hrs', '02'],
+    ['min', '05'],
+    ['sec', '09'],
+  ])
+  expect(countdown(-5000).map(([, n]) => n)).toEqual(['00', '00', '00', '00'])
 })

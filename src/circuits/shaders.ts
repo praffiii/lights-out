@@ -1,5 +1,7 @@
 import * as THREE from 'three'
 
+import type { Theme } from '#/shell/theme.ts'
+
 export const SECTORS = {
   S1: '#A43BFF',
   S2: '#2BD45E',
@@ -80,6 +82,88 @@ export function mattify(scene: THREE.Object3D, colorOf: (material: string) => st
   })
 
   return byName
+}
+
+const GROUND = {
+  dark: { ground: '#121316', line: '#737985', haze: '#1B1D22' },
+  light: { ground: '#EFEEE9', line: '#7E8187', haze: '#EDEBE6' },
+} as const
+
+const STEP = 3
+const PHASE = 0.37
+const FADE_RADIUS = 0.75
+const HAZE_BASE = 2.7
+const STRENGTH = 0.55
+const CROWD_FROM = 0.15
+const CROWD_TO = 0.5
+
+const groundVertex = `
+  varying vec3 vWorld;
+  varying vec3 vUp;
+  void main() {
+    vUp = normalize(mat3(modelMatrix) * normal);
+    vec4 world = modelMatrix * vec4(position, 1.0);
+    vWorld = world.xyz;
+    gl_Position = projectionMatrix * viewMatrix * world;
+  }`
+
+const groundFragment = `
+  uniform vec3 uGround;
+  uniform vec3 uLine;
+  uniform vec3 uHaze;
+  uniform float uSpan;
+  varying vec3 vWorld;
+  varying vec3 vUp;
+  void main() {
+    float h = vWorld.y;
+    float f = fract((h + ${STEP.toFixed(1)} * ${PHASE.toFixed(2)}) / ${STEP.toFixed(1)});
+    float w = max(fwidth(h / ${STEP.toFixed(1)}), 1e-4);
+    float line = 1.0 - smoothstep(0.0, w * 1.2, min(f, 1.0 - f));
+    line *= 1.0 - smoothstep(${CROWD_FROM.toFixed(2)}, ${CROWD_TO.toFixed(2)}, w);
+    line *= clamp(((1.0 - abs(normalize(vUp).y)) - 0.0004) / (0.002 - 0.0004), 0.0, 1.0);
+    float fade = pow(1.0 - min(length(vWorld.xz) / (uSpan * ${FADE_RADIUS.toFixed(2)}), 1.0), 1.6);
+    vec3 c = mix(uGround, uLine, line * fade * ${STRENGTH.toFixed(2)});
+    float near = uSpan * ${HAZE_BASE.toFixed(1)} * 0.7;
+    float far = uSpan * ${HAZE_BASE.toFixed(1)} * 1.9;
+    float haze = pow(clamp((distance(cameraPosition, vWorld) - near) / (far - near), 0.0, 1.0), 1.4);
+    gl_FragColor = vec4(mix(c, uHaze, haze), 1.0);
+    #include <colorspace_fragment>
+  }`
+
+export type Contour = { material: THREE.ShaderMaterial; setTheme: (theme: Theme) => void }
+
+function contour(theme: Theme, span: number): Contour {
+  const uniforms = {
+    uGround: { value: new THREE.Color() },
+    uLine: { value: new THREE.Color() },
+    uHaze: { value: new THREE.Color() },
+    uSpan: { value: span },
+  }
+
+  const setTheme = (next: Theme) => {
+    const p = GROUND[next]
+
+    uniforms.uGround.value.set(p.ground)
+    uniforms.uLine.value.set(p.line)
+    uniforms.uHaze.value.set(p.haze)
+  }
+
+  setTheme(theme)
+
+  return { material: new THREE.ShaderMaterial({ name: 'ground', vertexShader: groundVertex, fragmentShader: groundFragment, uniforms }), setTheme }
+}
+
+const grounds = new WeakMap<THREE.Object3D, Contour>()
+
+export function groundOf(scene: THREE.Object3D, theme: Theme, span: number): Contour {
+  const ground = grounds.get(scene) ?? contour(theme, span)
+
+  grounds.set(scene, ground)
+  scene.traverse((o) => {
+    if (o instanceof THREE.Mesh && o.name === 'ground') o.material = ground.material
+  })
+
+  return ground
 }
 
 const v = new THREE.Vector3()

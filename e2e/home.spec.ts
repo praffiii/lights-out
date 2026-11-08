@@ -9,7 +9,7 @@ const whenLoaderLifts = async (page: Page) => {
 
       if (document.querySelector('.loader')) return false
 
-      const band = document.querySelector('.weekend-sec')
+      const band = document.querySelector('.hero .stage')
 
       return { at: performance.now(), canvas: band?.querySelector('canvas') !== null && band !== null, poster: band?.querySelector<HTMLImageElement>('.poster')?.hidden === true, full: sessionStorage.getItem('full') === '1' }
     },
@@ -87,7 +87,7 @@ test('renders Home without the box or band when the season API is warming', asyn
 
   expect(lifted.at).toBeLessThan(2600)
   await expect(page.locator('.weekend')).toHaveCount(0)
-  await expect(page.locator('.weekend-sec')).toHaveCount(0)
+  await expect(page.locator('.hero .stage')).toHaveCount(0)
 
   await scrollToEnd(page)
 
@@ -122,12 +122,12 @@ test('holds the lights for a late circuit, then lifts on time with the poster gr
 
   expect(lifted).toMatchObject({ full: false, poster: false })
   expect(lifted.at).toBeLessThan(2600)
-  await expect(page.locator('.weekend-sec .track')).toHaveAttribute('data-waiting', '')
+  await expect(page.locator('.hero .stage')).toHaveAttribute('data-waiting', '')
 
   release()
 
-  await expect(page.locator('.weekend-sec canvas')).toHaveCount(1)
-  await expect(page.locator('.weekend-sec .poster')).toBeHidden()
+  await expect(page.locator('.hero canvas')).toHaveCount(1)
+  await expect(page.locator('.hero .poster')).toBeHidden()
   expect(errors).toEqual([])
 })
 
@@ -148,11 +148,11 @@ for (const [name, breakIt] of [
     const lifted = await whenLoaderLifts(page)
 
     expect(lifted.at).toBeLessThan(2600)
-    await page.locator('.weekend-sec').scrollIntoViewIfNeeded()
+    await page.locator('.hero .stage').scrollIntoViewIfNeeded()
     await page.waitForTimeout(1500)
     await expect(page.locator('.hero h1')).toBeAttached()
-    await expect(page.locator('.weekend-sec .poster')).toBeVisible()
-    await expect(page.locator('.weekend-sec .track')).not.toHaveAttribute('data-waiting', '')
+    await expect(page.locator('.hero .poster')).toBeVisible()
+    await expect(page.locator('.hero .stage')).not.toHaveAttribute('data-waiting', '')
     await expect(page.locator('footer')).toContainText('Lights Out is an unofficial fan project.')
     expect(errors.filter((e) => e.startsWith('pageerror') && !e.includes('Could not load /circuits/'))).toEqual([])
   })
@@ -161,7 +161,7 @@ for (const [name, breakIt] of [
 test('preloads only the hero photo, not the hidden menu photos', async ({ request }) => {
   const html = await (await request.get('/')).text()
 
-  expect([...html.matchAll(/<link rel="preload" as="image" href="([^"]+)"/g)].map((m) => m[1])).toEqual(['/img/hero-light.jpg'])
+  expect([...html.matchAll(/<link rel="preload" as="image" href="([^"]+)"/g)].map((m) => m[1])).toEqual(['/img/cars/pia.webp'])
 })
 
 test('keeps animated text readable by screen readers', async ({ page, errors }) => {
@@ -173,5 +173,54 @@ test('keeps animated text readable by screen readers', async ({ page, errors }) 
   for (const text of ['Lights Out is an unofficial fan project. Not affiliated with Formula 1, FOM or any team.', '4.309 km', '305.879 km', 'Five chapters · 30 min'])
     expect(tree).toContain(text)
 
+  expect(errors).toEqual([])
+})
+
+test('the footer lights come on one by one, then go out together', async ({ page, errors }) => {
+  await page.goto('/')
+  await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
+  await page.locator('.next-race').waitFor()
+  await page.locator('.next-race .lights').evaluate((row) => {
+    const lights = [...row.children]
+    const log: string[] = []
+
+    new MutationObserver((records) => {
+      for (const r of records) if (r.target instanceof Element) log.push(`${r.oldValue === 'on' ? 'off' : 'on'}${lights.indexOf(r.target)}`)
+      row.setAttribute('data-log', log.join(' '))
+    }).observe(row, { subtree: true, attributeFilter: ['class'], attributeOldValue: true })
+  })
+  await page.locator('.next-race').scrollIntoViewIfNeeded()
+  await expect(page.locator('.next-race .lights')).toHaveAttribute('data-log', 'on0 on1 on2 on3 on4 off0 off1 off2 off3 off4', { timeout: 10_000 })
+  await expect(page.locator('.next-race .lights i.on')).toHaveCount(0)
+  await expect(page.locator('.next-race .count b')).toHaveCount(4)
+  await expect(page.locator('.next-race .count b').first()).toHaveText('02')
+  expect(errors).toEqual([])
+})
+
+test('keeps the footer lights off under reduced motion', async ({ page, errors }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/')
+  await page.locator('.next-race').scrollIntoViewIfNeeded()
+  await page.waitForTimeout(1500)
+
+  await expect(page.locator('.next-race .lights i')).toHaveCount(5)
+  await expect(page.locator('.next-race .lights i.on')).toHaveCount(0)
+  expect(errors).toEqual([])
+})
+
+test('keeps the close button on screen while the menu is open, even if the page scrolls down', async ({ page, errors }) => {
+  await page.goto('/')
+  await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
+  await page.locator('.next-race').scrollIntoViewIfNeeded()
+  await page.mouse.wheel(0, -300)
+  await expect(page.locator('.header')).not.toHaveClass(/away/)
+  await page.getByRole('button', { name: 'Menu' }).click()
+  await page.evaluate(() => {
+    document.documentElement.classList.remove('lenis-stopped')
+    scrollBy(0, 120)
+  })
+  await page.waitForTimeout(600)
+
+  await expect(page.getByRole('button', { name: 'Close' })).toBeInViewport()
   expect(errors).toEqual([])
 })

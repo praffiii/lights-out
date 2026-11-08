@@ -183,3 +183,11 @@ export function roll(el: HTMLElement, o: { from?: number } = {}) {
     if (n) tl.fromTo(strip, { yPercent: 0 }, { yPercent: (-100 * n) / (n + 1), duration: 1.1 + i * 0.12, ease: 'power3.inOut' }, 0)
   })
 }
+
+export function wipe(el: HTMLElement) {
+  const img = el.querySelector('img')
+
+  if (img) gsap.fromTo(img, { scale: 1.08 }, { scale: 1, duration: 0.9, ease: 'expo.out' })
+
+  return gsap.fromTo(el, { clipPath: 'inset(0% 0% 0% 100%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.9, ease: 'expo.out' })
+}

@@ -1,14 +1,14 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { type PointerEvent, useEffect, useRef } from 'react'
 
-import { block, draw, gsap, HOVER, ONCE, onEnter, REDUCED, reveal, roll, ScrollTrigger, sweep, useGSAP } from '#/motion/motion.ts'
-import { Go, Soon } from '#/shell/Go.tsx'
+import { block, draw, gsap, HOVER, ONCE, REDUCED, reveal, roll, ScrollTrigger, sweep, useGSAP } from '#/motion/motion.ts'
+import { Go } from '#/shell/Go.tsx'
 import { waitFor } from '#/shell/Loader.tsx'
 import { opposite, useTheme } from '#/shell/theme.ts'
 import { seasonQueryOptions } from '#/season/use-season.ts'
 
-import { bandShown, CircuitBand } from './CircuitBand.tsx'
-import { CALLOUT_FRAME, CALLOUTS, CAR_STATS, CHAPTERS, CHIP_H, HERO, PHOTOS, READ_NEXT } from './content.ts'
+import { CALLOUT_FRAME, CALLOUTS, CAR_STATS, CHAPTERS, CHIP_H, PHOTOS, READ_NEXT } from './content.ts'
+import { Hero, heroShown } from './Hero.tsx'
 
 const pct = (v: number, of: number) => `${(v / of) * 100}%`
 
@@ -29,22 +29,15 @@ export function Home() {
   const root = useRef<HTMLDivElement>(null)
   const preview = useRef<HTMLDivElement>(null)
   const ride = useRef<Rider | null>(null)
-  const hero = theme === 'dark' ? PHOTOS.heroDark : PHOTOS.heroLight
-  const waited = useRef(false)
   const client = useQueryClient()
 
   useEffect(() => {
-    waitFor(client.fetchQuery(seasonQueryOptions).then(bandShown))
+    waitFor(client.fetchQuery(seasonQueryOptions).then(heroShown))
+
+    const img = root.current?.querySelector('.hero .tracker img')
+
+    if (img instanceof HTMLImageElement) waitFor(img.decode())
   }, [client])
-
-  useEffect(() => {
-    const img = root.current?.querySelector('.hero .photo img')
-
-    if (!theme || waited.current || !(img instanceof HTMLImageElement)) return
-
-    waited.current = true
-    waitFor(img.decode())
-  }, [theme])
 
   const { contextSafe } = useGSAP(
     (_, safe) => {
@@ -52,41 +45,20 @@ export function Home() {
 
       if (!scope || !safe) return
 
-      const off = onEnter(
-        safe(() => {
-          all(scope, '.hero h1 .hl').forEach((el, i) => sweep(el, { scroll: false, delay: i * 0.1 }))
-          sweep(one(scope, '.hero .intro p'), { scroll: false, delay: 0.3 })
-
-          for (const el of all(scope, '.hero .meta .mono')) sweep(el, { scroll: false, delay: 0.5 })
-
-          reveal(one(scope, '.hero .photo'), { scroll: false, delay: 0.2 })
-
-          if (!REDUCED) gsap.from(one(scope, '.hero .cta'), { autoAlpha: 0, y: 12, duration: 0.6, delay: 0.85 })
-        }),
-      )
-
-      for (const el of all(scope, '.type, h2.display, .caption > span, .next h3, .next p, .car .credit')) sweep(el)
+      for (const el of all(scope, '.type, h2.display, .next h3, .next p, .car .credit')) sweep(el)
 
       const rows = one(scope, '.rows')
 
       all(scope, '.rows h3').forEach((el, i) => sweep(el, { trigger: rows, start: 'top 78%', delay: i * 0.08 }))
       draw(all(scope, '.rows .hair'), rows)
 
-      for (const el of all(scope, '[data-count]')) roll(el, { from: el.dataset.count === 'year' ? 1950 : undefined })
+      for (const el of all(scope, '.car [data-count]')) roll(el, { from: el.dataset.count === 'year' ? 1950 : undefined })
 
       for (const el of all(scope, '.next .photo')) reveal(el)
 
       block(one(scope, '.car .plate'))
 
-      if (REDUCED) return off
-
-      const lines = all(scope, '.hero h1 .hl')
-
-      gsap
-        .timeline({ scrollTrigger: { trigger: one(scope, '.hero'), start: 'top top', end: 'bottom top', scrub: true } })
-        .fromTo(one(scope, '.hero h1'), { '--wdth': 100 }, { '--wdth': 125, ease: 'none' }, 0)
-        .to(lines[0] ?? [], { x: '-6vw', ease: 'none' }, 0)
-        .to(lines[1] ?? [], { x: '8vw', ease: 'none' }, 0)
+      if (REDUCED) return
 
       const band = one(scope, '.car')
 
@@ -137,7 +109,6 @@ export function Home() {
       if (HOVER) gsap.ticker.add(tick)
 
       return () => {
-        off()
         gsap.ticker.remove(tick)
         document.documentElement.classList.remove('flip')
       }
@@ -199,34 +170,7 @@ export function Home() {
 
   return (
     <div ref={root}>
-      <section className="hero" aria-labelledby="h1">
-        <div className="hero-top">
-          <h1 id="h1" className="display">
-            {HERO.lines.map((line) => (
-              <span key={line} className="hl">
-                {line}
-              </span>
-            ))}
-          </h1>
-          <div className="intro">
-            <p>{HERO.intro}</p>
-            <Soon className="cta">Start the guide</Soon>
-          </div>
-        </div>
-        <div className="meta">
-          <span className="mono">{HERO.meta}</span>
-          <span className="mono scroll-cue" aria-hidden>
-            Scroll <i />
-          </span>
-        </div>
-        <div className="photo">
-          <img src={hero.src} alt={hero.place} fetchPriority="high" />
-        </div>
-        <p className="caption mono">
-          <span>{hero.place}</span>
-          <span className="muted">{hero.credit}</span>
-        </p>
-      </section>
+      <Hero />
 
       <section className="chapters" aria-labelledby="start">
         <div className="head">
@@ -328,8 +272,6 @@ export function Home() {
           </dl>
         </div>
       </section>
-
-      <CircuitBand />
 
       <section className="next" aria-labelledby="next">
         <h2 id="next" className="mono muted type">

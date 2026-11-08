@@ -14,7 +14,7 @@ DATA = os.path.join(HERE, "data")
 PUBLIC = os.path.join(HERE, "..", "..", "public", "circuits")
 PINS = os.path.join(HERE, "..", "..", "src", "circuits", "pins")
 
-WIDTH = 16.0
+WIDTH = 7.2
 HEIGHT = 1.2
 STEP = 3.0
 CIRCUITS = {
@@ -311,7 +311,7 @@ class Track:
         return (self.at(x + span) - self.at(x - span)).normalized()
 
 
-def bar(track, x, name, mat, length=WIDTH + 2, depth=3.0, rise=0.25):
+def bar(track, x, name, mat, length=WIDTH + 0.9, depth=7.5, rise=0.25):
     p, h = track.at(x), flat(track.heading(x))
     side = Vector((-h.y, h.x, 0))
     bpy.ops.mesh.primitive_cube_add(size=1)
