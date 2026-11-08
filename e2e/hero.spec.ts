@@ -57,17 +57,73 @@ test('keeps the gallery running with no circuit when the season API is warming',
   expect(errors.filter((e) => !e.includes('503'))).toEqual([])
 })
 
+const lapBar = (page: Page) => page.evaluate(() => new DOMMatrix(getComputedStyle(document.querySelector('.tracker .lap') ?? document.body).transform).a)
+
+test('a car picked mid-lap starts its lap from the line', async ({ page, errors }) => {
+  test.setTimeout(90_000)
+  await page.goto('/')
+  await lifted(page)
+  await expect(page.locator('.hero .stage[data-gl]')).toHaveCount(1)
+  await page.clock.runFor(3_000)
+  expect(await lapBar(page)).toBeGreaterThan(0.1)
+  await page.getByRole('button', { name: 'Show Max Verstappen, Red Bull RB22' }).click()
+  await page.clock.runFor(300)
+  await expect(page.locator(current)).toHaveAttribute('data-code', 'VER')
+  expect(await lapBar(page)).toBeLessThan(0.06)
+  expect(errors).toEqual([])
+})
+
+test('keeps the lap running on a phone when the circuit arrives after the page loaded', async ({ page, errors }) => {
+  test.setTimeout(90_000)
+  await page.route('**/api/season', async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 3_000))
+    await route.fallback()
+  })
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/')
+  await expect(page.locator('.hero .stage[data-gl]')).toHaveCount(1, { timeout: 20_000 })
+  await page.evaluate(() => {
+    const hero = document.querySelector<HTMLElement>('.hero')
+
+    if (hero) scrollTo(0, hero.offsetTop + hero.offsetHeight - 120)
+  })
+  await page.clock.runFor(17_000)
+  await expect(page.locator(current)).toHaveAttribute('data-code', 'NOR')
+  expect(errors).toEqual([])
+})
+
 for (const width of [320, 390, 760, 1470]) {
-  test(`has no horizontal overflow and keeps the T1 pin clear at ${width}px`, async ({ page, errors }) => {
+  test(`has no horizontal overflow and keeps the T1 pin above the tag at ${width}px`, async ({ page, errors }) => {
     await page.setViewportSize({ width, height: 844 })
     await page.goto('/')
     await expect(page.locator('.tracker')).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 
-    const [tag, t1] = await Promise.all([page.locator('.hero .tag').boundingBox(), page.locator('[data-pin="turn-1"]').boundingBox()])
+    await expect(page.locator('.hero .stage[data-gl]')).toHaveCount(1)
+    await page.getByRole('button', { name: 'Pause' }).click()
+    await page.addStyleTag({ content: '.hero .pins > span, .hero .tag { pointer-events: auto !important }' })
 
-    if (tag && t1) expect(tag.x + tag.width <= t1.x || t1.x + t1.width <= tag.x || tag.y + tag.height <= t1.y || t1.y + t1.height <= tag.y).toBe(true)
+    const pinOnTop = await page.evaluate(() => {
+      const pin = document.querySelector<HTMLElement>('[data-pin="turn-1"]')
+      const tag = document.querySelector<HTMLElement>('.hero .tag')
+      const stage = document.querySelector<HTMLElement>('.hero .stage')
 
+      if (!pin || !tag || !stage) return false
+
+      pin.scrollIntoView({ block: 'center' })
+
+      const p = pin.getBoundingClientRect()
+      const t = tag.getBoundingClientRect()
+      const s = stage.getBoundingClientRect()
+      const x = p.x + p.width / 2
+      const y = p.y + p.height / 2
+
+      tag.style.transform = `translate(${x - s.x + t.width / 2}px, ${y - s.y - t.height / 2}px)`
+
+      return document.elementFromPoint(x, y)?.closest('[data-pin="turn-1"]') === pin
+    })
+
+    expect(pinOnTop).toBe(true)
     expect(errors).toEqual([])
   })
 }

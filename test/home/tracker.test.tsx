@@ -37,3 +37,11 @@ it('reports a pick and a pause', () => {
   expect(picked).toEqual([4])
   expect(paused).toBe(1)
 })
+
+it('steps to the previous and next car, wrapping at the ends', () => {
+  const picked: number[] = []
+  const { getByRole } = render(<Tracker at={0} onPick={(i) => picked.push(i)} lap={{ current: null }} paused={false} onPause={() => {}} />)
+  fireEvent.click(getByRole('button', { name: 'Previous car' }))
+  fireEvent.click(getByRole('button', { name: 'Next car' }))
+  expect(picked).toEqual([21, 1])
+})

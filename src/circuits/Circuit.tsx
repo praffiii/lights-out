@@ -35,6 +35,7 @@ type Props = {
   model: string
   theme: Theme
   layout: 'wide' | 'narrow'
+  restart: number
   fill: RefObject<number>
   tilt: RefObject<number>
   running: RefObject<boolean>
@@ -53,7 +54,7 @@ const infoFor = (model: string) => {
   return info
 }
 
-function Scene({ model, theme, layout, fill, tilt, running, pins, tag, onLap, onLapProgress, onReady }: Props) {
+function Scene({ model, theme, layout, restart, fill, tilt, running, pins, tag, onLap, onLapProgress, onReady }: Props) {
   const gltf = useLoader(GLTFLoader, modelUrl(model), meshopt)
   const camera = useThree((s) => s.camera)
   const size = useThree((s) => s.size)
@@ -61,12 +62,19 @@ function Scene({ model, theme, layout, fill, tilt, running, pins, tag, onLap, on
   const gl = useThree((s) => s.gl)
   const scene = useThree((s) => s.scene)
   const clock = useRef(0)
+  const previousU = useRef(0)
   const stale = useRef(true)
   const callbacks = useRef({ onLap, onLapProgress, onReady })
 
   useLayoutEffect(() => {
     callbacks.current = { onLap, onLapProgress, onReady }
   }, [onLap, onLapProgress, onReady])
+
+  useEffect(() => {
+    clock.current = 0
+    previousU.current = 0
+    stale.current = true
+  }, [restart])
 
   const { materials, ground, markers, rest, light } = useMemo(() => {
     const info = infoFor(model)
@@ -206,7 +214,6 @@ function Scene({ model, theme, layout, fill, tilt, running, pins, tag, onLap, on
 
     stale.current = true
 
-    let previousU = 0
     let first = true
     let compiled = false
     let lastFill = -1
@@ -253,9 +260,9 @@ function Scene({ model, theme, layout, fill, tilt, running, pins, tag, onLap, on
         const t = clock.current / LAP_SECONDS
         const u = rest.lap.uAt(t)
 
-        if (u < previousU) callbacks.current.onLap()
+        if (u < previousU.current) callbacks.current.onLap()
 
-        previousU = u
+        previousU.current = u
         callbacks.current.onLapProgress(t - Math.floor(t))
       }
 

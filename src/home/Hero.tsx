@@ -110,6 +110,12 @@ export function Hero() {
     if (REDUCED) drawn()
   }, [])
 
+  const hasCircuit = circuit !== null
+
+  useEffect(() => {
+    if (hasCircuit) ScrollTrigger.refresh()
+  }, [hasCircuit])
+
   const advance = useCallback(() => setAt((i) => (i + 1) % CARS.length), [])
 
   const fallback = useRef<gsap.core.Tween | null>(null)
@@ -180,7 +186,7 @@ export function Hero() {
   return (
     <section className="hero" ref={root} aria-labelledby="h1">
       <div className="hero-frame">
-        {circuit && <Stage {...circuit} car={car} fill={fill} tilt={tilt} running={running} glReady={glReady} glFailed={glFailed} onLap={advance} onLapProgress={onLapProgress} onReady={onReady} onFail={onFail} />}
+        {circuit && <Stage {...circuit} car={car} at={at} fill={fill} tilt={tilt} running={running} glReady={glReady} glFailed={glFailed} onLap={advance} onLapProgress={onLapProgress} onReady={onReady} onFail={onFail} />}
         <div className="hero-copy">
           <p className="meta mono muted">{HERO.meta}</p>
           <h1 id="h1">
@@ -204,6 +210,7 @@ type StageProps = {
   picked: PickedRace
   info: CircuitInfo
   car: Car | undefined
+  at: number
   fill: { current: number }
   tilt: { current: number }
   running: { current: boolean }
@@ -215,7 +222,7 @@ type StageProps = {
   onFail: () => void
 }
 
-function Stage({ info, car, fill, tilt, running, glReady, glFailed, onLap, onLapProgress, onReady, onFail }: StageProps) {
+function Stage({ info, car, at, fill, tilt, running, glReady, glFailed, onLap, onLapProgress, onReady, onFail }: StageProps) {
   const { theme } = useTheme()
   const mounted = useMounted()
   const narrow = useNarrow()
@@ -223,13 +230,16 @@ function Stage({ info, car, fill, tilt, running, glReady, glFailed, onLap, onLap
   const tag = useRef<HTMLSpanElement>(null)
   const [x0, y0, x1, y1] = info.crop
   const crop: Vars = { '--x0': x0, '--y0': y0, '--x1': x1, '--y1': y1 }
+  const poster = `/circuits/${info.model}-${theme ?? 'light'}`
 
   return (
     <div className="stage" style={crop} data-gl={glReady ? '' : undefined} data-waiting={!REDUCED && !glReady && !glFailed ? '' : undefined}>
       <div className="poster-box">
         <img
           className="poster"
-          src={`/circuits/${info.model}-${theme ?? 'light'}.png`}
+          src={`${poster}.webp`}
+          srcSet={`${poster}-1440.webp 1440w, ${poster}.webp 2880w`}
+          sizes={`${NARROW} 200vw, 100vw`}
           alt={`${info.name} in 3D. Sector one purple, sector two green, sector three yellow, with ${info.facts.turns} numbered turns.`}
           hidden={glReady}
         />
@@ -242,6 +252,7 @@ function Stage({ info, car, fill, tilt, running, glReady, glFailed, onLap, onLap
                 model={info.model}
                 theme={theme}
                 layout={narrow ? 'narrow' : 'wide'}
+                restart={at}
                 fill={fill}
                 tilt={tilt}
                 running={running}
@@ -255,22 +266,22 @@ function Stage({ info, car, fill, tilt, running, glReady, glFailed, onLap, onLap
           </CircuitGuard>
         </div>
       )}
-      <div className="pins" ref={pins} aria-hidden>
-        {info.pins.map((pin) => {
-          const at: Vars = { '--px': pin.x, '--py': pin.y }
-
-          return (
-            <span key={pin.turn} data-pin={`turn-${pin.turn}`} style={at}>
-              {pin.turn}
-            </span>
-          )
-        })}
-      </div>
       {car && (
         <span className="tag mono" ref={tag} hidden={!glReady || REDUCED} style={{ borderColor: car.colour }} aria-hidden>
           {car.code}
         </span>
       )}
+      <div className="pins" ref={pins} aria-hidden>
+        {info.pins.map((pin) => {
+          const place: Vars = { '--px': pin.x, '--py': pin.y }
+
+          return (
+            <span key={pin.turn} data-pin={`turn-${pin.turn}`} style={place}>
+              {pin.turn}
+            </span>
+          )
+        })}
+      </div>
     </div>
   )
 }

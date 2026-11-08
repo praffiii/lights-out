@@ -85,9 +85,17 @@ export function Tracker({ at, onPick, lap, paused, onPause }: TrackerProps) {
           {now.team} {now.car}
         </p>
       </div>
-      <button type="button" className="pause" aria-pressed={paused} onClick={onPause}>
-        {paused ? 'Play' : 'Pause'}
-      </button>
+      <div className="controls">
+        <button type="button" aria-label="Previous car" onClick={() => onPick((at + CARS.length - 1) % CARS.length)}>
+          Previous
+        </button>
+        <button type="button" aria-pressed={paused} onClick={onPause}>
+          {paused ? 'Play' : 'Pause'}
+        </button>
+        <button type="button" aria-label="Next car" onClick={() => onPick((at + 1) % CARS.length)}>
+          Next
+        </button>
+      </div>
     </div>
   )
 }

@@ -114,14 +114,15 @@ a:hover > .arr, a:hover .arr { translate: 4px 0; }
 .tracker .on, .tracker .model { font: 400 11px/1.2 'Martian Mono', monospace; letter-spacing: 0.04em; text-transform: uppercase; }
 .tracker .driver { margin-top: 6px; font: 600 max(18px, 1.53cqw)/1.15 Archivo, sans-serif; letter-spacing: -0.01em; }
 .tracker .model { margin-top: 12px; color: var(--muted); }
-.tracker .pause { padding: 4px 0; border: 0; background: none; color: var(--muted); font: 400 10px/1 'Martian Mono', monospace; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; }
-.tracker .pause:hover { color: var(--ink); }
+.tracker .controls { display: flex; gap: 20px; }
+.tracker .controls button { min-width: 24px; min-height: 24px; padding: 4px 0; border: 0; background: none; color: var(--muted); font: 400 10px/1 'Martian Mono', monospace; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; }
+.tracker .controls button:hover { color: var(--ink); }
 .hero .tracker { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 .hero .tracker > * { pointer-events: auto; }
 .hero .tracker .shots { position: absolute; left: 63.33cqw; top: 6.67cqw; width: 38.89cqw; aspect-ratio: 2.06; }
 .hero .tracker .ticks { position: absolute; left: 63.33cqw; top: calc(26.39cqw - 11px); width: calc(36.67cqw - var(--m)); }
 .hero .tracker .caption { position: absolute; left: 51.67cqw; top: 6.67cqw; width: calc(11.67cqw - 16px); height: 18.89cqw; }
-.hero .tracker .pause { position: absolute; right: var(--m); top: calc(26.39cqw + 18px); }
+.hero .tracker .controls { position: absolute; right: var(--m); top: calc(26.39cqw + 15px); }
 
 .hero-foot { position: absolute; z-index: 1; left: var(--m); right: var(--m); top: 49.44cqw; display: grid; grid-template-columns: 1fr auto; align-items: end; }
 .hero .facts { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; padding-top: 22px; border-top: 1px solid var(--line); }
@@ -143,7 +144,7 @@ a:hover > .arr, a:hover .arr { translate: 4px 0; }
   .hero .tracker .shots { position: relative; left: auto; top: auto; width: 100%; aspect-ratio: 1.95; margin-top: 40px; }
   .hero .tracker .ticks { position: static; width: auto; margin: 6px var(--m) 0; }
   .hero .tracker .caption { position: static; width: auto; height: auto; padding: 4px var(--m) 0; }
-  .hero .tracker .pause { position: static; align-self: flex-start; margin: 6px var(--m) 0; }
+  .hero .tracker .controls { position: static; align-self: flex-start; margin: 6px var(--m) 0; }
   .hero .stage { position: relative; inset: auto; order: 1; margin-top: 12px; aspect-ratio: calc((var(--x1) - var(--x0)) * 16) / calc((var(--y1) - var(--y0)) * 10); }
   .hero .stage::after { display: none; }
   .hero .poster { inset: auto; left: calc(var(--x0) / (var(--x1) - var(--x0)) * -100%); top: calc(var(--y0) / (var(--y1) - var(--y0)) * -100%); width: calc(100% / (var(--x1) - var(--x0))); height: calc(100% / (var(--y1) - var(--y0))); }

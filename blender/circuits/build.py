@@ -132,6 +132,9 @@ def main():
 
     bg = setup_render(scene)
     scene.render.resolution_x, scene.render.resolution_y = 2880, 1800
+    scene.render.image_settings.file_format = "WEBP"
+    scene.render.image_settings.color_mode = "RGB"
+    scene.render.image_settings.quality = 82
     scene.eevee.taa_render_samples = 32
     bloom(scene)
     cam = camera(scene, LENS)
@@ -152,8 +155,11 @@ def main():
         recolour(mats["ink"], c["ink"])
         for o in ribbons:
             o.active_material.node_tree.nodes["Emission"].inputs["Strength"].default_value = GLOW[theme]
-        scene.render.filepath = os.path.join(PUBLIC, f"{CID}-{theme}.png")
-        bpy.ops.render.render(write_still=True)
+        for percent, suffix in ((100, ""), (50, "-1440")):
+            scene.render.resolution_percentage = percent
+            scene.render.filepath = os.path.join(PUBLIC, f"{CID}-{theme}{suffix}.webp")
+            bpy.ops.render.render(write_still=True)
+        scene.render.resolution_percentage = 100
         ground.data.materials[0] = original
         bpy.data.materials.remove(contours)
     recolour(mats["ink"], THEMES["light"]["ink"])
