@@ -7,6 +7,5 @@
 	"main": "./src/server.ts",
 	"observability": { "enabled": true },
 	"upload_source_maps": true,
-	"triggers": { "crons": ["*/30 * * * *"] },
 	"kv_namespaces": [{ "binding": "SEASON_KV", "id": "633469db86874a8995c6a05239e3288f" }]
 }

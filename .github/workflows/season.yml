@@ -1,0 +1,29 @@
+name: season
+
+on:
+  schedule:
+    - cron: '7 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: season
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+        with:
+          bun-version: 1.4.4
+      - run: bun install --frozen-lockfile
+      - run: bun tools/refresh-season.ts
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: 25fa0f27992016edcaf8e040e67fe2ba
+          CF_KV_NAMESPACE_ID: 633469db86874a8995c6a05239e3288f
