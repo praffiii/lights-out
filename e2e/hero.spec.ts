@@ -131,7 +131,7 @@ for (const width of [320, 390, 760, 1470]) {
       const tag = document.querySelector<HTMLElement>('.hero .tag')
       const stage = document.querySelector<HTMLElement>('.hero .stage')
 
-      if (!pin || !tag || !stage) return false
+      if (!pin || !tag || !stage) return 'missing'
 
       pin.scrollIntoView({ block: 'center' })
 
@@ -143,10 +143,12 @@ for (const width of [320, 390, 760, 1470]) {
 
       tag.style.transform = `translate(${x - s.x + t.width / 2}px, ${y - s.y - t.height / 2}px)`
 
-      return document.elementFromPoint(x, y)?.closest('[data-pin="turn-1"]') === pin
+      const hit = document.elementFromPoint(x, y)
+
+      return hit?.closest('[data-pin="turn-1"]') === pin ? 'turn-1' : `${hit?.tagName ?? 'nothing'}.${hit?.className ?? ''} at ${Math.round(x)},${Math.round(y)}`
     })
 
-    expect(pinOnTop).toBe(true)
+    expect(pinOnTop).toBe('turn-1')
     expect(errors).toEqual([])
   })
 }
