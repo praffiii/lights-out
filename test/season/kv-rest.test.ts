@@ -1,9 +1,11 @@
 import { expect, it } from 'bun:test'
-import { Effect, Schema } from 'effect'
+import { Effect, Layer, Schema } from 'effect'
 
+import { refreshSnapshot } from '../../src/season/refresh.ts'
 import { KVWriteError, kvRest } from '../../src/season/kv-rest.ts'
 import { SeasonSnapshotJson } from '../../src/season/snapshot-schema.ts'
 import { SnapshotStore } from '../../src/season/store.ts'
+import { fakeJolpica } from './fake-jolpica.ts'
 
 const TOKEN = 'secret-token-123'
 
@@ -12,11 +14,11 @@ const base = { accountId: 'acc', namespaceId: 'ns', token: TOKEN }
 const valueUrl = 'https://api.cloudflare.com/client/v4/accounts/acc/storage/kv/namespaces/ns/values/season%3Av1'
 
 const recordingFetch = (respond: (request: Request) => Response) => {
-  const requests: Array<{ url: string; method: string; authorization: string | null; body: string }> = []
+  const requests: Array<{ url: string; method: string; authorization: string | null; contentType: string | null; body: string }> = []
 
   const fetch: Parameters<typeof kvRest>[0]['fetch'] = async (input, init) => {
     const request = new Request(input, init)
-    requests.push({ url: request.url, method: request.method, authorization: request.headers.get('authorization'), body: await request.clone().text() })
+    requests.push({ url: request.url, method: request.method, authorization: request.headers.get('authorization'), contentType: request.headers.get('content-type'), body: await request.clone().text() })
 
     return respond(request)
   }
@@ -29,7 +31,7 @@ it('puts the value under the encoded key with a bearer token and an unchanged bo
 
   await kvRest({ ...base, fetch }).put('season:v1', '{"a":1}')
 
-  expect(requests).toEqual([{ url: valueUrl, method: 'PUT', authorization: `Bearer ${TOKEN}`, body: '{"a":1}' }])
+  expect(requests).toEqual([{ url: valueUrl, method: 'PUT', authorization: `Bearer ${TOKEN}`, contentType: 'application/octet-stream', body: '{"a":1}' }])
 })
 
 it('rejects a failed put with its status and never leaks the token', async () => {
@@ -76,4 +78,15 @@ it('round-trips the fixture snapshot through SnapshotStore', async () => {
   )
 
   expect(result).toEqual(snapshot)
+})
+
+it('fails the refresh with the status and without the token when the KV write is rejected', async () => {
+  const { fetch } = recordingFetch(() => new Response(`forbidden ${TOKEN}`, { status: 403 }))
+
+  const services = Layer.merge(fakeJolpica(), SnapshotStore.fromKV(kvRest({ ...base, fetch })))
+
+  const failure = await Effect.runPromise(refreshSnapshot(new Date('2026-11-08T00:00:00Z')).pipe(Effect.provide(services))).catch((cause: Error) => String(cause))
+
+  expect(failure).toContain('403')
+  expect(failure).not.toContain(TOKEN)
 })

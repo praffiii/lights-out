@@ -39,7 +39,7 @@ export const kvRest = ({ accountId, namespaceId, token, fetch }: KVRestConfig): 
       return response.text()
     },
     put: async (key, value) => {
-      const response = await fetch(valueUrl(key), { method: 'PUT', headers, body: value })
+      const response = await fetch(valueUrl(key), { method: 'PUT', headers: { ...headers, 'content-type': 'application/octet-stream' }, body: value })
 
       if (!response.ok) {
         throw new KVWriteError({ status: response.status })

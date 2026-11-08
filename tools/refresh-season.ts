@@ -6,21 +6,20 @@ import { JolpicaClient } from '../src/season/jolpica-client.ts'
 import { refreshSnapshot } from '../src/season/refresh.ts'
 import { SnapshotStore } from '../src/season/store.ts'
 
-const names = ['CLOUDFLARE_API_TOKEN', 'CF_ACCOUNT_ID', 'CF_KV_NAMESPACE_ID'] as const
+const { CLOUDFLARE_API_TOKEN: token, CF_ACCOUNT_ID: accountId, CF_KV_NAMESPACE_ID: namespaceId } = process.env
 
-const missing = names.find((name) => !process.env[name])
+const missing = [
+  ['CLOUDFLARE_API_TOKEN', token],
+  ['CF_ACCOUNT_ID', accountId],
+  ['CF_KV_NAMESPACE_ID', namespaceId],
+].find(([, value]) => !value)
 
-if (missing !== undefined) {
-  console.error(`Missing environment variable ${missing}`)
+if (!token || !accountId || !namespaceId) {
+  console.error(`Missing environment variable ${missing?.[0]}`)
   process.exit(1)
 }
 
-const kv = kvRest({
-  token: process.env.CLOUDFLARE_API_TOKEN ?? '',
-  accountId: process.env.CF_ACCOUNT_ID ?? '',
-  namespaceId: process.env.CF_KV_NAMESPACE_ID ?? '',
-  fetch: globalThis.fetch,
-})
+const kv = kvRest({ token, accountId, namespaceId, fetch: globalThis.fetch })
 
 const services = Layer.merge(JolpicaClient.layer.pipe(Layer.provide(FetchHttpClient.layer)), SnapshotStore.fromKV(kv))
 
