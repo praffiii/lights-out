@@ -123,6 +123,7 @@ for (const width of [320, 390, 760, 1470]) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 
     await expect(page.locator('.hero .stage[data-gl]')).toHaveCount(1)
+    await lifted(page)
     await page.getByRole('button', { name: 'Pause' }).click()
     await page.addStyleTag({ content: '.hero .pins > span, .hero .tag { pointer-events: auto !important }' })
 
