@@ -207,3 +207,20 @@ test('keeps the footer lights off under reduced motion', async ({ page, errors }
   await expect(page.locator('.next-race .lights i.on')).toHaveCount(0)
   expect(errors).toEqual([])
 })
+
+test('keeps the close button on screen while the menu is open, even if the page scrolls down', async ({ page, errors }) => {
+  await page.goto('/')
+  await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
+  await page.locator('.next-race').scrollIntoViewIfNeeded()
+  await page.mouse.wheel(0, -300)
+  await expect(page.locator('.header')).not.toHaveClass(/away/)
+  await page.getByRole('button', { name: 'Menu' }).click()
+  await page.evaluate(() => {
+    document.documentElement.classList.remove('lenis-stopped')
+    scrollBy(0, 120)
+  })
+  await page.waitForTimeout(600)
+
+  await expect(page.getByRole('button', { name: 'Close' })).toBeInViewport()
+  expect(errors).toEqual([])
+})

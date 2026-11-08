@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 
 import { ScrollTrigger } from '#/motion/motion.ts'
 import { Roll } from '#/motion/Roll.tsx'
@@ -7,29 +7,28 @@ import { Go } from './Go.tsx'
 import { WeekendBox } from './WeekendBox.tsx'
 
 export function Header({ menuOpen, onMenu }: { menuOpen: boolean; onMenu: () => void }) {
-  const header = useRef<HTMLElement>(null)
+  const [away, setAway] = useState(false)
+  const [solid, setSolid] = useState(false)
 
   useEffect(() => {
-    const el = header.current
-
-    if (!el) return
-
     const st = ScrollTrigger.create({
       start: 0,
       end: 'max',
       onUpdate: (self) => {
         const y = self.scroll()
 
-        el.classList.toggle('away', y > 200 && self.direction === 1)
-        el.classList.toggle('solid', y > 10)
+        setAway(y > 200 && self.direction === 1)
+        setSolid(y > 10)
       },
     })
 
     return () => st.kill()
   }, [])
 
+  useEffect(() => setAway(false), [menuOpen])
+
   return (
-    <header ref={header} className={menuOpen ? 'header menu-open' : 'header'}>
+    <header className={['header', menuOpen ? 'menu-open' : away && 'away', solid && 'solid'].filter(Boolean).join(' ')}>
       <Go to="/" className="logo" aria-label="Lights Out, home">
         <span className="dots" aria-hidden>
           <i />
