@@ -3,7 +3,8 @@ import { defineConfig } from '@playwright/test'
 export default defineConfig({
   testDir: 'e2e',
   fullyParallel: true,
-  use: { baseURL: 'http://localhost:4400' },
+  workers: 2,
+  use: { baseURL: 'http://localhost:4400', channel: 'chrome', headless: false },
   webServer: {
     command: 'bun run build && bunx vite preview --port 4400 --strictPort',
     url: 'http://localhost:4400',
