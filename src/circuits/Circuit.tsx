@@ -7,7 +7,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { gsap } from '#/motion/motion.ts'
 import type { Theme } from '#/shell/theme.ts'
 
-import { damp, isSector, mattify, PALETTE, screen, SECTORS } from './shaders.ts'
+import { contour, damp, isSector, mattify, PALETTE, screen, SECTORS } from './shaders.ts'
 
 const START_AZIMUTH = -0.26
 const START_LIFT = 0.1
@@ -37,8 +37,22 @@ function Scene({ model, theme, progress, live, pins, onReady }: Props) {
   const gl = useThree((s) => s.gl)
   const scene = useThree((s) => s.scene)
 
-  const { materials, markers, orbit } = useMemo(() => {
+  const { materials, ground, markers, orbit } = useMemo(() => {
     const materials = mattify(gltf.scene, (name) => (isSector(name) ? SECTORS[name] : '#000000'))
+    const track = new THREE.Box3()
+
+    gltf.scene.updateMatrixWorld(true)
+    gltf.scene.traverse((o) => {
+      if (isSector(o.name)) track.expandByObject(o)
+    })
+
+    const extent = track.getSize(new THREE.Vector3())
+    const ground = contour(theme, Math.max(extent.x, extent.z))
+
+    materials.delete('ground')
+    gltf.scene.traverse((o) => {
+      if (o instanceof THREE.Mesh && o.name === 'ground') o.material = ground.material
+    })
     const markers: THREE.Object3D[] = []
 
     gltf.scene.traverse((o) => {
@@ -53,7 +67,7 @@ function Scene({ model, theme, progress, live, pins, onReady }: Props) {
 
     const at = source.getWorldPosition(new THREE.Vector3())
 
-    return { materials, markers, orbit: { distance: at.length(), elevation: Math.asin(at.y / at.length()), fov: source.fov, far: source.far } }
+    return { materials, ground, markers, orbit: { distance: at.length(), elevation: Math.asin(at.y / at.length()), fov: source.fov, far: source.far } }
   }, [gltf, model])
 
   useLayoutEffect(() => {
@@ -61,9 +75,11 @@ function Scene({ model, theme, progress, live, pins, onReady }: Props) {
 
     for (const [name, m] of materials) {
       if (isSector(name)) m.uniforms.uBase.value.set(t.unfilled)
-      else m.uniforms.uColor.value.set(name === 'ground' ? t.bg : t.ink)
+      else m.uniforms.uColor.value.set(t.ink)
     }
-  }, [theme, materials])
+
+    ground.setTheme(theme)
+  }, [theme, materials, ground])
 
   useLayoutEffect(() => {
     if (!(camera instanceof THREE.PerspectiveCamera)) return
