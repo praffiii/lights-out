@@ -11,6 +11,8 @@ import { type PickedRace, pickRace, type RaceKind } from '#/season/weekend.ts'
 
 const Circuit = lazy(() => import('#/circuits/Circuit.tsx'))
 
+const noop = () => {}
+
 const pct = (v: number) => `${v * 100}%`
 
 const LABEL: Record<RaceKind, string> = { 'this-weekend': 'This weekend', next: 'Next race', finale: 'Season finale' }
@@ -63,6 +65,9 @@ function Band({ picked, info }: BandProps) {
   const root = useRef<HTMLElement>(null)
   const progress = useRef(0)
   const live = useRef(false)
+  const fill = useRef(0)
+  const tilt = useRef(0)
+  const tag = useRef<HTMLElement>(null)
   const pins = useRef<HTMLDivElement>(null)
   const [glReady, setGlReady] = useState(false)
   const shown = theme ?? 'light'
@@ -91,6 +96,7 @@ function Band({ picked, info }: BandProps) {
 
       if (REDUCED) {
         progress.current = 1
+        fill.current = 1
 
         return
       }
@@ -111,7 +117,10 @@ function Band({ picked, info }: BandProps) {
           invalidateOnRefresh: true,
           end: '+=150%',
           scrub: true,
-          onUpdate: (s) => void (progress.current = s.progress),
+          onUpdate: (s) => {
+            progress.current = s.progress
+            fill.current = Math.min(1, Math.max(0, (s.progress - 0.05) / 0.85))
+          },
         })
         ScrollTrigger.create({ trigger: section, refreshPriority: -1, start: 'top bottom', end: 'bottom top', onToggle: (s) => void (live.current = s.isActive) })
       })
@@ -149,7 +158,7 @@ function Band({ picked, info }: BandProps) {
                 {mounted && !REDUCED && theme && (
                   <CircuitGuard onError={onFail}>
                     <Suspense fallback={null}>
-                      <Circuit model={info.model} theme={theme} progress={progress} live={live} pins={pins} onReady={onReady} />
+                      <Circuit model={info.model} theme={theme} layout="wide" fill={fill} tilt={tilt} running={live} pins={pins} tag={tag} onLap={noop} onLapProgress={noop} onReady={onReady} />
                     </Suspense>
                   </CircuitGuard>
                 )}
