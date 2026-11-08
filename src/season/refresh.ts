@@ -8,5 +8,5 @@ export const refreshSnapshot = (now: Date): Effect.Effect<'written' | 'kept-prev
   buildSnapshot(now).pipe(
     Effect.flatMap((snapshot) => SnapshotStore.use((store) => store.write(snapshot))),
     Effect.as('written' as const),
-    Effect.catchTag('JolpicaError', (error) => Effect.logError('Season refresh failed, keeping the previous snapshot', error).pipe(Effect.as('kept-previous' as const))),
+    Effect.catchTag('JolpicaError', (error) => Effect.logError('Season refresh failed, keeping the previous snapshot', { path: error.path, cause: String(error.cause) }).pipe(Effect.as('kept-previous' as const))),
   )

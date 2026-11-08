@@ -1,5 +1,6 @@
 import { expect, it } from 'bun:test'
-import { Effect, Layer, Schema } from 'effect'
+import { Effect, Layer, Logger, Schema } from 'effect'
+import { HttpClientError, HttpClientRequest, HttpClientResponse } from 'effect/http'
 
 import { JolpicaError } from '../../src/season/jolpica-client.ts'
 import { RacesResponse } from '../../src/season/jolpica-schema.ts'
@@ -41,4 +42,30 @@ it('treats corrupt stored JSON as empty', async () => {
   const { kv } = fakeKV({ 'season:v1': '{not json' })
 
   expect(await readBack(kv)).toBeNull()
+})
+
+it('logs the failing path and the HTTP status when Jolpica rejects the request', async () => {
+  const { kv } = fakeKV()
+  const request = HttpClientRequest.get('https://api.jolpi.ca/ergast/f1/current/races/?limit=100')
+
+  const rateLimited = Effect.fail(
+    new JolpicaError({
+      path: '/current/races/?limit=100',
+      cause: new HttpClientError.HttpClientError({
+        reason: new HttpClientError.StatusCodeError({ request, response: HttpClientResponse.fromWeb(request, new Response('', { status: 429 })) }),
+      }),
+    }),
+  )
+
+  const lines: Array<string> = []
+  const capture = Logger.layer([Logger.map(Logger.formatSimple, (line) => void lines.push(line))])
+
+  const result = await Effect.runPromise(
+    refreshSnapshot(now).pipe(Effect.provide(Layer.mergeAll(fakeJolpica({ races: () => rateLimited }), SnapshotStore.fromKV(kv), capture))),
+  )
+
+  expect(result).toBe('kept-previous')
+  expect(lines.join('\n')).toContain('Season refresh failed, keeping the previous snapshot')
+  expect(lines.join('\n')).toContain('/current/races/?limit=100')
+  expect(lines.join('\n')).toContain('429')
 })
