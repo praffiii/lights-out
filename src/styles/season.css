@@ -40,7 +40,7 @@
 .season .tile { position: relative; }
 .season .tile.is-open { z-index: 6; }
 .season .tile button {
-  position: relative; display: grid; grid-template-rows: 24px auto 18px 22px; width: 100%; padding: 0;
+  position: relative; display: grid; grid-template-rows: 24px auto 18px 22px; width: 100%; padding: 0; cursor: default;
   text-align: left; border-top: 1px solid var(--ink); transition: background-color 0.24s var(--brake), color 0.24s var(--brake);
 }
 .season .tile.is-upcoming button { border-top-color: var(--line); color: var(--muted); }
