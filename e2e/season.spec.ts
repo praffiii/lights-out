@@ -70,6 +70,7 @@ for (const width of [800, 1024, 1280]) {
 
     for (const round of [1, 6, 7, 8, 9, 12]) {
       await tile(page, round).hover()
+      await expect(card(page)).toContainText(`R${round} · `)
 
       const box = await card(page).boundingBox()
 
