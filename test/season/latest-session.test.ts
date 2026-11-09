@@ -55,6 +55,13 @@ it('a race drops unclassified drivers and keeps a lapped gap as text', async () 
   expect(latest?.rows.some((row) => row.gap === '+2 LAPS')).toBe(true)
 })
 
+it('matches a session that started at another time than the calendar says', async () => {
+  const latest = await at('2026-05-04T00:00:00Z', anyKey(11412))
+
+  expect(latest?.round).toBe(4)
+  expect(latest?.name).toBe('Race')
+})
+
 it('skips cancelled sessions', async () => {
   const asked: Array<number> = []
   const latest = await at('2026-04-20T00:00:00Z', anyKey(11412, asked))
@@ -77,9 +84,9 @@ it('a session with no result yet gives nothing', async () => {
 })
 
 it('a session the calendar does not know gives nothing', async () => {
-  const moved = calendar.map((race) => ({ ...race, sessions: race.sessions.map((s) => (s.name === 'FP2' ? { ...s, startsAt: s.startsAt.replace(':00:00Z', ':05:00Z') } : s)) }))
+  const missing = calendar.filter((race) => race.round !== 20)
 
-  expect(await at('2026-11-06T21:00:00Z', fakeOpenF1(), moved)).toBeUndefined()
+  expect(await at('2026-11-06T21:00:00Z', fakeOpenF1(), missing)).toBeUndefined()
 })
 
 const reply = (respond: (url: string) => Response) =>

@@ -16,6 +16,7 @@ const NAMES = new Map<string, SessionName>([
 ])
 
 const LIVE_MS = 30 * 60_000
+const MOVED_MS = 2 * 86_400_000
 
 export const latestSession = (calendar: ReadonlyArray<Race>, season: number, now: Date): Effect.Effect<LatestSession | undefined, never, OpenF1Client> =>
   Effect.gen(function* () {
@@ -32,8 +33,9 @@ export const latestSession = (calendar: ReadonlyArray<Race>, season: number, now
 
     if (!newest) return undefined
 
-    const race = calendar.find((r) => r.sessions.some((s) => s.name === newest.name && Date.parse(s.startsAt) === newest.at))
-    const entry = race?.sessions.find((s) => s.name === newest.name)
+    const same = (s: Race['sessions'][number]) => s.name === newest.name && Math.abs(Date.parse(s.startsAt) - newest.at) < MOVED_MS
+    const race = calendar.find((r) => r.sessions.some(same))
+    const entry = race?.sessions.find(same)
 
     if (!race || !entry) return undefined
 
