@@ -2,7 +2,7 @@ import { GlobalRegistrator } from '@happy-dom/global-registrator'
 
 GlobalRegistrator.register()
 
-import { afterAll, afterEach, expect, it, setSystemTime, spyOn } from 'bun:test'
+import { afterAll, afterEach, expect, it, jest, setSystemTime, spyOn } from 'bun:test'
 import { Schema } from 'effect'
 
 import { SeasonSnapshotJson } from '../../src/season/snapshot-schema.ts'
@@ -52,9 +52,11 @@ it('shows the flag line and no digits after the race', () => {
   expect(container.querySelector('.flag')?.textContent).toBe('Chequered flag. The Las Vegas Grand Prix starts Sat 21 Nov.')
 })
 
-it('hands the weekend to the calendar as a .ics file', () => {
+it('hands the weekend to the calendar as a .ics file and frees it once the download has started', () => {
   const created = spyOn(URL, 'createObjectURL').mockReturnValue('blob:weekend')
   const revoked = spyOn(URL, 'revokeObjectURL').mockReturnValue(undefined)
+  jest.useFakeTimers()
+
   const { getByRole } = show('2026-11-07T12:30:00Z')
 
   fireEvent.click(getByRole('button', { name: /Add the weekend to your calendar/ }))
@@ -62,6 +64,11 @@ it('hands the weekend to the calendar as a .ics file', () => {
   const blob = created.mock.calls[0]?.[0]
 
   expect(blob instanceof Blob && blob.type).toStartWith('text/calendar')
+  expect(revoked).not.toHaveBeenCalled()
+
+  jest.advanceTimersByTime(40_000)
+  jest.useRealTimers()
+
   expect(revoked).toHaveBeenCalledWith('blob:weekend')
 
   created.mockRestore()

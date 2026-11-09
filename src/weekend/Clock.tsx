@@ -6,6 +6,8 @@ import type { SeasonSnapshot } from '#/season/snapshot-schema.ts'
 import { weekendIcs } from './ics.ts'
 import { clockDigits, type WeekendPage } from './page-model.ts'
 
+const REVOKE_MS = 40_000
+
 const download = (snapshot: SeasonSnapshot) => {
   const ics = weekendIcs(snapshot, new Date())
 
@@ -17,7 +19,7 @@ const download = (snapshot: SeasonSnapshot) => {
   link.href = url
   link.download = ics.filename
   link.click()
-  URL.revokeObjectURL(url)
+  setTimeout(() => URL.revokeObjectURL(url), REVOKE_MS)
 }
 
 export function Clock({ page, snapshot }: { page: WeekendPage; snapshot: SeasonSnapshot }) {
