@@ -50,3 +50,18 @@ it('the weekend box keeps its short race names', () => {
   expect(gpName(interlagos)).toBe('São Paulo GP')
   expect(gpName(sepang)).toBe('Bahrain GP in Malaysia')
 })
+
+it('every calendar circuit has both photo sizes', async () => {
+  const srcs = Object.values(CALENDAR).flatMap(({ photo }) => [photo.small, photo.large])
+  const exists = await Promise.all(srcs.map(async (src) => [src, await Bun.file(`public${src}`).exists()] as const))
+
+  expect(exists.filter(([, found]) => !found).map(([src]) => src)).toEqual([])
+})
+
+it('every credit names a licence', () => {
+  const unlicensed = Object.entries(CALENDAR)
+    .filter(([, { photo }]) => !/· (CC BY(-SA)? \d\.\d|CC0|Public domain)$/.test(photo.credit))
+    .map(([id]) => id)
+
+  expect(unlicensed).toEqual([])
+})
