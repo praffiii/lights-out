@@ -21,14 +21,21 @@ it('fits every circuit inside the free area above the facts, never enlarged', ()
   }
 })
 
-it('keeps Interlagos within a few percent of its approved size', () => {
-  expect(fitCrop(circuitFor('interlagos')?.crop ?? [0, 0, 1, 1]).k).toBeGreaterThan(0.95)
+it('renders every circuit near full size, framed for the hero in Blender', () => {
+  const small = allCircuits().flatMap(({ crop, name }) => (fitCrop(crop).k < 0.95 ? [name] : []))
+
+  expect(small).toEqual([])
 })
 
-it('shrinks Las Vegas to the height of the free area', () => {
-  const crop = circuitFor('vegas')?.crop ?? [0, 0, 1, 1]
+it('shrinks a crop taller than the free area to its height', () => {
+  const crop = [0.2, 0.3, 0.9, 0.95] as const
   const [, y0, , y1] = placed(crop)
 
   expect(fitCrop(crop).k).toBeLessThan(1)
   expect(y1 - y0).toBeCloseTo(FREE[3] - FREE[1], 9)
+})
+
+it('exaggerates flat circuits more, so their contours still show', () => {
+  expect(circuitFor('interlagos')?.relief).toBe(3)
+  expect(circuitFor('yas_marina')?.relief).toBe(6)
 })

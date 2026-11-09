@@ -12,13 +12,17 @@ from bpy_extras.object_utils import world_to_camera_view
 
 OUT = os.path.join(HERE, ".out")
 LINES = os.path.join(HERE, "..", "..", "src", "circuits", "lines")
-AZ, PITCH, DIST, LENS, SHIFT_X, SHIFT_Y = 15.0, 40.0, 2.7, 60.0, -0.06, 0.07
+PITCH, DIST, LENS, SHIFT_X, SHIFT_Y = 40.0, 2.7, 60.0, -0.06, 0.07
 GLOW = {"dark": 1.1, "light": 1.0}
 CONTOUR_STEP = 3.0
 FOG = 0.75
 FLAT_LO, FLAT_HI = 0.0004, 0.002
 LINE_POINTS = 400
 CROP_MARGIN = 0.06
+FREE = (0.2, 0.41, 0.92, 0.785)
+FILL = 0.98
+AZIMUTHS = range(0, 360, 10)
+KEEP_OUT = ((0.0, 0.0, 0.31, 0.49), (0.79, 0.0, 1.0, 0.48))
 PALETTE = {
     "dark": {"ground": "#121316", "line": "#737985", "haze": "#1B1D22"},
     "light": {"ground": "#EFEEE9", "line": "#7E8187", "haze": "#EDEBE6"},
@@ -93,19 +97,74 @@ def bloom(scene):
     tree.links.new(glare.outputs["Image"], out.inputs[0])
 
 
-def aim(cam, mid, span):
-    az, pitch = math.radians(AZ), math.radians(PITCH)
+def aim(cam, mid, span, az_deg, target):
+    az, pitch = math.radians(az_deg), math.radians(PITCH)
     dist = span * DIST
-    cam.data.lens = LENS
     cam.data.shift_x, cam.data.shift_y = SHIFT_X, SHIFT_Y
     cam.location = (
         mid.x + dist * math.cos(pitch) * math.sin(az),
         mid.y - dist * math.cos(pitch) * math.cos(az),
         mid.z + dist * math.sin(pitch),
     )
-    cam.rotation_euler = (mid - cam.location).to_track_quat("-Z", "Y").to_euler()
+    cam.rotation_euler = (target - cam.location).to_track_quat("-Z", "Y").to_euler()
     cam.data.clip_start, cam.data.clip_end = 5, dist * 6
+    bpy.context.view_layer.update()
     return dist
+
+
+def box(scene, cam, track):
+    pts = [world_to_camera_view(scene, cam, p + Vector((0, 0, HEIGHT))) for p in track.samples]
+    x0, x1 = min(p.x for p in pts), max(p.x for p in pts)
+    y0, y1 = min(1 - p.y for p in pts), max(1 - p.y for p in pts)
+    mx, my = (x1 - x0) * CROP_MARGIN, (y1 - y0) * CROP_MARGIN
+    return x0 - mx, y0 - my, x1 + mx, y1 + my
+
+
+def room(b):
+    return min((FREE[2] - FREE[0]) / (b[2] - b[0]), (FREE[3] - FREE[1]) / (b[3] - b[1]))
+
+
+def intrudes(scene, cam, track):
+    for p in track.samples:
+        v = world_to_camera_view(scene, cam, p + Vector((0, 0, HEIGHT)))
+        if any(x0 <= v.x <= x1 and y0 <= 1 - v.y <= y1 for x0, y0, x1, y1 in KEEP_OUT):
+            return True
+    return False
+
+
+def place(scene, cam, track, mid, span, az, fill):
+    cam.data.lens = LENS
+    target = mid.copy()
+    for _ in range(8):
+        aim(cam, mid, span, az, target)
+        cam.data.lens *= room(box(scene, cam, track)) * fill
+        bpy.context.view_layer.update()
+        b = box(scene, cam, track)
+        dx = (FREE[0] + FREE[2]) / 2 - (b[0] + b[2]) / 2
+        dy = (FREE[1] + FREE[3]) / 2 - (b[1] + b[3]) / 2
+        wide = (target - cam.location).length * cam.data.sensor_width / cam.data.lens
+        tall = wide * scene.render.resolution_y / scene.render.resolution_x
+        right, up = cam.matrix_world.col[0].xyz, cam.matrix_world.col[1].xyz
+        target = target - right * dx * wide + up * dy * tall
+    aim(cam, mid, span, az, target)
+    return target
+
+
+def frame(scene, cam, track, mid, span):
+    best = None
+    for az in AZIMUTHS:
+        fill = FILL
+        target = place(scene, cam, track, mid, span, az, fill)
+        while intrudes(scene, cam, track) and fill > 0.6:
+            fill -= 0.03
+            target = place(scene, cam, track, mid, span, az, fill)
+        if not intrudes(scene, cam, track) and (best is None or cam.data.lens > best[0]):
+            best = (cam.data.lens, az, target)
+    lens, az, target = best
+    dist = aim(cam, mid, span, az, target)
+    cam.data.lens = lens
+    bpy.context.view_layer.update()
+    return az, dist
 
 
 def centreline(track):
@@ -117,11 +176,8 @@ def centreline(track):
 
 
 def crop(scene, cam, track):
-    pts = [world_to_camera_view(scene, cam, p + Vector((0, 0, HEIGHT))) for p in track.samples]
-    x0, x1 = min(p.x for p in pts), max(p.x for p in pts)
-    y0, y1 = min(1 - p.y for p in pts), max(1 - p.y for p in pts)
-    mx, my = (x1 - x0) * CROP_MARGIN, (y1 - y0) * CROP_MARGIN
-    return [round(max(0.0, v), 4) for v in (x0 - mx, y0 - my)] + [round(min(1.0, v), 4) for v in (x1 + mx, y1 + my)]
+    x0, y0, x1, y1 = box(scene, cam, track)
+    return [round(max(0.0, v), 4) for v in (x0, y0)] + [round(min(1.0, v), 4) for v in (x1, y1)]
 
 
 def main():
@@ -144,7 +200,7 @@ def main():
     hi = Vector((max(p.x for p in pts), max(p.y for p in pts), max(p.z for p in pts)))
     mid = (lo + hi) / 2
     span = max(hi.x - lo.x, hi.y - lo.y)
-    dist = aim(cam, mid, span)
+    az, dist = frame(scene, cam, track, mid, span)
     ground = scene.objects["ground"]
     original = ground.data.materials[0]
 
@@ -177,7 +233,7 @@ def main():
     export(os.path.join(OUT, f"{CID}.glb"))
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(HERE, f"{CID}.blend"))
     zs = [p.z for p in track.samples]
-    print(f"done {CID}: lap {track.lap:.0f} m, camera {dist:.0f} m, model height {min(zs):.0f}..{max(zs):.0f} m")
+    print(f"done {CID}: lap {track.lap:.0f} m, camera {dist:.0f} m at {az} deg, lens {cam.data.lens:.1f} mm, crop {pins['crop']}, model height {min(zs):.0f}..{max(zs):.0f} m")
 
 
 main()

@@ -57,3 +57,16 @@ it('keeps the Tracker but leaves the circuit out when the circuit has no model',
   expect(container.querySelector('.hero .stage')).toBeNull()
   expect(container.querySelector('.hero .facts')).toBeNull()
 })
+
+const withCircuit = (snapshot: SeasonSnapshot, circuitId: string): SeasonSnapshot => ({
+  ...snapshot,
+  calendar: snapshot.calendar.map((race) => (race.round === 20 ? { ...race, circuit: { ...race.circuit, circuitId } } : race)),
+})
+
+it('states the real contour interval and exaggeration of each circuit', async () => {
+  const snapshot = await snapshotAt(NOW)
+
+  expect(renderWith(snapshot).container.querySelector('.hero .note')?.textContent).toContain('Contours every metre of real ground, height ×3')
+  cleanup()
+  expect(renderWith(withCircuit(snapshot, 'yas_marina')).container.querySelector('.hero .note')?.textContent).toContain('Contours every half metre of real ground, height ×6')
+})

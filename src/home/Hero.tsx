@@ -314,7 +314,7 @@ function Facts({ picked, info }: { picked: PickedRace; info: CircuitInfo }) {
       </dl>
       <div className="note mono">
         <p>{`${info.name} · ${info.gp} · ${WHEN[picked.kind]} · round ${picked.round} of ${picked.of}`}</p>
-        <p className="muted">Contours every metre of real ground, height ×3</p>
+        <p className="muted">{`Contours every ${info.relief === 3 ? 'metre' : 'half metre'} of real ground, height ×${info.relief}`}</p>
         <p className="muted">Built in Blender from bacinger/f1-circuits (MIT) and NASA SRTM elevation</p>
       </div>
       <p className="key mono muted">
