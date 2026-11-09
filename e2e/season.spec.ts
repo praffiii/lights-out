@@ -42,6 +42,35 @@ test('no horizontal overflow at 390 px', async ({ page, errors }, testInfo) => {
   expect(errors).toEqual([])
 })
 
+const overlaps = (page: Page, a: string, b: string) =>
+  page.evaluate(
+    ([x, y]) =>
+      [...document.querySelectorAll(x)].some((one) =>
+        [...document.querySelectorAll(y)].some((two) => {
+          const p = one.getBoundingClientRect()
+          const q = two.getBoundingClientRect()
+
+          return p.left < q.right - 1 && q.left < p.right - 1 && p.top < q.bottom - 1 && q.top < p.bottom - 1
+        }),
+      ),
+    [a, b],
+  )
+
+for (const width of [800, 1024, 1280]) {
+  test(`fits at ${width} px with nothing on top of anything`, async ({ page, errors }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop')
+    await page.setViewportSize({ width, height: 800 })
+    await loaded(page, '/season?reduced')
+
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
+    expect(await overlaps(page, '.title-fight .gap', '.fighter')).toBe(false)
+    expect(await overlaps(page, '.this-weekend .caption', '.this-weekend .sessions')).toBe(false)
+    expect(await overlaps(page, '.team-row .part b', '.team-row .total b')).toBe(false)
+    expect(await page.evaluate(() => [...document.querySelectorAll('.this-weekend .caption h2')].every((el) => el.scrollWidth <= el.clientWidth))).toBe(true)
+    expect(errors).toEqual([])
+  })
+}
+
 test('?reduced shows everything with no bars', async ({ page, errors }) => {
   await page.goto('/season?reduced')
   await page.waitForLoadState('networkidle')

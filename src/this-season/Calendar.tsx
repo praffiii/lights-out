@@ -24,7 +24,7 @@ function Card({ id, tile, theme }: { id: string; tile: CalendarTile; theme: Them
       <p className="mono facts">
         {circuit.name} · {circuit.lengthKm} km · {circuit.laps} laps
       </p>
-      <p className="mono credit">{circuit.photo.credit}</p>
+      <p className="mono credit">{`${circuit.photo.place} · ${circuit.photo.credit}`}</p>
     </div>
   )
 }

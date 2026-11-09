@@ -49,7 +49,7 @@ export function ThisWeekend({ snapshot }: { snapshot: SeasonSnapshot }) {
           </ul>
         </div>
       </div>
-      <p className="mono credit">{facts ? `${facts.photo.credit} · times from the official calendar` : 'Times from the official calendar'}</p>
+      <p className="mono credit">{facts ? `${facts.photo.place} · ${facts.photo.credit} · times from the official calendar` : 'Times from the official calendar'}</p>
     </section>
   )
 }

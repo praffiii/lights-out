@@ -54,6 +54,7 @@ it('opens the circuit card on hover', async () => {
 
   expect(card(container)).toContain('R13 · Italian Grand Prix')
   expect(card(container)).toContain('Monza · 5.793 km · 53 laps')
+  expect(card(container)).toContain('From orbit · Monza, 2018 · Photo Planet Labs · CC BY-SA 4.0')
   expect(monza.querySelector('img')?.getAttribute('src')).toBe('/circuits/tiles/it-1922-hover-light.webp')
   expect(monza.getAttribute('aria-describedby')).toBe(container.querySelector('.card')?.id ?? 'missing')
 

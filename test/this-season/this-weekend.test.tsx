@@ -28,6 +28,7 @@ it('fills the next session and counts it down', async () => {
   expect(container.querySelectorAll('.sessions .is-next')).toHaveLength(1)
   expect(next()).toBe('Next · 02h 30m')
   expect(container.querySelector('.facts')?.textContent).toContain('4.309 km')
+  expect(container.querySelector('.this-weekend .credit')?.textContent).toBe('From the air · São Paulo, 2022 · Photo Governo do Estado de São Paulo · CC BY 2.0 · times from the official calendar')
 
   setSystemTime(new Date(Date.parse(NOW) + 60_000))
 

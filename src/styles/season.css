@@ -12,7 +12,7 @@
 .season .label { font-size: 11px; font-weight: 400; }
 
 .title-fight { padding: 0 var(--m); }
-.title-fight .poster { display: grid; grid-template-columns: 420px minmax(0, 1fr) 420px; gap: 14px; margin-top: 33px; }
+.title-fight .poster { display: grid; grid-template-columns: minmax(0, 420fr) minmax(0, 460fr) minmax(0, 420fr); gap: 14px; margin-top: 33px; }
 .fighter .frame { position: relative; aspect-ratio: 420 / 540; overflow: hidden; background: var(--line); }
 .fighter .frame > img, .fighter .frame > .blank { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .fighter .frame > img.car { object-position: 50% 50%; scale: 1.6; }
@@ -25,10 +25,10 @@
 .fighter .place { font-size: 12px; font-weight: 500; }
 .fighter .name { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
 .fighter .pts { font-size: 11px; }
-.title-fight .middle { display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 14px; }
-.title-fight .gap { font-size: 400px; line-height: 0.85; letter-spacing: -0.06em; }
-.title-fight .gap[data-digits='3'] { font-size: 236px; margin-top: 70px; }
-.title-fight .gap[data-digits='4'] { font-size: 176px; margin-top: 110px; }
+.title-fight .middle { container-type: inline-size; display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 14px; }
+.title-fight .gap { font-size: min(400px, 87cqi); line-height: 0.85; letter-spacing: -0.06em; }
+.title-fight .gap[data-digits='3'] { font-size: min(236px, 51cqi); margin-top: 70px; }
+.title-fight .gap[data-digits='4'] { font-size: min(176px, 38cqi); margin-top: 110px; }
 .title-fight .what { margin-top: auto; font-size: 11px; }
 .title-fight .line { max-width: 420px; margin: 18px 0 120px; font-size: 18px; line-height: 1.5; color: var(--muted); }
 .title-fight .credit { margin-top: 17px; font-size: 10px; }
@@ -155,7 +155,7 @@
 .this-weekend .band { position: relative; height: 820px; overflow: clip; background: var(--line); }
 .this-weekend .shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .this-weekend .caption { position: absolute; left: var(--m); bottom: 0; width: 600px; padding: 28px 28px 44px; border-top: 3px solid var(--purple); background: var(--bg); color: var(--ink); }
-.this-weekend .caption h2 { margin: 18px 0 0 -2px; font-size: 56px; line-height: 1; letter-spacing: -0.035em; }
+.this-weekend .caption h2 { white-space: normal; margin: 18px 0 0 -2px; font-size: 56px; line-height: 1; letter-spacing: -0.035em; }
 .this-weekend .facts { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 32px; }
 .this-weekend dt { font-size: 11px; color: var(--muted); }
 .this-weekend dd { margin-top: 12px; font-size: 22px; font-weight: 500; }
@@ -170,11 +170,28 @@
 .this-weekend .sessions .is-next .status { color: var(--purple); }
 .this-weekend .credit { padding: 16px var(--m) 0; font-size: 10px; color: var(--muted); }
 
+@media (max-width: 1199px) {
+  .season h2.display { white-space: normal; }
+  .season .intro { grid-template-columns: minmax(0, 1fr); }
+  .season .intro .copy { max-width: 560px; }
+
+  .team-row { grid-template-columns: 44px minmax(0, 1fr); grid-template-rows: auto auto auto; }
+  .team-row .sum { grid-column: 1 / -1; margin-top: 18px; }
+  .team-row .part { flex: 0 1 auto; }
+  .team-row b { font-size: 56px; }
+  .team-row .plus, .team-row .eq { font-size: 44px; padding: 0 14px; }
+  .team-row .shares { grid-column: 1 / -1; margin-top: 16px; }
+
+  .this-weekend .band { display: flex; flex-direction: column; height: auto; background: none; }
+  .this-weekend .shot { position: relative; height: clamp(240px, 56vw, 560px); }
+  .this-weekend .caption { position: relative; left: auto; width: auto; margin: -56px var(--m) 0; }
+  .this-weekend .sessions { position: relative; right: auto; width: auto; margin: 16px var(--m) 0; border: 1px solid var(--line); }
+}
+
 @media (max-width: 760px) {
   .season { padding-top: 124px; }
   .season .intro { grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: 16px; }
   .season .intro h2, .calendar h2 { font-size: 32px; }
-  .season h2.display { white-space: normal; }
   .season .intro .copy { padding-top: 0; font-size: 16px; }
 
   .title-fight .poster { grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
@@ -209,13 +226,10 @@
   .season .foot { flex-wrap: wrap; gap: 10px; }
 
   .teams { margin-top: 40px; }
-  .team-row { grid-template-columns: 36px minmax(0, 1fr); grid-template-rows: auto auto auto; padding: 20px 0; }
+  .team-row { grid-template-columns: 36px minmax(0, 1fr); padding: 20px 0; }
   .team-row .team { font-size: 24px; }
-  .team-row .sum { grid-column: 1 / -1; margin-top: 14px; }
-  .team-row .part { flex: 0 1 auto; }
   .team-row b { font-size: 34px; }
   .team-row .plus, .team-row .eq { font-size: 26px; padding: 0 8px; }
-  .team-row .shares { grid-column: 1 / -1; margin-top: 14px; }
 
   .who-led { margin-top: 64px; padding: 56px var(--m) 40px; }
   .who-led .marks, .who-led .leads, .who-led .legend, .who-led .to-race { display: none; }
@@ -226,12 +240,10 @@
   .who-led .live-round { flex-direction: row; gap: 10px; padding: 16px; }
   .who-led .live-round span { margin-top: 0; writing-mode: horizontal-tb; rotate: none; }
 
-  .this-weekend .band { display: flex; flex-direction: column; height: auto; background: none; }
-  .this-weekend .shot { position: relative; height: 280px; }
-  .this-weekend .caption { position: relative; left: auto; width: auto; margin: -56px var(--m) 0; padding: 20px 20px 24px; }
+  .this-weekend .caption { padding: 20px 20px 24px; }
   .this-weekend .caption h2 { font-size: 32px; }
   .this-weekend .facts { margin-top: 20px; }
   .this-weekend dd { font-size: 18px; }
-  .this-weekend .sessions { position: relative; right: auto; width: auto; margin: 16px var(--m) 0; padding: 16px; border: 1px solid var(--line); }
+  .this-weekend .sessions { padding: 16px; }
   .this-weekend .sessions li { grid-template-columns: 1fr 48px auto; padding: 0 8px; }
 }
