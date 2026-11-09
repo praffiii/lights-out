@@ -95,6 +95,19 @@ for (const width of [800, 1024, 1280]) {
   })
 }
 
+test('the circuit stage runs the full width of the window with no frame', async ({ page, errors }) => {
+  await loaded(page, '/weekend?reduced')
+
+  const width = await page.evaluate(() => document.documentElement.clientWidth)
+  const box = await stage(page).boundingBox()
+
+  expect(box?.x).toBe(0)
+  expect(box?.width).toBe(width)
+  await expect(page.locator('.weekend-page .band .card')).toHaveCSS('border-top-width', '0px')
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
+  expect(errors).toEqual([])
+})
+
 test('?reduced shows everything with no bars', async ({ page, errors }) => {
   await loaded(page, '/weekend?reduced')
   await page.waitForLoadState('networkidle')

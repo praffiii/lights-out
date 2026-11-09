@@ -25,8 +25,8 @@
 .weekend-page .note { max-width: 520px; font-size: 18px; color: var(--muted); }
 .weekend-page .add { flex: none; padding: 6px 0 8px; border-bottom: 2px solid var(--ink); font-size: 16px; font-weight: 500; }
 
-.weekend-page .band { padding: 60px var(--m) 30px; background: var(--bg); color: var(--ink); }
-.weekend-page .band .card { position: relative; display: grid; grid-template-columns: 1fr 280px; align-items: start; padding: 36px 32px 44px; border: 1px solid var(--line); }
+.weekend-page .band { padding: 60px 0 30px; background: var(--bg); color: var(--ink); }
+.weekend-page .band .card { position: relative; display: grid; grid-template-columns: 1fr 280px; align-items: start; padding: 36px var(--m) 44px; }
 .weekend-page .band .figures { position: relative; z-index: 2; display: grid; grid-template-columns: 340px repeat(2, 200px); row-gap: 28px; pointer-events: none; }
 .weekend-page .band .figures > div:first-child { grid-row: span 2; }
 .weekend-page .band .figures dt { font-size: 11px; color: var(--muted); }
@@ -43,7 +43,7 @@
 .weekend-page .band .schedule .is-done { color: var(--muted); }
 .weekend-page .band .schedule .is-next .day, .weekend-page .band .schedule .is-live .day { color: var(--purple); }
 
-.weekend-page .band .stage { position: relative; grid-column: 1 / -1; margin: -150px -32px 0; aspect-ratio: 16 / 9; overflow: clip; touch-action: pan-y; cursor: grab; user-select: none; }
+.weekend-page .band .stage { position: relative; grid-column: 1 / -1; margin: -150px calc(-1 * var(--m)) 0; aspect-ratio: 16 / 9; overflow: clip; touch-action: pan-y; cursor: grab; user-select: none; }
 .weekend-page .band .stage:active { cursor: grabbing; }
 .weekend-page .band .poster { position: absolute; left: calc(var(--x) * -100%); top: calc(var(--y) * -100%); width: calc(var(--w) * 100%); height: calc(var(--h) * 100%); max-width: none; pointer-events: none; }
 .weekend-page .band .poster[hidden] { display: none; }
@@ -60,7 +60,7 @@
 .weekend-page .band .sector { display: none; translate: -50% -50%; padding: 4px 6px; background: var(--bg); font-size: 11px; color: var(--ink); transition: opacity 0.6s var(--brake); }
 .weekend-page .band .stage[data-gl] .sector { display: block; }
 .weekend-page .band .stage[data-sectors='off'] .sector { opacity: 0; }
-.weekend-page .band .reset { position: absolute; right: 0; bottom: 12px; z-index: 3; padding: 8px 12px; border: 1px solid var(--line); background: var(--bg); font-size: 10px; }
+.weekend-page .band .reset { position: absolute; right: var(--m); bottom: 12px; z-index: 3; padding: 8px 12px; border: 1px solid var(--line); background: var(--bg); font-size: 10px; }
 
 .weekend-page .band .toggles { display: flex; gap: 28px; margin-top: 8px; font-size: 11px; }
 .weekend-page .band .toggles button { display: inline-flex; align-items: center; gap: 8px; letter-spacing: inherit; text-transform: inherit; }
@@ -69,7 +69,7 @@
 .weekend-page .band .toggles button:disabled { color: var(--muted); cursor: default; }
 .weekend-page .band .toggles button:disabled i { border-color: var(--muted); background: none; }
 .weekend-page .band .explore { justify-self: end; margin-top: 8px; font-size: 11px; }
-.weekend-page .band .credit { margin-top: 14px; font-size: 10px; color: var(--muted); }
+.weekend-page .band .credit { margin-top: 14px; padding: 0 var(--m); font-size: 10px; color: var(--muted); }
 
 @media (prefers-reduced-motion: reduce) {
   .weekend-page .band .turn, .weekend-page .band .sector { transition: none; }
@@ -145,13 +145,13 @@
   .weekend-page .clock-foot { flex-direction: column; gap: 24px; margin-top: 32px; }
   .weekend-page .note { font-size: 16px; }
 
-  .weekend-page .band { padding: 40px var(--m) 24px; }
-  .weekend-page .band .card { padding: 24px 16px 28px; }
+  .weekend-page .band { padding: 40px 0 24px; }
+  .weekend-page .band .card { padding: 24px var(--m) 28px; }
   .weekend-page .band .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 20px; }
   .weekend-page .band .figures > div:first-child { grid-column: 1 / -1; grid-row: auto; }
   .weekend-page .band .figures > div:first-child dd { font-size: 44px; }
   .weekend-page .band .figures dd { font-size: 28px; }
-  .weekend-page .band .stage { margin: 20px -16px 0; aspect-ratio: 4 / 5; }
+  .weekend-page .band .stage { margin: 20px calc(-1 * var(--m)) 0; aspect-ratio: 4 / 5; }
   .weekend-page .band .schedule { order: 1; margin-top: 32px; }
   .weekend-page .band .schedule li { grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 12px; }
 
