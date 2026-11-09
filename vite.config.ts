@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [
     cloudflare({ viteEnvironment: { name: 'ssr' } }),
     tanstackStart({
+      pages: [{ path: '/weekend' }],
       prerender: {
         enabled: true,
         crawlLinks: true,

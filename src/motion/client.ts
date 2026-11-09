@@ -33,3 +33,10 @@ export function useSecond() {
 
   return now
 }
+
+export const useZone = () =>
+  useSyncExternalStore(
+    never,
+    () => Intl.DateTimeFormat().resolvedOptions().timeZone,
+    () => 'UTC',
+  )

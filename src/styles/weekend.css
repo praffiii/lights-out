@@ -1,0 +1,21 @@
+.weekend-page { padding-top: 88px; }
+.weekend-page .weekend-empty { padding: 200px var(--m); font-size: 20px; color: var(--muted); }
+
+.weekend-page .top { position: relative; height: 900px; overflow: clip; background: var(--line); }
+.weekend-page .top .shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.weekend-page .top .title { position: absolute; left: 0; bottom: 0; width: 820px; max-width: 100%; padding: 40px var(--m) 39px; background: var(--bg); color: var(--ink); }
+.weekend-page .top h1 { margin: 17px 0 0 -6px; font-size: 104px; white-space: normal; }
+.weekend-page .top .dates { margin-top: 34px; }
+.weekend-page .top .credit { position: absolute; right: 0; bottom: 0; min-width: 420px; max-width: 50%; padding: 14px 16px; background: var(--bg); font-size: 10px; color: var(--muted); }
+
+.weekend-page .clock { padding: 78px var(--m) 120px; }
+.weekend-page .clock-head { display: flex; justify-content: space-between; gap: 24px; }
+.weekend-page .digits { display: flex; align-items: flex-start; margin: 27px 0 0 -14px; }
+.weekend-page .digits .group { display: grid; justify-items: start; }
+.weekend-page .digits .value, .weekend-page .digits .colon { font-weight: 800; font-size: 280px; line-height: 0.85; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
+.weekend-page .digits .colon { padding: 0 12px; color: var(--muted); }
+.weekend-page .digits .unit { margin: 22px 0 0 14px; color: var(--ink); }
+.weekend-page .flag { margin-top: 40px; font-size: 72px; white-space: normal; }
+.weekend-page .clock-foot { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; margin-top: 46px; }
+.weekend-page .note { max-width: 520px; font-size: 18px; color: var(--muted); }
+.weekend-page .add { flex: none; padding: 6px 0 8px; border-bottom: 2px solid var(--ink); font-size: 16px; font-weight: 500; }

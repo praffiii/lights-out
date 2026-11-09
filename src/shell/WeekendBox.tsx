@@ -189,7 +189,9 @@ function NowTab({ snapshot, now }: { snapshot: SeasonSnapshot; now: Date }) {
         {info && <Row label="Lap" value={`${info.facts.lengthKm} km`} />}
         {info && <Row label="Race" value={`${info.facts.laps} laps`} />}
       </div>
-      <Soon className="mono more">Race weekend page</Soon>
+      <Go to="/weekend" className="mono more">
+        Race weekend page <span className="arr">→</span>
+      </Go>
     </>
   )
 }
@@ -225,7 +227,9 @@ function NextTab({ snapshot, now }: { snapshot: SeasonSnapshot; now: Date }) {
           ))}
         </div>
       )}
-      <Soon className="mono more">Full weekend schedule</Soon>
+      <Go to="/weekend" className="mono more">
+        Full weekend schedule <span className="arr">→</span>
+      </Go>
     </>
   )
 }

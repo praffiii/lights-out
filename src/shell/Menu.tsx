@@ -122,11 +122,17 @@ export function Menu({ open, onClose, path }: { open: boolean; onClose: () => vo
               </span>
               {m.subs && (
                 <div className="subs mono">
-                  {m.subs.map((c) => (
-                    <Soon key={c.n} className="muted">
-                      {c.n} {c.title}
-                    </Soon>
-                  ))}
+                  {m.subs.map((sub) =>
+                    sub.to ? (
+                      <Go key={sub.key} to={sub.to} aria-current={sub.to === path ? 'page' : undefined}>
+                        {sub.label}
+                      </Go>
+                    ) : (
+                      <Soon key={sub.key} className="muted">
+                        {sub.label}
+                      </Soon>
+                    ),
+                  )}
                 </div>
               )}
             </li>
