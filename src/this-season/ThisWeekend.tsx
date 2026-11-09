@@ -1,6 +1,7 @@
 import { useSecond } from '#/motion/client.ts'
 import { weekend } from '#/season/page-model.ts'
 import type { SeasonSnapshot } from '#/season/snapshot-schema.ts'
+import { Go } from '#/shell/Go.tsx'
 
 export function ThisWeekend({ snapshot }: { snapshot: SeasonSnapshot }) {
   const now = useSecond()
@@ -35,6 +36,9 @@ export function ThisWeekend({ snapshot }: { snapshot: SeasonSnapshot }) {
               </div>
             </dl>
           ) : null}
+          <Go to="/weekend" className="mono more">
+            Race weekend <span className="arr">→</span>
+          </Go>
         </div>
         <div className="sessions">
           <p className="mono">Sessions · track time</p>

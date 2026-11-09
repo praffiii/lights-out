@@ -8,9 +8,10 @@ import { JolpicaClient, JolpicaError } from '../../src/season/jolpica-client.ts'
 import { RacesResponse, SeasonResultsResponse } from '../../src/season/jolpica-schema.ts'
 import { SeasonSnapshotJson } from '../../src/season/snapshot-schema.ts'
 import { calendar2026, calendar2027, fake, fakeJolpica, fixture, noRaces, qualifying } from './fake-jolpica.ts'
+import { fakeOpenF1 } from './fake-openf1.ts'
 
 const run = (now: string, overrides: Partial<JolpicaClient['Service']> = {}) =>
-  Effect.runPromise(buildSnapshot(new Date(now)).pipe(Effect.provide(fakeJolpica(overrides))))
+  Effect.runPromise(buildSnapshot(new Date(now)).pipe(Effect.provide(Layer.merge(fakeJolpica(overrides), fakeOpenF1()))))
 
 it('picks the next future session mid-season', async () => {
   const snapshot = await run('2026-05-20T00:00:00Z')
@@ -75,7 +76,7 @@ it('fails with JolpicaError when any endpoint fails', async () => {
 
   const exit = await Effect.runPromise(
     buildSnapshot(new Date('2026-05-20T00:00:00Z')).pipe(
-      Effect.provide(fakeJolpica({ races: () => broken })),
+      Effect.provide(Layer.merge(fakeJolpica({ races: () => broken }), fakeOpenF1())),
       Effect.flip,
     ),
   )
@@ -150,7 +151,7 @@ it('a history page that never answers times out after 20 s and the core snapshot
       yield* TestClock.adjust('21 seconds')
 
       return yield* Fiber.join(fiber)
-    }).pipe(Effect.provide(fakeJolpica({ seasonSprints: () => Effect.never })), Effect.provide(TestClock.layer())),
+    }).pipe(Effect.provide(Layer.merge(fakeJolpica({ seasonSprints: () => Effect.never }), fakeOpenF1())), Effect.provide(TestClock.layer())),
   )
 
   expect(snapshot.history).toBeUndefined()

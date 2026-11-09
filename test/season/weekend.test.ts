@@ -166,3 +166,8 @@ it('splits a countdown into days, hours, minutes and seconds', () => {
   ])
   expect(countdown(-5000).map(([, n]) => n)).toEqual(['00', '00', '00', '00'])
 })
+
+it('formats your time in the zone it is given', () => {
+  process.env.TZ = 'UTC'
+  expect(when('2026-11-08T17:00:00Z', 'America/Sao_Paulo', 'Asia/Jakarta')).toEqual({ day: 'Sun 8 Nov', track: '14:00', yours: '00:00 (next day)' })
+})

@@ -6,7 +6,7 @@ import { gsap, REDUCED } from '#/motion/motion.ts'
 import type { Race } from '#/season/jolpica-schema.ts'
 import type { SeasonSnapshot } from '#/season/snapshot-schema.ts'
 import { useSeason } from '#/season/use-season.ts'
-import { boxCopy, boxState, countdown, gpName, latestStart, pickRace, SESSION_LABEL, sessionDay, when } from '#/season/weekend.ts'
+import { boxCopy, boxState, countdown, gpName, latestStart, pickRace, SESSION_LABEL, sessionDay, when, zoneName } from '#/season/weekend.ts'
 
 import { Go, Soon } from './Go.tsx'
 import { opposite, useTheme } from './theme.ts'
@@ -169,9 +169,6 @@ const Row = ({ label, value, end, lead }: { label: string; value: string; end?: 
 
 const trackZone = (race: Race) => circuitFor(race.circuit.circuitId)?.tz
 
-const zoneName = (at: Date, timeZone: string) =>
-  new Intl.DateTimeFormat('en-US', { timeZone, timeZoneName: 'short' }).formatToParts(at).find((part) => part.type === 'timeZoneName')?.value ?? ''
-
 function NowTab({ snapshot, now }: { snapshot: SeasonSnapshot; now: Date }) {
   const race = pickRace(snapshot, now)?.race
 
@@ -192,7 +189,9 @@ function NowTab({ snapshot, now }: { snapshot: SeasonSnapshot; now: Date }) {
         {info && <Row label="Lap" value={`${info.facts.lengthKm} km`} />}
         {info && <Row label="Race" value={`${info.facts.laps} laps`} />}
       </div>
-      <Soon className="mono more">Race weekend page</Soon>
+      <Go to="/weekend" className="mono more">
+        Race weekend page <span className="arr">→</span>
+      </Go>
     </>
   )
 }
@@ -228,7 +227,9 @@ function NextTab({ snapshot, now }: { snapshot: SeasonSnapshot; now: Date }) {
           ))}
         </div>
       )}
-      <Soon className="mono more">Full weekend schedule</Soon>
+      <Go to="/weekend" className="mono more">
+        Full weekend schedule <span className="arr">→</span>
+      </Go>
     </>
   )
 }

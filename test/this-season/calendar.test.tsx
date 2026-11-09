@@ -11,6 +11,7 @@ import { snapshotAt } from '../season/snapshot.ts'
 
 const { cleanup, fireEvent, render } = await import('@testing-library/react')
 const { Calendar } = await import('../../src/this-season/Calendar.tsx')
+const { ShellContext } = await import('../../src/shell/context.ts')
 
 const NOW = '2026-11-06T15:00:00Z'
 
@@ -21,10 +22,24 @@ afterAll(async () => {
   await GlobalRegistrator.unregister()
 })
 
+const went: Array<string> = []
+
+afterEach(() => {
+  went.length = 0
+})
+
 const renderWith = (snapshot: SeasonSnapshot) => {
   setSystemTime(new Date(NOW))
 
-  return render(<Calendar snapshot={snapshot} />)
+  const go = async (to: string) => {
+    went.push(to)
+  }
+
+  return render(
+    <ShellContext.Provider value={{ go }}>
+      <Calendar snapshot={snapshot} />
+    </ShellContext.Provider>,
+  )
 }
 
 const tile = (root: HTMLElement, round: number) => {
@@ -76,6 +91,30 @@ it('opens the card on keyboard focus and closes it on Escape', async () => {
   expect(card(container)).toBeNull()
 })
 
+it('keeps the card open while focus moves to its Race weekend link, then closes it when focus leaves', async () => {
+  const { container } = renderWith(await snapshotAt(NOW))
+  const now = tile(container, 20)
+
+  fireEvent.focus(now)
+
+  const link = container.querySelector<HTMLAnchorElement>('.card a')
+
+  if (!link) throw new Error('the current round has a link')
+
+  fireEvent.blur(now, { relatedTarget: link })
+
+  expect(card(container)).toContain('R20 · ')
+
+  fireEvent.keyDown(link, { key: 'Escape' })
+
+  expect(card(container)).toBeNull()
+
+  fireEvent.focus(now)
+  fireEvent.blur(now, { relatedTarget: tile(container, 21) })
+
+  expect(card(container)).toBeNull()
+})
+
 it('locks the card open on a tap and closes it on a second tap', async () => {
   const { container } = renderWith(await snapshotAt(NOW))
   const monza = tile(container, 13)
@@ -102,4 +141,34 @@ it('shows a circuit it has no tile for by its code alone', async () => {
   fireEvent.pointerEnter(unknown, { pointerType: 'mouse' })
 
   expect(card(container)).toBeNull()
+})
+
+it('a click on the current round opens the Race weekend page', async () => {
+  const { container } = renderWith(await snapshotAt(NOW))
+
+  fireEvent.pointerDown(tile(container, 20), { pointerType: 'mouse' })
+  fireEvent.click(tile(container, 20))
+
+  expect(went).toEqual(['/weekend'])
+  expect(tile(container, 20).dataset.to).toBe('/weekend')
+})
+
+it('a click on any other round goes nowhere', async () => {
+  const { container } = renderWith(await snapshotAt(NOW))
+
+  fireEvent.pointerDown(tile(container, 13), { pointerType: 'mouse' })
+  fireEvent.click(tile(container, 13))
+
+  expect(went).toEqual([])
+  expect(tile(container, 13).dataset.to).toBeUndefined()
+})
+
+it('a tap on the current round opens its card with a link to the Race weekend page', async () => {
+  const { container } = renderWith(await snapshotAt(NOW))
+
+  fireEvent.pointerDown(tile(container, 20), { pointerType: 'touch' })
+  fireEvent.click(tile(container, 20))
+
+  expect(went).toEqual([])
+  expect(container.querySelector('.card a')?.getAttribute('href')).toBe('/weekend')
 })

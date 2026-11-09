@@ -3,6 +3,7 @@ import { FetchHttpClient } from 'effect/http'
 
 import { kvRest } from '../src/season/kv-rest.ts'
 import { JolpicaClient } from '../src/season/jolpica-client.ts'
+import { OpenF1Client } from '../src/season/openf1-client.ts'
 import { refreshSnapshot } from '../src/season/refresh.ts'
 import { SnapshotStore } from '../src/season/store.ts'
 
@@ -21,7 +22,7 @@ if (!token || !accountId || !namespaceId) {
 
 const kv = kvRest({ token, accountId, namespaceId, fetch: globalThis.fetch })
 
-const services = Layer.merge(JolpicaClient.layer.pipe(Layer.provide(FetchHttpClient.layer)), SnapshotStore.fromKV(kv))
+const services = Layer.merge(Layer.merge(JolpicaClient.layer, OpenF1Client.layer).pipe(Layer.provide(FetchHttpClient.layer)), SnapshotStore.fromKV(kv))
 
 const code = await Effect.runPromise(refreshSnapshot(new Date()).pipe(Effect.provide(services))).then(
   (outcome) => (outcome === 'written' ? 0 : 1),

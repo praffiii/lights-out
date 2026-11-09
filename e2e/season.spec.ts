@@ -210,11 +210,12 @@ test('hovering a leader-strip column shows its lead in a whole chip', async ({ p
   expect(errors).toEqual([])
 })
 
-test('calendar tiles do not look like links while they go nowhere', async ({ page, errors }, testInfo) => {
+test('only the current round looks like a link', async ({ page, errors }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop')
   await loaded(page)
 
   expect(await tile(page, 13).evaluate((el) => getComputedStyle(el).cursor)).toBe('default')
+  expect(await tile(page, 20).evaluate((el) => getComputedStyle(el).cursor)).toBe('pointer')
   expect(errors).toEqual([])
 })
 

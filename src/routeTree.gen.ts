@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SeasonRouteImport } from './routes/season'
+import { Route as WeekendRouteImport } from './routes/weekend'
 import { Route as ApiSeasonRouteImport } from './routes/api/season'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const SeasonRoute = SeasonRouteImport.update({
   path: '/season',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WeekendRoute = WeekendRouteImport.update({
+  id: '/weekend',
+  path: '/weekend',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSeasonRoute = ApiSeasonRouteImport.update({
   id: '/api/season',
   path: '/api/season',
@@ -32,30 +38,34 @@ const ApiSeasonRoute = ApiSeasonRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/season': typeof SeasonRoute
+  '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/season': typeof SeasonRoute
+  '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/season': typeof SeasonRoute
+  '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/season' | '/api/season'
+  fullPaths: '/' | '/season' | '/weekend' | '/api/season'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/season' | '/api/season'
-  id: '__root__' | '/' | '/season' | '/api/season'
+  to: '/' | '/season' | '/weekend' | '/api/season'
+  id: '__root__' | '/' | '/season' | '/weekend' | '/api/season'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SeasonRoute: typeof SeasonRoute
+  WeekendRoute: typeof WeekendRoute
   ApiSeasonRoute: typeof ApiSeasonRoute
 }
 
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SeasonRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/weekend': {
+      id: '/weekend'
+      path: '/weekend'
+      fullPath: '/weekend'
+      preLoaderRoute: typeof WeekendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/season': {
       id: '/api/season'
       path: '/api/season'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SeasonRoute: SeasonRoute,
+  WeekendRoute: WeekendRoute,
   ApiSeasonRoute: ApiSeasonRoute,
 }
 export const routeTree = rootRouteImport

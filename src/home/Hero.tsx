@@ -1,8 +1,9 @@
-import { Component, type CSSProperties, lazy, type ReactNode, Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { type CSSProperties, lazy, Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 
+import { CircuitGuard } from '#/circuits/CircuitGuard.tsx'
 import { fitCrop } from '#/circuits/fit.ts'
 import { type CircuitInfo, circuitFor } from '#/circuits/registry.ts'
-import { useMounted } from '#/motion/client.ts'
+import { useMedia, useMounted } from '#/motion/client.ts'
 import { gsap, onEnter, REDUCED, ScrollTrigger, sweep, useGSAP } from '#/motion/motion.ts'
 import { Soon } from '#/shell/Go.tsx'
 import { useTheme } from '#/shell/theme.ts'
@@ -41,21 +42,6 @@ const circuitOf = (snapshot: SeasonSnapshot) => {
 
 export const heroShown = (snapshot: SeasonSnapshot) => (circuitOf(snapshot) && !REDUCED ? firstFrame : undefined)
 
-const watchNarrow = (fn: () => void) => {
-  const query = matchMedia(NARROW)
-
-  query.addEventListener('change', fn)
-
-  return () => query.removeEventListener('change', fn)
-}
-
-const useNarrow = () =>
-  useSyncExternalStore(
-    watchNarrow,
-    () => matchMedia(NARROW).matches,
-    () => false,
-  )
-
 const watchHidden = (fn: () => void) => {
   document.addEventListener('visibilitychange', fn)
 
@@ -68,22 +54,6 @@ const useHidden = () =>
     () => document.hidden,
     () => false,
   )
-
-class CircuitGuard extends Component<{ onError: () => void; children: ReactNode }, { failed: boolean }> {
-  override state = { failed: false }
-
-  static getDerivedStateFromError() {
-    return { failed: true }
-  }
-
-  override componentDidCatch() {
-    this.props.onError()
-  }
-
-  override render() {
-    return this.state.failed ? null : this.props.children
-  }
-}
 
 export function Hero() {
   const season = useSeason()
@@ -222,7 +192,7 @@ type StageProps = {
 function Stage({ info, car, at, fill, running, glReady, glFailed, onLap, onLapProgress, onReady, onFail }: StageProps) {
   const { theme } = useTheme()
   const mounted = useMounted()
-  const narrow = useNarrow()
+  const narrow = useMedia(NARROW)
   const pins = useRef<HTMLDivElement>(null)
   const tag = useRef<HTMLSpanElement>(null)
   const [x0, y0, x1, y1] = info.crop
@@ -250,14 +220,10 @@ function Stage({ info, car, at, fill, running, glReady, glFailed, onLap, onLapPr
                 model={info.model}
                 theme={theme}
                 layout={narrow ? 'narrow' : 'wide'}
-                restart={at}
                 fill={fill}
-                running={running}
                 pins={pins}
-                tag={tag}
-                onLap={onLap}
-                onLapProgress={onLapProgress}
                 onReady={onReady}
+                lap={{ restart: at, running, tag, onLap, onLapProgress }}
               />
             </Suspense>
           </CircuitGuard>

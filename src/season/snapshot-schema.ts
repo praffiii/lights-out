@@ -1,6 +1,6 @@
 import { Schema } from 'effect'
 
-import { ConstructorStandings, DriverRef, DriverStandings, QualifyingResults, Race, RaceResults, Session } from './jolpica-schema.ts'
+import { ConstructorStandings, DriverRef, DriverStandings, QualifyingResults, Race, RaceResults, Session, SessionName } from './jolpica-schema.ts'
 
 export const NextSession = Schema.Struct({
   round: Schema.Number,
@@ -24,6 +24,29 @@ export const History = Schema.Struct({ round: Schema.Number, leaders: Schema.Arr
 
 export type History = typeof History.Type
 
+export const LatestRow = Schema.Struct({
+  position: Schema.Number,
+  code: Schema.String,
+  family: Schema.String,
+  name: Schema.String,
+  team: Schema.String,
+  colour: Schema.NullOr(Schema.String),
+  time: Schema.NullOr(Schema.Number),
+  gap: Schema.NullOr(Schema.Union([Schema.Number, Schema.String])),
+})
+
+export type LatestRow = typeof LatestRow.Type
+
+export const LatestSession = Schema.Struct({
+  season: Schema.Number,
+  round: Schema.Number,
+  name: SessionName,
+  startsAt: Schema.String,
+  rows: Schema.Array(LatestRow),
+})
+
+export type LatestSession = typeof LatestSession.Type
+
 export const SeasonSnapshot = Schema.Struct({
   fetchedAt: Schema.String,
   season: Schema.Number,
@@ -40,6 +63,7 @@ export const SeasonSnapshot = Schema.Struct({
   driverStandings: DriverStandings,
   constructorStandings: ConstructorStandings,
   history: Schema.optionalKey(History),
+  latestSession: Schema.optionalKey(LatestSession),
 })
 
 export type SeasonSnapshot = typeof SeasonSnapshot.Type
