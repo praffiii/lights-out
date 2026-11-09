@@ -134,7 +134,10 @@ Read each section with `get_design_context` before building it, and match type, 
   - **Race rows.** With 11412, rows with a null `position` are dropped, and a lapped gap stays the string `'+2 LAPS'`.
   - **Skipped sessions.** Cancelled sessions and testing days are skipped.
   - **A 404 result** gives `undefined`.
-  - **No calendar match.** A session that matches no calendar session (same name and `date_start === startsAt`) gives `undefined`.
+  - **Calendar match.**
+    - A session matches a calendar session when the mapped name is the same and `Date.parse(date_start) === Date.parse(startsAt)`. OpenF1 writes `+00:00` and Jolpica writes `Z`, so never compare the raw strings.
+    - The fixtures keep OpenF1's own timestamps untouched, and FP2's `…T19:00:00+00:00` must match the calendar's `…T19:00:00Z`.
+    - A session with no match gives `undefined`.
   - **Failures.** A 401 gives `undefined` and a warning. So does no answer within 20 s, run with `TestClock`.
   - **In `refresh.test.ts`:**
     - `keeps the stored latestSession when OpenF1 has nothing new`;
@@ -145,7 +148,7 @@ Read each section with `get_design_context` before building it, and match type, 
   - **`latestSession`.**
     - Read `sessions?year=`. Keep the uncancelled sessions with a mapped name whose `date_end` plus 30 minutes is before `now`, and take the newest.
     - Read its result and drivers, and join them on `driver_number`.
-    - Match the session to the calendar to get `round`.
+    - Match the session to the calendar on name and parsed instant to get `round`.
     - Apply `Effect.timeout('20 seconds')` and `Effect.catch` with a warning log, as `history` does.
   - **Wiring.**
     - `buildSnapshot` attaches the result when it is defined.
@@ -160,7 +163,10 @@ Read each section with `get_design_context` before building it, and match type, 
 **Files:**
 - Create: `src/weekend/page-model.ts`, `src/weekend/ics.ts`, `test/weekend/page-model.test.ts`, `test/weekend/ics.test.ts`
 - Modify:
-  - `src/season/weekend.ts`: `when(iso, trackZone, visitorZone)` formats "yours" in `visitorZone`; update its callers. Also move `zoneName` here from `WeekendBox.tsx`.
+  - `src/season/weekend.ts`:
+    - `when(iso, trackZone, visitorZone?)` formats "yours", and its "(next day)" shift, in `visitorZone`.
+    - When `visitorZone` is `undefined` it keeps today's runtime default, so `WeekendBox` and `Footer` don't change. The page model always passes the zone.
+    - Also move `zoneName` here from `WeekendBox.tsx`.
   - `test/season/weekend.test.ts`
 
 **Interfaces:**
@@ -196,7 +202,7 @@ Read each section with `get_design_context` before building it, and match type, 
   - While a session runs, the clock counts to its end, using `SESSION_MINUTES`.
   - Otherwise it counts to the race's next session.
   - After the race's last session ends, `clock` is `null`, and `flag` says what's next:
-    - `Chequered flag. The ${grandPrix(next gp)} starts ${Fri 20 Nov}.` when `nextLightsOut` finds a race;
+    - `Chequered flag. The ${grandPrix(next gp)} starts ${Sat 21 Nov}.` when `nextLightsOut` finds a race. The day is that race's start day in its own track zone, through `sessionDay`; Las Vegas reads `Sat 21 Nov`.
     - `Chequered flag. That was the last race of ${season}.` when it doesn't.
 - **`clock.label`.** `Next · ${SESSION_LABEL}`, or `Live · ${SESSION_LABEL}` while a session runs.
 - **`clock.units`.**
@@ -252,7 +258,7 @@ Read each section with `get_design_context` before building it, and match type, 
     - `DTSTAMP` (now, UTC);
     - `SUMMARY:${gp} · ${SESSION_LABEL}`, with `,`, `;` and `\` escaped.
   - **Times.** A confirmed session has `DTSTART` in UTC and a `DURATION` from `SESSION_MINUTES`. An unconfirmed one has `DTSTART;VALUE=DATE` from its UTC date and `DTEND;VALUE=DATE` the day after.
-  - Lines end with CRLF and fold at 75 octets.
+  - Lines end with CRLF. They fold at 75 UTF-8 octets, only at code-point boundaries, so the 2-byte `·` is never split.
 
 - [ ] **Step 1: Write the failing tests** with the fixture snapshot and fixed clocks, on a process zone of UTC:
   - **Weekend copy.**
@@ -262,7 +268,9 @@ Read each section with `get_design_context` before building it, and match type, 
     - At race end plus 1 h, `clock` is `null` and `flag` names the Las Vegas Grand Prix.
     - After the finale with no next calendar, `flag` is the last-race line.
     - A `nextCalendar` race gets the `Next race · 2027 · Round 1` label.
-  - **Notes.** After FP3 the note reads "…set Sunday's grid.", and "…set Saturday's grid." for Las Vegas.
+  - **Notes.**
+    - At FP3 minus 2 h, the note about Qualifying reads "…set Sunday's grid.".
+    - At the same point of the Las Vegas weekend, it reads "…set Saturday's grid.".
   - **Visitor times.**
     - In `Asia/Jakarta`, the race row is `MON` `00:00`.
     - In `America/New_York`, an unconfirmed session shows its UTC day and `TBC`.
@@ -273,7 +281,10 @@ Read each section with `get_design_context` before building it, and match type, 
     - A `+1 LAP` gap reads `1 lap`.
     - A driver missing from `CARS` uses the row's names.
     - `latest` is `null` without `latestSession`.
-  - **ICS.** The body parses into five events with `VERSION`, `PRODID` and `DTSTAMP`. An unconfirmed session is all-day. A long summary folds.
+  - **ICS.**
+    - The body parses into five events with `VERSION`, `PRODID` and `DTSTAMP`.
+    - An unconfirmed session is all-day.
+    - A long summary with a `·` at the 75-octet cut folds without splitting it.
 - [ ] **Step 2: Run them and watch them fail** → "weekendPage is not defined".
 - [ ] **Step 3: Implement** the functions above, with `Intl.DateTimeFormat` and an explicit `timeZone` for every conversion.
 - [ ] **Step 4: Run** `bun test` and `bun run lint`.
@@ -335,7 +346,7 @@ Read each section with `get_design_context` before building it, and match type, 
   - **Stage.** The poster `<img>` first. GL mounts inside a `CircuitGuard` once the band is within 200 px of the viewport, through an `IntersectionObserver` in an effect. It mounts under reduced motion too, because dragging is user-driven.
   - **Drag.**
     - Pointer events on the stage, with `touch-action: pan-y`.
-    - Horizontal movement sets `yaw += dx * 0.006`, clamped to ±45°; beyond the clamp, movement is scaled by 0.3 and springs back on release.
+    - Horizontal movement sets `yaw += dx * 0.006`, clamped to ±45°. Beyond the clamp, movement is scaled by 0.3 and springs back on release; under `REDUCED` it snaps back to ±45°.
     - On release, velocity decays by `0.92 ** (dt / 16.7)` on `gsap.ticker`, skipped under `REDUCED`.
   - **Reset.** A reset button appears once the yaw is not 0. It tweens the yaw to 0 over 0.8 s with ease `launch`; under reduced motion it snaps.
   - **Turns.** Plain mono numbers on a 24 px stem (a `::before` line). The named corner's name sits under its number. The toggle fades the pins over 240 ms.
@@ -408,7 +419,9 @@ Read each section with `get_design_context` before building it, and match type, 
   - a 503 shows the waiting line within the loader budget;
   - the countdown ticks (`clock.fastForward`);
   - the calendar button downloads `interlagos-2026.ics`, whose body has five `BEGIN:VEVENT`;
-  - dragging the stage 200 px moves turn 1's pin, and the reset button brings it back to within 2 px;
+  - dragging the stage 200 px moves turn 1's pin;
+  - dragging 600 px reaches the ±45° limit, and every visible pin's box stays inside the stage;
+  - the reset button brings turn 1's pin back to within 2 px;
   - on the phone project, a vertical swipe on the stage scrolls the page;
   - the Turns toggle hides the pins, and the Sectors toggle hides the S labels;
   - the weekend box's "Race weekend page" link opens `/weekend`;
