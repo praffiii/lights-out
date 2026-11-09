@@ -33,6 +33,13 @@ const unconfirm = (snapshot: SeasonSnapshot, round: number, names: ReadonlyArray
 
 const withLatest = (latestSession: LatestSession): SeasonSnapshot => ({ ...fixture, latestSession })
 
+it('names the visitor day when the session falls on another day for them', () => {
+  const vegas = page('2026-11-22T01:00:00Z')
+
+  expect(vegas?.clock).toMatchObject({ label: 'Next · Race', track: 'Sat 21 Nov · 20:00 at the track', yours: 'Sun 11:00 your time' })
+  expect(page('2026-11-22T01:00:00Z', fixture, 'America/Los_Angeles')?.clock?.yours).toBe('20:00 your time')
+})
+
 it('writes the hero copy two hours before Practice 3', () => {
   const p = page('2026-11-07T12:30:00Z')
 

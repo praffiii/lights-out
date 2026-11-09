@@ -121,8 +121,10 @@ const clockOf = (aim: NonNullable<ReturnType<typeof target>>, timeZone: string, 
   if (!session.timeConfirmed) return { label, target: targetIso, units: 'd', track: `${sessionDay(session, timeZone)} · time TBC`, yours: '' }
 
   const w = when(session.startsAt, timeZone, visitor)
+  const day = (zone: string) => new Intl.DateTimeFormat('en-GB', { timeZone: zone, weekday: 'short' }).format(new Date(session.startsAt))
+  const mine = day(visitor) === day(timeZone) ? '' : `${day(visitor)} `
 
-  return { label, target: targetIso, units: at - t < DAY ? 'hms' : 'dhm', track: `${w.day} · ${w.track} at the track`, yours: `${w.yours.replace(/ \(.*\)$/, '')} your time` }
+  return { label, target: targetIso, units: at - t < DAY ? 'hms' : 'dhm', track: `${w.day} · ${w.track} at the track`, yours: `${mine}${w.yours.replace(/ \(.*\)$/, '')} your time` }
 }
 
 const noteOf = (race: Race, aim: ReturnType<typeof target>, timeZone: string, info: CircuitInfo | undefined) => {
