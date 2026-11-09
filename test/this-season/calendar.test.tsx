@@ -91,6 +91,30 @@ it('opens the card on keyboard focus and closes it on Escape', async () => {
   expect(card(container)).toBeNull()
 })
 
+it('keeps the card open while focus moves to its Race weekend link, then closes it when focus leaves', async () => {
+  const { container } = renderWith(await snapshotAt(NOW))
+  const now = tile(container, 20)
+
+  fireEvent.focus(now)
+
+  const link = container.querySelector<HTMLAnchorElement>('.card a')
+
+  if (!link) throw new Error('the current round has a link')
+
+  fireEvent.blur(now, { relatedTarget: link })
+
+  expect(card(container)).toContain('R20 · ')
+
+  fireEvent.keyDown(link, { key: 'Escape' })
+
+  expect(card(container)).toBeNull()
+
+  fireEvent.focus(now)
+  fireEvent.blur(now, { relatedTarget: tile(container, 21) })
+
+  expect(card(container)).toBeNull()
+})
+
 it('locks the card open on a tap and closes it on a second tap', async () => {
   const { container } = renderWith(await snapshotAt(NOW))
   const monza = tile(container, 13)

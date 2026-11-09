@@ -63,7 +63,7 @@ function Tile({ tile, theme, linked, open, setOpen }: TileProps) {
   }
 
   return (
-    <li className={`tile is-${state}${shown ? ' is-open' : ''}`}>
+    <li className={`tile is-${state}${shown ? ' is-open' : ''}`} onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && close()} onKeyDown={onKeyDown}>
       <button
         type="button"
         aria-label={`Round ${round} · ${circuit?.name ?? tile.code}${tile.status ? ` · ${tile.status}` : ''}`}
@@ -76,8 +76,6 @@ function Tile({ tile, theme, linked, open, setOpen }: TileProps) {
           pointer.current = e.pointerType
         }}
         onFocus={show}
-        onBlur={close}
-        onKeyDown={onKeyDown}
         onClick={onClick}
       >
         <span className="mono n">{two(round)}</span>
