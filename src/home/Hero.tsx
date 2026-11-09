@@ -1,5 +1,6 @@
 import { Component, type CSSProperties, lazy, type ReactNode, Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 
+import { fitCrop } from '#/circuits/fit.ts'
 import { type CircuitInfo, circuitFor } from '#/circuits/registry.ts'
 import { useMounted } from '#/motion/client.ts'
 import { gsap, onEnter, REDUCED, ScrollTrigger, sweep, useGSAP } from '#/motion/motion.ts'
@@ -225,7 +226,8 @@ function Stage({ info, car, at, fill, running, glReady, glFailed, onLap, onLapPr
   const pins = useRef<HTMLDivElement>(null)
   const tag = useRef<HTMLSpanElement>(null)
   const [x0, y0, x1, y1] = info.crop
-  const crop: Vars = { '--x0': x0, '--y0': y0, '--x1': x1, '--y1': y1 }
+  const fit = fitCrop(info.crop)
+  const crop: Vars = { '--x0': x0, '--y0': y0, '--x1': x1, '--y1': y1, '--fk': fit.k, '--fx': fit.x, '--fy': fit.y }
   const poster = `/circuits/${info.model}-${theme ?? 'light'}`
 
   return (

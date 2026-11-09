@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+
 import type { Page } from '@playwright/test'
 
 import { expect, LOADER_MS, test } from './fixtures.ts'
@@ -113,6 +115,45 @@ test('the track holds its framing while the page scrolls', async ({ page, errors
   await page.clock.runFor(600)
   expect(await t1InStage(page)).toEqual(before)
   expect(errors).toEqual([])
+})
+
+const withCircuit = (page: Page, id: string) =>
+  page.route('**/api/season', async (route) => {
+    const body = readFileSync('test/fixtures/season-snapshot.json', 'utf8').replace('"circuitId": "interlagos"', `"circuitId": "${id}"`)
+
+    await route.fulfill({ status: 200, contentType: 'application/json', body })
+  })
+
+const pinsBelowFacts = (page: Page) =>
+  page.evaluate(() => {
+    const facts = document.querySelector('.hero .facts')?.getBoundingClientRect().top ?? 0
+
+    return [...document.querySelectorAll('.hero .pins > span')].flatMap((pin) => (pin.getBoundingClientRect().bottom > facts ? [pin.textContent] : []))
+  })
+
+for (const id of ['interlagos', 'vegas', 'losail', 'yas_marina', 'albert_park']) {
+  test(`keeps the ${id} track above the facts on desktop`, async ({ page, errors }, info) => {
+    test.skip(info.project.name === 'phone', 'the phone stacks the facts under the track')
+    test.setTimeout(90_000)
+    await withCircuit(page, id)
+    await page.goto('/')
+    await lifted(page)
+    await expect(page.locator('.hero .stage[data-gl]')).toHaveCount(1)
+    await page.clock.runFor(300)
+    expect(await pinsBelowFacts(page)).toEqual([])
+    expect(errors).toEqual([])
+  })
+}
+
+test('keeps the poster pins above the facts when the circuit model never loads', async ({ page }, info) => {
+  test.skip(info.project.name === 'phone', 'the phone stacks the facts under the track')
+  await withCircuit(page, 'losail')
+  await page.route('**/circuits/*.glb', () => new Promise(() => {}))
+  await page.goto('/')
+  await lifted(page)
+  await expect(page.locator('.hero .poster')).toBeVisible()
+  await expect(page.locator('.hero .pins > span').first()).toBeVisible()
+  expect(await pinsBelowFacts(page)).toEqual([])
 })
 
 for (const width of [320, 390, 760, 1470]) {
