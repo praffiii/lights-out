@@ -26,7 +26,7 @@
 ## Review Focus
 
 1. A phone given a 4096² map (about 85 MB of GPU memory with mipmaps): phones load only the 2048 map. Pinned by an e2e request check in Task 5.
-2. Light theme: text, buttons and focus rings in the forced-dark hero and band, and the header over the hero, read as dark-theme ink, and the header's weekend panel keeps the page theme. Pinned in Task 1.
+2. Light theme: text, buttons and focus rings in the forced-dark hero and band, and the header over the hero, read as dark-theme ink, and the header's weekend panel keeps its current theme. Pinned in Task 1.
 3. The map request hangs or fails: the poster stays and no error shows, as for the glb today. Pinned in Task 5.
 4. Spin to ±45° on desktop and phone: no hard map edge, no smeared border texels across the apron, every pin inside. Pinned in Task 5 (map fade and outside-map colour) and by the 45° test running on both projects.
 5. Map orientation: the map in WebGL lines up with the poster (glTF UVs need `flipY = false`). Checked in Task 5 against the lakes inside Interlagos.
@@ -38,11 +38,11 @@ Reduced motion keeps today's behaviour: the hero shows the poster, and the band 
 ### Task 1: Circuit sections are always dark
 
 **Files:**
-- Modify: `src/styles/site.css`, `src/shell/Header.tsx`, `src/home/Hero.tsx`, `src/weekend/CircuitBand.tsx` and its caller
+- Modify: `src/styles/site.css`, `src/shell/Header.tsx`, `src/shell/WeekendBox.tsx` (takes the dark state for its trigger), `src/home/Hero.tsx`, `src/weekend/CircuitBand.tsx` and its caller
 - Test: `e2e/sections.spec.ts`
 
 **Interfaces:**
-- Produces: `.hero` and `.band` render with `data-theme="dark"` and `--bg: #06080E` in both themes; on `/`, while the header is not solid and the menu is closed, the logo, weekend trigger and menu button carry `data-theme="dark"` (not the `<header>`, so the weekend panel keeps the page theme). `CircuitBand` loses its `theme` prop; `Circuit` keeps `theme` until Task 5 and is always given `'dark'`.
+- Produces: `.hero` and `.band` render with `data-theme="dark"` and `--bg: #06080E` in both themes; on `/`, while the header is not solid and the menu is closed, the logo, weekend trigger and menu button carry `data-theme="dark"` (not the `<header>`, so the weekend panel's own `opposite(theme)` is unchanged). `CircuitBand` loses its `theme` prop; `Circuit` keeps `theme` until Task 5 and is always given `'dark'`.
 
 - [ ] **Step 1: Write the failing test** in `e2e/sections.spec.ts`, both projects:
 
@@ -93,7 +93,7 @@ test('the circuit sections and the header over the hero stay dark in the light t
 
 - [ ] **Step 1: Implement** `broadcast.py` and the build changes. Glow palette from the mock: `bg #06080E`, `ground #0A0E18`, `minor #172033`, `major #22304C`, `water #081226`, `green #0A1019`, `foot #0D1220`, `block #131A2B`, `road #111726`. Keep `frame()`'s azimuth search, `FREE` and `KEEP_OUT`.
 - [ ] **Step 2: Run** `sh blender/circuits/build.sh br-1940`, then `bun test` and the hero, weekend and sections e2e. Expected: the files above; tests still pass on today's runtime (the pins json gains `sector-N` keys, which `pinsOf` ignores).
-- [ ] **Step 3: Checkpoint with Praffi.** Show `br-1940.webp` beside the approved `glow-dark.png` with: the five sizes; the phone total (poster-1440 + glb + map-2048) and the hero's LCP image next to today's 32 KB and 315 KB; metres per pixel next to the mock's 0.6. Ask: does the halo read without bloom (if not, the desktop-only bloom fallback is decided now); are upright DOM labels fine or must they lie flat on the ground; are the budgets OK.
+- [ ] **Step 3: Checkpoint with Praffi.** Show `br-1940.webp` beside the approved `glow-dark.png` with: the five sizes; the bytes a 390×844 DPR 3 phone actually transfers for the hero (selected poster + glb + map), measured with Playwright on this branch and on `main` (today: br-1940 poster 31,786 B at 1440 or 85,192 B full, whichever `srcset` picks, plus the 315,272 B glb), and the selected poster as the LCP image; metres per pixel next to the mock's 0.6. Ask: does the halo read without bloom (if not, the desktop-only bloom fallback is decided now); are upright DOM labels fine or must they lie flat on the ground; are the budgets OK.
 - [ ] **Step 4: Commit** `feat(circuits): Blender bakes Interlagos as a glowing ribbon on its OpenStreetMap map`.
 
 ### Task 4: The other four circuits
@@ -111,34 +111,34 @@ test('the circuit sections and the header over the hero stay dark in the light t
 ### Task 5: The runtime draws the broadcast look
 
 **Files:**
-- Modify: `src/circuits/shaders.ts` (replace `mattify`, `groundOf`, `PALETTE`, `GROUND` and their shaders), `src/circuits/Circuit.tsx`, `src/circuits/fit.ts` (`SQUASH` from 36°), `src/circuits/registry.ts` (drop `relief`), `src/home/Hero.tsx`, `src/weekend/CircuitBand.tsx`
+- Modify: `src/circuits/shaders.ts` (replace `mattify`, `groundOf`, `PALETTE`, `GROUND` and their shaders), `src/circuits/Circuit.tsx`, `src/circuits/fit.ts` (`SQUASH` from 36°), `src/circuits/registry.ts` (drop `relief`; add `sectors`), `src/home/Hero.tsx` (the contour note line becomes the OSM credit), `src/weekend/CircuitBand.tsx` (`data-pin="sector-N"`, OSM credit)
 - Delete: `public/circuits/*-light*.webp`, `public/circuits/*-dark*.webp`, `test/circuits/posters.test.ts`, `test/circuits/ground.test.ts`
-- Test: `test/circuits/broadcast.test.ts`, `test/circuits/fit.test.ts`, `test/circuits/assets.test.ts`, `e2e/hero.spec.ts`, `e2e/weekend.spec.ts`
+- Test: `test/circuits/broadcast.test.ts`, `test/circuits/fit.test.ts` (drop the `relief` test), `test/circuits/registry.test.ts`, `test/circuits/assets.test.ts`, `e2e/hero.spec.ts`, `e2e/weekend.spec.ts` (the Sectors toggle test selects `sector-1`)
 
 **Interfaces:**
 - Consumes: Tasks 3–4's mesh names, UVs, empties and files.
-- Produces: `broadcast(scene: THREE.Object3D, map: THREE.Texture, span: number): { fills: ReadonlyArray<{ uniforms: { uTo: { value: number } } }> }`; `mapUrl(model: string, small: boolean): string` beside `modelUrl`; `Circuit` loses its `theme` prop; posters load from `/circuits/{model}.webp`.
+- Produces: `broadcast(scene: THREE.Object3D, map: THREE.Texture, span: number): { fills: ReadonlyArray<{ uniforms: { uTo: { value: number } } }> }`; `mapUrl(model: string, small: boolean): string` beside `modelUrl`; `Circuit` loses its `theme` prop; posters load from `/circuits/{model}.webp`; `CircuitInfo.sectors: ReadonlyArray<{ n: 1 | 2 | 3; x: number; y: number }>`, read from the pins json's `sector-N` by a reader beside `pinsOf`; the band credit and the hero note end with `Map © OpenStreetMap contributors (ODbL)`.
 
-- [ ] **Step 1: Write the failing tests.** `broadcast.test.ts`: a group with meshes `ground`, `S1`, `S1-halo`, `blocks`; after `broadcast(group, texture, 100)` the ground's `uMap` uniform is the texture; setting `fills[0].uniforms.uTo.value` reaches `S1` and `S1-halo`; `S1-halo`'s material is `transparent`, `depthWrite: false`, `THREE.AdditiveBlending`; a second call returns the same materials. `fit.test.ts`: the 36° squash. `assets.test.ts`: no `-light` or `-dark` poster exists. e2e: a phone requests `*-map-2048.webp` and never `*-map.webp`; with `**/circuits/*-map*.webp` hung (as `hero.spec.ts:148` hangs the glb) the poster stays with no page errors on `/` and `/weekend`; remove the desktop-only skip from "the spin stops at 45 degrees with every pin inside the stage".
+- [ ] **Step 1: Write the failing tests.** `broadcast.test.ts`: a group with meshes `ground`, `S1`, `S1-halo`, `blocks`; after `broadcast(group, texture, 100)` the ground's `uMap` uniform is the texture; setting `fills[0].uniforms.uTo.value` reaches `S1` and `S1-halo`; `S1-halo`'s material is `transparent`, `depthWrite: false`, `THREE.AdditiveBlending`; a second call returns the same materials. `fit.test.ts`: the 36° squash. `assets.test.ts`: no `-light` or `-dark` poster exists. e2e: a phone requests `*-map-2048.webp` and never `*-map.webp`; with `**/circuits/*-map*.webp` hung (as `hero.spec.ts:148` hangs the glb) the poster stays with no page errors on `/` and `/weekend`; remove the desktop-only skip from "the spin stops at 45 degrees with every pin inside the stage". `registry.test.ts`: every circuit has three sectors with coordinates. e2e: once WebGL is ready the band's `sector-1` pin has moved from its poster position; `.band .credit` and the hero note contain `OpenStreetMap`, and the hero note no longer contains `Contours`.
 - [ ] **Step 2: Run** them. Expected: FAIL.
-- [ ] **Step 3: Implement.** Ground: unlit `uMap`, faded to plain ground over the outer 15% of UV space and plain outside `0..1`, then the existing camera-distance haze toward `#06080E`. Strips: sector colour × 1.6 where filled, × 0.25 where not, using the existing `vLap`/`uFrom`/`uTo` test. Halo: `exp(-k·(uv.y−0.5)²)` × sector colour × fill, additive, `polygonOffset`. Blocks: flat dark with a fixed top-light shade. Lap light and trail: white. `Circuit` calls `useLoader.preload(TextureLoader, url)` before the glb `useLoader`, then `useLoader(TextureLoader, url)` with `flipY = false`, sRGB, anisotropy 8; `small` is `innerWidth < 900` at mount. Delete the runtime sector-anchor loop (`Circuit.tsx:150-161`); sector anchors come from the `sector-N` empties. Hero and band posters switch to `{model}.webp`; delete the old posters.
+- [ ] **Step 3: Implement.** Ground: unlit `uMap`, faded to plain ground over the outer 15% of UV space and plain outside `0..1`, then the existing camera-distance haze toward `#06080E`. Strips: sector colour × 1.6 where filled, × 0.25 where not, using the existing `vLap`/`uFrom`/`uTo` test. Halo: `exp(-k·(uv.y−0.5)²)` × sector colour × fill, additive, `polygonOffset`. Blocks: flat dark with a fixed top-light shade. Lap light and trail: white. `Circuit` calls `useLoader.preload(TextureLoader, url)` before the glb `useLoader`, then `useLoader(TextureLoader, url)` with `flipY = false`, sRGB, anisotropy 8; `small` is `innerWidth < 900` at mount. Delete the runtime sector-anchor loop (`Circuit.tsx:150-161`) and the `<primitive>` re-mount of non-turn markers (`Circuit.tsx:341-345`); the marker traversal collects `turn-` and `sector-` empties from `gltf.scene`. Hero and band posters switch to `{model}.webp`; delete the old posters.
 - [ ] **Step 4: Run** `bun run lint`, `bun test`, and the hero, weekend and sections e2e. Expected: PASS. Capture br-1940 in WebGL beside its poster and check the infield lakes sit in the same place.
 - [ ] **Step 5: Commit** `feat(circuits): the circuit glows in sector colours on its map`.
 
-### Task 6: Broadcast pins and the OSM credit
+### Task 6: Broadcast pins
 
 **Files:**
-- Modify: `src/circuits/registry.ts` (a sector `Pin` variant read by `pinsOf` from `sector-N`), `src/home/Hero.tsx`, `src/weekend/CircuitBand.tsx`, `src/styles/home.css`, `src/styles/weekend.css`
-- Test: `test/circuits/registry.test.ts`, `e2e/hero.spec.ts`, `e2e/weekend.spec.ts`
+- Modify: `src/home/Hero.tsx`, `src/weekend/CircuitBand.tsx`, `src/styles/home.css`, `src/styles/weekend.css`
+- Test: `e2e/hero.spec.ts`, `e2e/weekend.spec.ts`
 
 **Interfaces:**
-- Produces: turn pins read `01`…; sector pins (`data-pin="sector-N"`) read `S1` with a `SECTOR 1` caption, in the hero and the band, placed from the pins json before WebGL is ready; the band credit and the hero note end with `Map © OpenStreetMap contributors (ODbL)` (the hero's contour line is removed).
+- Produces: turn pins read `01`…; sector pins (`data-pin="sector-N"`, from `CircuitInfo.sectors`) read `S1` with a `SECTOR 1` caption, now in the hero too, placed from the pins json before WebGL is ready.
 
-- [ ] **Step 1: Write the failing tests:** `registry.test.ts`: every circuit has three sector pins with coordinates; `/weekend` first turn pin reads `01`, `.band .credit` contains `OpenStreetMap`; `/` T1 pin reads `01`, the hero shows `S1` `S2` `S3`, and its note contains `OpenStreetMap` and no `Contours`.
+- [ ] **Step 1: Write the failing tests:** `/weekend` first turn pin reads `01`; `/` T1 pin reads `01` and the hero shows `S1` `S2` `S3` pins inside the stage.
 - [ ] **Step 2: Run** them. Expected: FAIL.
-- [ ] **Step 3: Implement** the tile style (tile `#2A3655`, white mono numerals, 1 px light rim), the flat sector label style from the mock, and the credit.
+- [ ] **Step 3: Implement** the tile style (tile `#2A3655`, white mono numerals, 1 px light rim) and the flat sector label style from the mock.
 - [ ] **Step 4: Run** `bun test` and the hero, weekend and sections e2e. Expected: PASS, including 45° on both projects.
-- [ ] **Step 5: Commit** `feat(circuits): turn pins read as broadcast tiles and the map credits OpenStreetMap`.
+- [ ] **Step 5: Commit** `feat(circuits): turn pins read as broadcast tiles and the hero labels its sectors`.
 
 ### Task 7: Proof and docs
 

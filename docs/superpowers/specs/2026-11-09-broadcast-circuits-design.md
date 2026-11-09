@@ -6,7 +6,7 @@ Praffi: the circuit "feels 2D". The matte road on a pale contour sheet reads as 
 
 ## What Praffi decided (2026-11-09)
 
-- **Style B, glow.** The road is a raised ribbon in sector colours (S1 purple `#A43BFF`, S2 green `#2BD45E`, S3 yellow `#F5C400`) that glows, on a dark OpenStreetMap context map: streets, water, green areas, and the larger buildings near the track standing up as low blocks. Reference mocks: `glow-dark.png`, `hero.png`, `band-full.png` from the session.
+- **Style B, glow.** The road is a raised ribbon in sector colours (S1 purple `#A43BFF`, S2 green `#2BD45E`, S3 yellow `#F5C400`) that glows, on a dark OpenStreetMap context map: streets, water, green areas, and the larger buildings near the track standing up as low blocks. Approved mocks: `glow-dark.png`, `page-hero-dark.png` and `page-band-full-whole.png` from the session (not the earlier `hero.png` and `band-full.png` drafts).
 - **Flat sector labels** ("S1 / SECTOR 1") beside each sector, and **"01"-style turn tiles**.
 - **A low oblique camera**, as in the broadcast flyovers.
 - **Option 1: circuit sections are always a dark "broadcast screen"**, in light theme too. That covers the Home hero and the Race weekend circuit band. Everything else on those pages keeps the visitor's theme.
