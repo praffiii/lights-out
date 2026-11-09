@@ -19,3 +19,53 @@
 .weekend-page .clock-foot { display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; margin-top: 46px; }
 .weekend-page .note { max-width: 520px; font-size: 18px; color: var(--muted); }
 .weekend-page .add { flex: none; padding: 6px 0 8px; border-bottom: 2px solid var(--ink); font-size: 16px; font-weight: 500; }
+
+.weekend-page .band { padding: 60px var(--m) 30px; background: var(--bg); color: var(--ink); }
+.weekend-page .band .card { position: relative; display: grid; grid-template-columns: 1fr 280px; align-items: start; padding: 36px 32px 44px; border: 1px solid var(--line); }
+.weekend-page .band .stats { position: relative; z-index: 2; display: grid; grid-template-columns: 340px repeat(2, 200px); row-gap: 28px; pointer-events: none; }
+.weekend-page .band .stats > div:first-child { grid-row: span 2; }
+.weekend-page .band .stats dt { font-size: 11px; color: var(--muted); }
+.weekend-page .band .stats dd { margin-top: 8px; font-size: 36px; font-weight: 700; line-height: 1; letter-spacing: -0.03em; }
+.weekend-page .band .stats > div:first-child dd { font-size: 64px; font-weight: 800; letter-spacing: -0.045em; }
+.weekend-page .band .stats .unit { margin-left: 6px; font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+.weekend-page .band .schedule { position: relative; z-index: 2; pointer-events: none; }
+.weekend-page .band .schedule > p { font-size: 11px; color: var(--muted); }
+.weekend-page .band .schedule ul { list-style: none; margin-top: 14px; }
+.weekend-page .band .schedule li { display: grid; grid-template-columns: 140px 1fr auto; align-items: baseline; padding: 9px 0 8px; border-bottom: 1px solid var(--line); }
+.weekend-page .band .schedule .name { font-size: 15px; font-weight: 500; }
+.weekend-page .band .schedule .day { font-size: 10px; color: var(--muted); }
+.weekend-page .band .schedule .time { font-size: 13px; }
+.weekend-page .band .schedule .is-done { color: var(--muted); }
+.weekend-page .band .schedule .is-next .day, .weekend-page .band .schedule .is-live .day { color: var(--purple); }
+
+.weekend-page .band .stage { position: relative; grid-column: 1 / -1; margin: -150px -32px 0; aspect-ratio: 16 / 9; overflow: clip; touch-action: pan-y; cursor: grab; user-select: none; }
+.weekend-page .band .stage:active { cursor: grabbing; }
+.weekend-page .band .poster { position: absolute; left: calc(var(--x) * -100%); top: calc(var(--y) * -100%); width: calc(var(--w) * 100%); height: calc(var(--h) * 100%); max-width: none; pointer-events: none; }
+.weekend-page .band .poster[hidden] { display: none; }
+.weekend-page .band .gl { position: absolute; inset: 0; }
+.weekend-page .band .gl, .weekend-page .band .poster { mask-image: linear-gradient(to bottom, transparent, #000 180px, #000 calc(100% - 120px), transparent); }
+.weekend-page .band .pins { position: absolute; inset: 0; pointer-events: none; transition: opacity 0.24s var(--brake); }
+.weekend-page .band .pins > span { position: absolute; left: calc((var(--px) * var(--w) - var(--x)) * 100%); top: calc((var(--py) * var(--h) - var(--y)) * 100%); }
+.weekend-page .band .stage[data-gl] .pins > span { left: 0; top: 0; }
+.weekend-page .band .turn { display: grid; justify-items: start; translate: -1px -100%; padding-bottom: 24px; transition: opacity 0.24s var(--brake); }
+.weekend-page .band .turn::before { content: ''; position: absolute; left: 0; bottom: 0; width: 1px; height: 24px; background: var(--ink); }
+.weekend-page .band .turn b { padding-left: 4px; font-size: 11px; font-weight: 500; color: var(--ink); }
+.weekend-page .band .turn i { padding-left: 4px; font-size: 9px; font-style: normal; color: var(--muted); white-space: nowrap; }
+.weekend-page .band .stage[data-turns='off'] .turn { opacity: 0; }
+.weekend-page .band .sector { display: none; translate: -50% -50%; padding: 4px 6px; background: var(--bg); font-size: 11px; color: var(--ink); transition: opacity 0.6s var(--brake); }
+.weekend-page .band .stage[data-gl] .sector { display: block; }
+.weekend-page .band .stage[data-sectors='off'] .sector { opacity: 0; }
+.weekend-page .band .reset { position: absolute; right: 0; bottom: 12px; z-index: 3; padding: 8px 12px; border: 1px solid var(--line); background: var(--bg); font-size: 10px; }
+
+.weekend-page .band .toggles { display: flex; gap: 28px; margin-top: 8px; font-size: 11px; }
+.weekend-page .band .toggles button { display: inline-flex; align-items: center; gap: 8px; letter-spacing: inherit; text-transform: inherit; }
+.weekend-page .band .toggles i { width: 12px; height: 12px; border: 1px solid var(--ink); }
+.weekend-page .band .toggles [aria-pressed='true'] i { background: var(--ink); }
+.weekend-page .band .toggles button:disabled { color: var(--muted); cursor: default; }
+.weekend-page .band .toggles button:disabled i { border-color: var(--muted); background: none; }
+.weekend-page .band .explore { justify-self: end; margin-top: 8px; font-size: 11px; }
+.weekend-page .band .credit { margin-top: 14px; font-size: 10px; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .weekend-page .band .turn, .weekend-page .band .sector { transition: none; }
+}

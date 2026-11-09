@@ -10,7 +10,7 @@ import type { Theme } from '#/shell/theme.ts'
 import { lapProfile } from './lap.ts'
 import { allCircuits } from './registry.ts'
 import { groundOf, isSector, mattify, PALETTE, screen, SECTORS } from './shaders.ts'
-import { fitCrop } from './fit.ts'
+import { fitCrop, fitSpin } from './fit.ts'
 
 const LAP_SECONDS = 14
 const TRAIL = 8
@@ -27,19 +27,28 @@ export const modelUrl = (model: string) => `/circuits/${model}.glb`
 
 export const preloadCircuit = (model: string) => useLoader.preload(GLTFLoader, modelUrl(model), meshopt)
 
-type Props = {
-  model: string
-  theme: Theme
-  layout: 'wide' | 'narrow'
+export type Lap = {
   restart: number
-  fill: RefObject<number>
   running: RefObject<boolean>
-  pins: RefObject<HTMLDivElement | null>
   tag: RefObject<HTMLElement | null>
   onLap: () => void
   onLapProgress: (t: number) => void
-  onReady: () => void
 }
+
+type Props = {
+  model: string
+  theme: Theme
+  layout: 'wide' | 'narrow' | 'spin'
+  fill: RefObject<number>
+  pins: RefObject<HTMLDivElement | null>
+  onReady: () => void
+  yaw?: RefObject<number>
+  lap?: Lap
+}
+
+const SECTOR_NAMES = ['S1', 'S2', 'S3'] as const
+
+const NO_LAP = () => {}
 
 const infoFor = (model: string) => {
   const info = allCircuits().find((c) => c.model === model)
@@ -49,7 +58,13 @@ const infoFor = (model: string) => {
   return info
 }
 
-function Scene({ model, theme, layout, restart, fill, running, pins, tag, onLap, onLapProgress, onReady }: Props) {
+function Scene({ model, theme, layout, fill, pins, onReady, yaw, lap }: Props) {
+  const restart = lap?.restart ?? 0
+  const running = lap?.running
+  const tag = lap?.tag
+  const lapped = lap !== undefined
+  const onLap = lap?.onLap ?? NO_LAP
+  const onLapProgress = lap?.onLapProgress ?? NO_LAP
   const gltf = useLoader(GLTFLoader, modelUrl(model), meshopt)
   const camera = useThree((s) => s.camera)
   const size = useThree((s) => s.size)
@@ -71,7 +86,7 @@ function Scene({ model, theme, layout, restart, fill, running, pins, tag, onLap,
     stale.current = true
   }, [restart])
 
-  const { materials, ground, markers, rest, light } = useMemo(() => {
+  const { materials, ground, markers, rest, light, spin } = useMemo(() => {
     const info = infoFor(model)
     const materials = mattify(gltf.scene, (name) => (isSector(name) ? SECTORS[name] : '#000000'))
     const track = new THREE.Box3()
@@ -124,10 +139,36 @@ function Scene({ model, theme, layout, restart, fill, running, pins, tag, onLap,
     const group = new THREE.Group()
 
     group.add(head, ...trail)
-    group.visible = !REDUCED
+    group.visible = false
 
-    return { materials, ground, markers, rest, light: { group, head, trail, geometry } }
+    const spin = new THREE.Group()
+    const inner = new THREE.Group()
+
+    spin.position.copy(centre)
+    inner.position.copy(centre).negate()
+    spin.add(inner)
+    inner.add(gltf.scene, group)
+
+    const [c1, c2] = info.cuts
+    const mids = [c1 / 2, (c1 + c2) / 2, (c2 + 1) / 2]
+
+    for (const [i, name] of SECTOR_NAMES.entries()) {
+      const target = mids[i] ?? 0
+      const nearest = info.line.reduce((best, p) => (Math.abs(p.u - target) < Math.abs(best.u - target) ? p : best))
+      const anchor = new THREE.Object3D()
+
+      anchor.name = name
+      anchor.position.set(nearest.x, nearest.y, nearest.z)
+      inner.add(anchor)
+      markers.push(anchor)
+    }
+
+    return { materials, ground, markers, rest, light: { group, head, trail, geometry }, spin }
   }, [gltf, model])
+
+  useEffect(() => {
+    light.group.visible = lapped && !REDUCED
+  }, [light, lapped])
 
   useEffect(
     () => () => {
@@ -164,7 +205,14 @@ function Scene({ model, theme, layout, restart, fill, running, pins, tag, onLap,
       camera.near = 10
       camera.far = rest.far
 
-      if (layout === 'wide') {
+      if (layout === 'spin') {
+        const fit = fitSpin(rest.crop, size.width / size.height)
+        const fullW = fit.w * size.width
+        const fullH = fit.h * size.height
+
+        camera.aspect = REST_ASPECT
+        camera.setViewOffset(fullW, fullH, fit.x * size.width + SHIFT_X * fullW, fit.y * size.height - SHIFT_Y * fullW, size.width, size.height)
+      } else if (layout === 'wide') {
         const { k, x, y } = fitCrop(rest.crop)
 
         camera.aspect = size.width / size.height
@@ -207,6 +255,7 @@ function Scene({ model, theme, layout, restart, fill, running, pins, tag, onLap,
     let first = true
     let compiled = false
     let lastFill = -1
+    let lastYaw = Number.NaN
 
     void gl.compileAsync(scene, camera).then(() => {
       compiled = true
@@ -217,8 +266,9 @@ function Scene({ model, theme, layout, restart, fill, running, pins, tag, onLap,
 
       if (camera instanceof THREE.PerspectiveCamera && camera.aspect !== (layout === 'wide' ? size.width / size.height : REST_ASPECT)) stale.current = true
 
-      const go = running.current && !REDUCED
-      const moved = fill.current !== lastFill
+      const go = (running?.current ?? false) && !REDUCED
+      const turned = (yaw?.current ?? 0) !== lastYaw
+      const moved = fill.current !== lastFill || turned
 
       if (!go && !moved && !stale.current) return
 
@@ -226,6 +276,8 @@ function Scene({ model, theme, layout, restart, fill, running, pins, tag, onLap,
 
       stale.current = false
       lastFill = fill.current
+      lastYaw = yaw?.current ?? 0
+      spin.rotation.y = lastYaw
 
       for (const [name, m] of materials) if (isSector(name)) m.uniforms.uTo.value = fill.current
 
@@ -242,14 +294,14 @@ function Scene({ model, theme, layout, restart, fill, running, pins, tag, onLap,
         callbacks.current.onLapProgress(t - Math.floor(t))
       }
 
-      if (!REDUCED) {
+      if (lapped && !REDUCED) {
         const index = rest.lap.uAt(clock.current / LAP_SECONDS) * n
 
         light.head.position.copy(sample(index, spot))
 
         for (const [i, m] of light.trail.entries()) m.position.copy(sample(index - TRAIL_STEP * (i + 1), next))
 
-        const el = tag.current
+        const el = tag?.current
         const at = el && screen(light.head, camera, size.width, size.height)
 
         if (el) {
@@ -263,7 +315,11 @@ function Scene({ model, theme, layout, restart, fill, running, pins, tag, onLap,
         const pin = pinEls.get(o.name)
         const at = pin && screen(o, camera, size.width, size.height)
 
-        if (pin && at) pin.style.transform = `translate(${at[0]}px, ${at[1]}px)`
+        if (!pin) continue
+
+        pin.style.visibility = at ? '' : 'hidden'
+
+        if (at) pin.style.transform = `translate(${at[0]}px, ${at[1]}px)`
       }
 
       advance(time * 1000)
@@ -277,12 +333,11 @@ function Scene({ model, theme, layout, restart, fill, running, pins, tag, onLap,
     gsap.ticker.add(tick)
 
     return () => gsap.ticker.remove(tick)
-  }, [materials, markers, rest, light, camera, size, layout, advance, gl, scene, fill, running, pins, tag])
+  }, [materials, markers, rest, light, spin, camera, size, layout, advance, gl, scene, fill, running, pins, tag, yaw, lapped])
 
   return (
     <>
-      <primitive object={gltf.scene} />
-      <primitive object={light.group} />
+      <primitive object={spin} />
     </>
   )
 }

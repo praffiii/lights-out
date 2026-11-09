@@ -1,5 +1,6 @@
-import { Component, type CSSProperties, lazy, type ReactNode, Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { type CSSProperties, lazy, Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 
+import { CircuitGuard } from '#/circuits/CircuitGuard.tsx'
 import { fitCrop } from '#/circuits/fit.ts'
 import { type CircuitInfo, circuitFor } from '#/circuits/registry.ts'
 import { useMounted } from '#/motion/client.ts'
@@ -68,22 +69,6 @@ const useHidden = () =>
     () => document.hidden,
     () => false,
   )
-
-class CircuitGuard extends Component<{ onError: () => void; children: ReactNode }, { failed: boolean }> {
-  override state = { failed: false }
-
-  static getDerivedStateFromError() {
-    return { failed: true }
-  }
-
-  override componentDidCatch() {
-    this.props.onError()
-  }
-
-  override render() {
-    return this.state.failed ? null : this.props.children
-  }
-}
 
 export function Hero() {
   const season = useSeason()
@@ -250,14 +235,10 @@ function Stage({ info, car, at, fill, running, glReady, glFailed, onLap, onLapPr
                 model={info.model}
                 theme={theme}
                 layout={narrow ? 'narrow' : 'wide'}
-                restart={at}
                 fill={fill}
-                running={running}
                 pins={pins}
-                tag={tag}
-                onLap={onLap}
-                onLapProgress={onLapProgress}
                 onReady={onReady}
+                lap={{ restart: at, running, tag, onLap, onLapProgress }}
               />
             </Suspense>
           </CircuitGuard>
