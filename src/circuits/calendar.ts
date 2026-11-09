@@ -1,3 +1,5 @@
+import type { Theme } from '#/shell/theme.ts'
+
 export type CircuitPhoto = { small: string; large: string; place: string; credit: string }
 
 export type CalendarCircuit = {
@@ -50,3 +52,7 @@ const byId = new Map<string, CalendarCircuit>(Object.entries(CALENDAR))
 export const calendarCircuit = (circuitId: string) => byId.get(circuitId)
 
 export const grandPrix = (gp: string) => gp.replace(/\bGP\b/, 'Grand Prix')
+
+export type TileState = 'done' | 'upcoming' | 'now' | 'hover'
+
+export const tileSrc = (tile: string, state: TileState, theme: Theme) => `/circuits/tiles/${tile}-${state}-${theme}.webp`
