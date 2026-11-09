@@ -1,3 +1,5 @@
+import { type PointerEvent, useState } from 'react'
+
 import { useSecond } from '#/motion/client.ts'
 import { whoLed } from '#/season/page-model.ts'
 import type { SeasonSnapshot } from '#/season/snapshot-schema.ts'
@@ -11,9 +13,21 @@ const rounds = (n: number) => `${n} ${n === 1 ? 'round' : 'rounds'}`
 export function WhoLed({ snapshot }: { snapshot: SeasonSnapshot }) {
   const now = useSecond()
   const { theme } = useTheme()
+  const [hovered, setHovered] = useState<number | null>(null)
   const led = whoLed(snapshot, now)
 
   if (!led) return null
+
+  const { columns, leads } = led
+
+  const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== 'mouse') return
+
+    const box = e.currentTarget.getBoundingClientRect()
+    const round = Math.min(columns, Math.max(1, Math.floor(((e.clientX - box.left) / box.width) * columns) + 1))
+
+    setHovered(round <= leads.length ? round : null)
+  }
 
   const last = led.stints.at(-1)?.to ?? 0
   const liveRace = led.live === null ? undefined : snapshot.calendar.find((race) => race.round === led.live)
@@ -40,14 +54,14 @@ export function WhoLed({ snapshot }: { snapshot: SeasonSnapshot }) {
           </li>
         ))}
       </ol>
-      <div className="strip" style={grid}>
+      <div className="strip" style={grid} onPointerMove={onPointerMove} onPointerLeave={() => setHovered(null)}>
         {led.stints.map((stint) => {
           const span = stint.to - stint.from + 1
           const src = stint.photo === 'portrait' ? stint.person.portrait?.src : stint.person.car?.src
           const compact = span < 3
 
           return (
-            <figure key={stint.from} className={`stint is-${stint.photo}${compact ? ' is-compact' : ''}`} style={{ gridColumn: `${stint.from} / span ${span}`, borderTopColor: stint.person.colour }}>
+            <figure key={stint.from} className={`stint is-${stint.photo}${compact ? ' is-compact' : ''}${stint.current ? ' is-current' : ''}`} style={{ gridColumn: `${stint.from} / span ${span}`, borderTopColor: stint.person.colour }}>
               {src ? <img src={src} alt="" loading="lazy" /> : null}
               <i className="dividers" style={{ backgroundSize: `${100 / span}% 100%` }} />
               <figcaption>
@@ -68,6 +82,11 @@ export function WhoLed({ snapshot }: { snapshot: SeasonSnapshot }) {
         {ahead.map((round) => (
           <div key={round} className="to-race" style={{ gridColumn: `${round} / span 1` }} />
         ))}
+        {hovered === null ? null : (
+          <span className="mono chip" style={{ gridColumn: `${hovered} / span 1` }} aria-hidden="true">
+            {`R${hovered} · +${leads[hovered - 1] ?? 0}`}
+          </span>
+        )}
       </div>
       <ol className="mono leads" style={grid}>
         {all.map((round) => (

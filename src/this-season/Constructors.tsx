@@ -51,11 +51,11 @@ export function Constructors({ snapshot }: { snapshot: SeasonSnapshot }) {
                 <b>{row.total}</b>
               </span>
             </div>
-            <div className="bars">
+            <div className="shares">
               {(row.parts.length > 0 ? row.parts : [{ label: 'Team', points: row.total }]).map((part, i) => (
                 <span
                   key={part.label}
-                  className="bar"
+                  className="share"
                   style={{ width: `${(part.points / scale) * 100}%`, background: shade(row.team.colour, i) }}
                 />
               ))}

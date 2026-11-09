@@ -185,6 +185,7 @@ Everything is square-cornered. Only things that roll or light up are round: whee
 - **One clock.** Everything ticks from GSAP's ticker (Lenis, ScrollTrigger, the 3D canvas). On every page, scroll velocity drives Archivo `wdth`.
 - **Page transition:** a thin purple sector line sweeps across the top while the next headline arrives behind it (Praffi chose this over a red curtain, 2026-11-08). It must finish in under 0.8s. Full per-page motion: `docs/motion-map.md`.
 - **Reduced motion:** no stretching and no blur. All content stays visible.
+- **Row hover:** a standings row fills ink from the left in 240ms; its hairline is a background layer so it can draw on scroll. Only on fine pointers.
 
 ## 3D, 2D and sound
 

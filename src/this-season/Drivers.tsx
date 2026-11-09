@@ -60,7 +60,7 @@ export function Drivers({ snapshot }: { snapshot: SeasonSnapshot }) {
         <thead className="mono">
           <tr>
             <th>Pos</th>
-            <th colSpan={2}>Driver</th>
+            <th>Driver</th>
             <th>Team</th>
             <th>Points</th>
             <th>Gap to leader</th>
@@ -70,12 +70,14 @@ export function Drivers({ snapshot }: { snapshot: SeasonSnapshot }) {
           {shown.map((row) => (
             <tr key={`${row.position}-${row.person.name}`}>
               <td className="mono pos">{two(row.position)}</td>
-              <td className="mono code" style={{ borderLeftColor: row.team.colour }}>
-                {row.person.code ?? ''}
+              <td className="driver" style={{ borderLeftColor: row.team.colour }}>
+                <span className="mono code">{row.person.code ?? ''}</span>
+                <span className="name">{row.person.name}</span>
               </td>
-              <td className="name">{row.person.name}</td>
               <td className="mono team">{row.team.name}</td>
-              <td className="pts">{row.points}</td>
+              <td className="pts">
+                <span>{row.points}</span>
+              </td>
               <td className="gap">{row.gap}</td>
             </tr>
           ))}
