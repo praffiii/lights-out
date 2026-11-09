@@ -158,15 +158,18 @@ const dayKey = (at: Date, timeZone?: string) => new Intl.DateTimeFormat('en-CA',
 
 const clock = (at: Date, timeZone?: string) => new Intl.DateTimeFormat('en-GB', { timeZone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(at)
 
-export function when(iso: string, timeZone: string) {
+export function when(iso: string, timeZone: string, visitorZone?: string) {
   const at = new Date(iso)
   const track = dayKey(at, timeZone)
-  const mine = dayKey(at)
+  const mine = dayKey(at, visitorZone)
   const shift = mine > track ? ' (next day)' : mine < track ? ' (day before)' : ''
   const day = new Intl.DateTimeFormat('en-GB', { timeZone, weekday: 'short', day: 'numeric', month: 'short' }).format(at).replace(',', '')
 
-  return { day, track: clock(at, timeZone), yours: `${clock(at)}${shift}` }
+  return { day, track: clock(at, timeZone), yours: `${clock(at, visitorZone)}${shift}` }
 }
+
+export const zoneName = (at: Date, timeZone: string) =>
+  new Intl.DateTimeFormat('en-US', { timeZone, timeZoneName: 'short' }).formatToParts(at).find((part) => part.type === 'timeZoneName')?.value ?? ''
 
 export const weekday = (session: Session, timeZone: string) =>
   new Intl.DateTimeFormat('en-GB', { timeZone: session.timeConfirmed ? timeZone : 'UTC', weekday: 'short' }).format(new Date(session.startsAt))
