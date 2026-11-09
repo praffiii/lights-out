@@ -6,6 +6,7 @@
 .weekend-page .top .title, .weekend-page .top .credit { z-index: 3; }
 .weekend-page .top > .bar, .weekend-page .band .card > .bar, .weekend-page .latest figure > .bar, .weekend-page .teaser .frame > .bar, .weekend-page .digits .group > .bar, .weekend-page .latest .rows li > .bar { inset: 0; }
 .weekend-page .digits > *, .weekend-page .latest figure, .weekend-page .latest .rows li { position: relative; }
+.weekend-page .latest figure { overflow: clip; }
 .weekend-page .top .shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .weekend-page .top .title { position: absolute; left: 0; bottom: 0; width: 820px; max-width: 100%; padding: 40px var(--m) 39px; background: var(--bg); color: var(--ink); }
 .weekend-page .top h1 { margin: 17px 0 0 -6px; font-size: 104px; white-space: normal; }
