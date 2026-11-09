@@ -69,3 +69,29 @@
 @media (prefers-reduced-motion: reduce) {
   .weekend-page .band .turn, .weekend-page .band .sector { transition: none; }
 }
+
+.weekend-page .latest { display: grid; grid-template-columns: 420px 1fr; column-gap: 92px; padding: 80px var(--m) 64px; }
+.weekend-page .latest.is-text { grid-template-columns: 1fr; }
+.weekend-page .latest figure img { width: 100%; aspect-ratio: 420 / 540; object-fit: cover; }
+.weekend-page .latest figcaption { padding: 12px 16px 10px; background: var(--ink); color: var(--bg); }
+.weekend-page .latest .who { font-size: 13px; font-weight: 500; }
+.weekend-page .latest figcaption .credit { margin-top: 6px; font-size: 9px; opacity: 0.7; }
+.weekend-page .latest .label { color: var(--muted); }
+.weekend-page .latest .gap { margin: 17px 0 0 -12px; font-size: 220px; line-height: 0.85; letter-spacing: -0.05em; }
+.weekend-page .latest .headline { margin-top: 33px; max-width: 760px; font-size: 30px; font-weight: 600; line-height: 1.15; letter-spacing: -0.015em; }
+.weekend-page .latest .body { margin-top: 17px; max-width: 560px; color: var(--muted); }
+.weekend-page .latest .rows { display: flex; gap: 46px; margin-top: 66px; list-style: none; }
+.weekend-page .latest .rows li { display: flex; align-items: center; gap: 10px; }
+.weekend-page .latest .rows .pos { color: var(--muted); }
+.weekend-page .latest .rows i { width: 3px; height: 16px; margin-left: 7px; }
+.weekend-page .latest .rows .code, .weekend-page .latest .rows .time { font-size: 13px; }
+.weekend-page .latest .more { display: inline-block; margin-top: 56px; padding-bottom: 6px; border-bottom: 2px solid var(--ink); font-size: 12px; }
+
+.weekend-page .teaser { padding-bottom: 48px; }
+.weekend-page .teaser .frame { position: relative; height: 680px; overflow: clip; background: var(--line); }
+.weekend-page .teaser .shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.weekend-page .teaser .caption { position: absolute; top: 0; right: 0; display: grid; grid-template-columns: 1fr auto; align-items: end; width: 780px; max-width: 100%; padding: 36px var(--m) 36px 48px; background: var(--bg); }
+.weekend-page .teaser .caption > p { grid-column: 1 / -1; color: var(--muted); }
+.weekend-page .teaser h2 { margin-top: 16px; font-size: 56px; line-height: 0.92; letter-spacing: -0.03em; }
+.weekend-page .teaser .read { padding-bottom: 6px; border-bottom: 2px solid var(--ink); font-size: 12px; }
+.weekend-page .teaser .credit { margin: 16px var(--m) 0; font-size: 10px; color: var(--muted); }

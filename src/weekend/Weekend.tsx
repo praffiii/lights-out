@@ -8,7 +8,9 @@ import { opposite, useTheme } from '#/shell/theme.ts'
 
 import { CircuitBand } from './CircuitBand.tsx'
 import { Clock } from './Clock.tsx'
+import { Latest } from './Latest.tsx'
 import { weekendPage } from './page-model.ts'
+import { Teaser } from './Teaser.tsx'
 import { Top } from './Top.tsx'
 
 export function Weekend() {
@@ -37,6 +39,8 @@ export function Weekend() {
       <Top page={page} />
       <Clock page={page} snapshot={data} />
       <CircuitBand band={page.band} theme={opposite(theme)} />
+      <Latest latest={page.latest} />
+      <Teaser />
     </div>
   )
 }
