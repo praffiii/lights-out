@@ -10,7 +10,7 @@
 .weekend-page .top .title { position: absolute; left: 0; bottom: 0; width: 820px; max-width: 100%; padding: 40px var(--m) 39px; background: var(--bg); color: var(--ink); }
 .weekend-page .top h1 { margin: 17px 0 0 -6px; font-size: 104px; white-space: normal; }
 .weekend-page .top .dates { margin-top: 34px; }
-.weekend-page .top .credit { position: absolute; right: 0; bottom: 0; min-width: 420px; max-width: 50%; padding: 14px 16px; background: var(--bg); font-size: 10px; color: var(--muted); }
+.weekend-page .top .credit { position: absolute; right: 0; bottom: 0; max-width: min(50%, calc(100% - 820px)); padding: 14px 16px; background: var(--bg); font-size: 10px; color: var(--muted); }
 
 .weekend-page .clock { padding: 78px var(--m) 120px; }
 .weekend-page .clock-head { display: flex; justify-content: space-between; gap: 24px; }
@@ -99,3 +99,69 @@
 .weekend-page .teaser h2 { margin-top: 16px; font-size: 56px; line-height: 0.92; letter-spacing: -0.03em; }
 .weekend-page .teaser .read { padding-bottom: 6px; border-bottom: 2px solid var(--ink); font-size: 12px; }
 .weekend-page .teaser .credit { margin: 16px var(--m) 0; font-size: 10px; color: var(--muted); }
+
+@media (max-width: 1199px) {
+  .weekend-page .top { height: 720px; }
+  .weekend-page .top .title { width: min(640px, 68%); }
+  .weekend-page .top h1 { font-size: 76px; }
+  .weekend-page .top .credit { max-width: 32%; }
+
+  .weekend-page .digits .value, .weekend-page .digits .colon { font-size: clamp(120px, 20vw, 280px); }
+
+  .weekend-page .band .card { grid-template-columns: minmax(0, 1fr); }
+  .weekend-page .band .stats { grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(0, 1fr)); }
+  .weekend-page .band .schedule { max-width: 560px; margin-top: 36px; }
+  .weekend-page .band .stage { margin-top: 24px; }
+  .weekend-page .band .gl, .weekend-page .band .poster { mask-image: linear-gradient(to bottom, transparent, #000 60px, #000 calc(100% - 60px), transparent); }
+  .weekend-page .band .explore { justify-self: start; }
+
+  .weekend-page .latest { grid-template-columns: 320px minmax(0, 1fr); column-gap: 48px; }
+  .weekend-page .latest .gap { font-size: clamp(96px, 14vw, 150px); }
+  .weekend-page .latest .rows { flex-wrap: wrap; gap: 16px 36px; }
+
+  .weekend-page .teaser .frame { height: 560px; }
+  .weekend-page .teaser .caption { width: min(640px, 80%); }
+  .weekend-page .teaser h2 { font-size: 48px; }
+}
+
+@media (max-width: 760px) {
+  .weekend-page { padding-top: 124px; }
+
+  .weekend-page .top { display: flex; flex-direction: column; height: auto; background: none; }
+  .weekend-page .top .shot { position: relative; height: auto; aspect-ratio: 4 / 5; }
+  .weekend-page .top .title { position: relative; width: auto; padding: 24px var(--m) 8px; }
+  .weekend-page .top h1 { margin: 12px 0 0 -2px; font-size: clamp(40px, 11vw, 56px); }
+  .weekend-page .top .dates { margin-top: 16px; }
+  .weekend-page .top .credit { position: relative; max-width: none; padding: 8px var(--m); }
+
+  .weekend-page .clock { padding: 48px var(--m) 64px; }
+  .weekend-page .clock-head { flex-direction: column; gap: 6px; }
+  .weekend-page .digits { margin: 20px 0 0 -4px; }
+  .weekend-page .digits .value, .weekend-page .digits .colon { font-size: clamp(56px, 22vw, 120px); }
+  .weekend-page .digits .colon { padding: 0 2px; }
+  .weekend-page .digits .unit { margin: 10px 0 0 4px; font-size: 10px; }
+  .weekend-page .flag { font-size: 40px; }
+  .weekend-page .clock-foot { flex-direction: column; gap: 24px; margin-top: 32px; }
+  .weekend-page .note { font-size: 16px; }
+
+  .weekend-page .band { padding: 40px var(--m) 24px; }
+  .weekend-page .band .card { padding: 24px 16px 28px; }
+  .weekend-page .band .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 20px; }
+  .weekend-page .band .stats > div:first-child { grid-column: 1 / -1; grid-row: auto; }
+  .weekend-page .band .stats > div:first-child dd { font-size: 44px; }
+  .weekend-page .band .stats dd { font-size: 28px; }
+  .weekend-page .band .stage { margin: 20px -16px 0; aspect-ratio: 4 / 5; }
+  .weekend-page .band .schedule { order: 1; margin-top: 32px; }
+  .weekend-page .band .schedule li { grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 12px; }
+
+  .weekend-page .latest { grid-template-columns: minmax(0, 1fr); row-gap: 32px; padding: 56px var(--m) 48px; }
+  .weekend-page .latest .gap { margin-left: -4px; font-size: clamp(80px, 28vw, 140px); }
+  .weekend-page .latest .headline { margin-top: 20px; font-size: 22px; }
+  .weekend-page .latest .rows { margin-top: 32px; gap: 12px 24px; }
+  .weekend-page .latest .more { margin-top: 32px; }
+
+  .weekend-page .teaser .frame { display: flex; flex-direction: column; height: auto; background: none; }
+  .weekend-page .teaser .shot { position: relative; height: auto; aspect-ratio: 4 / 3; }
+  .weekend-page .teaser .caption { position: relative; width: auto; padding: 20px var(--m) 0; }
+  .weekend-page .teaser h2 { font-size: 36px; }
+}

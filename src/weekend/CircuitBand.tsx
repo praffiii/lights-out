@@ -3,6 +3,7 @@ import { type CSSProperties, lazy, type PointerEvent, Suspense, useEffect, useRe
 import { CircuitGuard } from '#/circuits/CircuitGuard.tsx'
 import { fitSpin } from '#/circuits/fit.ts'
 import type { CircuitInfo } from '#/circuits/registry.ts'
+import { useMedia } from '#/motion/client.ts'
 import { gsap, REDUCED } from '#/motion/motion.ts'
 import { Soon } from '#/shell/Go.tsx'
 import type { Theme } from '#/shell/theme.ts'
@@ -11,7 +12,11 @@ import type { Band } from './page-model.ts'
 
 const Circuit = lazy(() => import('#/circuits/Circuit.tsx'))
 
-const ASPECT = 16 / 9
+const WIDE = 16 / 9
+
+const TALL = 4 / 5
+
+const PHONE = '(max-width: 760px)'
 
 const LIMIT = Math.PI / 4
 
@@ -54,7 +59,8 @@ function Stage({ info, theme }: { info: CircuitInfo; theme: Theme }) {
   const [turns, setTurns] = useState(true)
   const [sectors, setSectors] = useState(true)
   const [deg, setDeg] = useState(0)
-  const fit = fitSpin(info.crop, ASPECT)
+  const phone = useMedia(PHONE)
+  const fit = fitSpin(info.crop, phone ? TALL : WIDE)
   const vars: Vars = { '--w': fit.w, '--h': fit.h, '--x': fit.x, '--y': fit.y }
   const poster = `/circuits/${info.model}-${theme}`
 

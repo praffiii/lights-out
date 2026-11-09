@@ -1,4 +1,4 @@
-import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
 
 import { gsap } from './motion.ts'
 
@@ -40,3 +40,22 @@ export const useZone = () =>
     () => Intl.DateTimeFormat().resolvedOptions().timeZone,
     () => 'UTC',
   )
+
+export function useMedia(query: string) {
+  const watch = useCallback(
+    (fn: () => void) => {
+      const list = matchMedia(query)
+
+      list.addEventListener('change', fn)
+
+      return () => list.removeEventListener('change', fn)
+    },
+    [query],
+  )
+
+  return useSyncExternalStore(
+    watch,
+    () => matchMedia(query).matches,
+    () => false,
+  )
+}

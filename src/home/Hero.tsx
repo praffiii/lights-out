@@ -3,7 +3,7 @@ import { type CSSProperties, lazy, Suspense, useCallback, useEffect, useRef, use
 import { CircuitGuard } from '#/circuits/CircuitGuard.tsx'
 import { fitCrop } from '#/circuits/fit.ts'
 import { type CircuitInfo, circuitFor } from '#/circuits/registry.ts'
-import { useMounted } from '#/motion/client.ts'
+import { useMedia, useMounted } from '#/motion/client.ts'
 import { gsap, onEnter, REDUCED, ScrollTrigger, sweep, useGSAP } from '#/motion/motion.ts'
 import { Soon } from '#/shell/Go.tsx'
 import { useTheme } from '#/shell/theme.ts'
@@ -41,21 +41,6 @@ const circuitOf = (snapshot: SeasonSnapshot) => {
 }
 
 export const heroShown = (snapshot: SeasonSnapshot) => (circuitOf(snapshot) && !REDUCED ? firstFrame : undefined)
-
-const watchNarrow = (fn: () => void) => {
-  const query = matchMedia(NARROW)
-
-  query.addEventListener('change', fn)
-
-  return () => query.removeEventListener('change', fn)
-}
-
-const useNarrow = () =>
-  useSyncExternalStore(
-    watchNarrow,
-    () => matchMedia(NARROW).matches,
-    () => false,
-  )
 
 const watchHidden = (fn: () => void) => {
   document.addEventListener('visibilitychange', fn)
@@ -207,7 +192,7 @@ type StageProps = {
 function Stage({ info, car, at, fill, running, glReady, glFailed, onLap, onLapProgress, onReady, onFail }: StageProps) {
   const { theme } = useTheme()
   const mounted = useMounted()
-  const narrow = useNarrow()
+  const narrow = useMedia(NARROW)
   const pins = useRef<HTMLDivElement>(null)
   const tag = useRef<HTMLSpanElement>(null)
   const [x0, y0, x1, y1] = info.crop
