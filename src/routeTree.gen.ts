@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SeasonRouteImport } from './routes/season'
 import { Route as ApiSeasonRouteImport } from './routes/api/season'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SeasonRoute = SeasonRouteImport.update({
+  id: '/season',
+  path: '/season',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSeasonRoute = ApiSeasonRouteImport.update({
@@ -25,27 +31,31 @@ const ApiSeasonRoute = ApiSeasonRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/season': typeof SeasonRoute
   '/api/season': typeof ApiSeasonRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/season': typeof SeasonRoute
   '/api/season': typeof ApiSeasonRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/season': typeof SeasonRoute
   '/api/season': typeof ApiSeasonRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/season'
+  fullPaths: '/' | '/season' | '/api/season'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/season'
-  id: '__root__' | '/' | '/api/season'
+  to: '/' | '/season' | '/api/season'
+  id: '__root__' | '/' | '/season' | '/api/season'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SeasonRoute: typeof SeasonRoute
   ApiSeasonRoute: typeof ApiSeasonRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/season': {
+      id: '/season'
+      path: '/season'
+      fullPath: '/season'
+      preLoaderRoute: typeof SeasonRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/season': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SeasonRoute: SeasonRoute,
   ApiSeasonRoute: ApiSeasonRoute,
 }
 export const routeTree = rootRouteImport

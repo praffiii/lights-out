@@ -80,7 +80,7 @@ it('carries the start, every chapter, the credit and the disclaimer without seas
   expect([...container.querySelectorAll('.footer .toc li')].map((li) => li.textContent)).toEqual([
     '01Home',
     '02How F1 worksSoon',
-    '03This seasonSoon',
+    '03This season',
     '04The carSoon',
     '05The engineSoon',
     '06The tracksSoon',
