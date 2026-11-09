@@ -6,6 +6,7 @@ import { KVWriteError, kvRest } from '../../src/season/kv-rest.ts'
 import { SeasonSnapshotJson } from '../../src/season/snapshot-schema.ts'
 import { SnapshotStore } from '../../src/season/store.ts'
 import { fakeJolpica } from './fake-jolpica.ts'
+import { fakeOpenF1 } from './fake-openf1.ts'
 
 const TOKEN = 'secret-token-123'
 
@@ -83,7 +84,7 @@ it('round-trips the fixture snapshot through SnapshotStore', async () => {
 it('fails the refresh with the status and without the token when the KV write is rejected', async () => {
   const { fetch } = recordingFetch(() => new Response(`forbidden ${TOKEN}`, { status: 403 }))
 
-  const services = Layer.merge(fakeJolpica(), SnapshotStore.fromKV(kvRest({ ...base, fetch })))
+  const services = Layer.mergeAll(fakeJolpica(), fakeOpenF1(), SnapshotStore.fromKV(kvRest({ ...base, fetch })))
 
   const failure = await Effect.runPromise(refreshSnapshot(new Date('2026-11-08T00:00:00Z')).pipe(Effect.provide(services))).catch((cause: Error) => String(cause))
 
