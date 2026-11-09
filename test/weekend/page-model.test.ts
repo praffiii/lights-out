@@ -211,6 +211,15 @@ it("uses the row's own names for a driver CARS does not know", () => {
   expect(latest?.image).toBeUndefined()
 })
 
+it('paints a team colour that is not six hex digits as muted', () => {
+  const latest = page(
+    '2026-11-06T21:00:00Z',
+    withLatest({ season: 2026, round: 20, name: 'FP2', startsAt: '2026-11-06T19:00:00Z', rows: [row(1, 'XYZ', 0, { colour: 'fff; background: url(//x.test)' }), row(2, 'NOR', 0.1)] }),
+  )?.latest
+
+  expect(latest?.rows[0]?.colour).toBe('var(--muted)')
+})
+
 it('has no latest block without a latest session', () => {
   const { latestSession: _, ...bare } = fixture
 
