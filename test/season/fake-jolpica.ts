@@ -31,6 +31,15 @@ export const calendar2027 = {
   races: calendar2026.races.map((race) => ({ ...race, season: 2027 })),
 }
 
+export const calendar2027Shifted = {
+  season: 2027,
+  races: calendar2026.races.map((race) => ({
+    ...race,
+    season: 2027,
+    sessions: race.sessions.map((session) => ({ ...session, startsAt: session.startsAt.replace(/^2026-/, '2027-') })),
+  })),
+}
+
 export const pageOf = (all: SeasonResults, offset: number): SeasonResults => {
   const rows = all.races.flatMap((race) => race.rows.map((row) => ({ round: race.round, row })))
   const races: Array<{ round: number; rows: Array<ResultRow> }> = []

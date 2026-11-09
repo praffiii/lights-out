@@ -17,7 +17,7 @@ export type RaceKind = 'this-weekend' | 'next' | 'finale'
 
 export type PickedRace = { race: Race; round: number; of: number; kind: RaceKind }
 
-const bounds = (race: Race) => {
+export const bounds = (race: Race) => {
   const first = race.sessions[0]
   const final = race.sessions.find((session) => session.name === 'Race') ?? race.sessions.at(-1)
 
@@ -167,6 +167,9 @@ export function when(iso: string, timeZone: string) {
 
   return { day, track: clock(at, timeZone), yours: `${clock(at)}${shift}` }
 }
+
+export const weekday = (session: Session, timeZone: string) =>
+  new Intl.DateTimeFormat('en-GB', { timeZone: session.timeConfirmed ? timeZone : 'UTC', weekday: 'short' }).format(new Date(session.startsAt))
 
 export const sessionDay = (session: Session, timeZone: string) => when(session.startsAt, session.timeConfirmed ? timeZone : 'UTC').day
 
