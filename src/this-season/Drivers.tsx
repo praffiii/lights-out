@@ -17,7 +17,7 @@ function Podium({ row, leader }: { row: DriverRow; leader: boolean }) {
         {leader ? <img className="brackets" src="/img/viewfinder.svg" alt="" width={420} height={540} /> : null}
       </div>
       <figcaption>
-        <span className={`mono place${leader ? ' lead' : ''}`}>
+        <span className={`mono place${leader ? ' is-leader' : ''}`}>
           P{row.position} · {row.team.name} · {behind}
         </span>
         <span className="display family">{row.person.family}</span>

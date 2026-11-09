@@ -33,7 +33,7 @@ function motion(scope: HTMLElement) {
 
   for (const el of all(scope, '.podium .is-p1 .family, .team-row:first-child .team')) block(el, { delay: 1.3 })
 
-  const strip = scope.querySelector('.who-led .strip')
+  const strip = scope.querySelector('.who-led .lead-strip')
   const current = scope.querySelector<HTMLElement>('.who-led .is-current figcaption')
 
   if (strip && current) block(current, { trigger: strip, start: 'top 30%' })

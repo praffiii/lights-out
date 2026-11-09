@@ -54,7 +54,7 @@ export function WhoLed({ snapshot }: { snapshot: SeasonSnapshot }) {
           </li>
         ))}
       </ol>
-      <div className="strip" style={grid} onPointerMove={onPointerMove} onPointerLeave={() => setHovered(null)}>
+      <div className="lead-strip" style={grid} onPointerMove={onPointerMove} onPointerLeave={() => setHovered(null)}>
         {led.stints.map((stint) => {
           const span = stint.to - stint.from + 1
           const src = stint.photo === 'portrait' ? stint.person.portrait?.src : stint.person.car?.src
@@ -75,7 +75,7 @@ export function WhoLed({ snapshot }: { snapshot: SeasonSnapshot }) {
         })}
         {led.live !== null && liveRace ? (
           <div className="live-round" style={{ gridColumn: `${led.live} / span 1` }}>
-            <i className="dot" />
+            <i className="pulse" />
             <span className="mono">{gpName(liveRace)} · live this weekend</span>
           </div>
         ) : null}
@@ -83,7 +83,7 @@ export function WhoLed({ snapshot }: { snapshot: SeasonSnapshot }) {
           <div key={round} className="to-race" style={{ gridColumn: `${round} / span 1` }} />
         ))}
         {hovered === null ? null : (
-          <span className="mono chip" style={{ gridColumn: `${hovered} / span 1` }} aria-hidden="true">
+          <span className="mono lead-chip" style={{ gridColumn: `${hovered} / span 1` }} aria-hidden="true">
             {`R${hovered} · +${leads[hovered - 1] ?? 0}`}
           </span>
         )}

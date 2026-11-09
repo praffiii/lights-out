@@ -71,6 +71,45 @@ for (const width of [800, 1024, 1280]) {
   })
 }
 
+test('each page keeps its own styles across in-app navigation', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await loaded(page, '/')
+  await page.locator('footer a[href="/season"]').first().click()
+  await page.waitForURL('**/season')
+  await expect(page.locator('.who-led')).toBeVisible()
+
+  const leaked = () =>
+    page.evaluate(() =>
+      [...document.querySelectorAll('.podium .is-p1 .place, .teams .who > i, .who-led .live-round > i')].flatMap((el) =>
+        getComputedStyle(el).position === 'absolute' ? [`${el.parentElement?.className} > ${el.className}`] : [],
+      ),
+    )
+
+  expect(await leaked()).toEqual([])
+
+  await page.getByRole('link', { name: 'Lights Out, home' }).click()
+  await page.waitForURL((url) => url.pathname === '/')
+
+  const card = await page.evaluate(() => {
+    const el = document.querySelector('.preview .card')
+
+    return el ? [getComputedStyle(el).top, getComputedStyle(el).width] : []
+  })
+
+  expect(card).toEqual(['0px', '300px'])
+  expect(errors).toEqual([])
+})
+
+test('the weekend title stays on one line when the band has room', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await loaded(page, '/season?reduced')
+
+  const lines = await page.locator('.this-weekend .caption h2').evaluate((el) => Math.round(el.getBoundingClientRect().height / Number.parseFloat(getComputedStyle(el).lineHeight)))
+
+  expect(lines).toBe(1)
+  expect(errors).toEqual([])
+})
+
 test('?reduced shows everything with no bars', async ({ page, errors }) => {
   await page.goto('/season?reduced')
   await page.waitForLoadState('networkidle')
@@ -138,6 +177,26 @@ test('the hover card sits above the tiles next to it', async ({ page, errors }, 
   })
 
   expect(covered).toEqual([])
+  expect(errors).toEqual([])
+})
+
+test('hovering a leader-strip column shows its lead in a whole chip', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await loaded(page)
+
+  const strip = page.locator('.who-led .lead-strip')
+
+  await strip.scrollIntoViewIfNeeded()
+  await page.waitForTimeout(1500)
+
+  const box = await strip.boundingBox()
+
+  await page.mouse.move((box?.x ?? 0) + (box?.width ?? 0) * (9.5 / 23), (box?.y ?? 0) + 100)
+
+  const chip = page.locator('.who-led .lead-chip')
+
+  await expect(chip).toHaveText('R10 · +45')
+  expect((await chip.boundingBox())?.height).toBeGreaterThanOrEqual(20)
   expect(errors).toEqual([])
 })
 

@@ -39,7 +39,7 @@ export function Constructors({ snapshot }: { snapshot: SeasonSnapshot }) {
                 <span key={part.label} className="part">
                   {i > 0 ? <i className="plus">+</i> : null}
                   <span className="mono who">
-                    <i className="dot" style={{ background: shade(row.team.colour, i) }} />
+                    <i className="swatch" style={{ background: shade(row.team.colour, i) }} />
                     {part.label}
                   </span>
                   <b>{part.points}</b>
