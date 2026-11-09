@@ -217,7 +217,7 @@ const latestOf = (snapshot: SeasonSnapshot, race: Race, session: LatestSession |
     headline: `${familyOf(p1)} ${LEAD[session.name]}. ${familyOf(p2)} that far behind.`,
     body: p3 && p4 ? `${familyOf(p3)} third, ${familyOf(p4)} fourth. ${LESSON[session.name]}` : LESSON[session.name],
     rows: [p1, p2, p3].flatMap((row, i) =>
-      row ? [{ position: row.position, code: row.code, colour: carOf(row.code)?.colour ?? (row.colour ? `#${row.colour}` : 'var(--muted)'), time: i === 0 ? lapTime(row.time) : behind(row.gap) }] : [],
+      row ? [{ position: row.position, code: row.code, colour: carOf(row.code)?.colour ?? (row.colour && /^[0-9A-Fa-f]{6}$/.test(row.colour) ? `#${row.colour}` : 'var(--muted)'), time: i === 0 ? lapTime(row.time) : behind(row.gap) }] : [],
     ),
     image: imageOf(p1.code),
     who: car ? `${car.driver} · ${car.team}` : `${p1.name} · ${p1.team}`,
