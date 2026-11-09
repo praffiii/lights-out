@@ -5,7 +5,6 @@ import { useSecond, useZone } from '#/motion/client.ts'
 import { block, gsap, ONCE, onEnter, REDUCED, reveal, roll, sweep, useGSAP } from '#/motion/motion.ts'
 import { seasonQueryOptions, useSeason } from '#/season/use-season.ts'
 import { waitFor } from '#/shell/Loader.tsx'
-import { opposite, useTheme } from '#/shell/theme.ts'
 
 import { CircuitBand } from './CircuitBand.tsx'
 import { Clock } from './Clock.tsx'
@@ -53,7 +52,6 @@ export function Weekend() {
   const { data } = useSeason()
   const now = useSecond()
   const zone = useZone()
-  const theme = useTheme().theme ?? 'light'
   const root = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -88,7 +86,7 @@ export function Weekend() {
     <div className="weekend-page" ref={root}>
       <Top page={page} />
       <Clock page={page} snapshot={data} />
-      <CircuitBand band={page.band} theme={opposite(theme)} />
+      <CircuitBand band={page.band} />
       <Latest latest={page.latest} />
       <Teaser />
     </div>

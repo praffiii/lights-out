@@ -6,7 +6,6 @@ import type { CircuitInfo } from '#/circuits/registry.ts'
 import { useMedia } from '#/motion/client.ts'
 import { gsap, REDUCED } from '#/motion/motion.ts'
 import { Soon } from '#/shell/Go.tsx'
-import type { Theme } from '#/shell/theme.ts'
 
 import type { Band } from './page-model.ts'
 
@@ -46,7 +45,7 @@ function Stat({ label, value, unit, num }: { label: string; value: string | numb
   )
 }
 
-function Stage({ info, theme }: { info: CircuitInfo; theme: Theme }) {
+function Stage({ info }: { info: CircuitInfo }) {
   const box = useRef<HTMLDivElement>(null)
   const pins = useRef<HTMLDivElement>(null)
   const yaw = useRef(0)
@@ -62,7 +61,7 @@ function Stage({ info, theme }: { info: CircuitInfo; theme: Theme }) {
   const phone = useMedia(PHONE)
   const fit = fitSpin(info.crop, phone ? TALL : WIDE)
   const vars: Vars = { '--w': fit.w, '--h': fit.h, '--x': fit.x, '--y': fit.y }
-  const poster = `/circuits/${info.model}-${theme}`
+  const poster = `/circuits/${info.model}-dark`
 
   useEffect(() => {
     const el = box.current
@@ -210,7 +209,7 @@ function Stage({ info, theme }: { info: CircuitInfo; theme: Theme }) {
           <div className="gl">
             <CircuitGuard onError={() => setFailed(true)}>
               <Suspense fallback={null}>
-                <Circuit model={info.model} theme={theme} layout="spin" fill={fill} pins={pins} yaw={yaw} onReady={() => setReady(true)} />
+                <Circuit model={info.model} theme="dark" layout="spin" fill={fill} pins={pins} yaw={yaw} onReady={() => setReady(true)} />
               </Suspense>
             </CircuitGuard>
           </div>
@@ -253,11 +252,11 @@ function Stage({ info, theme }: { info: CircuitInfo; theme: Theme }) {
   )
 }
 
-export function CircuitBand({ band, theme }: { band: Band; theme: Theme }) {
+export function CircuitBand({ band }: { band: Band }) {
   const { info, facts } = band
 
   return (
-    <section className="band" data-theme={theme} aria-label="The circuit">
+    <section className="band" data-theme="dark" aria-label="The circuit">
       <div className="card">
         <dl className="figures">
           <Stat label="When" value={band.when} />
@@ -278,7 +277,7 @@ export function CircuitBand({ band, theme }: { band: Band; theme: Theme }) {
             ))}
           </ul>
         </div>
-        {info ? <Stage info={info} theme={theme} /> : null}
+        {info ? <Stage info={info} /> : null}
       </div>
       {info ? <p className="mono credit">{CREDIT}</p> : null}
     </section>

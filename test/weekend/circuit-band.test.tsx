@@ -37,7 +37,7 @@ afterAll(async () => {
 })
 
 it('shows the circuit stats and the schedule with the next session marked', () => {
-  const { container } = render(<CircuitBand band={band} theme="dark" />)
+  const { container } = render(<CircuitBand band={band} />)
   const stats = container.querySelector('.figures')?.textContent ?? ''
 
   expect(stats).toContain('6–8 Nov')
@@ -51,7 +51,7 @@ it('shows the circuit stats and the schedule with the next session marked', () =
 })
 
 it('the Turns toggle hides the turn numbers', () => {
-  const { container, getByRole } = render(<CircuitBand band={band} theme="dark" />)
+  const { container, getByRole } = render(<CircuitBand band={band} />)
 
   fireEvent.click(getByRole('button', { name: 'Turns' }))
 
@@ -60,7 +60,7 @@ it('the Turns toggle hides the turn numbers', () => {
 })
 
 it('without a 3D model it shows only the stats and the schedule', () => {
-  const { container } = render(<CircuitBand band={{ ...band, info: undefined }} theme="dark" />)
+  const { container } = render(<CircuitBand band={{ ...band, info: undefined }} />)
 
   expect(container.querySelector('.figures')).not.toBeNull()
   expect(container.querySelectorAll('.schedule li')).toHaveLength(5)
@@ -82,7 +82,7 @@ it('keeps the poster and turns Sectors off when the model fails to load', async 
   Object.defineProperty(globalThis, 'IntersectionObserver', { value: Near, configurable: true, writable: true })
 
   const quiet = spyOn(console, 'error').mockImplementation(() => {})
-  const { container, getByRole } = render(<CircuitBand band={band} theme="dark" />)
+  const { container, getByRole } = render(<CircuitBand band={band} />)
 
   await act(async () => {
     await new Promise((resolve) => setTimeout(resolve, 50))

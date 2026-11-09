@@ -67,3 +67,15 @@ for (const share of [0.55, 1]) {
     expect(errors).toEqual([])
   })
 }
+
+test('the circuit sections and the header over the hero stay dark in the light theme', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('theme', 'light'))
+  const colours = (selector: string) => page.locator(selector).first().evaluate((n) => ({ bg: getComputedStyle(n).backgroundColor, ink: getComputedStyle(n).color }))
+
+  await loaded(page)
+  expect(await colours('.hero')).toEqual({ bg: 'rgb(6, 8, 14)', ink: 'rgb(242, 241, 236)' })
+  expect((await colours('.header .logo')).ink).toBe('rgb(242, 241, 236)')
+
+  await page.goto('/weekend')
+  expect(await colours('.weekend-page .band')).toEqual({ bg: 'rgb(6, 8, 14)', ink: 'rgb(242, 241, 236)' })
+})

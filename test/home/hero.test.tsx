@@ -43,8 +43,8 @@ it('shows the circuit, facts and caption for a circuit with a model', async () =
   const { container } = renderWith(await snapshotAt(NOW))
 
   expect(container.querySelector('.hero h1')?.textContent).toBe('Formula 1,from lights out.')
-  expect(container.querySelector('.hero .stage .poster')?.getAttribute('src')).toBe('/circuits/br-1940-light.webp')
-  expect(container.querySelector('.hero .stage .poster')?.getAttribute('srcset')).toBe('/circuits/br-1940-light-1440.webp 1440w, /circuits/br-1940-light.webp 2880w')
+  expect(container.querySelector('.hero .stage .poster')?.getAttribute('src')).toBe('/circuits/br-1940-dark.webp')
+  expect(container.querySelector('.hero .stage .poster')?.getAttribute('srcset')).toBe('/circuits/br-1940-dark-1440.webp 1440w, /circuits/br-1940-dark.webp 2880w')
   expect(container.querySelector('.hero .facts')?.textContent).toContain('4.309 km')
   expect(container.querySelector('.hero .note')?.textContent).toContain('Interlagos · São Paulo GP · this weekend · round 20 of 23')
   expect(container.querySelector('.hero .tracker')).not.toBeNull()

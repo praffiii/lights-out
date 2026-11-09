@@ -132,7 +132,7 @@ export function Shell() {
         Skip to content
       </a>
       <Loader />
-      <Header menuOpen={menuOpen} onMenu={() => setMenuOpen((o) => !o)} />
+      <Header menuOpen={menuOpen} onMenu={() => setMenuOpen((o) => !o)} home={path === '/'} />
       <Menu open={menuOpen} onClose={closeMenu} path={path} />
       <main id="main" ref={main} tabIndex={-1}>
         <Outlet />
