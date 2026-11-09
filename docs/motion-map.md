@@ -99,6 +99,18 @@ Built. The headlines and the round count `sweep`, the photos `reveal`, the point
 | Title-fight strip | None | A column shows its round's points in a mono chip. | The 23 columns draw left to right, scrubbed. The leader's line fills purple last. |
 | Standings rows | None | The row fills ink from the left. | The hairlines draw; the points count up. The payoff row fills purple last. |
 
+## Race weekend
+
+Built. The hero photo `reveal`s behind the sector bar while the label, the Grand Prix name and the dates `sweep` in after it. Below the hero, each section moves once as it scrolls in. The countdown never animates on a tick. Everything is still under reduced motion and nothing stays hidden.
+
+| Section | Enter | Hover / tap | Scroll |
+|---|---|---|---|
+| Hero | The bar crosses the photo, which settles from 1.18×. The label, the name and the dates `sweep`, 120 ms apart. | None | None |
+| Countdown | Each digit group and colon is a `block`, 60 ms apart. `block` because a `sweep` would split the text and freeze the ticking digits. | None | None |
+| Circuit band | The bar crosses the whole card (a `block`, so the live 3D view is hidden with it). The length, distance and laps `roll`; the first Grand Prix rolls from 1950. The schedule hairlines draw. | Drag spins the circuit ±45° and springs back; Reset tweens home over 0.8 s. The Turns and Sectors toggles fade their layers. | None |
+| Latest | The portrait `reveal`s, the gap `roll`s, and the P1 row is a `block` that fills last. | None | None |
+| Teaser | The photo `reveal`s and the title `sweep`s. | None | None |
+
 ## The tracks
 
 From here on the pages are planned, not built. Read every "rises", "types on" and "wipes" as the sector bar (`sweep`, `reveal`, `block`), and every "counts up" as `roll`.

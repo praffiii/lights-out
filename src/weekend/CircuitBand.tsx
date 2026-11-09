@@ -29,12 +29,12 @@ type Drag = { x: number; t: number; v: number }
 
 const degrees = (radians: number) => Math.round((radians * 180) / Math.PI) || 0
 
-function Stat({ label, value, unit }: { label: string; value: string | number; unit?: string }) {
+function Stat({ label, value, unit, num }: { label: string; value: string | number; unit?: string; num?: 'num' | 'num year' }) {
   return (
     <div>
       <dt className="mono">{label}</dt>
       <dd>
-        {value}
+        <span className={num}>{value}</span>
         {unit ? <span className="mono unit">{unit}</span> : null}
       </dd>
     </div>
@@ -255,10 +255,10 @@ export function CircuitBand({ band, theme }: { band: Band; theme: Theme }) {
       <div className="card">
         <dl className="stats">
           <Stat label="When" value={band.when} />
-          {facts ? <Stat label="Length" value={facts.lengthKm} unit="km" /> : null}
-          {info ? <Stat label="Distance" value={info.facts.distanceKm} unit="km" /> : null}
-          {facts ? <Stat label="Laps" value={facts.laps} /> : null}
-          {facts ? <Stat label="First Grand Prix" value={facts.firstGp} /> : null}
+          {facts ? <Stat label="Length" value={facts.lengthKm} unit="km" num="num" /> : null}
+          {info ? <Stat label="Distance" value={info.facts.distanceKm} unit="km" num="num" /> : null}
+          {facts ? <Stat label="Laps" value={facts.laps} num="num" /> : null}
+          {facts ? <Stat label="First Grand Prix" value={facts.firstGp} num="num year" /> : null}
         </dl>
         <div className="schedule">
           <p className="mono">{`Schedule · your time · ${band.zone}`}</p>

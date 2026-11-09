@@ -1,7 +1,11 @@
+@property --hair { syntax: '<number>'; inherits: false; initial-value: 1; }
 .weekend-page { padding-top: 88px; }
 .weekend-page .weekend-empty { padding: 200px var(--m); font-size: 20px; color: var(--muted); }
 
 .weekend-page .top { position: relative; height: 900px; overflow: clip; background: var(--line); }
+.weekend-page .top .title, .weekend-page .top .credit { z-index: 3; }
+.weekend-page .top > .bar, .weekend-page .band .card > .bar, .weekend-page .latest figure > .bar, .weekend-page .teaser .frame > .bar, .weekend-page .digits .group > .bar, .weekend-page .latest .rows li > .bar { inset: 0; }
+.weekend-page .digits > *, .weekend-page .latest figure, .weekend-page .latest .rows li { position: relative; }
 .weekend-page .top .shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .weekend-page .top .title { position: absolute; left: 0; bottom: 0; width: 820px; max-width: 100%; padding: 40px var(--m) 39px; background: var(--bg); color: var(--ink); }
 .weekend-page .top h1 { margin: 17px 0 0 -6px; font-size: 104px; white-space: normal; }
@@ -31,7 +35,7 @@
 .weekend-page .band .schedule { position: relative; z-index: 2; pointer-events: none; }
 .weekend-page .band .schedule > p { font-size: 11px; color: var(--muted); }
 .weekend-page .band .schedule ul { list-style: none; margin-top: 14px; }
-.weekend-page .band .schedule li { display: grid; grid-template-columns: 140px 1fr auto; align-items: baseline; padding: 9px 0 8px; border-bottom: 1px solid var(--line); }
+.weekend-page .band .schedule li { display: grid; grid-template-columns: 140px 1fr auto; align-items: baseline; padding: 9px 0 8px; background: linear-gradient(var(--line), var(--line)) left bottom / calc(var(--hair) * 100%) 1px no-repeat; }
 .weekend-page .band .schedule .name { font-size: 15px; font-weight: 500; }
 .weekend-page .band .schedule .day { font-size: 10px; color: var(--muted); }
 .weekend-page .band .schedule .time { font-size: 13px; }
