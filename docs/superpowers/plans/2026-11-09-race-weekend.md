@@ -44,7 +44,12 @@ Read each section with `get_design_context` before building it, and match type, 
   - the Blender still shows until the band scrolls into view.
 
 **My calls, flagged for Praffi:**
-- **Route.** The page lives at `/weekend` and is not added to the menu, because the approved menu has no slot for it. It is reached from the weekend box on every page.
+- **Ways in (Praffi, 2026-11-09).** The page lives at `/weekend`. It is reached from:
+  - the weekend box;
+  - a `Race weekend →` link in This season's weekend band;
+  - the current round's calendar tile;
+  - a `Race weekend` sub-line under "This season" in the menu.
+  - Past rounds have no page of their own.
 - **Corner names.** The data names one corner per circuit, such as turn 1 "S do Senna". It shows as a fixed label, as in the mock.
 - **The spin is limited to ±45°,** with a rubber-band edge. Spun further, a long track like Las Vegas leaves the frame, and the ground tile's corners swing into view. Council found this.
 - **Links with nowhere to go yet.** "Explore the lap in 3D", "Full timesheet", the Chapter 02 "Read" and the weekend box's "Full result" stay "Soon". The box's Latest tab shows Jolpica's last race, which can differ from this page's newest session.
@@ -296,6 +301,18 @@ Read each section with `get_design_context` before building it, and match type, 
 - Create: `src/routes/weekend.tsx`, `src/weekend/Weekend.tsx`, `src/weekend/Top.tsx`, `src/weekend/Clock.tsx`, `src/styles/weekend.css`, `test/weekend/clock.test.tsx`
 - Modify:
   - `src/shell/WeekendBox.tsx`: "Race weekend page" and "Full weekend schedule" become `<Go to="/weekend">`, and "Full result" stays `Soon`.
+  - `src/this-season/ThisWeekend.tsx`: the caption gets a `Race weekend →` link to `/weekend`.
+  - `src/this-season/Calendar.tsx`:
+    - **The `now` tile** (the current or next round) leads to `/weekend`.
+      - With a mouse, clicking the tile opens the page, and the tile shows the pointer cursor.
+      - On touch, a tap still toggles the card.
+      - Its card gets a `Race weekend →` link.
+    - **Every other tile** keeps the default cursor and no link, because past and later rounds have no page.
+  - `src/shell/menu.ts` and `src/shell/Menu.tsx`:
+    - "This season" gets one sub-line, `Race weekend`, linking to `/weekend`.
+    - Sub-lines with a `to` render as `<Go>`; the rest stay `Soon`, as the chapter lines do today.
+    - The sub type becomes `{ key: string; label: string; to: To | null }`, mapped from `CHAPTERS` for How F1 works.
+  - `e2e/season.spec.ts`: "calendar tiles do not look like links while they go nowhere" now expects the pointer only on the `now` tile.
   - `vite.config.ts`: add `pages: [{ path: '/weekend' }]`.
   - `test/build.test.ts`: assert `dist/client/weekend/index.html`.
 
@@ -425,7 +442,12 @@ Read each section with `get_design_context` before building it, and match type, 
   - the reset button brings turn 1's pin back to within 2 px;
   - on the phone project, a vertical swipe on the stage scrolls the page;
   - the Turns toggle hides the pins, and the Sectors toggle hides the S labels;
-  - the weekend box's "Race weekend page" link opens `/weekend`;
+  - each way in opens `/weekend`:
+    - the weekend box's "Race weekend page" link;
+    - This season's `Race weekend →` link;
+    - clicking the `now` calendar tile, and the link in its card;
+    - the menu's `Race weekend` sub-line;
+  - clicking a `done` tile goes nowhere;
   - Home → Weekend → Home keeps each page's styles, and Home's hero still runs its lap.
 - [ ] **Step 2: Run** `bunx playwright test e2e/weekend.spec.ts` → all pass. Then run the full suite and record the result.
 - [ ] **Step 3: Commit** `test(weekend): end-to-end checks for the Race weekend page`.
