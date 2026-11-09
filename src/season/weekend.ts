@@ -1,4 +1,4 @@
-import { circuitFor } from '#/circuits/registry.ts'
+import { calendarCircuit } from '#/circuits/calendar.ts'
 
 import type { Race, Session, SessionName } from './jolpica-schema.ts'
 import type { SeasonSnapshot } from './snapshot-schema.ts'
@@ -68,7 +68,7 @@ export type BoxState =
 
 export type Segment = { label?: string; value: string }
 
-export const gpName = (race: Race) => circuitFor(race.circuit.circuitId)?.gp ?? race.raceName.replace(/Grand Prix$/, 'GP')
+export const gpName = (race: Race) => calendarCircuit(race.circuit.circuitId)?.gp ?? race.raceName.replace(/Grand Prix$/, 'GP')
 
 const endOf = (session: Session) => startOf(session) + SESSION_MINUTES[session.name] * MINUTE
 
