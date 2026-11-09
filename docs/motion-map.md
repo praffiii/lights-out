@@ -61,16 +61,15 @@ Bundle in the spike, gzipped:
 ## Decisions (settled by Praffi, 2026-11-08)
 
 1. **Page change:** the purple line. The red curtain is dropped, and red is reserved for the start lights.
-2. **`wdth` at rest:** 100, as in the mocks, rising to 112 with scroll speed. The 62 → 100 launch is kept for the footer wordmark and the intro.
+2. **`wdth` at rest:** 100, as in the mocks, rising to 112 with scroll speed. The 62 → 100 launch is kept for the footer wordmark.
 3. **Header on return:** it takes the page colour as a fill.
-4. **One clock extras** (blur, speed readout, gear, engine pitch): the intro only.
+4. **One clock extras** (blur, speed readout, gear, engine pitch): dropped with the intro (Praffi, 2026-11-09).
 
 ## Shell (every page)
 
 | Element | Enter | Hover / tap | Scroll | Exit |
 |---|---|---|---|---|
-| Loader *(spike)* | Five dots light red with real progress (fonts and the hero photo), at most one every 140 ms. | None | None | All five go out together after a 0.2–0.5 s hold, the screen lifts (0.7 s, launch) and the page intro plays. Capped at 2.6 s. |
-| Intro (first visit, and every refresh: the page always starts at the top, never at the restored scroll position) | The approved 25 s storyboard. Skip bottom right. | Skip | None | The lights shrink into the logo's five dots, then the Home headline sweeps in. |
+| Loader *(spike)* | Five dots light red with real progress (fonts and the hero photo), at most one every 140 ms. | None | None | All five go out together after a 0.2–0.5 s hold, the screen lifts (0.7 s, launch) and the page entrance plays. Capped at 2.6 s. |
 | Header B *(spike)* | Visible at load. | Menu button: the bars cross into an X in 240 ms. | Steps aside on scroll down after 200 px; returns on scroll up with a fill. | None |
 | Weekend box *(spike)* | Ticks every second. | Opens the 440 px panel: clip down 0.4 s; the tab underline slides 240 ms. | None | The panel clips up 0.3 s. |
 | Menu *(spike)* | The panel wipes down (0.6 s, launch). The big links arrive as a staircase of sector bars, 70 ms apart, and the photo arrives behind a bar of its own. The chapter list and theme row fade in. Focus moves to the first link. | Links: the hover roll into purple. Hover or focus also swaps the photo with a 0.5 s wipe and updates its caption. The current page is ink with a purple square. | Lenis stops while the menu is open. | It clips back up in 0.5 s. Escape closes it, and focus returns to the Menu button. |
@@ -160,7 +159,6 @@ From here on the pages are planned, not built. Read every "rises", "types on" an
 | Console | No errors |
 
 Still to prove in the build:
-- the 25-second intro;
 - the calendar hover;
 - a pinned replay;
 - the same results on a mid-range phone, not just this Mac.

@@ -124,31 +124,18 @@ Captures: `.playwright-mcp/study/` in the scratch workspace (`lando-*`, `merc/`,
 ```
 Idea:        Your first lap of F1. Scroll is the throttle, and every sector teaches one thing.
 Metaphor:    The pit wall's telemetry screen: speed, gear, sector times, track map.
-Signature:   The intro. A Grand Prix start told in F1's own screen language: start lights, speed readout, timing tower, race control.
+Signature:   The start lights: the loader fills them with real progress and they live on as the logo's five dots.
 Emotion:     The held breath before the start, then speed.
 Motion verb: Brake and launch. Hold, then accelerate hard. Arrive fast, then settle long.
-Screenshot:  "Lights out" launched to Archivo's widest cut under ten dark start lights.
+Screenshot:  The next race's circuit lapping under the timing strip.
 ```
 
-### Intro storyboard (approved by Praffi, 2026-11-08)
+### Intro (dropped by Praffi, 2026-11-09)
 
-Figma boards "Intro storyboard" (dark) and "Intro storyboard · light". About 25 s, first visit only, "Skip intro" always bottom right, sound off until the visitor turns it on, replay from the footer. No footage, no 3D, no named race or driver; it evokes the feeling, never retells Abu Dhabi 2021.
-
-1. 0:00 The grid: five dark lights, "Twenty-two cars. One start."
-2. 0:01 Lights on, one pair a second, with a counter.
-3. 0:05 The hold: all five on, a random wait.
-4. 0:07 Lights out: a beat of black, then "Lights out" launches from condensed to widest.
-5. 0:08 Flat out: 0 to 312 km/h and gears 1 to 8 in Martian Mono; one value drives type width and engine pitch.
-6. 0:11 The order: the timing tower reshuffles; a purple sector moves P3 up.
-7. 0:15 Safety car: a yellow race-control band; every gap shrinks. "Anything can happen."
-8. 0:18 Last lap: one huge gap (0.214) ticking down; the chaser's last sector never fills in.
-9. 0:22 The flag: a chequered wipe before any result. "Nobody knows until the flag."
-10. 0:24 Handoff: the lights shrink into the logo's five red dots and the Home headline lands.
-
-Reduced motion: one still of the lights out with "Lights out" and the way in.
+A 25 s first-visit intro was storyboarded on 2026-11-08 and built, then dropped before it shipped: it only stood between a visitor and the site, and the animation did not earn its time. The loader stays. Do not bring back a pre-site intro.
 
 Two runner-up concepts lend parts to this one:
-- "Lights Out" (race-start tension) gives the loader and the intro.
+- "Lights Out" (race-start tension) gives the loader.
 - "Race Weekend" (Friday to Sunday) may shape the season page.
 
 ## Color: every color is a real F1 signal
@@ -162,7 +149,7 @@ Two runner-up concepts lend parts to this one:
 | `accent` | Sector purple | `#A43BFF` | "Fastest". The one thing to look at right now. Use it rarely |
 | `signal-green` | Personal best | `#2BD45E` | Only with its F1 meaning |
 | `signal-yellow` | Caution | `#F5C400` | Only with its F1 meaning (slower, yellow flag) |
-| `curtain` | Start-light red | `#FF1E1E` | Only for the start lights (loader, intro, logo dots) |
+| `curtain` | Start-light red | `#FF1E1E` | Only for the start lights (loader, logo dots) |
 
 Genericness check: "near-black with one red accent" is an AI default. Red here is limited to the start lights. The everyday accent is sector purple, and each color carries its F1 meaning.
 
@@ -170,7 +157,7 @@ Genericness check: "near-black with one red accent" is an AI default. Red here i
 
 - **Display and text: Archivo** (Google, OFL), a variable font with width 62 to 125 and weight 100 to 900.
   - Display: weight 800 to 900, tracking about −0.03em, leading 0.85 to 0.95.
-  - Scroll velocity drives `wdth` on display type: 100 at rest (as in every mock), up to 112 flat out, settling back with the brake ease (Praffi, 2026-11-08). The 62 → 100 launch is kept for two moments only: the footer wordmark and the intro's "Lights out".
+  - Scroll velocity drives `wdth` on display type: 100 at rest (as in every mock), up to 112 flat out, settling back with the brake ease (Praffi, 2026-11-08). The 62 → 100 launch is kept for one moment only: the footer wordmark.
 - **Numbers: Martian Mono** (Google, OFL). Tabular figures for lap times, speed, gaps and standings.
 - **Scale:** mega `clamp(4rem, 1.2rem + 14vw, 16rem)`, xl `clamp(2.5rem, 1.4rem + 4.8vw, 6rem)`, l `clamp(1.75rem, 1.3rem + 1.9vw, 3rem)`, m `clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem)`, body `clamp(1rem, 0.95rem + 0.2vw, 1.125rem)`, s 0.875rem, xs 0.75rem.
 
@@ -194,9 +181,9 @@ Everything is square-cornered. Only things that roll or light up are round: whee
   - `launch` = `cubic-bezier(0.8, 0, 0.15, 1)`: hold, then a violent start.
   - `brake` = `cubic-bezier(0.05, 0.7, 0.1, 1)`: fast arrival, long settle.
 - **Durations:** UI 240ms, elements 600–900ms, scenes 1.2–1.6s. Stagger 30–60ms.
-- **One clock.** Everything ticks from GSAP's ticker (Lenis, ScrollTrigger, the 3D canvas). On every page, scroll velocity drives Archivo `wdth`. Motion blur, the speed readout (km/h), the gear number and engine pitch belong to the 25 s intro only (Praffi, 2026-11-08).
+- **One clock.** Everything ticks from GSAP's ticker (Lenis, ScrollTrigger, the 3D canvas). On every page, scroll velocity drives Archivo `wdth`.
 - **Page transition:** a thin purple sector line sweeps across the top while the next headline arrives behind it (Praffi chose this over a red curtain, 2026-11-08). It must finish in under 0.8s. Full per-page motion: `docs/motion-map.md`.
-- **Reduced motion:** no stretching and no blur. The intro becomes a static frame of the lights out, and all content stays visible.
+- **Reduced motion:** no stretching and no blur. All content stays visible.
 
 ## 3D, 2D and sound
 

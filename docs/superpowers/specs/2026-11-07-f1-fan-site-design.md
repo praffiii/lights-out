@@ -22,7 +22,7 @@ People who are new to F1. Assume zero knowledge: no jargon goes unexplained.
 
 ## 3. Goals
 
-- A cinematic intro that makes people *feel* why F1 is beautiful. It carries three things: tension (it all comes down to one moment), sensation (speed and noise), and unpredictability (anything can happen).
+- A cinematic intro that makes people *feel* why F1 is beautiful. It carries three things: tension (it all comes down to one moment), sensation (speed and noise), and unpredictability (anything can happen). **Dropped by Praffi on 2026-11-09, never shipped; see "Intro (dropped)" in DESIGN.md.**
 - Teach through visuals, animation, and interaction, not walls of text. Text is short captions that support the visuals.
 - Follow the current season, up to date after each session.
 - Cost nothing to run.
@@ -82,12 +82,12 @@ English. **[my call]**
 
 - **Reduced motion:** visitors with `prefers-reduced-motion` get still frames or simplified transitions.
 - **Sound:** off until the user interacts. Browsers block autoplaying audio anyway.
-- **Skipping:** the intro can be skipped.
+- **Skipping:** the intro can be skipped. **Dropped by Praffi on 2026-11-09, never shipped; see "Intro (dropped)" in DESIGN.md.**
 - **Keyboard:** interactive figures work with the keyboard.
 
 ## 7. The site: eight sections
 
-1. **Cinematic intro.** A short opening act built from original motion, typography, and sound, not footage. It plays on the first visit. It can be skipped, and a visitor can replay it. **[my call]**
+1. **Cinematic intro.** A short opening act built from original motion, typography, and sound, not footage. It plays on the first visit. It can be skipped, and a visitor can replay it. **[my call]** **Dropped by Praffi on 2026-11-09, never shipped; see "Intro (dropped)" in DESIGN.md.**
 2. **The car.** The visitor takes the car apart piece by piece. The interaction pattern comes from <https://skills.wheresryan.sh/anatomy>:
    - The car is a real object, not a diagram.
    - Exactly one part is lit with an accent color at any moment.
@@ -117,7 +117,7 @@ History is woven in: a car's evolution, a legend's story, a classic corner's pas
 **Changed by Praffi on 2026-11-08.** The release split below (Release 1, then 2 to 5) is replaced. Each approved Figma design is built and shipped on its own, with its own plan:
 
 1. **Home**, together with the shell every page shares (loader, header and weekend box, menu, footer). Plan: `docs/superpowers/plans/2026-11-08-home.md`, on top of `2026-11-07-foundation-season-data.md`.
-2. **The intro** (storyboard in DESIGN.md). It plays before Home on the first visit. **[my call]** on its place in the order.
+2. **The intro** (storyboard in DESIGN.md). It plays before Home on the first visit. **[my call]** on its place in the order. **Dropped by Praffi on 2026-11-09, never shipped; see "Intro (dropped)" in DESIGN.md.**
 3. **This season.**
 4. **How F1 works:** the index, then one chapter at a time.
 5. **The car**, **the engine**, **the tracks** (index and circuit page), **the people** (index and driver page).
