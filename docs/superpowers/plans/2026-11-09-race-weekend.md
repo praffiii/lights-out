@@ -170,7 +170,7 @@ Read each section with `get_design_context` before building it, and match type, 
   - `test/season/weekend.test.ts`
 
 **Interfaces:**
-- Consumes: `pickRace`, `nextLightsOut`, `when`, `countdown`, `SESSION_LABEL`, `SESSION_MINUTES`, `latestStart` and `gpName` from `src/season/weekend.ts`; `weekend()`'s label rule (`page-model.ts:117`); `calendarCircuit`, `circuitFor`, `CARS` and `portraitFor`.
+- Consumes: `pickRace`, `nextLightsOut`, `when`, `sessionDay`, `countdown`, `SESSION_LABEL`, `SESSION_MINUTES`, `latestStart` and `gpName` from `src/season/weekend.ts`. For the flag, pass `nextLightsOut(...).race`'s `Race` session to `sessionDay`, with the zone from `circuitFor(…).tz`. `weekend()`'s label rule (`page-model.ts:117`); `calendarCircuit`, `circuitFor`, `CARS` and `portraitFor`.
 - Produces:
   ```ts
   export function weekendPage(snapshot: SeasonSnapshot, now: Date, zone: string): WeekendPage | null
@@ -265,7 +265,7 @@ Read each section with `get_design_context` before building it, and match type, 
     - The hero copy at FP3 minus 2 h.
     - `clock.units` `hms`, `dhm` (5 days out) and `d` (unconfirmed).
     - A live session (FP3 plus 20 min) gives the `Live · Practice 3` label and a `live` row.
-    - At race end plus 1 h, `clock` is `null` and `flag` names the Las Vegas Grand Prix.
+    - At race end plus 1 h, `clock` is `null` and `flag` is exactly `Chequered flag. The Las Vegas Grand Prix starts Sat 21 Nov.`. The race starts at 04:00Z on 22 Nov, so this catches a version that ignores the track zone.
     - After the finale with no next calendar, `flag` is the last-race line.
     - A `nextCalendar` race gets the `Next race · 2027 · Round 1` label.
   - **Notes.**
@@ -348,6 +348,7 @@ Read each section with `get_design_context` before building it, and match type, 
     - Pointer events on the stage, with `touch-action: pan-y`.
     - Horizontal movement sets `yaw += dx * 0.006`, clamped to ±45°. Beyond the clamp, movement is scaled by 0.3 and springs back on release; under `REDUCED` it snaps back to ±45°.
     - On release, velocity decays by `0.92 ** (dt / 16.7)` on `gsap.ticker`, skipped under `REDUCED`.
+  - **`data-yaw`.** The stage carries `data-yaw`: the yaw in whole degrees, updated on release and when a tween ends.
   - **Reset.** A reset button appears once the yaw is not 0. It tweens the yaw to 0 over 0.8 s with ease `launch`; under reduced motion it snaps.
   - **Turns.** Plain mono numbers on a 24 px stem (a `::before` line). The named corner's name sits under its number. The toggle fades the pins over 240 ms.
   - **Sectors.** The toggle tweens `fill` from 1 to 0 over 0.6 s, to the unfilled grey, and back up to 1 to redraw the colours along the lap. It fades the S labels with it, and snaps under reduced motion.
@@ -420,7 +421,7 @@ Read each section with `get_design_context` before building it, and match type, 
   - the countdown ticks (`clock.fastForward`);
   - the calendar button downloads `interlagos-2026.ics`, whose body has five `BEGIN:VEVENT`;
   - dragging the stage 200 px moves turn 1's pin;
-  - dragging 600 px reaches the ±45° limit, and every visible pin's box stays inside the stage;
+  - **The limit.** On `?reduced`, so the spring-back snaps, drag 600 px and release. The stage's `data-yaw` (degrees, rounded, written by `CircuitBand`) reads `45`. Every visible pin's box stays inside the stage.
   - the reset button brings turn 1's pin back to within 2 px;
   - on the phone project, a vertical swipe on the stage scrolls the page;
   - the Turns toggle hides the pins, and the Sectors toggle hides the S labels;
