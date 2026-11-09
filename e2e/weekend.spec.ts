@@ -90,7 +90,7 @@ for (const width of [800, 1024, 1280]) {
 
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
     expect(await overlaps(page, '.weekend-page .digits', '.weekend-page .note')).toBe(false)
-    expect(await overlaps(page, '.weekend-page .band .stats', '.weekend-page .band .schedule')).toBe(false)
+    expect(await overlaps(page, '.weekend-page .band .figures', '.weekend-page .band .schedule')).toBe(false)
     expect(errors).toEqual([])
   })
 }
@@ -268,6 +268,8 @@ test('Home to Weekend to Home keeps each page styled and the lap running', async
 
   await expect(page.locator('.weekend-page .top')).toHaveCSS('position', 'relative')
   await expect(page.locator('.weekend-page .digits')).toHaveCSS('display', 'flex')
+  await expect(page.locator('.weekend-page .band dl')).toHaveCSS('padding-top', '0px')
+  await expect(page.locator('.weekend-page .latest ol')).toHaveCSS('border-top-width', '0px')
 
   await expect(async () => {
     await page.getByRole('link', { name: 'Lights Out, home' }).click()
@@ -279,5 +281,20 @@ test('Home to Weekend to Home keeps each page styled and the lap running', async
   const first = await tag.evaluate((el) => el.style.transform)
 
   await expect.poll(() => tag.evaluate((el) => el.style.transform)).not.toBe(first)
+  expect(errors).toEqual([])
+})
+
+test('the P1 row fills with a bar as wide as the row', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await loaded(page)
+  await page.locator('.weekend-page .latest ol li').first().scrollIntoViewIfNeeded()
+
+  const sizes = await page.locator('.weekend-page .latest ol li').first().evaluate((li) => {
+    const bar = li.querySelector(':scope > .bar')
+
+    return bar ? [getComputedStyle(bar).width, getComputedStyle(li).width] : []
+  })
+
+  expect(sizes[0]).toBe(sizes[1])
   expect(errors).toEqual([])
 })

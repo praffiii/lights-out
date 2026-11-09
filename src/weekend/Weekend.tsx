@@ -33,7 +33,7 @@ function motion(scope: HTMLElement) {
 
   if (card) block(card)
 
-  for (const el of all(scope, '.band .stats .num')) roll(el, el.classList.contains('year') ? { from: 1950 } : {})
+  for (const el of all(scope, '.band .figures .num')) roll(el, el.classList.contains('year') ? { from: 1950 } : {})
 
   const schedule = scope.querySelector<HTMLElement>('.band .schedule')
 
@@ -43,7 +43,7 @@ function motion(scope: HTMLElement) {
 
   for (const el of all(scope, '.latest .gap')) roll(el)
 
-  for (const el of all(scope, '.latest .rows li:first-child')) block(el, { delay: 1.3 })
+  for (const el of all(scope, '.latest .order li:first-child')) block(el, { delay: 1.3 })
 
   for (const el of all(scope, '.teaser h2')) sweep(el)
 }

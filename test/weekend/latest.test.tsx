@@ -29,7 +29,7 @@ it('shows the gap, the headline, the top three and the portrait credit', () => {
   expect(container.querySelector('.gap')?.textContent).toBe('0.253 s')
   expect(container.querySelector('h2')?.textContent).toBe('Antonelli fastest. Norris that far behind.')
   expect(container.querySelector('.body')?.textContent).toBe("Verstappen third, Russell fourth. Practice times hint, they don't decide: teams run different fuel loads and tyres.")
-  expect([...container.querySelectorAll('.rows li')].map((li) => li.textContent)).toEqual(['P1ANT1:10.763', 'P2NOR+0.253', 'P3VER+0.259'])
+  expect([...container.querySelectorAll('.order li')].map((li) => li.textContent)).toEqual(['P1ANT1:10.763', 'P2NOR+0.253', 'P3VER+0.259'])
   expect(container.querySelector('figcaption')?.textContent).toBe(`Kimi Antonelli · Mercedes${portraitFor('ANT')?.credit}`)
 })
 

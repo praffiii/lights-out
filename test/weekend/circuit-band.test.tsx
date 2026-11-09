@@ -38,7 +38,7 @@ afterAll(async () => {
 
 it('shows the circuit stats and the schedule with the next session marked', () => {
   const { container } = render(<CircuitBand band={band} theme="dark" />)
-  const stats = container.querySelector('.stats')?.textContent ?? ''
+  const stats = container.querySelector('.figures')?.textContent ?? ''
 
   expect(stats).toContain('6–8 Nov')
   expect(stats).toContain('4.309')
@@ -62,7 +62,7 @@ it('the Turns toggle hides the turn numbers', () => {
 it('without a 3D model it shows only the stats and the schedule', () => {
   const { container } = render(<CircuitBand band={{ ...band, info: undefined }} theme="dark" />)
 
-  expect(container.querySelector('.stats')).not.toBeNull()
+  expect(container.querySelector('.figures')).not.toBeNull()
   expect(container.querySelectorAll('.schedule li')).toHaveLength(5)
   expect(container.querySelector('.stage')).toBeNull()
   expect(container.querySelector('.toggles')).toBeNull()

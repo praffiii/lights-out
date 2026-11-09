@@ -259,7 +259,7 @@ export function CircuitBand({ band, theme }: { band: Band; theme: Theme }) {
   return (
     <section className="band" data-theme={theme} aria-label="The circuit">
       <div className="card">
-        <dl className="stats">
+        <dl className="figures">
           <Stat label="When" value={band.when} />
           {facts ? <Stat label="Length" value={facts.lengthKm} unit="km" num="num" /> : null}
           {info ? <Stat label="Distance" value={info.facts.distanceKm} unit="km" num="num" /> : null}

@@ -25,11 +25,11 @@ export function Latest({ latest }: { latest: LatestBlock | null }) {
           {latest.headline}
         </h2>
         <p className="body">{latest.body}</p>
-        <ol className="rows">
+        <ol className="order">
           {latest.rows.map((row) => (
             <li key={row.position}>
               <span className="mono pos">P{row.position}</span>
-              <i style={{ background: row.colour }} aria-hidden />
+              <i className="tint" style={{ background: row.colour }} aria-hidden />
               <span className="mono code">{row.code}</span>
               <span className="mono time">{row.time}</span>
             </li>
