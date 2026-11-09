@@ -240,6 +240,23 @@ test('the link in the now card opens the Race weekend page', async ({ page, erro
   expect(errors).toEqual([])
 })
 
+test('a hovered tile card shows no link the pointer cannot reach, and keyboard focus shows it', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await loaded(page, '/season')
+
+  const tile = page.locator('.tiles .tile.is-now')
+
+  await tile.locator('button').hover()
+  await expect(tile.locator('.card')).toBeVisible()
+  await expect(tile.locator('.card a')).toBeHidden()
+
+  await page.mouse.move(0, 0)
+  await tile.locator('button').focus()
+  await page.keyboard.press('Tab')
+  await expect(tile.locator('.card a')).toBeFocused()
+  expect(errors).toEqual([])
+})
+
 test('a done tile goes nowhere', async ({ page, errors }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop')
   await loaded(page, '/season')
