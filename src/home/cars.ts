@@ -1,6 +1,6 @@
 export type Car = { code: string; driver: string; team: string; car: string; colour: string; src: string; credit: string; commons: string }
 
-const TEAMS = {
+export const TEAMS = {
   McLaren: { car: 'MCL40', colour: '#FF8000' },
   Mercedes: { car: 'W17', colour: '#27F4D2' },
   'Red Bull': { car: 'RB22', colour: '#3671C6' },

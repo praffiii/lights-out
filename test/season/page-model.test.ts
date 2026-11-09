@@ -1,7 +1,8 @@
 import { expect, it } from 'bun:test'
 import { Effect } from 'effect'
 
-import { calendarHead, calendarTiles, weekend } from '../../src/season/page-model.ts'
+import { calendarHead, calendarTiles, constructorRows, driverRows, driversCopy, person, team, titleFight, weekend, whoLed } from '../../src/season/page-model.ts'
+import type { SeasonSnapshot } from '../../src/season/snapshot-schema.ts'
 import { words } from '../../src/season/words.ts'
 import { calendar2026, calendar2027Shifted } from './fake-jolpica.ts'
 import { snapshotAt } from './snapshot.ts'
@@ -115,4 +116,162 @@ it('keeps the sessions of a circuit it has no facts for', async () => {
 
   expect(now?.facts).toBeUndefined()
   expect(now?.sessions).toHaveLength(5)
+})
+
+const base = await snapshotAt('2026-11-06T15:00:00Z')
+
+const standings = base.driverStandings
+
+const latestRace = base.latest?.race
+
+if (!standings || !latestRace?.race || !base.history) throw new Error('fixture has no standings, latest race or history')
+
+const latestRef = latestRace.race
+
+const { history: _history, ...noHistory } = base
+
+const withLatestRound = (snapshot: SeasonSnapshot, round: number): SeasonSnapshot => ({
+  ...snapshot,
+  latest: snapshot.latest && { ...snapshot.latest, race: { ...latestRace, race: { ...latestRef, round } } },
+})
+
+const twoAt = (points: [number, number], round: number): SeasonSnapshot => {
+  const mclaren = standings.rows.find((row) => row.driver.code === 'NOR')?.constructors ?? []
+  const rows = standings.rows.slice(0, 2).map((row, i) => ({ ...row, points: points[i] ?? 0, constructors: mclaren }))
+
+  return { ...base, latest: null, driverStandings: { ...standings, round, rows } }
+}
+
+it('reads an open fight with the rounds and points still to win', () => {
+  const fight = titleFight(twoAt([300, 290], 17))
+
+  expect(fight).toMatchObject({ state: 'open', gap: 10, label: 'The 2026 title fight · after round 17' })
+  expect(fight?.line).toBe('Six rounds left, 150 points still to win. Same team, same car, one title.')
+})
+
+it('names the round a decided title was settled at', () => {
+  const fight = titleFight(base)
+
+  expect(fight).toMatchObject({ gap: 119, state: 'decided', label: 'The 2026 title fight · after round 19', firstPoints: 380, secondPoints: 261 })
+  expect(fight?.line).toBe('Antonelli is the 2026 champion. It was settled at the Mexico City Grand Prix, with four rounds to spare.')
+})
+
+it('reads a decided title without history', () => {
+  expect(titleFight(noHistory)?.line).toBe('Antonelli is the 2026 champion, with four rounds still to run.')
+})
+
+it('keeps a gap equal to the points left open', () => {
+  expect(titleFight(twoAt([300, 150], 17))?.state).toBe('open')
+})
+
+it('reads a finished season as over', () => {
+  const final = withLatestRound(base, 23)
+
+  expect(titleFight(final)).toMatchObject({ state: 'over', label: 'The 2026 title fight · final' })
+  expect(titleFight(final)?.line).toBe('Antonelli is the 2026 champion. It was settled at the Mexico City Grand Prix, with four rounds to spare.')
+  expect(titleFight({ ...withLatestRound(noHistory, 23) })?.line).toBe('Antonelli is the 2026 champion.')
+})
+
+it('falls back to last season before round 1', () => {
+  const lastSeason: SeasonSnapshot = { ...base, latest: null, driverStandings: { ...standings, season: 2025 } }
+
+  expect(titleFight(lastSeason)).toMatchObject({ state: 'over', label: 'The 2025 title fight · final', line: 'Antonelli is the 2025 champion.' })
+})
+
+it('uses the standings round when the results agree with it', () => {
+  expect(titleFight(withLatestRound(noHistory, 20))?.line).toBe('Antonelli is the 2026 champion, with three rounds still to run.')
+})
+
+it('has no title fight without two standings rows', () => {
+  expect(titleFight({ ...base, driverStandings: null })).toBeNull()
+  expect(titleFight({ ...base, driverStandings: { ...standings, rows: standings.rows.slice(0, 1) } })).toBeNull()
+})
+
+it('sums up the gaps at the front', () => {
+  expect(driversCopy(standings.rows)).toBe('The front three are covered by 121 points. Fourth is 9 points behind third.')
+  expect(driversCopy([{ points: 30 }, { points: 20 }, { points: 10 }, { points: 9 }])).toBe('The front three are covered by 20 points. Fourth is 1 point behind third.')
+})
+
+it('shows a driver outside the car list by their Jolpica name in a muted colour', () => {
+  const camara = standings.rows.find((row) => row.driver.familyName === 'Camara')
+
+  if (!camara) throw new Error('fixture has no Camara')
+
+  const shown = person(camara.driver)
+
+  expect([shown.code, shown.name, shown.colour, shown.car, shown.portrait]).toEqual([null, 'Rafael Camara', 'var(--muted)', undefined, undefined])
+  expect(person(standings.rows[0]?.driver ?? camara.driver)).toMatchObject({ name: 'Kimi Antonelli', family: 'Antonelli', colour: '#27F4D2' })
+})
+
+it('maps Jolpica constructors to the site team names', () => {
+  expect(team({ constructorId: 'rb', name: 'RB F1 Team', nationality: 'Italian' })).toEqual({ id: 'rb', name: 'Racing Bulls', colour: '#6692FF' })
+  expect(team({ constructorId: 'nobody', name: 'Nobody Racing', nationality: 'British' })).toEqual({ id: 'nobody', name: 'Nobody Racing', colour: 'var(--muted)' })
+})
+
+it('puts each driver in the team they last raced for', () => {
+  const rows = driverRows(base)
+  const lawson = rows?.rest.find((row) => row.person.code === 'LAW')
+
+  expect(rows?.podium.map((row) => [row.person.code, row.gap])).toEqual([
+    ['ANT', ''],
+    ['VER', '+119'],
+    ['HAM', '+121'],
+  ])
+  expect([lawson?.position, lawson?.team.name]).toEqual([9, 'Racing Bulls'])
+  expect(driverRows({ ...base, driverStandings: null })).toBeNull()
+})
+
+it('splits each team total into its drivers', () => {
+  const rows = constructorRows(base)
+  const parts = (id: string) => rows.find((row) => row.team.id === id)
+
+  expect(parts('red_bull')).toMatchObject({ total: 382, parts: [{ label: 'VER', points: 261 }, { label: 'HAD', points: 107 }, { label: 'Others', points: 14 }] })
+  expect(parts('mclaren')).toMatchObject({ total: 365, parts: [{ label: 'NOR', points: 221 }, { label: 'PIA', points: 144 }] })
+  expect(parts('cadillac')).toMatchObject({ total: 0, parts: [] })
+  expect(rows).toHaveLength(11)
+
+  for (const row of rows) {
+    expect(row.parts.every((part) => part.points > 0)).toBe(true)
+    expect(row.parts.length === 0 || row.parts.reduce((sum, part) => sum + part.points, 0) === row.total).toBe(true)
+  }
+})
+
+it('shows totals only when history and standings disagree', () => {
+  const history = base.history
+
+  if (!history) throw new Error('fixture has no history')
+
+  const behind = { ...base, history: { ...history, round: 18 } }
+  const off = { ...base, history: { ...history, teams: history.teams.map((entry) => (entry.driver.code === 'VER' ? { ...entry, points: entry.points + 1 } : entry)) } }
+
+  expect(constructorRows(behind).every((row) => row.parts.length === 0)).toBe(true)
+  expect(constructorRows(off).find((row) => row.team.id === 'red_bull')?.parts).toEqual([])
+  expect(constructorRows(noHistory).every((row) => row.parts.length === 0)).toBe(true)
+})
+
+it('strips who led the championship into stints', () => {
+  const led = whoLed(base, new Date('2026-11-06T15:00:00Z'))
+
+  expect(led?.stints.map((stint) => [stint.person.code, stint.from, stint.to, stint.photo, stint.current])).toEqual([
+    ['RUS', 1, 2, 'portrait', false],
+    ['ANT', 3, 19, 'car', true],
+  ])
+  expect([led?.changes, led?.columns, led?.live, led?.leads.length]).toEqual([[3], 23, 20, 19])
+  expect(led?.line).toBe('Each column is one round. The photo shows who led the championship after it. Two drivers have led this season.')
+  expect(whoLed(base, new Date('2026-11-12T12:00:00Z'))?.live).toBeNull()
+})
+
+it('says when one driver has led every round', () => {
+  const history = base.history
+
+  if (!history) throw new Error('fixture has no history')
+
+  const ant = history.leaders.at(-1)?.driver ?? history.leaders[0]?.driver
+
+  if (!ant) throw new Error('fixture has no leader')
+
+  const solo = { ...base, history: { ...history, leaders: history.leaders.map((leader) => ({ ...leader, driver: ant })) } }
+
+  expect(whoLed(solo, new Date('2026-11-06T15:00:00Z'))?.line).toBe('Each column is one round. The photo shows who led the championship after it. Antonelli has led every round.')
+  expect(whoLed(noHistory, new Date('2026-11-06T15:00:00Z'))).toBeNull()
 })

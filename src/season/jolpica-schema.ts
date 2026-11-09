@@ -40,6 +40,8 @@ export type DriverRef = typeof DriverRef.Type
 
 export const ConstructorRef = Schema.Struct({ constructorId: Schema.String, name: Schema.String, nationality: Schema.String })
 
+export type ConstructorRef = typeof ConstructorRef.Type
+
 export const ResultRow = Schema.Struct({
   position: Schema.Number,
   positionText: Schema.String,
