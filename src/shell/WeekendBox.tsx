@@ -8,7 +8,7 @@ import type { SeasonSnapshot } from '#/season/snapshot-schema.ts'
 import { useSeason } from '#/season/use-season.ts'
 import { boxCopy, boxState, countdown, gpName, latestStart, pickRace, SESSION_LABEL, sessionDay, when } from '#/season/weekend.ts'
 
-import { Soon } from './Go.tsx'
+import { Go, Soon } from './Go.tsx'
 import { opposite, useTheme } from './theme.ts'
 
 const TABS = ['Now', 'Next', 'Latest', 'Standings'] as const
@@ -282,7 +282,9 @@ function StandingsTab({ snapshot, now }: { snapshot: SeasonSnapshot; now: Date }
           <Row key={row.driver.driverId} label={`P${row.position ?? i + 1}`} value={fullName(row.driver)} end={`${row.points} pts`} lead={i === 0} />
         ))}
       </div>
-      <Soon className="mono more">This season</Soon>
+      <Go to="/season" className="mono more">
+        This season <span className="arr">→</span>
+      </Go>
     </>
   )
 }

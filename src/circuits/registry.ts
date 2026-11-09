@@ -1,3 +1,4 @@
+import { CALENDAR, type CalendarCircuit } from './calendar.ts'
 import ae2009Line from './lines/ae-2009.json'
 import ae2009 from './pins/ae-2009.json'
 import au1953Line from './lines/au-1953.json'
@@ -53,59 +54,48 @@ const cropOf = ({ crop: [x0, y0, x1, y1] }: { crop: ReadonlyArray<number> }): Cr
   return [x0, y0, x1, y1]
 }
 
+const fromCalendar = ({ tile, name, gp, tz }: CalendarCircuit) => ({ model: tile, name, gp, tz })
+
+const factsOf = ({ firstGp, lengthKm, laps }: CalendarCircuit, rest: Omit<CircuitFacts, 'firstGp' | 'lengthKm' | 'laps'>): CircuitFacts => ({ firstGp, lengthKm, laps, ...rest })
+
 const CIRCUITS = {
   interlagos: {
-    model: 'br-1940',
-    name: 'Interlagos',
-    gp: 'São Paulo GP',
-    tz: 'America/Sao_Paulo',
+    ...fromCalendar(CALENDAR.interlagos),
     corner: { turn: 1, name: 'S do Senna' },
-    facts: { firstGp: 1973, lengthKm: '4.309', laps: 71, distanceKm: '305.879', turns: 15, direction: 'anticlockwise' },
+    facts: factsOf(CALENDAR.interlagos, { distanceKm: '305.879', turns: 15, direction: 'anticlockwise' }),
     pins: pinsOf(br1940),
     line: br1940Line,
     crop: cropOf(br1940),
     relief: 3,
   },
   vegas: {
-    model: 'us-2023',
-    name: 'Las Vegas',
-    gp: 'Las Vegas GP',
-    tz: 'America/Los_Angeles',
+    ...fromCalendar(CALENDAR.vegas),
     corner: { turn: 7, name: 'Sphere chicane' },
-    facts: { firstGp: 2023, lengthKm: '6.201', laps: 50, distanceKm: '309.958', turns: 17, direction: 'anticlockwise' },
+    facts: factsOf(CALENDAR.vegas, { distanceKm: '309.958', turns: 17, direction: 'anticlockwise' }),
     pins: pinsOf(us2023),
     line: us2023Line,
     crop: cropOf(us2023),
     relief: 3,
   },
   losail: {
-    model: 'qa-2004',
-    name: 'Lusail',
-    gp: 'Qatar GP',
-    tz: 'Asia/Qatar',
-    facts: { firstGp: 2021, lengthKm: '5.419', laps: 57, distanceKm: '308.611', turns: 16, direction: 'clockwise' },
+    ...fromCalendar(CALENDAR.losail),
+    facts: factsOf(CALENDAR.losail, { distanceKm: '308.611', turns: 16, direction: 'clockwise' }),
     pins: pinsOf(qa2004),
     line: qa2004Line,
     crop: cropOf(qa2004),
     relief: 6,
   },
   yas_marina: {
-    model: 'ae-2009',
-    name: 'Yas Marina',
-    gp: 'Abu Dhabi GP',
-    tz: 'Asia/Dubai',
-    facts: { firstGp: 2009, lengthKm: '5.281', laps: 58, distanceKm: '306.188', turns: 16, direction: 'anticlockwise' },
+    ...fromCalendar(CALENDAR.yas_marina),
+    facts: factsOf(CALENDAR.yas_marina, { distanceKm: '306.188', turns: 16, direction: 'anticlockwise' }),
     pins: pinsOf(ae2009),
     line: ae2009Line,
     crop: cropOf(ae2009),
     relief: 6,
   },
   albert_park: {
-    model: 'au-1953',
-    name: 'Albert Park',
-    gp: 'Australian GP',
-    tz: 'Australia/Melbourne',
-    facts: { firstGp: 1996, lengthKm: '5.278', laps: 58, distanceKm: '306.124', turns: 14, direction: 'clockwise' },
+    ...fromCalendar(CALENDAR.albert_park),
+    facts: factsOf(CALENDAR.albert_park, { distanceKm: '306.124', turns: 14, direction: 'clockwise' }),
     pins: pinsOf(au1953),
     line: au1953Line,
     crop: cropOf(au1953),

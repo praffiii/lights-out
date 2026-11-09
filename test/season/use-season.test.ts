@@ -1,6 +1,6 @@
 import { afterEach, expect, it, mock, spyOn } from 'bun:test'
 
-import { fetchSeason, SeasonWarmingError, seasonQueryOptions } from '../../src/season/use-season.ts'
+import { fetchSeason, retrySeason, SeasonWarmingError, seasonQueryOptions } from '../../src/season/use-season.ts'
 import { snapshotAt } from './snapshot.ts'
 
 const stubFetch = (response: Response) => spyOn(globalThis, 'fetch').mockResolvedValue(response)
@@ -41,4 +41,27 @@ it('rejects a snapshot missing season', async () => {
   stubFetch(Response.json(rest))
 
   await expect(fetchSeason()).rejects.toThrow()
+})
+
+it('decodes a snapshot written before history', async () => {
+  stubFetch(new Response(await Bun.file('test/fixtures/season-snapshot-v1.json').text(), { headers: { 'content-type': 'application/json' } }))
+
+  const snapshot = await fetchSeason()
+
+  expect(snapshot.history).toBeUndefined()
+})
+
+it('a SeasonWarmingError is not retried', () => {
+  expect(seasonQueryOptions.retry).toBe(retrySeason)
+  expect(retrySeason(0, new SeasonWarmingError())).toBe(false)
+  expect(retrySeason(0, new Error('down'))).toBe(true)
+  expect(retrySeason(3, new Error('down'))).toBe(false)
+})
+
+it('fetchSeason passes an AbortSignal to fetch', async () => {
+  const fetch = stubFetch(Response.json(await snapshotAt('2026-11-08T00:00:00.000Z')))
+
+  await fetchSeason()
+
+  expect(fetch.mock.calls[0]?.[1]?.signal).toBeInstanceOf(AbortSignal)
 })

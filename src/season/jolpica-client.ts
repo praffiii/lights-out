@@ -1,4 +1,4 @@
-import { Context, Data, Effect, Layer, Schedule, Schema } from 'effect'
+import { Context, Data, Effect, Layer, Schedule, Schema, Semaphore } from 'effect'
 import { HttpClient, HttpClientError, HttpClientRequest } from 'effect/http'
 
 import {
@@ -7,6 +7,8 @@ import {
   QualifyingResponse,
   RaceResultsResponse,
   RacesResponse,
+  SeasonResultsResponse,
+  SeasonSprintsResponse,
   SprintResponse,
 } from './jolpica-schema.ts'
 
@@ -19,9 +21,13 @@ type Season = number | 'current'
 
 type Endpoint<S extends Schema.Decoder<unknown>> = (season: Season) => Effect.Effect<S['Type'], JolpicaError>
 
+type Paged<S extends Schema.Decoder<unknown>> = (season: number, offset: number) => Effect.Effect<S['Type'], JolpicaError>
+
 const BASE_URL = 'https://api.jolpi.ca/ergast/f1'
 
 const USER_AGENT = 'LightsOutFanSite/0.1 (personal project)'
+
+const SPACING = '250 millis'
 
 export class JolpicaClient extends Context.Service<
   JolpicaClient,
@@ -32,6 +38,8 @@ export class JolpicaClient extends Context.Service<
     readonly lastSprint: Endpoint<typeof SprintResponse>
     readonly driverStandings: Endpoint<typeof DriverStandingsResponse>
     readonly constructorStandings: Endpoint<typeof ConstructorStandingsResponse>
+    readonly seasonResults: Paged<typeof SeasonResultsResponse>
+    readonly seasonSprints: Paged<typeof SeasonSprintsResponse>
   }
 >()('JolpicaClient') {
   static readonly layer = Layer.effect(
@@ -43,17 +51,24 @@ export class JolpicaClient extends Context.Service<
         HttpClient.retryTransient({ retryOn: 'errors-only', schedule: Schedule.exponential('500 millis'), times: 3 }),
       )
 
+      const gate = yield* Semaphore.make(1)
+
+      const get = <S extends Schema.Decoder<unknown>>(schema: S, path: string): Effect.Effect<S['Type'], JolpicaError> =>
+        Semaphore.withPermits(gate, 1)(Effect.sleep(SPACING).pipe(Effect.andThen(client.get(path)))).pipe(
+          Effect.flatMap((response) => response.json),
+          Effect.flatMap(Schema.decodeUnknownEffect(schema)),
+          Effect.mapError((cause) => new JolpicaError({ path, cause })),
+        )
+
       const endpoint =
         <S extends Schema.Decoder<unknown>>(schema: S, resource: string): Endpoint<S> =>
-        (season) => {
-          const path = `/${season}/${resource}/?limit=100`
+        (season) =>
+          get(schema, `/${season}/${resource}/?limit=100`)
 
-          return client.get(path).pipe(
-            Effect.flatMap((response) => response.json),
-            Effect.flatMap(Schema.decodeUnknownEffect(schema)),
-            Effect.mapError((cause) => new JolpicaError({ path, cause })),
-          )
-        }
+      const paged =
+        <S extends Schema.Decoder<unknown>>(schema: S, resource: string): Paged<S> =>
+        (season, offset) =>
+          get(schema, `/${season}/${resource}/?limit=100&offset=${offset}`)
 
       return {
         races: endpoint(RacesResponse, 'races'),
@@ -62,6 +77,8 @@ export class JolpicaClient extends Context.Service<
         lastSprint: endpoint(SprintResponse, 'last/sprint'),
         driverStandings: endpoint(DriverStandingsResponse, 'driverstandings'),
         constructorStandings: endpoint(ConstructorStandingsResponse, 'constructorstandings'),
+        seasonResults: paged(SeasonResultsResponse, 'results'),
+        seasonSprints: paged(SeasonSprintsResponse, 'sprint'),
       }
     }),
   )

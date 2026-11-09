@@ -90,16 +90,18 @@ Bundle in the spike, gzipped:
 
 ## This season
 
-From here on the pages are planned, not built. Read every "rises", "types on" and "wipes" as the sector bar (`sweep`, `reveal`, `block`), and every "counts up" as `roll`.
+Built. The headlines and the round count `sweep`, the photos `reveal`, the points `roll`, and the payoff (the leader's name, the leading team, the current leader's caption) is a `block` that fills purple last. The phone keeps every motion but the strip becomes a vertical list of stints, so its scrub reads as a wipe.
 
 | Section | Enter | Hover / tap | Scroll |
 |---|---|---|---|
 | Headline and count | The headline rises; "Round 20 of 23" types on. | None | None |
-| Calendar grid (23 Blender tiles) | None | The tile lifts to the hover state: the 3D tile swaps to the accent render and a photo card clips in beside it, 240 ms. On touch, the first tap locks the card and the second tap opens the page. | The tiles fade up row by row, 30 ms apart. The "Now" tile's purple edge draws. |
+| Calendar grid (23 Blender tiles) | None | The tile lifts to the hover state: the 3D tile swaps to the accent render and a photo card clips in beside it, 240 ms. On touch, a tap toggles the card. | The tiles fade up row by row, 30 ms apart. The "Now" tile's purple edge draws. |
 | Title-fight strip | None | A column shows its round's points in a mono chip. | The 23 columns draw left to right, scrubbed. The leader's line fills purple last. |
 | Standings rows | None | The row fills ink from the left. | The hairlines draw; the points count up. The payoff row fills purple last. |
 
 ## The tracks
+
+From here on the pages are planned, not built. Read every "rises", "types on" and "wipes" as the sector bar (`sweep`, `reveal`, `block`), and every "counts up" as `roll`.
 
 | Section | Enter | Hover / tap | Scroll |
 |---|---|---|---|

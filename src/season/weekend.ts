@@ -1,4 +1,4 @@
-import { circuitFor } from '#/circuits/registry.ts'
+import { calendarCircuit } from '#/circuits/calendar.ts'
 
 import type { Race, Session, SessionName } from './jolpica-schema.ts'
 import type { SeasonSnapshot } from './snapshot-schema.ts'
@@ -17,7 +17,7 @@ export type RaceKind = 'this-weekend' | 'next' | 'finale'
 
 export type PickedRace = { race: Race; round: number; of: number; kind: RaceKind }
 
-const bounds = (race: Race) => {
+export const bounds = (race: Race) => {
   const first = race.sessions[0]
   const final = race.sessions.find((session) => session.name === 'Race') ?? race.sessions.at(-1)
 
@@ -68,7 +68,7 @@ export type BoxState =
 
 export type Segment = { label?: string; value: string }
 
-export const gpName = (race: Race) => circuitFor(race.circuit.circuitId)?.gp ?? race.raceName.replace(/Grand Prix$/, 'GP')
+export const gpName = (race: Race) => calendarCircuit(race.circuit.circuitId)?.gp ?? race.raceName.replace(/Grand Prix$/, 'GP')
 
 const endOf = (session: Session) => startOf(session) + SESSION_MINUTES[session.name] * MINUTE
 
@@ -167,6 +167,9 @@ export function when(iso: string, timeZone: string) {
 
   return { day, track: clock(at, timeZone), yours: `${clock(at)}${shift}` }
 }
+
+export const weekday = (session: Session, timeZone: string) =>
+  new Intl.DateTimeFormat('en-GB', { timeZone: session.timeConfirmed ? timeZone : 'UTC', weekday: 'short' }).format(new Date(session.startsAt))
 
 export const sessionDay = (session: Session, timeZone: string) => when(session.startsAt, session.timeConfirmed ? timeZone : 'UTC').day
 

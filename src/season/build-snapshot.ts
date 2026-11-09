@@ -1,8 +1,9 @@
 import { Effect } from 'effect'
 
 import { JolpicaClient, type JolpicaError } from './jolpica-client.ts'
-import type { Race } from './jolpica-schema.ts'
-import type { NextSession, SeasonSnapshot } from './snapshot-schema.ts'
+import { seasonHistory, type SeasonRace } from './history.ts'
+import type { Race, SeasonResults } from './jolpica-schema.ts'
+import type { History, NextSession, SeasonSnapshot } from './snapshot-schema.ts'
 
 const timeline = (races: ReadonlyArray<Race>): ReadonlyArray<NextSession> =>
   races
@@ -16,6 +17,34 @@ const timeline = (races: ReadonlyArray<Race>): ReadonlyArray<NextSession> =>
       })),
     )
     .sort((a, b) => Date.parse(a.session.startsAt) - Date.parse(b.session.startsAt))
+
+const allPages = (page: (offset: number) => Effect.Effect<SeasonResults, JolpicaError>): Effect.Effect<ReadonlyArray<SeasonRace>, JolpicaError> =>
+  Effect.gen(function* () {
+    const races: Array<SeasonRace> = []
+    let offset = 0
+    let total = 1
+
+    while (offset < total) {
+      const next = yield* page(offset)
+
+      races.push(...next.races)
+      total = next.total
+      offset += 100
+    }
+
+    return races
+  })
+
+const history = (jolpica: JolpicaClient['Service'], season: number): Effect.Effect<History | undefined> =>
+  Effect.gen(function* () {
+    const races = yield* allPages((offset) => jolpica.seasonResults(season, offset))
+    const sprints = yield* allPages((offset) => jolpica.seasonSprints(season, offset))
+
+    return seasonHistory(races, sprints)
+  }).pipe(
+    Effect.timeout('20 seconds'),
+    Effect.catch((error) => Effect.logWarning('season history skipped', error).pipe(Effect.as(undefined))),
+  )
 
 export const buildSnapshot = (now: Date): Effect.Effect<SeasonSnapshot, JolpicaError, JolpicaClient> =>
   Effect.gen(function* () {
@@ -44,7 +73,9 @@ export const buildSnapshot = (now: Date): Effect.Effect<SeasonSnapshot, JolpicaE
     const sameWeekend = <S extends { race: { round: number } | null; rows: ReadonlyArray<object> }>(session: S) =>
       session.race?.round === results.race?.round && session.rows.length > 0 ? session : null
 
-    return {
+    const past = driverStandings === null ? undefined : yield* history(jolpica, driverStandings.season)
+
+    const snapshot: SeasonSnapshot = {
       fetchedAt: now.toISOString(),
       season,
       calendar: races,
@@ -54,4 +85,6 @@ export const buildSnapshot = (now: Date): Effect.Effect<SeasonSnapshot, JolpicaE
       driverStandings,
       constructorStandings,
     }
+
+    return past ? { ...snapshot, history: past } : snapshot
   })
