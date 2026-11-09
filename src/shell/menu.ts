@@ -13,4 +13,4 @@ export const MENU: ReadonlyArray<MenuEntry> = [
   { label: 'Glossary', to: null, photo: PHOTOS.ch04 },
 ]
 
-export const FOOTER_LINKS = ['Credits', 'Source', 'Replay the intro'] as const
+export const FOOTER_LINKS = ['Credits', 'Source'] as const
