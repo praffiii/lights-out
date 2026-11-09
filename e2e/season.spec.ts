@@ -109,6 +109,38 @@ test('hovering round 13 shows the Monza card', async ({ page, errors }, testInfo
   expect(errors).toEqual([])
 })
 
+test('the hover card sits above the tiles next to it', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await loaded(page)
+  await page.locator('.tiles').scrollIntoViewIfNeeded()
+  await page.waitForTimeout(1500)
+  await tile(page, 5).hover()
+  await expect(card(page)).toBeVisible()
+
+  const covered = await page.evaluate(() => {
+    const el = document.querySelector<HTMLElement>('.calendar .card')
+
+    if (!el) return ['no card']
+
+    el.style.pointerEvents = 'auto'
+
+    for (const animation of el.getAnimations()) animation.finish()
+
+    const box = el.getBoundingClientRect()
+
+    return [0.25, 0.5, 0.75].flatMap((x) =>
+      [0.3, 0.6, 0.9].flatMap((y) => {
+        const top = document.elementFromPoint(box.left + box.width * x, box.top + box.height * y)
+
+        return top?.closest('.card') ? [] : [`${x},${y}: ${top?.tagName} ${top?.getAttribute('src') ?? ''}`]
+      }),
+    )
+  })
+
+  expect(covered).toEqual([])
+  expect(errors).toEqual([])
+})
+
 test('Tab + Escape drive the card', async ({ page, errors }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop')
   await loaded(page)
