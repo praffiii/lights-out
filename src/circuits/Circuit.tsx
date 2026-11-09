@@ -10,6 +10,7 @@ import type { Theme } from '#/shell/theme.ts'
 import { lapProfile } from './lap.ts'
 import { allCircuits } from './registry.ts'
 import { groundOf, isSector, mattify, PALETTE, screen, SECTORS } from './shaders.ts'
+import { fitCrop } from './fit.ts'
 
 const LAP_SECONDS = 14
 const TRAIL = 8
@@ -164,8 +165,10 @@ function Scene({ model, theme, layout, restart, fill, running, pins, tag, onLap,
       camera.far = rest.far
 
       if (layout === 'wide') {
+        const { k, x, y } = fitCrop(rest.crop)
+
         camera.aspect = size.width / size.height
-        camera.setViewOffset(size.width, size.height, SHIFT_X * size.width, -SHIFT_Y * size.width, size.width, size.height)
+        camera.setViewOffset(k * size.width, k * size.height, (k * SHIFT_X - x) * size.width, -(k * SHIFT_Y * size.width + y * size.height), size.width, size.height)
       } else {
         const [x0, y0, x1, y1] = rest.crop
         const fullH = size.height / (y1 - y0)
