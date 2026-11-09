@@ -2,7 +2,7 @@ name: season
 
 on:
   schedule:
-    - cron: '7 * * * *'
+    - cron: '23 * * * *'
   workflow_dispatch:
 
 permissions:
