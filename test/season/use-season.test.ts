@@ -42,3 +42,11 @@ it('rejects a snapshot missing season', async () => {
 
   await expect(fetchSeason()).rejects.toThrow()
 })
+
+it('decodes a snapshot written before history', async () => {
+  stubFetch(new Response(await Bun.file('test/fixtures/season-snapshot-v1.json').text(), { headers: { 'content-type': 'application/json' } }))
+
+  const snapshot = await fetchSeason()
+
+  expect(snapshot.history).toBeUndefined()
+})

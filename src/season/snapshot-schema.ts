@@ -1,6 +1,6 @@
 import { Schema } from 'effect'
 
-import { ConstructorStandings, DriverStandings, QualifyingResults, Race, RaceResults, Session } from './jolpica-schema.ts'
+import { ConstructorStandings, DriverRef, DriverStandings, QualifyingResults, Race, RaceResults, Session } from './jolpica-schema.ts'
 
 export const NextSession = Schema.Struct({
   round: Schema.Number,
@@ -11,6 +11,18 @@ export const NextSession = Schema.Struct({
 })
 
 export type NextSession = typeof NextSession.Type
+
+export const Leader = Schema.Struct({ round: Schema.Number, driver: DriverRef, lead: Schema.Number })
+
+export type Leader = typeof Leader.Type
+
+export const TeamPoints = Schema.Struct({ constructorId: Schema.String, driver: DriverRef, points: Schema.Number })
+
+export type TeamPoints = typeof TeamPoints.Type
+
+export const History = Schema.Struct({ round: Schema.Number, leaders: Schema.Array(Leader), teams: Schema.Array(TeamPoints) })
+
+export type History = typeof History.Type
 
 export const SeasonSnapshot = Schema.Struct({
   fetchedAt: Schema.String,
@@ -27,6 +39,7 @@ export const SeasonSnapshot = Schema.Struct({
   ),
   driverStandings: DriverStandings,
   constructorStandings: ConstructorStandings,
+  history: Schema.optionalKey(History),
 })
 
 export type SeasonSnapshot = typeof SeasonSnapshot.Type

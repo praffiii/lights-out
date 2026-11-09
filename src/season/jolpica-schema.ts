@@ -301,3 +301,32 @@ export const ConstructorStandingsResponse = standingsTable({
     encode: noEncode(),
   }),
 )
+
+export const SeasonResults = Schema.Struct({
+  total: Schema.Number,
+  races: Schema.Array(Schema.Struct({ round: Schema.Number, rows: Schema.Array(ResultRow) })),
+})
+
+export type SeasonResults = typeof SeasonResults.Type
+
+export type ResultRow = typeof ResultRow.Type
+
+const seasonRace = (race: { round: number }, rows: ReadonlyArray<typeof JolpicaResult.Type>) => ({ round: race.round, rows: rows.map(result) })
+
+export const SeasonResultsResponse = Schema.Struct({
+  MRData: Schema.Struct({ total: Count, RaceTable: Schema.Struct({ Races: Schema.Array(Schema.Struct({ round: Count, Results: Schema.Array(JolpicaResult) })) }) }),
+}).pipe(
+  Schema.decodeTo(SeasonResults, {
+    decode: SchemaGetter.transform(({ MRData }) => ({ total: MRData.total, races: MRData.RaceTable.Races.map((race) => seasonRace(race, race.Results)) })),
+    encode: noEncode(),
+  }),
+)
+
+export const SeasonSprintsResponse = Schema.Struct({
+  MRData: Schema.Struct({ total: Count, RaceTable: Schema.Struct({ Races: Schema.Array(Schema.Struct({ round: Count, SprintResults: Schema.Array(JolpicaResult) })) }) }),
+}).pipe(
+  Schema.decodeTo(SeasonResults, {
+    decode: SchemaGetter.transform(({ MRData }) => ({ total: MRData.total, races: MRData.RaceTable.Races.map((race) => seasonRace(race, race.SprintResults)) })),
+    encode: noEncode(),
+  }),
+)

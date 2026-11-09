@@ -2438,5 +2438,540 @@
         }
       }
     ]
+  },
+  "history": {
+    "round": 19,
+    "leaders": [
+      {
+        "round": 1,
+        "driver": {
+          "driverId": "russell",
+          "code": "RUS",
+          "number": 63,
+          "givenName": "George",
+          "familyName": "Russell",
+          "nationality": "British"
+        },
+        "lead": 7
+      },
+      {
+        "round": 2,
+        "driver": {
+          "driverId": "russell",
+          "code": "RUS",
+          "number": 63,
+          "givenName": "George",
+          "familyName": "Russell",
+          "nationality": "British"
+        },
+        "lead": 4
+      },
+      {
+        "round": 3,
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "lead": 9
+      },
+      {
+        "round": 4,
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "lead": 20
+      },
+      {
+        "round": 5,
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "lead": 43
+      },
+      {
+        "round": 6,
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "lead": 66
+      },
+      {
+        "round": 7,
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "lead": 41
+      },
+      {
+        "round": 8,
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "lead": 40
+      },
+      {
+        "round": 9,
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "lead": 25
+      },
+      {
+        "round": 10,
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "lead": 45
+      },
+      {
+        "round": 11,
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "lead": 50
+      },
+      {
+        "round": 12,
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "lead": 59
+      },
+      {
+        "round": 13,
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "lead": 66
+      },
+      {
+        "round": 14,
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "lead": 81
+      },
+      {
+        "round": 15,
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "lead": 66
+      },
+      {
+        "round": 16,
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "lead": 84
+      },
+      {
+        "round": 17,
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "lead": 102
+      },
+      {
+        "round": 18,
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "lead": 123
+      },
+      {
+        "round": 19,
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "lead": 119
+      }
+    ],
+    "teams": [
+      {
+        "constructorId": "mercedes",
+        "driver": {
+          "driverId": "russell",
+          "code": "RUS",
+          "number": 63,
+          "givenName": "George",
+          "familyName": "Russell",
+          "nationality": "British"
+        },
+        "points": 250
+      },
+      {
+        "constructorId": "mercedes",
+        "driver": {
+          "driverId": "antonelli",
+          "code": "ANT",
+          "number": 12,
+          "givenName": "Andrea Kimi",
+          "familyName": "Antonelli",
+          "nationality": "Italian"
+        },
+        "points": 380
+      },
+      {
+        "constructorId": "ferrari",
+        "driver": {
+          "driverId": "leclerc",
+          "code": "LEC",
+          "number": 16,
+          "givenName": "Charles",
+          "familyName": "Leclerc",
+          "nationality": "Monegasque"
+        },
+        "points": 245
+      },
+      {
+        "constructorId": "ferrari",
+        "driver": {
+          "driverId": "hamilton",
+          "code": "HAM",
+          "number": 44,
+          "givenName": "Lewis",
+          "familyName": "Hamilton",
+          "nationality": "British"
+        },
+        "points": 259
+      },
+      {
+        "constructorId": "mclaren",
+        "driver": {
+          "driverId": "norris",
+          "code": "NOR",
+          "number": 1,
+          "givenName": "Lando",
+          "familyName": "Norris",
+          "nationality": "British"
+        },
+        "points": 221
+      },
+      {
+        "constructorId": "red_bull",
+        "driver": {
+          "driverId": "max_verstappen",
+          "code": "VER",
+          "number": 3,
+          "givenName": "Max",
+          "familyName": "Verstappen",
+          "nationality": "Dutch"
+        },
+        "points": 261
+      },
+      {
+        "constructorId": "haas",
+        "driver": {
+          "driverId": "bearman",
+          "code": "BEA",
+          "number": 87,
+          "givenName": "Oliver",
+          "familyName": "Bearman",
+          "nationality": "British"
+        },
+        "points": 23
+      },
+      {
+        "constructorId": "rb",
+        "driver": {
+          "driverId": "arvid_lindblad",
+          "code": "LIN",
+          "number": 41,
+          "givenName": "Arvid",
+          "familyName": "Lindblad",
+          "nationality": "British"
+        },
+        "points": 38
+      },
+      {
+        "constructorId": "audi",
+        "driver": {
+          "driverId": "bortoleto",
+          "code": "BOR",
+          "number": 5,
+          "givenName": "Gabriel",
+          "familyName": "Bortoleto",
+          "nationality": "Brazilian"
+        },
+        "points": 14
+      },
+      {
+        "constructorId": "alpine",
+        "driver": {
+          "driverId": "gasly",
+          "code": "GAS",
+          "number": 10,
+          "givenName": "Pierre",
+          "familyName": "Gasly",
+          "nationality": "French"
+        },
+        "points": 42
+      },
+      {
+        "constructorId": "haas",
+        "driver": {
+          "driverId": "ocon",
+          "code": "OCO",
+          "number": 31,
+          "givenName": "Esteban",
+          "familyName": "Ocon",
+          "nationality": "French"
+        },
+        "points": 7
+      },
+      {
+        "constructorId": "williams",
+        "driver": {
+          "driverId": "albon",
+          "code": "ALB",
+          "number": 23,
+          "givenName": "Alexander",
+          "familyName": "Albon",
+          "nationality": "Thai"
+        },
+        "points": 5
+      },
+      {
+        "constructorId": "rb",
+        "driver": {
+          "driverId": "lawson",
+          "code": "LAW",
+          "number": 30,
+          "givenName": "Liam",
+          "familyName": "Lawson",
+          "nationality": "New Zealander"
+        },
+        "points": 69
+      },
+      {
+        "constructorId": "alpine",
+        "driver": {
+          "driverId": "colapinto",
+          "code": "COL",
+          "number": 43,
+          "givenName": "Franco",
+          "familyName": "Colapinto",
+          "nationality": "Argentine"
+        },
+        "points": 27
+      },
+      {
+        "constructorId": "williams",
+        "driver": {
+          "driverId": "sainz",
+          "code": "SAI",
+          "number": 55,
+          "givenName": "Carlos",
+          "familyName": "Sainz",
+          "nationality": "Spanish"
+        },
+        "points": 7
+      },
+      {
+        "constructorId": "cadillac",
+        "driver": {
+          "driverId": "perez",
+          "code": "PER",
+          "number": 11,
+          "givenName": "Sergio",
+          "familyName": "Pérez",
+          "nationality": "Mexican"
+        },
+        "points": 0
+      },
+      {
+        "constructorId": "aston_martin",
+        "driver": {
+          "driverId": "stroll",
+          "code": "STR",
+          "number": 18,
+          "givenName": "Lance",
+          "familyName": "Stroll",
+          "nationality": "Canadian"
+        },
+        "points": 0
+      },
+      {
+        "constructorId": "aston_martin",
+        "driver": {
+          "driverId": "alonso",
+          "code": "ALO",
+          "number": 14,
+          "givenName": "Fernando",
+          "familyName": "Alonso",
+          "nationality": "Spanish"
+        },
+        "points": 7
+      },
+      {
+        "constructorId": "cadillac",
+        "driver": {
+          "driverId": "bottas",
+          "code": "BOT",
+          "number": 77,
+          "givenName": "Valtteri",
+          "familyName": "Bottas",
+          "nationality": "Finnish"
+        },
+        "points": 0
+      },
+      {
+        "constructorId": "red_bull",
+        "driver": {
+          "driverId": "hadjar",
+          "code": "HAD",
+          "number": 6,
+          "givenName": "Isack",
+          "familyName": "Hadjar",
+          "nationality": "French"
+        },
+        "points": 107
+      },
+      {
+        "constructorId": "mclaren",
+        "driver": {
+          "driverId": "piastri",
+          "code": "PIA",
+          "number": 81,
+          "givenName": "Oscar",
+          "familyName": "Piastri",
+          "nationality": "Australian"
+        },
+        "points": 144
+      },
+      {
+        "constructorId": "audi",
+        "driver": {
+          "driverId": "hulkenberg",
+          "code": "HUL",
+          "number": 27,
+          "givenName": "Nico",
+          "familyName": "Hülkenberg",
+          "nationality": "German"
+        },
+        "points": 13
+      },
+      {
+        "constructorId": "red_bull",
+        "driver": {
+          "driverId": "lawson",
+          "code": "LAW",
+          "number": 30,
+          "givenName": "Liam",
+          "familyName": "Lawson",
+          "nationality": "New Zealander"
+        },
+        "points": 14
+      },
+      {
+        "constructorId": "rb",
+        "driver": {
+          "driverId": "tsunoda",
+          "code": "TSU",
+          "number": 22,
+          "givenName": "Yuki",
+          "familyName": "Tsunoda",
+          "nationality": "Japanese"
+        },
+        "points": 1
+      },
+      {
+        "constructorId": "haas",
+        "driver": {
+          "driverId": "ryo_hirakawa",
+          "code": "HIR",
+          "number": 50,
+          "givenName": "Ryo",
+          "familyName": "Hirakawa",
+          "nationality": "Japanese"
+        },
+        "points": 1
+      }
+    ]
   }
 }

@@ -5,8 +5,9 @@ import { TestClock } from 'effect/testing'
 
 import { buildSnapshot } from '../../src/season/build-snapshot.ts'
 import { JolpicaClient, JolpicaError } from '../../src/season/jolpica-client.ts'
-import { RacesResponse } from '../../src/season/jolpica-schema.ts'
-import { calendar2026, calendar2027, fakeJolpica, fixture, noRaces, qualifying } from './fake-jolpica.ts'
+import { RacesResponse, SeasonResultsResponse } from '../../src/season/jolpica-schema.ts'
+import { SeasonSnapshotJson } from '../../src/season/snapshot-schema.ts'
+import { calendar2026, calendar2027, fake, fakeJolpica, fixture, noRaces, qualifying } from './fake-jolpica.ts'
 
 const run = (now: string, overrides: Partial<JolpicaClient['Service']> = {}) =>
   Effect.runPromise(buildSnapshot(new Date(now)).pipe(Effect.provide(fakeJolpica(overrides))))
@@ -108,4 +109,70 @@ it('jolpica client retries a 429 then succeeds', async () => {
 
   expect(races.season).toBe(2026)
   expect(calls).toBe(2)
+})
+
+const brokenPage = Schema.decodeUnknownEffect(SeasonResultsResponse)({}).pipe(Effect.mapError((cause) => new JolpicaError({ path: '/2026/results/', cause })))
+
+it('the snapshot carries history for the standings season', async () => {
+  const snapshot = await run('2026-11-06T15:00:00Z')
+
+  expect(snapshot.history?.round).toBe(19)
+  expect(snapshot.history?.leaders).toHaveLength(19)
+})
+
+it('history fetches pages one at a time until offset reaches the total', async () => {
+  const calls: Array<string> = []
+
+  const snapshot = await run('2026-11-06T15:00:00Z', {
+    seasonResults: (season, offset) => Effect.sync(() => calls.push(`results ${season} ${offset}`)).pipe(Effect.andThen(fake.seasonResults(season, offset))),
+    seasonSprints: (season, offset) => Effect.sync(() => calls.push(`sprint ${season} ${offset}`)).pipe(Effect.andThen(fake.seasonSprints(season, offset))),
+  })
+
+  expect(calls).toEqual(['results 2026 0', 'results 2026 100', 'results 2026 200', 'results 2026 300', 'results 2026 400', 'sprint 2026 0', 'sprint 2026 100'])
+  expect(snapshot.history?.round).toBe(19)
+})
+
+it('a failing history page still writes the core snapshot', async () => {
+  const snapshot = await run('2026-11-06T15:00:00Z', {
+    seasonResults: (season, offset) => (offset === 200 ? brokenPage : fake.seasonResults(season, offset)),
+  })
+
+  expect(snapshot.history).toBeUndefined()
+  expect(snapshot.nextSession?.round).toBe(20)
+  expect(snapshot.driverStandings?.rows.length).toBe(25)
+})
+
+it('a history page that never answers times out after 20 s and the core snapshot stays', async () => {
+  const snapshot = await Effect.runPromise(
+    Effect.gen(function* () {
+      const fiber = yield* Effect.forkChild(buildSnapshot(new Date('2026-11-06T15:00:00Z')))
+
+      yield* TestClock.adjust('21 seconds')
+
+      return yield* Fiber.join(fiber)
+    }).pipe(Effect.provide(fakeJolpica({ seasonSprints: () => Effect.never })), Effect.provide(TestClock.layer())),
+  )
+
+  expect(snapshot.history).toBeUndefined()
+  expect(snapshot.nextSession?.round).toBe(20)
+})
+
+it('no standings means no history', async () => {
+  const asked: Array<number> = []
+
+  const snapshot = await run('2026-11-06T15:00:00Z', {
+    driverStandings: () => Effect.succeed(null),
+    seasonResults: (season, offset) => Effect.sync(() => asked.push(offset)).pipe(Effect.andThen(fake.seasonResults(season, offset))),
+  })
+
+  expect(snapshot.history).toBeUndefined()
+  expect(asked).toEqual([])
+})
+
+it('a snapshot written before history still decodes', async () => {
+  const legacy = await Bun.file('test/fixtures/season-snapshot-v1.json').text()
+  const snapshot = await Effect.runPromise(Schema.decodeEffect(SeasonSnapshotJson)(legacy))
+
+  expect(snapshot.history).toBeUndefined()
+  expect(snapshot.season).toBe(2026)
 })
