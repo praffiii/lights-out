@@ -261,6 +261,22 @@ it('strips who led the championship into stints', () => {
   expect(whoLed(base, new Date('2026-11-12T12:00:00Z'))?.live).toBeNull()
 })
 
+it('counts a driver who takes the lead back once', () => {
+  const history = base.history
+
+  if (!history) throw new Error('fixture has no history')
+
+  const rus = history.leaders[0]?.driver
+
+  if (!rus) throw new Error('fixture has no leader')
+
+  const back = { ...base, history: { ...history, leaders: history.leaders.map((leader) => (leader.round >= 18 ? { ...leader, driver: rus } : leader)) } }
+  const led = whoLed(back, new Date('2026-11-06T15:00:00Z'))
+
+  expect(led?.stints.map((stint) => stint.person.code)).toEqual(['RUS', 'ANT', 'RUS'])
+  expect(led?.line).toBe('Each column is one round. The photo shows who led the championship after it. Two drivers have led this season.')
+})
+
 it('says when one driver has led every round', () => {
   const history = base.history
 

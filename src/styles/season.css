@@ -172,6 +172,7 @@
 .season .this-weekend .credit { padding: 16px var(--m) 0; font-size: 10px; color: var(--muted); }
 
 @media (max-width: 1199px) {
+  .season .tile:nth-child(12n + 7) .card, .season .tile:nth-child(12n + 8) .card { left: auto; right: calc(100% + 12px); }
   .season h2.display { white-space: normal; }
   .season .intro { grid-template-columns: minmax(0, 1fr); }
   .season .intro .copy { max-width: 560px; }

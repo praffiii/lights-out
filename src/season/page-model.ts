@@ -316,7 +316,8 @@ export function whoLed(snapshot: SeasonSnapshot, now: Date) {
 
   const thisSeason = standings.season === snapshot.season
   const live = thisSeason ? calendarTiles(snapshot, now).find((tile) => tile.state === 'now' && tile.round > last.round)?.round ?? null : null
-  const only = stints.length === 1 ? stints[0] : undefined
+  const drivers = new Set(runs.map((run) => run.driver.driverId)).size
+  const only = drivers === 1 ? stints[0] : undefined
 
   return {
     columns: thisSeason ? snapshot.calendar.length : standings.round,
@@ -324,6 +325,6 @@ export function whoLed(snapshot: SeasonSnapshot, now: Date) {
     leads: leaders.map((leader) => leader.lead),
     changes: stints.slice(1).map((stint) => stint.from),
     live,
-    line: `Each column is one round. The photo shows who led the championship after it. ${only ? `${only.person.family} has led every round.` : `${capital(words(stints.length))} drivers have led this season.`}`,
+    line: `Each column is one round. The photo shows who led the championship after it. ${only ? `${only.person.family} has led every round.` : `${capital(words(drivers))} drivers have led this season.`}`,
   }
 }

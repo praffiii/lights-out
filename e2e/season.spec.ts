@@ -67,6 +67,15 @@ for (const width of [800, 1024, 1280]) {
     expect(await overlaps(page, '.this-weekend .caption', '.this-weekend .sessions')).toBe(false)
     expect(await overlaps(page, '.team-row .part b', '.team-row .total b')).toBe(false)
     expect(await page.evaluate(() => [...document.querySelectorAll('.this-weekend .caption h2')].every((el) => el.scrollWidth <= el.clientWidth))).toBe(true)
+
+    for (const round of [1, 6, 7, 8, 9, 12]) {
+      await tile(page, round).hover()
+
+      const box = await card(page).boundingBox()
+
+      expect([round, (box?.x ?? -1) >= 0 && (box?.x ?? 0) + (box?.width ?? 0) <= width]).toEqual([round, true])
+    }
+
     expect(errors).toEqual([])
   })
 }
