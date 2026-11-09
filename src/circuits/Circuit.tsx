@@ -86,7 +86,7 @@ function Scene({ model, theme, layout, fill, pins, onReady, yaw, lap }: Props) {
     stale.current = true
   }, [restart])
 
-  const { materials, ground, markers, rest, light, spin } = useMemo(() => {
+  const { materials, ground, markers, rest, light, spin, inner } = useMemo(() => {
     const info = infoFor(model)
     const materials = mattify(gltf.scene, (name) => (isSector(name) ? SECTORS[name] : '#000000'))
     const track = new THREE.Box3()
@@ -146,8 +146,6 @@ function Scene({ model, theme, layout, fill, pins, onReady, yaw, lap }: Props) {
 
     spin.position.copy(centre)
     inner.position.copy(centre).negate()
-    spin.add(inner)
-    inner.add(gltf.scene, group)
 
     const [c1, c2] = info.cuts
     const mids = [c1 / 2, (c1 + c2) / 2, (c2 + 1) / 2]
@@ -159,11 +157,10 @@ function Scene({ model, theme, layout, fill, pins, onReady, yaw, lap }: Props) {
 
       anchor.name = name
       anchor.position.set(nearest.x, nearest.y, nearest.z)
-      inner.add(anchor)
       markers.push(anchor)
     }
 
-    return { materials, ground, markers, rest, light: { group, head, trail, geometry }, spin }
+    return { materials, ground, markers, rest, light: { group, head, trail, geometry }, spin, inner }
   }, [gltf, model])
 
   useEffect(() => {
@@ -337,7 +334,17 @@ function Scene({ model, theme, layout, fill, pins, onReady, yaw, lap }: Props) {
 
   return (
     <>
-      <primitive object={spin} />
+      <primitive object={spin}>
+        <primitive object={inner}>
+          <primitive object={gltf.scene} />
+          <primitive object={light.group} />
+          {markers
+            .filter((o) => !o.name.startsWith('turn-'))
+            .map((o) => (
+              <primitive key={o.name} object={o} />
+            ))}
+        </primitive>
+      </primitive>
     </>
   )
 }
