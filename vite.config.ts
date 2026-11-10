@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [
     cloudflare({ viteEnvironment: { name: 'ssr' } }),
     tanstackStart({
-      pages: [{ path: '/weekend' }],
+      pages: [{ path: '/weekend' }, ...['interlagos', 'vegas', 'losail', 'yas_marina', 'albert_park'].map((id) => ({ path: `/lap/${id}` }))],
       prerender: {
         enabled: true,
         crawlLinks: true,

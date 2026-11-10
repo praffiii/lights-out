@@ -28,6 +28,7 @@ export function Shell() {
   const main = useRef<HTMLElement>(null)
   const sweepBar = useRef<HTMLDivElement>(null)
   const busy = useRef(false)
+  const bare = path.startsWith('/lap/')
 
   useEffect(() => {
     if (theme) document.documentElement.dataset.theme = theme
@@ -94,7 +95,7 @@ export function Shell() {
       busy.current = true
 
       const line = sweepBar.current
-      const page = [main.current, document.querySelector('.footer')]
+      const page = [main.current, document.querySelector('.footer')].filter((el) => el !== null)
 
       if (!REDUCED && line) {
         gsap.set(line, { transformOrigin: 'left center' })
@@ -106,7 +107,7 @@ export function Shell() {
 
       leave()
       setMenuOpen(false)
-      await router.navigate({ to })
+      await router.navigate({ href: to })
       scrollTop(lenis, true)
       ScrollTrigger.refresh()
       gsap.set(page, { autoAlpha: 1 })
@@ -127,17 +128,21 @@ export function Shell() {
 
   return (
     <ShellContext.Provider value={api}>
-      {mounted && !REDUCED && <ReactLenis root options={{ autoRaf: false, lerp: 0.1, anchors: true }} />}
+      {mounted && !REDUCED && !bare && <ReactLenis root options={{ autoRaf: false, lerp: 0.1, anchors: true }} />}
       <a className="skip" href="#main">
         Skip to content
       </a>
       <Loader />
-      <Header menuOpen={menuOpen} onMenu={() => setMenuOpen((o) => !o)} home={path === '/'} />
-      <Menu open={menuOpen} onClose={closeMenu} path={path} />
+      {bare ? null : (
+        <>
+          <Header menuOpen={menuOpen} onMenu={() => setMenuOpen((o) => !o)} home={path === '/'} />
+          <Menu open={menuOpen} onClose={closeMenu} path={path} />
+        </>
+      )}
       <main id="main" ref={main} tabIndex={-1}>
         <Outlet />
       </main>
-      <Footer />
+      {bare ? null : <Footer />}
       <div className="sweep" ref={sweepBar} aria-hidden />
     </ShellContext.Provider>
   )

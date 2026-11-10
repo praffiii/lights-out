@@ -2,7 +2,7 @@ import { createContext, useContext } from 'react'
 
 import type { FileRoutesByTo } from '#/routeTree.gen'
 
-export type To = Exclude<keyof FileRoutesByTo, `/api/${string}`>
+export type To = Exclude<keyof FileRoutesByTo, `/api/${string}` | `/lap/${string}`> | `/lap/${string}`
 
 export type ShellApi = { go: (to: To) => Promise<void> }
 

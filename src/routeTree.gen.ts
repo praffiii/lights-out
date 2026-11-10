@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SeasonRouteImport } from './routes/season'
 import { Route as WeekendRouteImport } from './routes/weekend'
 import { Route as ApiSeasonRouteImport } from './routes/api/season'
+import { Route as LapCircuitRouteImport } from './routes/lap.$circuit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const ApiSeasonRoute = ApiSeasonRouteImport.update({
   path: '/api/season',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LapCircuitRoute = LapCircuitRouteImport.update({
+  id: '/lap/$circuit',
+  path: '/lap/$circuit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
+  '/lap/$circuit': typeof LapCircuitRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
+  '/lap/$circuit': typeof LapCircuitRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,15 @@ export interface FileRoutesById {
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
+  '/lap/$circuit': typeof LapCircuitRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/season' | '/weekend' | '/api/season'
+  fullPaths: '/' | '/season' | '/weekend' | '/api/season' | '/lap/$circuit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/season' | '/weekend' | '/api/season'
-  id: '__root__' | '/' | '/season' | '/weekend' | '/api/season'
+  to: '/' | '/season' | '/weekend' | '/api/season' | '/lap/$circuit'
+  id:
+    '__root__' | '/' | '/season' | '/weekend' | '/api/season' | '/lap/$circuit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +77,7 @@ export interface RootRouteChildren {
   SeasonRoute: typeof SeasonRoute
   WeekendRoute: typeof WeekendRoute
   ApiSeasonRoute: typeof ApiSeasonRoute
+  LapCircuitRoute: typeof LapCircuitRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +110,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSeasonRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lap/$circuit': {
+      id: '/lap/$circuit'
+      path: '/lap/$circuit'
+      fullPath: '/lap/$circuit'
+      preLoaderRoute: typeof LapCircuitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +125,7 @@ const rootRouteChildren: RootRouteChildren = {
   SeasonRoute: SeasonRoute,
   WeekendRoute: WeekendRoute,
   ApiSeasonRoute: ApiSeasonRoute,
+  LapCircuitRoute: LapCircuitRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

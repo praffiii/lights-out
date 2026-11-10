@@ -5,7 +5,7 @@ import { fitSpin } from '#/circuits/fit.ts'
 import type { CircuitInfo } from '#/circuits/registry.ts'
 import { useMedia } from '#/motion/client.ts'
 import { gsap, REDUCED } from '#/motion/motion.ts'
-import { Soon } from '#/shell/Go.tsx'
+import { Go } from '#/shell/Go.tsx'
 
 import type { Band } from './page-model.ts'
 
@@ -240,7 +240,9 @@ function Stage({ info }: { info: CircuitInfo }) {
           Sectors
         </button>
       </div>
-      <Soon className="mono explore">Explore the lap in 3D</Soon>
+      <Go to={`/lap/${info.id}`} className="mono explore">
+        Explore the lap in 3D
+      </Go>
     </>
   )
 }
