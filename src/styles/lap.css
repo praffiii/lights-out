@@ -20,3 +20,43 @@ html:has(.lap), html:has(.lap) body { overflow: hidden; overscroll-behavior: non
 .lap.missing { display: grid; place-content: center; gap: 20px; justify-items: center; text-align: center; padding: 24px; }
 .lap.missing h1 { font: 500 14px/1.4 'Martian Mono', monospace; text-transform: uppercase; letter-spacing: 0.12em; }
 .lap.missing a { color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; font-size: 11px; }
+.lap .drive { position: absolute; inset: 0; }
+.lap:not([data-ready]) .drive { visibility: hidden; }
+.lap[data-ready] > .poster, .lap[data-ready] > .vignette { display: none; }
+.lap .drive canvas { width: 100%; height: 100%; }
+.lap .read { position: absolute; top: 28px; right: 96px; display: flex; gap: 20px; }
+.lap .read div { display: grid; gap: 6px; min-width: 96px; padding: 10px 14px 12px; border: 1px solid var(--line); border-top: 2px solid var(--accent); background: rgb(10 14 24 / 0.55); backdrop-filter: blur(10px); transition: border-color 0.4s; }
+.lap .read dt { color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: 0.16em; }
+.lap .read dd { position: relative; font: 600 22px/1 'Martian Mono', monospace; font-variant-numeric: tabular-nums; }
+.lap .read small { color: var(--muted); font-size: 10px; font-weight: 400; }
+.lap [data-sector] { color: var(--accent); transition: color 0.4s; }
+.lap .gauge { position: absolute; left: 0; right: 0; bottom: -8px; height: 2px; background: var(--line); }
+.lap .gauge b { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.lap .callout { position: absolute; left: 32px; bottom: 120px; display: grid; gap: 4px; pointer-events: none; }
+.lap .callout[hidden] { display: none; }
+.lap .callout span { font: 900 84px/0.85 Archivo, sans-serif; font-stretch: 125%; color: transparent; -webkit-text-stroke: 1.5px var(--ink); opacity: 0.9; }
+.lap .callout em { font-style: normal; text-transform: uppercase; letter-spacing: 0.24em; font-size: 12px; color: var(--accent); }
+.lap .flash { position: absolute; right: 32px; top: 50%; translate: 0 -50%; font: 900 220px/0.8 Archivo, sans-serif; font-stretch: 125%; color: transparent; -webkit-text-stroke: 2px var(--accent); opacity: 0; pointer-events: none; text-shadow: 0 0 40px var(--accent); }
+.lap .chips { position: absolute; inset: 0; pointer-events: none; }
+.lap .chips span { position: absolute; left: 0; top: 0; display: grid; justify-items: center; padding-bottom: 16px; translate: -50% -100%; opacity: 0; transition: opacity 0.3s; }
+.lap .chips span::before { content: ''; position: absolute; left: 50%; bottom: 0; width: 1px; height: 16px; background: linear-gradient(to top, var(--ring), transparent); }
+.lap .chips span::after { content: ''; position: absolute; left: 50%; bottom: 0; translate: -50% 50%; width: 14px; height: 6px; border: 1px solid var(--ring); border-radius: 50%; box-shadow: 0 0 8px var(--ring); }
+.lap .chips b { padding: 3px 6px 2px; border-radius: 3px; background: rgb(14 20 36 / 0.6); backdrop-filter: blur(6px); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.2); font: 500 10px/1 'Martian Mono', monospace; }
+.lap .chips span.next b { background: var(--accent); color: #06080e; box-shadow: 0 0 14px var(--accent); }
+.lap .bottom { bottom: 28px; align-items: center; }
+.lap .mode { flex: none; display: flex; align-items: center; gap: 8px; min-width: 96px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: rgb(10 14 24 / 0.6); backdrop-filter: blur(10px); color: var(--ink); font: 400 10px/1 'Martian Mono', monospace; text-transform: uppercase; letter-spacing: 0.16em; cursor: pointer; }
+.lap .mode.you:hover, .lap .mode.you:focus-visible { border-color: var(--accent); }
+.lap .mode i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: lap-pulse 1.4s ease-in-out infinite; }
+.lap .mode.you i { animation: none; background: #fff; box-shadow: 0 0 8px #fff; }
+@keyframes lap-pulse { 50% { opacity: 0.25; } }
+.lap .timeline { position: relative; flex: 1; height: 64px; cursor: pointer; touch-action: none; }
+.lap .sectors { position: absolute; left: 0; right: 0; bottom: 14px; display: flex; gap: 3px; height: 4px; }
+.lap .sectors i { position: relative; height: 100%; background: color-mix(in srgb, var(--c) 22%, transparent); }
+.lap .sectors i b { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--c); box-shadow: 0 0 10px var(--c); }
+.lap .ticks { position: absolute; inset: 0 0 22px; }
+.lap .ticks button { position: absolute; bottom: 0; translate: -50% 0; padding: 0 0 8px; border: 0; background: none; color: var(--muted); font: 500 9px/1 'Martian Mono', monospace; cursor: pointer; }
+.lap .ticks button::after { content: ''; position: absolute; left: 50%; bottom: 0; width: 1px; height: 6px; background: currentColor; }
+.lap .ticks button.high { padding-bottom: 20px; }
+.lap .ticks button:hover, .lap .ticks button:focus-visible, .lap .ticks button.on { color: var(--ink); }
+.lap .head { position: absolute; bottom: 8px; width: 2px; height: 16px; translate: -50% 0; background: #fff; box-shadow: 0 0 12px #fff, 0 0 2px #fff; pointer-events: none; }
+.lap .hint { flex: none; color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; }

@@ -14,7 +14,11 @@ const open = async (page: Page, path: string) => {
 const explore = async (page: Page) => {
   const link = page.getByText('Explore the lap in 3D')
 
-  await link.scrollIntoViewIfNeeded()
+  await page.mouse.move(700, 300)
+  await expect(async () => {
+    await page.mouse.wheel(0, 600)
+    await expect(link).toBeVisible({ timeout: 500 })
+  }).toPass({ timeout: 20_000 })
   await link.click()
 }
 
@@ -65,10 +69,104 @@ test('an unknown circuit says there is no 3D lap yet', async ({ page }) => {
   await expect(page.locator('a[href="/weekend"]')).toBeVisible()
 })
 
-test('the wheel never scrolls the lap page', async ({ page }) => {
+test('the wheel never scrolls the lap page', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'wheel, keys and the wide timeline are desktop input')
   await open(page, '/lap/vegas')
   await page.mouse.move(400, 400)
   await page.mouse.wheel(0, 2000)
   await page.waitForTimeout(300)
   expect(await page.evaluate(() => scrollY)).toBe(0)
+})
+
+const drive = async (page: Page, path = '/lap/vegas') => {
+  await open(page, path)
+  await expect(page.locator('.lap')).toHaveAttribute('data-ready', '', { timeout: 20_000 })
+  await page.mouse.move(700, 400)
+}
+
+const km = async (page: Page) => Number(await page.locator('[data-km]').textContent())
+
+const thrown = (errors: string[]) => errors.filter((e) => e.startsWith('pageerror'))
+
+test('cruises by itself once the loader lifts', async ({ page, errors }) => {
+  await drive(page)
+  await page.clock.runFor(2000)
+  await expect(page.locator('.lap')).toHaveAttribute('data-mode', 'auto')
+
+  const before = await km(page)
+
+  await page.clock.runFor(3000)
+  expect(await km(page)).toBeGreaterThan(before)
+  expect(thrown(errors)).toEqual([])
+})
+
+test('a scroll takes the wheel and the light holds still', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'wheel, keys and the wide timeline are desktop input')
+  await drive(page)
+  await page.mouse.wheel(0, 1400)
+  await page.clock.runFor(4000)
+
+  const held = await km(page)
+
+  await page.clock.runFor(3000)
+  expect(await km(page)).toBe(held)
+  await expect(page.locator('.lap')).toHaveAttribute('data-mode', 'you')
+})
+
+test('tapping a turn number glides to that corner', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'wheel, keys and the wide timeline are desktop input')
+  await drive(page)
+  await page.locator('.lap .ticks button', { hasText: /^05$/ }).click()
+  await page.clock.runFor(2000)
+  await expect(page.locator('.lap .callout')).toContainText('T05')
+})
+
+test('the right arrow glides to the next turn', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'wheel, keys and the wide timeline are desktop input')
+  await drive(page)
+  await page.mouse.wheel(0, 100)
+  await page.keyboard.press('ArrowRight')
+  await page.clock.runFor(2000)
+  await expect(page.locator('.lap .callout')).toBeVisible()
+})
+
+test('Resume hands the lap back to auto', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'wheel, keys and the wide timeline are desktop input')
+  await drive(page)
+  await page.mouse.wheel(0, 1400)
+  await page.clock.runFor(1000)
+  await page.locator('.lap .mode').click()
+  await expect(page.locator('.lap')).toHaveAttribute('data-mode', 'auto')
+
+  const before = await km(page)
+
+  await page.clock.runFor(3000)
+  expect(await km(page)).toBeGreaterThan(before)
+})
+
+test('scrolling back across the line wraps to the end of the lap', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'wheel, keys and the wide timeline are desktop input')
+  await drive(page)
+  await page.mouse.wheel(0, -1400)
+  await page.clock.runFor(2000)
+  await expect(page.locator('[data-sector]')).toHaveText('S3')
+  expect(await km(page)).toBeGreaterThan(3)
+})
+
+test('a second visit cruises at the normal pace', async ({ page, errors }) => {
+  await open(page, '/weekend')
+  await explore(page)
+  await expect(page.locator('.lap')).toHaveAttribute('data-ready', '', { timeout: 20_000 })
+  await page.clock.runFor(2000)
+  await page.keyboard.press('Escape')
+  await expect(page).toHaveURL(/\/weekend\/?$/)
+  await explore(page)
+  await expect(page.locator('.lap')).toHaveAttribute('data-ready', '', { timeout: 20_000 })
+  await page.clock.runFor(2000)
+
+  const before = await km(page)
+
+  await page.clock.runFor(3000)
+  expect(await km(page)).toBeGreaterThan(before)
+  expect(thrown(errors)).toEqual([])
 })
