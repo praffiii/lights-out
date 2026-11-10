@@ -1,4 +1,5 @@
 import { CALENDAR, type CalendarCircuit } from './calendar.ts'
+import type { ModelledId } from './modelled.ts'
 import ae2009Line from './lines/ae-2009.json'
 import ae2009 from './pins/ae-2009.json'
 import au1953Line from './lines/au-1953.json'
@@ -108,7 +109,7 @@ const CIRCUITS = {
     crop: cropOf(au1953),
     cuts: [0.328, 0.6],
   },
-} satisfies Record<string, Omit<CircuitInfo, 'id'>>
+} satisfies Record<ModelledId, Omit<CircuitInfo, 'id'>>
 
 const byId = new Map<string, CircuitInfo>(Object.entries(CIRCUITS).map(([id, c]) => [id, { ...c, id }]))
 
