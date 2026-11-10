@@ -131,8 +131,19 @@ const pinsBelowFacts = (page: Page) =>
     return [...document.querySelectorAll('.hero .pins > span')].flatMap((pin) => (pin.getBoundingClientRect().bottom > facts ? [pin.textContent] : []))
   })
 
+const pinsOverGallery = (page: Page) =>
+  page.evaluate(() => {
+    const gallery = [...document.querySelectorAll('.hero .tracker > *')].map((el) => el.getBoundingClientRect())
+
+    return [...document.querySelectorAll('.hero .pins > span')].flatMap((pin) => {
+      const p = pin.getBoundingClientRect()
+
+      return gallery.some((g) => p.left < g.right && p.right > g.left && p.top < g.bottom && p.bottom > g.top) ? [pin.textContent] : []
+    })
+  })
+
 for (const id of ['interlagos', 'vegas', 'losail', 'yas_marina', 'albert_park']) {
-  test(`keeps the ${id} track above the facts on desktop`, async ({ page, errors }, info) => {
+  test(`keeps the ${id} track above the facts and clear of the gallery on desktop`, async ({ page, errors }, info) => {
     test.skip(info.project.name === 'phone', 'the phone stacks the facts under the track')
     test.setTimeout(90_000)
     await withCircuit(page, id)
@@ -141,6 +152,7 @@ for (const id of ['interlagos', 'vegas', 'losail', 'yas_marina', 'albert_park'])
     await expect(page.locator('.hero .stage[data-gl]')).toHaveCount(1)
     await page.clock.runFor(300)
     expect(await pinsBelowFacts(page)).toEqual([])
+    expect(await pinsOverGallery(page)).toEqual([])
     expect(errors).toEqual([])
   })
 }

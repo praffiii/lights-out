@@ -1,6 +1,6 @@
 import { expect, it } from 'bun:test'
 
-import { FREE, fitCrop, fitSpin } from '../../src/circuits/fit.ts'
+import { chipBelow, FREE, fitCrop, fitSpin } from '../../src/circuits/fit.ts'
 import { allCircuits } from '../../src/circuits/registry.ts'
 
 const placed = (crop: readonly [number, number, number, number]) => {
@@ -41,4 +41,10 @@ it('spins a ground square seen at 36 degrees inside √2 of its resting size', (
   const { h } = fitSpin([0.2, 0.4, 0.5, 0.4 + ch], 1.6)
 
   expect(h).toBeCloseTo(0.86 * Math.min(1.6 / (Math.SQRT2 * cw), 1 / (Math.SQRT2 * ch)), 9)
+})
+
+it('hangs a turn chip below its ring only where it would rise into the gallery', () => {
+  const fit = { k: 1, x: 0, y: 0 }
+
+  expect([chipBelow(0.75, 0.45, fit), chipBelow(0.75, 0.6, fit), chipBelow(0.4, 0.45, fit)]).toEqual([true, false, false])
 })

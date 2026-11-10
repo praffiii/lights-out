@@ -1,7 +1,7 @@
 import { type CSSProperties, lazy, Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 
 import { CircuitGuard } from '#/circuits/CircuitGuard.tsx'
-import { fitCrop } from '#/circuits/fit.ts'
+import { chipBelow, fitCrop } from '#/circuits/fit.ts'
 import { type CircuitInfo, circuitFor } from '#/circuits/registry.ts'
 import { useMedia, useMounted } from '#/motion/client.ts'
 import { gsap, onEnter, REDUCED, ScrollTrigger, sweep, useGSAP } from '#/motion/motion.ts'
@@ -236,7 +236,7 @@ function Stage({ info, car, at, fill, running, glReady, glFailed, onLap, onLapPr
           const place: Vars = { '--px': pin.x, '--py': pin.y }
 
           return (
-            <span key={pin.turn} data-pin={`turn-${pin.turn}`} style={place}>
+            <span key={pin.turn} data-pin={`turn-${pin.turn}`} data-below={chipBelow(pin.x, pin.y, fit) ? '' : undefined} style={place}>
               <b>{String(pin.turn).padStart(2, '0')}</b>
             </span>
           )
