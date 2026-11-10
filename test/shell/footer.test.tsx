@@ -20,7 +20,7 @@ afterAll(async () => {
   await GlobalRegistrator.unregister()
 })
 
-const shell = { go: async () => {} }
+const shell = { go: async () => {}, surface: async () => {} }
 
 const renderAt = (iso: string, snapshot?: SeasonSnapshot) => {
   const client = new QueryClient()

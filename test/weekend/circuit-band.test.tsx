@@ -26,7 +26,7 @@ if (!page) throw new Error('the fixture has a weekend')
 
 const { band } = page
 
-const shell = { go: async () => {} }
+const shell = { go: async () => {}, surface: async () => {} }
 
 const view = (b: typeof band) =>
   render(<CircuitBand band={b} />, { wrapper: ({ children }) => <ShellContext.Provider value={shell}>{children}</ShellContext.Provider> })

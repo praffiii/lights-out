@@ -335,3 +335,27 @@ test('a turn next to another one calls out its own number', async ({ page }, tes
     await expect(page.locator('.lap .callout span')).toHaveText(`T${turn}`)
   }
 })
+
+test('the band dives into the explorer and closing shrinks back into the band', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'one transition check is enough')
+  await open(page, '/weekend')
+
+  const link = page.getByText('Explore the lap in 3D')
+  const veil = page.locator('.veil')
+
+  await page.mouse.move(700, 300)
+  await expect(async () => {
+    await page.mouse.wheel(0, 600)
+    await expect(link).toBeInViewport({ timeout: 500 })
+  }).toPass({ timeout: 20_000 })
+  await page.waitForTimeout(800)
+  await link.click()
+  await expect(veil).toBeVisible()
+  await expect(page.locator('.lap h1')).toBeVisible()
+  await expect(veil).toBeHidden()
+  await page.keyboard.press('Escape')
+  await expect(veil).toBeVisible()
+  await expect(veil).toBeHidden()
+  await expect(link).toBeInViewport()
+  expect(thrown(errors)).toEqual([])
+})

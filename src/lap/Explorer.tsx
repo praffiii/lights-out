@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { type GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
-import { mapUrl, modelUrl } from '#/circuits/Circuit.tsx'
+import { mapUrl, modelUrl, REST_ASPECT, SHIFT_X, SHIFT_Y } from '#/circuits/Circuit.tsx'
 import { lapProfile } from '#/circuits/lap.ts'
 import type { CircuitInfo } from '#/circuits/registry.ts'
 import { broadcast, isSector, screen, SECTORS } from '#/circuits/shaders.ts'
@@ -14,7 +14,7 @@ import { type Drive, LAP_PX, nextTurn, push, resume, seek, SETTLE, step, turnLap
 
 const PLAY_SECONDS = 48
 const DRAG_PX = 2600
-const START_DELAY = 1
+const START_DELAY = 0.4
 const BACK = 250
 const RISE = 125
 const SIDE = 30
@@ -108,7 +108,10 @@ function run(host: HTMLElement, section: HTMLElement, info: CircuitInfo, gltf: G
   if (!(source instanceof THREE.PerspectiveCamera)) throw new Error(`${info.model}.glb has no perspective camera`)
 
   const camera = new THREE.PerspectiveCamera(source.fov, 1, 2, 40000)
-  const overview = { pos: source.getWorldPosition(new THREE.Vector3()), look: box.getCenter(new THREE.Vector3()), fov: source.fov }
+  const from = source.getWorldPosition(new THREE.Vector3())
+  const forward = source.getWorldDirection(new THREE.Vector3())
+  const look = from.clone().addScaledVector(forward, box.getCenter(new THREE.Vector3()).sub(from).dot(forward))
+  const overview = { pos: from, look: look.clone() }
 
   camera.position.copy(overview.pos)
   camera.lookAt(overview.look)
@@ -297,6 +300,7 @@ function run(host: HTMLElement, section: HTMLElement, info: CircuitInfo, gltf: G
   pill.addEventListener('click', onPill)
 
   const size = { w: 1, h: 1 }
+  const poster = { w: 1, h: 1, x: 0, y: 0 }
 
   const stagger = () => {
     const px = timeline.clientWidth
@@ -318,8 +322,10 @@ function run(host: HTMLElement, section: HTMLElement, info: CircuitInfo, gltf: G
     size.w = host.clientWidth || 1
     size.h = host.clientHeight || 1
     renderer.setSize(size.w, size.h, false)
-    camera.aspect = size.w / size.h
-    camera.updateProjectionMatrix()
+    poster.w = Math.max(size.w, size.h * REST_ASPECT)
+    poster.h = poster.w / REST_ASPECT
+    poster.x = (poster.w - size.w) / 2 + SHIFT_X * poster.w
+    poster.y = (poster.h - size.h) / 2 - SHIFT_Y * poster.w
   }
 
   const observer = new ResizeObserver(fit)
@@ -338,7 +344,6 @@ function run(host: HTMLElement, section: HTMLElement, info: CircuitInfo, gltf: G
   const side = new THREE.Vector3()
   const wantPos = new THREE.Vector3()
   const wantLook = new THREE.Vector3()
-  const look = overview.look.clone()
   const tmp = new THREE.Vector3()
 
   const chase = (u: number) => {
@@ -376,7 +381,13 @@ function run(host: HTMLElement, section: HTMLElement, info: CircuitInfo, gltf: G
     tmp.lerpVectors(overview.look, wantLook, b)
     look.lerp(tmp, follow)
     camera.lookAt(look)
-    camera.fov = THREE.MathUtils.lerp(overview.fov, CHASE_FOV, b)
+
+    const fullW = THREE.MathUtils.lerp(poster.w, size.w, b)
+    const fullH = THREE.MathUtils.lerp(poster.h, size.h, b)
+
+    camera.aspect = fullW / fullH
+    camera.setViewOffset(fullW, fullH, (1 - b) * poster.x, (1 - b) * poster.y, size.w, size.h)
+    camera.fov = THREE.MathUtils.lerp(source.fov, CHASE_FOV, b)
     camera.updateProjectionMatrix()
 
     for (const f of fills) f.uniforms.uTo.value = started ? u : 1

@@ -240,7 +240,17 @@ function Stage({ info }: { info: CircuitInfo }) {
           Sectors
         </button>
       </div>
-      <Go to={`/lap/${info.id}`} className="mono explore">
+      <Go
+        to={`/lap/${info.id}`}
+        className="mono explore"
+        dive={() => {
+          const el = box.current
+          const img = el?.querySelector('img.poster')
+          const rect = el?.getBoundingClientRect()
+
+          return rect ? { rect, image: { left: rect.left - fit.x * rect.width, top: rect.top - fit.y * rect.height, width: fit.w * rect.width, height: fit.h * rect.height }, poster: img instanceof HTMLImageElement && img.currentSrc ? img.currentSrc : `${poster}.webp` } : undefined
+        }}
+      >
         Explore the lap in 3D
       </Go>
     </>

@@ -32,7 +32,7 @@ const renderWith = (snapshot?: SeasonSnapshot) => {
   setSystemTime(new Date(NOW))
 
   return render(
-    <ShellContext.Provider value={{ go: async () => {} }}>
+    <ShellContext.Provider value={{ go: async () => {}, surface: async () => {} }}>
       <QueryClientProvider client={client}>
         <Season />
       </QueryClientProvider>

@@ -13,7 +13,7 @@ export function LapPage({ circuit }: { circuit: string }) {
   const info = circuitFor(circuit)
   const router = useRouter()
   const canGoBack = useCanGoBack()
-  const { go } = useShell()
+  const { go, surface } = useShell()
   const mounted = useMounted()
   const stage = useRef<HTMLElement>(null)
   const [ready, setReady] = useState(false)
@@ -21,10 +21,15 @@ export function LapPage({ circuit }: { circuit: string }) {
   const shown = useCallback(() => setReady(true), [])
   const broke = useCallback(() => setFailed(true), [])
 
+  const closing = useRef(false)
+
   const close = useCallback(() => {
-    if (canGoBack) router.history.back()
-    else void go('/weekend')
-  }, [canGoBack, router, go])
+    if (!canGoBack) void go('/weekend')
+    else if (!closing.current) {
+      closing.current = true
+      void surface().then(() => router.history.back())
+    }
+  }, [canGoBack, router, go, surface])
 
   useEffect(() => {
     const key = (e: KeyboardEvent) => {

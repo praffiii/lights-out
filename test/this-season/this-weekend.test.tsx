@@ -26,7 +26,7 @@ it('fills the next session and counts it down', async () => {
   setSystemTime(new Date(NOW))
 
   const { container } = render(
-    <ShellContext.Provider value={{ go }}>
+    <ShellContext.Provider value={{ go, surface: async () => {} }}>
       <ThisWeekend snapshot={await snapshotAt(NOW)} />
     </ShellContext.Provider>,
   )

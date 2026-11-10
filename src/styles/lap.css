@@ -1,4 +1,4 @@
-html:has(.lap), html:has(.lap) body { overflow: hidden; overscroll-behavior: none; }
+html:has(.lap), html:has(.lap) body { overflow: hidden; overscroll-behavior: none; background: #06080e; }
 .lap {
   --bg: #06080e; --ink: #f2f4f8; --muted: #8c94a8; --line: rgb(207 224 255 / 0.16); --ring: #cfe0ff; --accent: var(--s1);
   position: fixed; inset: 0; overflow: hidden; background: var(--bg); color: var(--ink); touch-action: none;
@@ -20,9 +20,8 @@ html:has(.lap), html:has(.lap) body { overflow: hidden; overscroll-behavior: non
 .lap.missing { display: grid; place-content: center; gap: 20px; justify-items: center; text-align: center; padding: 24px; }
 .lap.missing h1 { font: 500 14px/1.4 'Martian Mono', monospace; text-transform: uppercase; letter-spacing: 0.12em; }
 .lap.missing a { color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; font-size: 11px; }
-.lap .drive { position: absolute; inset: 0; }
-.lap:not([data-ready]) .drive { visibility: hidden; }
-.lap[data-ready] > .poster, .lap[data-ready] > .vignette { display: none; }
+.lap .drive { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity 0.6s var(--brake); }
+.lap[data-ready] .drive { opacity: 1; pointer-events: auto; }
 .lap .drive canvas { width: 100%; height: 100%; }
 .lap .read { position: absolute; top: 28px; right: 96px; display: flex; gap: 20px; }
 .lap .read div { display: grid; gap: 6px; min-width: 96px; padding: 10px 14px 12px; border: 1px solid var(--line); border-top: 2px solid var(--accent); background: rgb(10 14 24 / 0.55); backdrop-filter: blur(10px); transition: border-color 0.4s; }
@@ -88,3 +87,17 @@ html:has(.lap), html:has(.lap) body { overflow: hidden; overscroll-behavior: non
   .lap .timeline { order: 0; flex: 1; }
   .lap .callout { bottom: 84px; }
 }
+@media (prefers-reduced-motion: no-preference) {
+  .lap[data-ready] .read div { animation: lap-drop 0.5s var(--brake) 0.2s backwards; }
+  .lap[data-ready] .read div:nth-child(2) { animation-delay: 0.28s; }
+  .lap[data-ready] .read div:nth-child(3) { animation-delay: 0.36s; }
+  .lap[data-ready] .bottom { animation: lap-rise 0.5s var(--brake) 0.3s backwards; }
+  .lap[data-ready] .sectors i { transform-origin: left center; animation: lap-draw 0.6s var(--launch) 0.4s backwards; }
+  .lap[data-ready] .sectors i:nth-child(2) { animation-delay: 0.55s; }
+  .lap[data-ready] .sectors i:nth-child(3) { animation-delay: 0.7s; }
+  .lap[data-ready] .ticks { animation: lap-fade 0.5s ease-out 0.8s backwards; }
+}
+@keyframes lap-drop { from { opacity: 0; translate: 0 -14px; } }
+@keyframes lap-rise { from { opacity: 0; translate: 0 14px; } }
+@keyframes lap-draw { from { scale: 0 1; } }
+@keyframes lap-fade { from { opacity: 0; } }

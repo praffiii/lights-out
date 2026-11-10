@@ -36,7 +36,7 @@ const renderWith = (snapshot: SeasonSnapshot) => {
   }
 
   return render(
-    <ShellContext.Provider value={{ go }}>
+    <ShellContext.Provider value={{ go, surface: async () => {} }}>
       <Calendar snapshot={snapshot} />
     </ShellContext.Provider>,
   )
