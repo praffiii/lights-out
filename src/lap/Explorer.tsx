@@ -415,7 +415,9 @@ function run(host: HTMLElement, section: HTMLElement, info: CircuitInfo, gltf: G
     speedEl.textContent = String(Math.round(kmh))
     gauge.style.width = `${Math.min(100, (kmh / GAUGE_KMH) * 100)}%`
 
-    const near = started ? turns.find((t) => Math.abs(wrap(t.u - u + 0.5) - 0.5) < NEAR_TURN) : undefined
+    const gap = (t: { u: number }) => Math.abs(wrap(t.u - u + 0.5) - 0.5)
+    const closest = turns.reduce<(typeof turns)[number] | undefined>((best, t) => (best === undefined || gap(t) < gap(best) ? t : best), undefined)
+    const near = started && closest && gap(closest) < NEAR_TURN ? closest : undefined
 
     if (near && near.n !== lastTurn) {
       callout.hidden = false

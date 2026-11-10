@@ -324,3 +324,14 @@ test('closing returns to where the visitor left the weekend page', async ({ page
   await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(left - 80)
   await expect(link).toBeInViewport()
 })
+
+test('a turn next to another one calls out its own number', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'the tick tap needs the wide timeline')
+  await drive(page)
+
+  for (const turn of ['02', '08', '16']) {
+    await page.locator('.lap .ticks button', { hasText: new RegExp(`^${turn}$`) }).click()
+    await page.clock.runFor(2000)
+    await expect(page.locator('.lap .callout span')).toHaveText(`T${turn}`)
+  }
+})
