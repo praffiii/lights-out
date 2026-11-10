@@ -33,3 +33,8 @@ it('laps Interlagos in a believable time', () => {
   expect(seconds).toBeGreaterThan(55)
   expect(seconds).toBeLessThan(80)
 })
+
+it('reads the grip-limited speed on a circle', () => {
+  expect(lapProfile(circle(100), 1).speed(0.3)).toBeCloseTo(Math.sqrt(44 * 100) * 3.6, 0)
+  expect(lapProfile(circle(10000), 1).speed(0.3)).toBeCloseTo(92 * 3.6, 0)
+})

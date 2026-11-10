@@ -66,5 +66,7 @@ export const lapProfile = (line: ReadonlyArray<LinePoint>, metresPerUnit: number
     return at(lo).u + (u1 - at(lo).u) * fraction
   }
 
-  return { seconds, uAt }
+  const speed = (u: number) => Math.sqrt(speedSq[wrap(Math.round(u * n))] ?? 0) * 3.6
+
+  return { seconds, uAt, speed }
 }
