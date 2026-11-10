@@ -73,7 +73,7 @@ On the band, a glowing car runs the pole lap in real time, about 1:33 to 1:48. A
 - Each sample needs a position on the model's lap line, as the line's own `u` from 0 to 1.
 - Compute it from the real `location` positions. Fit a 2D similarity transform (rotation, scale, translation; allow a mirror) from OpenF1's x/y onto the model line's x/z, then project each sample onto the line.
 - Do not use speed integration plus a fixed offset. That was the spike's shortcut and it was off by 2.8% of a lap on Vegas.
-- **Splits and colours always agree (my call).** After the fit, warp `u` piecewise between four anchors: lap start = 0, the S1 split time = the model's first cut, the S1+S2 time = the second cut, and the pole time = 1. The car then reaches each sector colour at the exact moment its split shows. The baked cuts are never edited, and the circuits are never re-baked for this.
+- **Splits and colours always agree (my call).** After the fit, warp `u` piecewise between four anchors. At time 0 it is the projected timing line, `u₀`. At the S1 split time it is the model's first cut, at the S1+S2 time the second cut, and at the pole time `u₀ + 1`. The model's `u = 0` is not always the timing line: on Vegas they are 2.8% of a lap apart. The car then reaches each sector colour at the exact moment its split shows. The baked cuts are never edited, and the circuits are never re-baked for this.
 - **Sanity bound (my call).** If the un-warped fit misses either cut by more than 3% of a lap, the alignment is wrong. The pipeline skips that session and keeps the previous lap. The tests check the same bound on recorded laps.
 
 **Stored shape (per circuit).**
