@@ -1,6 +1,8 @@
 import { Context, Data, Effect, Layer, Predicate, Schedule, Schema, Semaphore } from 'effect'
 import { HttpClient, HttpClientError, HttpClientRequest } from 'effect/http'
 
+import { CarResponse, LapsResponse, LocationResponse, WeatherResponse } from '../pole/schema.ts'
+
 import { DriversResponse, ResultResponse, SessionsResponse } from './openf1-schema.ts'
 
 export class OpenF1Error extends Data.TaggedError('OpenF1Error')<{
@@ -9,6 +11,10 @@ export class OpenF1Error extends Data.TaggedError('OpenF1Error')<{
 }> {}
 
 type Read<S extends Schema.Decoder<unknown>> = (key: number) => Effect.Effect<S['Type'], OpenF1Error>
+
+type ReadDriver<S extends Schema.Decoder<unknown>> = (key: number, driver: number) => Effect.Effect<S['Type'], OpenF1Error>
+
+type ReadWindow<S extends Schema.Decoder<unknown>> = (key: number, driver: number, from: string, to: string) => Effect.Effect<S['Type'], OpenF1Error>
 
 const BASE_URL = 'https://api.openf1.org/v1'
 
@@ -25,6 +31,10 @@ export class OpenF1Client extends Context.Service<
     readonly sessions: Read<typeof SessionsResponse>
     readonly result: Read<typeof ResultResponse>
     readonly drivers: Read<typeof DriversResponse>
+    readonly laps: ReadDriver<typeof LapsResponse>
+    readonly carData: ReadWindow<typeof CarResponse>
+    readonly location: ReadWindow<typeof LocationResponse>
+    readonly weather: Read<typeof WeatherResponse>
   }
 >()('OpenF1Client') {
   static readonly layer = Layer.effect(
@@ -45,10 +55,18 @@ export class OpenF1Client extends Context.Service<
           Effect.mapError((cause) => new OpenF1Error({ path, cause })),
         )
 
+      const empty = <A>(read: Effect.Effect<ReadonlyArray<A>, OpenF1Error>) => read.pipe(Effect.catchIf(notFound, () => Effect.succeed([])))
+
+      const window = (from: string, to: string) => `date%3E=${from}&date%3C=${to}`
+
       return {
         sessions: (year) => get(SessionsResponse, `/sessions?year=${year}`),
         result: (key) => get(ResultResponse, `/session_result?session_key=${key}`).pipe(Effect.catchIf(notFound, () => Effect.succeed([]))),
         drivers: (key) => get(DriversResponse, `/drivers?session_key=${key}`),
+        laps: (key, driver) => empty(get(LapsResponse, `/laps?session_key=${key}&driver_number=${driver}`)),
+        carData: (key, driver, from, to) => get(CarResponse, `/car_data?session_key=${key}&driver_number=${driver}&${window(from, to)}`),
+        location: (key, driver, from, to) => get(LocationResponse, `/location?session_key=${key}&driver_number=${driver}&${window(from, to)}`),
+        weather: (key) => empty(get(WeatherResponse, `/weather?session_key=${key}`)),
       }
     }),
   )

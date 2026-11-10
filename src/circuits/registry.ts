@@ -31,6 +31,7 @@ export type CircuitInfo = {
   name: string
   gp: string
   tz: string
+  openf1: string
   corner?: { turn: number; name: string }
   facts: CircuitFacts
   pins: ReadonlyArray<Pin>
@@ -62,6 +63,7 @@ const factsOf = ({ firstGp, lengthKm, laps }: CalendarCircuit, rest: Omit<Circui
 const CIRCUITS = {
   interlagos: {
     ...fromCalendar(CALENDAR.interlagos),
+    openf1: 'Interlagos',
     corner: { turn: 1, name: 'S do Senna' },
     facts: factsOf(CALENDAR.interlagos, { distanceKm: '305.879', turns: 15, direction: 'anticlockwise' }),
     pins: pinsOf(br1940),
@@ -71,6 +73,7 @@ const CIRCUITS = {
   },
   vegas: {
     ...fromCalendar(CALENDAR.vegas),
+    openf1: 'Las Vegas',
     corner: { turn: 7, name: 'Sphere chicane' },
     facts: factsOf(CALENDAR.vegas, { distanceKm: '309.958', turns: 17, direction: 'anticlockwise' }),
     pins: pinsOf(us2023),
@@ -80,6 +83,7 @@ const CIRCUITS = {
   },
   losail: {
     ...fromCalendar(CALENDAR.losail),
+    openf1: 'Lusail',
     facts: factsOf(CALENDAR.losail, { distanceKm: '308.611', turns: 16, direction: 'clockwise' }),
     pins: pinsOf(qa2004),
     line: qa2004Line,
@@ -88,6 +92,7 @@ const CIRCUITS = {
   },
   yas_marina: {
     ...fromCalendar(CALENDAR.yas_marina),
+    openf1: 'Yas Marina Circuit',
     facts: factsOf(CALENDAR.yas_marina, { distanceKm: '306.188', turns: 16, direction: 'anticlockwise' }),
     pins: pinsOf(ae2009),
     line: ae2009Line,
@@ -96,6 +101,7 @@ const CIRCUITS = {
   },
   albert_park: {
     ...fromCalendar(CALENDAR.albert_park),
+    openf1: 'Melbourne',
     facts: factsOf(CALENDAR.albert_park, { distanceKm: '306.124', turns: 14, direction: 'clockwise' }),
     pins: pinsOf(au1953),
     line: au1953Line,

@@ -3,6 +3,7 @@ import { Schema, SchemaGetter } from 'effect'
 export const OpenF1Session = Schema.Struct({
   session_key: Schema.Number,
   session_name: Schema.String,
+  circuit_short_name: Schema.String,
   date_start: Schema.String,
   date_end: Schema.String,
   is_cancelled: Schema.optionalKey(Schema.Boolean),
