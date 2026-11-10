@@ -1,7 +1,7 @@
 import { Context, Data, Effect, Layer, Predicate, Schedule, Schema, Semaphore } from 'effect'
 import { HttpClient, HttpClientError, HttpClientRequest } from 'effect/http'
 
-import { CarResponse, LapsResponse, LocationResponse, StintsResponse } from '../pole/schema.ts'
+import { CarResponse, LapsResponse, LocationResponse, PoleResultResponse, StintsResponse } from '../pole/schema.ts'
 
 import { DriversResponse, ResultResponse, SessionsResponse } from './openf1-schema.ts'
 
@@ -30,6 +30,7 @@ export class OpenF1Client extends Context.Service<
   {
     readonly sessions: Read<typeof SessionsResponse>
     readonly result: Read<typeof ResultResponse>
+    readonly poleResult: Read<typeof PoleResultResponse>
     readonly drivers: Read<typeof DriversResponse>
     readonly laps: ReadDriver<typeof LapsResponse>
     readonly carData: ReadWindow<typeof CarResponse>
@@ -62,6 +63,7 @@ export class OpenF1Client extends Context.Service<
       return {
         sessions: (year) => get(SessionsResponse, `/sessions?year=${year}`),
         result: (key) => get(ResultResponse, `/session_result?session_key=${key}`).pipe(Effect.catchIf(notFound, () => Effect.succeed([]))),
+        poleResult: (key) => empty(get(PoleResultResponse, `/session_result?session_key=${key}`)),
         drivers: (key) => get(DriversResponse, `/drivers?session_key=${key}`),
         laps: (key, driver) => empty(get(LapsResponse, `/laps?session_key=${key}&driver_number=${driver}`)),
         carData: (key, driver, from, to) => get(CarResponse, `/car_data?session_key=${key}&driver_number=${driver}&${window(from, to)}`),

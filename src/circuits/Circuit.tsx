@@ -40,7 +40,6 @@ export type Lap = {
 }
 
 export type Replay = {
-  at: RefObject<number>
   running: RefObject<boolean>
   trace: RefObject<Float32Array | null>
   turns: RefObject<ReadonlyArray<{ turn: number; u: number }>>

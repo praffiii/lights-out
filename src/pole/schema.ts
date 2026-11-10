@@ -1,4 +1,12 @@
-import { Schema } from 'effect'
+import { Schema, SchemaGetter } from 'effect'
+
+const Q3 = Schema.Array(Schema.NullOr(Schema.Number)).pipe(
+  Schema.decodeTo(Schema.NullOr(Schema.Number), { decode: SchemaGetter.transform((parts) => parts[2] ?? null), encode: SchemaGetter.forbidden(() => 'OpenF1 responses are decode-only') }),
+)
+
+export const PoleResult = Schema.Struct({ position: Schema.NullOr(Schema.Number), driver_number: Schema.Number, duration: Schema.NullOr(Q3) })
+
+export const PoleResultResponse = Schema.Array(PoleResult)
 
 export const OpenF1Lap = Schema.Struct({
   driver_number: Schema.Number,

@@ -45,7 +45,7 @@ function Stage({ info, near, lap, onNear }: { info: CircuitInfo; near: boolean; 
   const box = useRef<HTMLDivElement>(null)
   const pins = useRef<HTMLDivElement>(null)
   const fill = useRef(1)
-  const replay = useRef<Replay>({ at: { current: 0 }, running: { current: false }, trace: { current: null }, turns: { current: [] } }).current
+  const replay = useRef<Replay>({ running: { current: false }, trace: { current: null }, turns: { current: [] } }).current
   const [ready, setReady] = useState(false)
   const [failed, setFailed] = useState(false)
   const [turns, setTurns] = useState(true)

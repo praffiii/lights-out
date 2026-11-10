@@ -1,7 +1,7 @@
 import { Effect, Layer, Schema } from 'effect'
 
 import { OpenF1Client } from '../../src/season/openf1-client.ts'
-import { CarResponse, LapsResponse, LocationResponse, StintsResponse } from '../../src/pole/schema.ts'
+import { CarResponse, LapsResponse, LocationResponse, PoleResultResponse, StintsResponse } from '../../src/pole/schema.ts'
 import { DriversResponse, ResultResponse, SessionsResponse } from '../../src/season/openf1-schema.ts'
 
 const fixture = (name: string) => Bun.file(`test/fixtures/openf1/${name}.json`).json()
@@ -21,6 +21,7 @@ const pole = await Promise.all(
   POLE_KEYS.map(async (key) => ({
     key,
     result: Schema.decodeUnknownSync(ResultResponse)(await fixture(`pole/${key}-result`)),
+    poleResult: Schema.decodeUnknownSync(PoleResultResponse)(await fixture(`pole/${key}-result`)),
     laps: Schema.decodeUnknownSync(LapsResponse)(await fixture(`pole/${key}-laps`)),
     car: Schema.decodeUnknownSync(CarResponse)(await fixture(`pole/${key}-car`)),
     location: Schema.decodeUnknownSync(LocationResponse)(await fixture(`pole/${key}-location`)),
@@ -50,6 +51,7 @@ export const driversOf = (key: number) => saved.find((s) => s.key === key)?.driv
 export const fakeOpenF1Service: OpenF1Client['Service'] = {
   sessions: (year) => Effect.succeed(byYear.get(year) ?? []),
   result: (key) => Effect.succeed(resultOf(key).length > 0 ? resultOf(key) : (poleOf(key)?.result ?? [])),
+  poleResult: (key) => Effect.succeed(poleOf(key)?.poleResult ?? []),
   laps: (key) => Effect.succeed(poleOf(key)?.laps ?? []),
   carData: (key, _driver, from, to) => Effect.succeed(within(poleOf(key)?.car, from, to)),
   location: (key, _driver, from, to) => Effect.succeed(within(poleOf(key)?.location, from, to)),

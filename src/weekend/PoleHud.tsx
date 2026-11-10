@@ -95,7 +95,6 @@ export function PoleHud({ lap, gp, stage, pins, replay, onPick }: Props) {
       const u = scrub ?? now.u
       const trace = replay.trace.current
 
-      replay.at.current = u
       write(clockEl, clock(state.t))
 
       for (const [i, split] of splits(lap, state.t).entries()) {

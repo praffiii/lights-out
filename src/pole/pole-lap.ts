@@ -22,7 +22,7 @@ export const poleLap = (info: CircuitInfo, session: OpenF1Session): Effect.Effec
   OpenF1Client.use((client) =>
     Effect.gen(function* () {
       const key = session.session_key
-      const pole = (yield* client.result(key)).find((row) => row.position === 1)
+      const pole = (yield* client.poleResult(key)).find((row) => row.position === 1)
       const time = pole?.duration ?? null
 
       if (!pole || time === null) return { skip: `session ${key} has no pole time yet` }

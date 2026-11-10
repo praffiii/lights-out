@@ -2,8 +2,10 @@ import { expect, it } from 'bun:test'
 import { Effect, Layer, Schema } from 'effect'
 
 import { OpenF1Error } from '../../src/season/openf1-client.ts'
+import { circuitFor } from '../../src/circuits/registry.ts'
+import { poleLap } from '../../src/pole/pole-lap.ts'
 import { refreshPoles } from '../../src/pole/refresh-poles.ts'
-import { LocationResponse } from '../../src/pole/schema.ts'
+import { LocationResponse, PoleResultResponse } from '../../src/pole/schema.ts'
 import { PoleStore } from '../../src/pole/store.ts'
 import type { OpenF1Client } from '../../src/season/openf1-client.ts'
 import { fakeKV } from '../season/fake-kv.ts'
@@ -77,10 +79,31 @@ it('keeps the stored lap when the newest qualifying has no pole time yet', async
   await run(kv, { sessions: (year) => fakeOpenF1Service.sessions(year === 2026 ? 2025 : year) })
 
   const old = await stored(kv, 'interlagos')
-  const outcomes = await run(kv, { result: (key) => (key === 11408 ? Effect.succeed([]) : fakeOpenF1Service.result(key)) })
+  const outcomes = await run(kv, { poleResult: (key) => (key === 11408 ? Effect.succeed([]) : fakeOpenF1Service.poleResult(key)) })
 
   expect(outcomes.find((o) => o.id === 'interlagos')?.outcome).toBe('kept')
   expect(await stored(kv, 'interlagos')).toEqual(old)
+})
+
+it('skips a qualifying whose Q3 has no time instead of taking the Q2 lap', async () => {
+  const rows: ReadonlyArray<{ duration: ReadonlyArray<number | null> }> = JSON.parse(await Bun.file('test/fixtures/openf1/result-11408.json').text())
+  const noQ3 = rows.map((row) => ({ ...row, duration: [row.duration[0] ?? null, row.duration[1] ?? null, null] }))
+  const session = sessions2026.find((s) => s.session_key === 11408)
+  const info = circuitFor('interlagos')
+
+  if (!session || !info) throw new Error('no Interlagos 2026 qualifying in the fixtures')
+
+  const outcome = await Effect.runPromise(
+    poleLap(info, session).pipe(
+      Effect.provide(
+        fakeOpenF1({
+          poleResult: () => Effect.succeed(Schema.decodeUnknownSync(PoleResultResponse)(noQ3)),
+        }),
+      ),
+    ),
+  )
+
+  expect(outcome).toEqual({ skip: 'session 11408 has no pole time yet' })
 })
 
 it('one circuit failing keeps the others', async () => {
