@@ -237,7 +237,7 @@ function Stage({ info, car, at, fill, running, glReady, glFailed, onLap, onLapPr
 
           return (
             <span key={pin.turn} data-pin={`turn-${pin.turn}`} style={place}>
-              {pin.turn}
+              <b>{String(pin.turn).padStart(2, '0')}</b>
             </span>
           )
         })}

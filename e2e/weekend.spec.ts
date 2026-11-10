@@ -215,6 +215,15 @@ test('the Turns toggle hides the pins and the Sectors toggle turns the sectors o
   expect(errors).toEqual([])
 })
 
+test('a turn reads 01 on a chip above a ring', async ({ page, errors }) => {
+  await loaded(page)
+  await stage(page).scrollIntoViewIfNeeded()
+
+  await expect(pin(page).locator('b')).toHaveText('01')
+  expect(await pin(page).evaluate((el) => getComputedStyle(el, '::after').borderRadius)).toBe('50%')
+  expect(errors).toEqual([])
+})
+
 test('the sector names live on the map, not as pins, and the map is credited', async ({ page, errors }) => {
   await withGl(page)
 

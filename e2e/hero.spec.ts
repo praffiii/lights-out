@@ -156,6 +156,17 @@ test('keeps the poster pins above the facts when the circuit model never loads',
   expect(await pinsBelowFacts(page)).toEqual([])
 })
 
+test('the first turn reads 01 on a chip above a ring', async ({ page, errors }) => {
+  await page.goto('/')
+  await lifted(page)
+
+  const t1 = page.locator('.hero [data-pin="turn-1"]')
+
+  await expect(t1.locator('b')).toHaveText('01')
+  expect(await t1.evaluate((el) => getComputedStyle(el, '::after').borderRadius)).toBe('50%')
+  expect(errors).toEqual([])
+})
+
 test('a phone loads the small map and credits it', async ({ page, errors }, info) => {
   test.skip(info.project.name !== 'phone')
 

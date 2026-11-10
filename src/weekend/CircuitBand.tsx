@@ -218,7 +218,7 @@ function Stage({ info }: { info: CircuitInfo }) {
 
             return (
               <span key={pin.turn} className="turn" data-pin={`turn-${pin.turn}`} style={place}>
-                <b className="mono">{pin.turn}</b>
+                <b className="mono">{String(pin.turn).padStart(2, '0')}</b>
                 {info.corner?.turn === pin.turn ? <i className="mono">{info.corner.name}</i> : null}
               </span>
             )
