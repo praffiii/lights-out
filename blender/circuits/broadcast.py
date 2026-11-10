@@ -29,6 +29,7 @@ MAP_PX = 4096
 FADE = 0.15
 NEAR = 420.0
 MIN_AREA = 1800.0
+SIMPLIFY = 2.0
 CORE = 4.5
 EDGE = 2.0
 HALO = 40.0
@@ -260,7 +261,22 @@ def ground_material(img, span):
     return m
 
 
-def blocks(footprints, track, tree, mat):
+def simplify(pts, tol):
+    if len(pts) < 3:
+        return pts
+    a, b = pts[0], pts[-1]
+    ab = b - a
+    far, at = 0.0, 0
+    for i, p in enumerate(pts[1:-1], start=1):
+        d = (p - a).cross(ab).length / ab.length if ab.length > 1e-6 else (p - a).length
+        if d > far:
+            far, at = d, i
+    if far <= tol:
+        return [a, b]
+    return simplify(pts[: at + 1], tol)[:-1] + simplify(pts[at:], tol)
+
+
+def blocks(footprints, track, tree, mat, eye, targets):
     cell = 60.0
     grid = {(int(p.x // cell), int(p.y // cell)) for p in track.samples}
     reach = int(NEAR // cell) + 1
@@ -270,6 +286,7 @@ def blocks(footprints, track, tree, mat):
         return any((cx + a, cy + b) in grid for a in range(-reach, reach + 1) for b in range(-reach, reach + 1))
 
     bm = bmesh.new()
+    owner = bm.faces.layers.int.new("owner")
     count = 0
     for tags, pts in footprints:
         c = sum(pts, Vector()) / len(pts)
@@ -284,15 +301,31 @@ def blocks(footprints, track, tree, mat):
         except ValueError:
             levels = 0
         tall = min(36.0, levels * 3.2) if levels else (9.0 if tags.get("building") in ("grandstand", "industrial", "commercial", "retail") else 6.0)
-        f = polygon(bm, pts, hit[0].z - 2)
+        f = polygon(bm, simplify(pts, SIMPLIFY), hit[0].z - 2)
         if f is None:
             continue
         made = bmesh.ops.extrude_face_region(bm, geom=[f])
         top = [v for v in made["geom"] if isinstance(v, bmesh.types.BMVert)]
         bmesh.ops.translate(bm, verts=top, vec=(0, 0, tall + 2))
         count += 1
+        for face in {g for v in top for g in v.link_faces} | {f}:
+            face[owner] = count
+    bm.faces.ensure_lookup_table()
+    bvh = BVHTree.FromBMesh(bm)
+    hidden = set()
+    for q in targets:
+        d = q - eye
+        origin, left, step = eye.copy(), d.length, d.normalized()
+        while left > 1:
+            hit, _, idx, dist = bvh.ray_cast(origin, step, left)
+            if hit is None:
+                break
+            hidden.add(bm.faces[idx][owner])
+            origin, left = hit + step * 0.5, left - dist - 0.5
+    bmesh.ops.delete(bm, geom=list({v for f in bm.faces if f[owner] in hidden for v in f.verts}), context="VERTS")
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    return mesh_obj("blocks", bm, mat), count
+    mesh_obj("blocks", bm, mat)
+    return count - len(hidden)
 
 
 def sector_span(track, a, b):
@@ -472,7 +505,7 @@ def drape(bm, frame, tree):
         v.co = on_ground(tree, q, LABEL_LIFT + v.co.z)
 
 
-def sector_label(n, hex_, track, ks, own, az, span, tree, solid, score):
+def sector_label(n, hex_, track, ks, own, az, span, tree, taken, score):
     cap = span * LABEL_CAP
     size = cap / cap_height(f"S{n}", TITLE_FONT)
     small = cap * CAPTION_CAP
@@ -505,15 +538,23 @@ def sector_label(n, hex_, track, ks, own, az, span, tree, solid, score):
                 return frame, [on_ground(tree, frame(Vector((x, y, 0)))) for x in (min(xs), max(xs)) for y in (min(ys), max(ys))]
             t += LABEL_STEP
 
+    def rect(corners):
+        rs, hs = [c.dot(right) for c in corners], [c.dot(ahead) for c in corners]
+        return min(rs) - LABEL_CLEAR, min(hs) - LABEL_CLEAR, max(rs) + LABEL_CLEAR, max(hs) + LABEL_CLEAR
+
+    def apart(corners):
+        a = rect(corners)
+        return all(a[2] < b[0] or b[2] < a[0] or a[3] < b[1] or b[3] < a[1] for b in taken)
+
     def rank(option):
         frame, corners = option
-        mine = kd.find(frame(Vector((cx, cy, 0))))[1] in own
-        free = not any(solid.ray_cast(frame(co) + Vector((0, 0, 3000)), Vector((0, 0, -1)))[0] for co in edge)
-        return mine, free, score(corners)
+        return apart(corners), kd.find(frame(Vector((cx, cy, 0))))[1] in own, score(corners)
 
     frame, corners = max((placed(k, side) for k in ks for side in (1, -1)), key=rank)
+    taken.append(rect(corners))
     drape(core, frame, tree)
     drape(glow, frame, tree)
+    points = [v.co.copy() for v in list(core.verts)[:: max(1, len(core.verts) // 300)]]
     mesh_obj(f"S{n}-label", core, glow_material(f"S{n}-label", hex_))
     mesh_obj(f"S{n}-label-halo", glow, additive(f"S{n}-label-halo", hex_, LABEL_HALO_GAIN))
-    return corners
+    return corners, points

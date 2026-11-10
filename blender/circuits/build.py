@@ -34,7 +34,7 @@ def aim(cam, mid, span, az_deg, target):
         mid.z + dist * math.sin(pitch),
     )
     cam.rotation_euler = (target - cam.location).to_track_quat("-Z", "Y").to_euler()
-    cam.data.clip_start, cam.data.clip_end = 5, dist * 6
+    cam.data.clip_start, cam.data.clip_end = dist * 0.25, dist * 6
     bpy.context.view_layer.update()
     return dist
 
@@ -142,7 +142,6 @@ def main():
     ground = circuit.terrain(track, b.ground_material(img, span))
     b.map_uvs(ground, lo, hi)
     tree = b.ground_tree(ground)
-    solid, count = b.blocks(footprints, track, tree, circuit.material("blocks", b.PAL["block"]))
     circuit.ribbon("road", track.samples, track.s, 0, track.lap, track.lap, circuit.material("road", b.PAL["road"]))
     spans = ribbons(track)
     mids = [ks[len(ks) // 2] for ks, _ in spans]
@@ -161,9 +160,11 @@ def main():
     cam = camera(scene, LENS)
     az, dist = frame(scene, cam, top + [e.location.copy() for e in turns] + anchors, mid, span)
     base = top + [e.location.copy() for e in turns]
-    corners = [c for n, (ks, own) in enumerate(spans, start=1) for c in b.sector_label(n, hues[f"S{n}"], track, ks, own, az, span, tree, b.ground_tree(solid), lambda cs: room(box(scene, cam, base + cs)))]
-    pts = base + corners
+    taken = []
+    labels = [b.sector_label(n, hues[f"S{n}"], track, ks, own, az, span, tree, taken, lambda cs: room(box(scene, cam, base + cs))) for n, (ks, own) in enumerate(spans, start=1)]
+    pts = base + [c for corners, _ in labels for c in corners]
     fit(scene, cam, pts, mid, span, az)
+    count = b.blocks(footprints, track, tree, circuit.material("blocks", b.PAL["block"]), cam.location.copy(), top[::4] + [p for _, points in labels for p in points])
 
     for percent, suffix in ((100, ""), (50, "-1440")):
         scene.render.resolution_percentage = percent
