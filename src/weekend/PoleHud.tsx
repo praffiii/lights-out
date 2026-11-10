@@ -126,8 +126,8 @@ export function PoleHud({ lap, gp, stage, pins, replay, onPick }: Props) {
       const head = pointAt(trace, u)
 
       readout.style.transform = `translate(${Math.max(0, Math.min(head.x + GAP, width - cardW))}px, ${Math.max(0, Math.min(head.y + GAP, height - cardH))}px)`
-      car.current.style.visibility = 'visible'
-      readout.style.visibility = 'visible'
+      car.current.toggleAttribute('data-on', true)
+      readout.toggleAttribute('data-on', true)
     }
 
     const tick = (_time: number, dtMs: number) => {

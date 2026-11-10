@@ -358,6 +358,32 @@ test('the pole lap runs: the clock moves and S1 fills with its real split', asyn
   expect(errors).toEqual([])
 })
 
+test('the car and its readout fade in instead of popping in', async ({ page, errors }) => {
+  await page.addInitScript(() => {
+    const seen = new Set<Element>()
+
+    new MutationObserver(() => {
+      for (const el of document.querySelectorAll('.weekend-page .band .car, .weekend-page .band .readout')) {
+        const style = getComputedStyle(el)
+
+        if (seen.has(el) || style.visibility !== 'visible') continue
+
+        seen.add(el)
+        document.documentElement.dataset.firstOpacity = `${document.documentElement.dataset.firstOpacity ?? ''}${style.opacity};`
+      }
+    }).observe(document, { subtree: true, attributes: true, attributeFilter: ['style', 'data-on'] })
+  })
+  await withPole(page)
+  await expect(page.locator('html')).toHaveAttribute('data-first-opacity', /^[\d.]+;[\d.]+;$/)
+
+  const first = (await page.locator('html').getAttribute('data-first-opacity')) ?? ''
+
+  expect(first.split(';').filter(Boolean).map(Number)).toEqual([0, 0])
+  await expect(car(page)).toHaveCSS('opacity', '1')
+  await expect(page.locator('.weekend-page .band .readout')).toHaveCSS('opacity', '1')
+  expect(errors).toEqual([])
+})
+
 test('hovering the track snaps the car and the clock jumps', async ({ page, errors }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop')
   await withPole(page)

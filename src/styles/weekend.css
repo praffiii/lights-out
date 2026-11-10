@@ -94,11 +94,12 @@
 .weekend-page .band .replay .hint { margin-top: 14px; font-size: 9px; color: var(--muted); letter-spacing: 0.08em; }
 .weekend-page .band .replay .coarse { display: none; }
 
-.weekend-page .band .car { position: absolute; inset: 0; z-index: 3; visibility: hidden; pointer-events: none; }
+.weekend-page .band .car { position: absolute; inset: 0; z-index: 3; visibility: hidden; opacity: 0; pointer-events: none; transition: opacity 0.6s cubic-bezier(0.05, 0.7, 0.1, 1); }
+.weekend-page .band .car[data-on], .weekend-page .band .readout[data-on] { visibility: visible; opacity: 1; translate: 0 0; }
 .weekend-page .band .car i { position: absolute; left: 0; top: 0; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px 2px rgb(164 59 255 / 0.85); opacity: calc(1 - var(--k) * 0.1); scale: calc(1 - var(--k) * 0.08); }
 .weekend-page .band .car .head { z-index: 1; width: 14px; height: 14px; margin: -7px 0 0 -7px; opacity: 1; scale: 1; box-shadow: 0 0 0 3px rgb(255 255 255 / 0.3), 0 0 14px 4px rgb(255 255 255 / 0.6), 0 0 30px 10px rgb(164 59 255 / 0.5); }
 
-.weekend-page .band .readout { position: absolute; left: 0; top: 0; z-index: 3; display: grid; grid-template-columns: auto auto; align-items: baseline; column-gap: 5px; padding: 6px 9px 7px; border-left: 2px solid #fff; background: rgb(6 8 14 / 0.62); backdrop-filter: blur(8px); visibility: hidden; pointer-events: none; }
+.weekend-page .band .readout { position: absolute; left: 0; top: 0; z-index: 3; display: grid; grid-template-columns: auto auto; align-items: baseline; column-gap: 5px; padding: 6px 9px 7px; border-left: 2px solid #fff; background: rgb(6 8 14 / 0.62); backdrop-filter: blur(8px); visibility: hidden; opacity: 0; translate: 0 8px; pointer-events: none; transition: opacity 0.5s cubic-bezier(0.05, 0.7, 0.1, 1) 0.2s, translate 0.7s cubic-bezier(0.05, 0.7, 0.1, 1) 0.2s; }
 .weekend-page .band .readout [data-speed] { font: 800 24px/1 Archivo, sans-serif; font-variation-settings: 'wdth' 125; font-variant-numeric: tabular-nums; color: #fff; }
 .weekend-page .band .readout > .mono { font-size: 9px; color: var(--muted); }
 .weekend-page .band .readout .gear { grid-column: 1 / -1; margin-top: 4px; font-size: 10px; color: #fff; }
