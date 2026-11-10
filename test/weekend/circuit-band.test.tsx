@@ -15,7 +15,7 @@ mock.module('../../src/circuits/Circuit.tsx', () => ({
   },
 }))
 
-const { act, cleanup, fireEvent, render } = await import('@testing-library/react')
+const { act, cleanup, fireEvent, render, waitFor } = await import('@testing-library/react')
 const { CircuitBand } = await import('../../src/weekend/CircuitBand.tsx')
 
 const snapshot = Schema.decodeUnknownSync(SeasonSnapshotJson)(await Bun.file('test/fixtures/season-snapshot.json').text())
@@ -32,6 +32,36 @@ const view = (b: typeof band) =>
   render(<CircuitBand band={b} />, { wrapper: ({ children }) => <ShellContext.Provider value={shell}>{children}</ShellContext.Provider> })
 
 const observers = globalThis.IntersectionObserver
+
+const INTERLAGOS = await Bun.file('test/fixtures/pole/interlagos.json').text()
+
+const CREDIT = 'Blender model · layout bacinger/f1-circuits (MIT) · elevation SRTM (NASA) · Map © OpenStreetMap contributors (ODbL)'
+
+class Near {
+  constructor(private readonly callback: (entries: ReadonlyArray<{ isIntersecting: boolean }>) => void) {}
+
+  observe() {
+    this.callback([{ isIntersecting: true }])
+  }
+
+  disconnect() {}
+}
+
+const nearby = () => Object.defineProperty(globalThis, 'IntersectionObserver', { value: Near, configurable: true, writable: true })
+
+const withPole = async (response: Response) => {
+  nearby()
+
+  const fetched = spyOn(globalThis, 'fetch').mockResolvedValue(response)
+  const quiet = spyOn(console, 'error').mockImplementation(() => {})
+  const rendered = view(band)
+
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 50))
+  })
+
+  return { ...rendered, fetched, restore: () => [fetched, quiet].forEach((spy) => spy.mockRestore()) }
+}
 
 afterEach(() => {
   cleanup()
@@ -53,7 +83,7 @@ it('shows the circuit stats and the schedule with the next session marked', () =
   expect(container.querySelector('.schedule .mono')?.textContent).toBe('Schedule · your time · GMT+7')
   expect(container.querySelectorAll('.schedule li')).toHaveLength(5)
   expect(container.querySelector('.schedule .is-next')?.textContent).toContain('Practice 3')
-  expect(container.querySelector('.credit')?.textContent).toBe('Blender model · layout bacinger/f1-circuits (MIT) · elevation SRTM (NASA) · Map © OpenStreetMap contributors (ODbL)')
+  expect(container.querySelector('.credit')?.textContent).toBe(CREDIT)
 })
 
 it('the Turns toggle hides the turn numbers', () => {
@@ -75,17 +105,7 @@ it('without a 3D model it shows only the stats and the schedule', () => {
 })
 
 it('keeps the poster and turns Sectors off when the model fails to load', async () => {
-  class Near {
-    constructor(private readonly callback: (entries: ReadonlyArray<{ isIntersecting: boolean }>) => void) {}
-
-    observe() {
-      this.callback([{ isIntersecting: true }])
-    }
-
-    disconnect() {}
-  }
-
-  Object.defineProperty(globalThis, 'IntersectionObserver', { value: Near, configurable: true, writable: true })
+  nearby()
 
   const quiet = spyOn(console, 'error').mockImplementation(() => {})
   const { container, getByRole } = view(band)
@@ -107,4 +127,26 @@ it('links Explore the lap in 3D to its circuit', () => {
 
   expect(link?.getAttribute('href')).toBe('/lap/interlagos')
   expect(link?.classList.contains('is-soon')).toBe(false)
+})
+
+it('labels a wet pole lap', async () => {
+  const { container, fetched, restore } = await withPole(new Response(INTERLAGOS))
+
+  await waitFor(() => expect(container.querySelector('.replay .who')?.textContent).toBe('Pole lap · Lando Norris · 2026 São Paulo Grand Prix · Wet'))
+  expect(fetched.mock.calls[0]?.[0]).toBe('/api/pole/interlagos')
+  restore()
+})
+
+it('credits OpenF1 only when a lap is shown', async () => {
+  const shown = await withPole(new Response(INTERLAGOS))
+
+  await waitFor(() => expect(shown.container.querySelector('.credit')?.textContent).toBe(`${CREDIT} · Telemetry: OpenF1 (unofficial)`))
+  shown.restore()
+  cleanup()
+
+  const none = await withPole(new Response(null, { status: 204 }))
+
+  expect(none.container.querySelector('.replay')).toBeNull()
+  expect(none.container.querySelector('.credit')?.textContent).toBe(CREDIT)
+  none.restore()
 })

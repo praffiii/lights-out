@@ -4,6 +4,7 @@ import * as THREE from 'three'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
+import { turnLaps } from '#/lap/drive.ts'
 import { gsap, REDUCED } from '#/motion/motion.ts'
 
 import { lapProfile } from './lap.ts'
@@ -38,14 +39,21 @@ export type Lap = {
   onLapProgress: (t: number) => void
 }
 
+export type Replay = {
+  at: RefObject<number>
+  running: RefObject<boolean>
+  trace: RefObject<Float32Array | null>
+  turns: RefObject<ReadonlyArray<{ turn: number; u: number }>>
+}
+
 type Props = {
   model: string
   layout: 'wide' | 'narrow' | 'spin'
   fill: RefObject<number>
   pins: RefObject<HTMLDivElement | null>
   onReady: () => void
-  yaw?: RefObject<number>
   lap?: Lap
+  replay?: Replay
 }
 
 const NO_LAP = () => {}
@@ -58,7 +66,7 @@ const infoFor = (model: string) => {
   return info
 }
 
-function Scene({ model, layout, fill, pins, onReady, yaw, lap }: Props) {
+function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
   const restart = lap?.restart ?? 0
   const running = lap?.running
   const tag = lap?.tag
@@ -92,7 +100,7 @@ function Scene({ model, layout, fill, pins, onReady, yaw, lap }: Props) {
     stale.current = true
   }, [restart])
 
-  const { fills, markers, rest, light, spin, inner } = useMemo(() => {
+  const { fills, markers, rest, light, turns } = useMemo(() => {
     const info = infoFor(model)
     const track = new THREE.Box3()
 
@@ -150,18 +158,21 @@ function Scene({ model, layout, fill, pins, onReady, yaw, lap }: Props) {
     group.add(head, ...trail)
     group.visible = false
 
-    const spin = new THREE.Group()
-    const inner = new THREE.Group()
+    const turns = turnLaps(
+      markers.map((o) => o.getWorldPosition(new THREE.Vector3())),
+      info.line,
+    ).map((u, i) => ({ turn: Number(markers[i]?.name.slice('turn-'.length)), u }))
 
-    spin.position.copy(centre)
-    inner.position.copy(centre).negate()
-
-    return { fills, markers, rest, light: { group, head, trail, geometry }, spin, inner }
+    return { fills, markers, rest, light: { group, head, trail, geometry }, turns }
   }, [gltf, map, model])
 
   useEffect(() => {
     light.group.visible = lapped && !REDUCED
   }, [light, lapped])
+
+  useEffect(() => {
+    if (replay) replay.turns.current = turns
+  }, [replay, turns])
 
   useEffect(
     () => () => {
@@ -234,29 +245,38 @@ function Scene({ model, layout, fill, pins, onReady, yaw, lap }: Props) {
     let first = true
     let compiled = false
     let lastFill = -1
-    let lastYaw = Number.NaN
+    const trace = new Float32Array(n * 2)
+
+    const project = () => {
+      for (const [i, p] of line.entries()) {
+        spot.set(p.x, p.y, p.z).project(camera)
+        trace[i * 2] = ((spot.x + 1) / 2) * size.width
+        trace[i * 2 + 1] = ((1 - spot.y) / 2) * size.height
+      }
+
+      if (replay) replay.trace.current = trace
+    }
 
     void gl.compileAsync(scene, camera).then(() => {
       compiled = true
     })
 
     const tick = (time: number, dt: number) => {
-      if (!compiled) return
+      if (!compiled || (replay && !replay.running.current)) return
 
       if (camera instanceof THREE.PerspectiveCamera && camera.aspect !== (layout === 'wide' ? size.width / size.height : REST_ASPECT)) stale.current = true
 
       const go = (running?.current ?? false) && !REDUCED
-      const turned = (yaw?.current ?? 0) !== lastYaw
-      const moved = fill.current !== lastFill || turned
+      const moved = fill.current !== lastFill
 
       if (!go && !moved && !stale.current) return
 
       if (stale.current) frame()
 
+      if (replay) project()
+
       stale.current = false
       lastFill = fill.current
-      lastYaw = yaw?.current ?? 0
-      spin.rotation.y = lastYaw
 
       for (const f of fills) f.uniforms.uTo.value = fill.current
 
@@ -311,16 +331,12 @@ function Scene({ model, layout, fill, pins, onReady, yaw, lap }: Props) {
     gsap.ticker.add(tick)
 
     return () => gsap.ticker.remove(tick)
-  }, [fills, markers, rest, light, spin, camera, size, layout, advance, gl, scene, fill, running, pins, tag, yaw, lapped])
+  }, [fills, markers, rest, light, camera, size, layout, advance, gl, scene, fill, running, pins, tag, lapped, replay])
 
   return (
     <>
-      <primitive object={spin}>
-        <primitive object={inner}>
-          <primitive object={gltf.scene} />
-          <primitive object={light.group} />
-        </primitive>
-      </primitive>
+      <primitive object={gltf.scene} />
+      <primitive object={light.group} />
     </>
   )
 }

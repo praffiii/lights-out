@@ -26,15 +26,15 @@ it('404s a circuit with no model', async () => {
   expect(response.headers.get('cache-control')).toBe('public, max-age=3600')
 })
 
-it('404s a circuit with nothing stored', async () => {
+it('answers 204 for a circuit with nothing stored, so the browser logs no error', async () => {
   const response = await respond(fakeKV().kv, 'vegas')
 
-  expect(response.status).toBe(404)
+  expect(response.status).toBe(204)
   expect(response.headers.get('cache-control')).toBe('public, max-age=300')
 })
 
-it('404s a corrupt stored lap', async () => {
+it('answers 204 for a corrupt stored lap', async () => {
   const response = await respond(fakeKV({ [poleKey('vegas')]: '{not json' }).kv, 'vegas')
 
-  expect(response.status).toBe(404)
+  expect(response.status).toBe(204)
 })

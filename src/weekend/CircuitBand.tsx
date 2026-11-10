@@ -1,13 +1,18 @@
-import { type CSSProperties, lazy, type PointerEvent, Suspense, useEffect, useRef, useState } from 'react'
+import { type CSSProperties, lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 
+import { grandPrix } from '#/circuits/calendar.ts'
+import type { Replay } from '#/circuits/Circuit.tsx'
 import { CircuitGuard } from '#/circuits/CircuitGuard.tsx'
 import { fitSpin } from '#/circuits/fit.ts'
 import type { CircuitInfo } from '#/circuits/registry.ts'
 import { useMedia } from '#/motion/client.ts'
 import { gsap, REDUCED } from '#/motion/motion.ts'
+import type { PoleLap } from '#/pole/schema.ts'
+import { usePoleLap } from '#/pole/use-pole-lap.ts'
 import { Go } from '#/shell/Go.tsx'
 
 import type { Band } from './page-model.ts'
+import { PoleHud } from './PoleHud.tsx'
 
 const Circuit = lazy(() => import('#/circuits/Circuit.tsx'))
 
@@ -17,19 +22,11 @@ const TALL = 4 / 5
 
 const PHONE = '(max-width: 760px)'
 
-const LIMIT = Math.PI / 4
-
-const GAIN = 0.006
-
-const OVER = 0.3
-
 const CREDIT = 'Blender model · layout bacinger/f1-circuits (MIT) · elevation SRTM (NASA) · Map © OpenStreetMap contributors (ODbL)'
 
+const TELEMETRY = ' · Telemetry: OpenF1 (unofficial)'
+
 type Vars = CSSProperties & Record<`--${string}`, number | string>
-
-type Drag = { x: number; t: number; v: number }
-
-const degrees = (radians: number) => Math.round((radians * 180) / Math.PI) || 0
 
 function Stat({ label, value, unit, num }: { label: string; value: string | number; unit?: string; num?: 'num' | 'num year' }) {
   return (
@@ -43,19 +40,15 @@ function Stat({ label, value, unit, num }: { label: string; value: string | numb
   )
 }
 
-function Stage({ info }: { info: CircuitInfo }) {
+function Stage({ info, near, lap, onNear }: { info: CircuitInfo; near: boolean; lap: PoleLap | null; onNear: () => void }) {
   const box = useRef<HTMLDivElement>(null)
   const pins = useRef<HTMLDivElement>(null)
-  const yaw = useRef(0)
   const fill = useRef(1)
-  const drag = useRef<Drag | null>(null)
-  const coast = useRef<((time: number, dt: number) => void) | null>(null)
-  const [near, setNear] = useState(false)
+  const replay = useRef<Replay>({ at: { current: 0 }, running: { current: false }, trace: { current: null }, turns: { current: [] } }).current
   const [ready, setReady] = useState(false)
   const [failed, setFailed] = useState(false)
   const [turns, setTurns] = useState(true)
   const [sectors, setSectors] = useState(true)
-  const [deg, setDeg] = useState(0)
   const phone = useMedia(PHONE)
   const fit = fitSpin(info.crop, phone ? TALL : WIDE)
   const vars: Vars = { '--w': fit.w, '--h': fit.h, '--x': fit.x, '--y': fit.y }
@@ -66,108 +59,14 @@ function Stage({ info }: { info: CircuitInfo }) {
 
     if (!el) return
 
-    const observer = new IntersectionObserver((entries) => entries.some((entry) => entry.isIntersecting) && setNear(true), { rootMargin: '200px' })
+    const observer = new IntersectionObserver((entries) => entries.some((entry) => entry.isIntersecting) && onNear(), { rootMargin: '200px' })
 
     observer.observe(el)
 
     return () => observer.disconnect()
-  }, [])
+  }, [onNear])
 
-  useEffect(
-    () => () => {
-      gsap.killTweensOf(yaw)
-      gsap.killTweensOf(fill)
-
-      if (coast.current) gsap.ticker.remove(coast.current)
-    },
-    [],
-  )
-
-  const settle = () => setDeg(degrees(yaw.current))
-
-  const halt = () => {
-    gsap.killTweensOf(yaw)
-
-    if (coast.current) gsap.ticker.remove(coast.current)
-
-    coast.current = null
-  }
-
-  const springBack = () => {
-    const edge = Math.sign(yaw.current) * LIMIT
-
-    if (REDUCED) {
-      yaw.current = edge
-      settle()
-
-      return
-    }
-
-    gsap.to(yaw, { current: edge, duration: 0.5, ease: 'power3.out', onComplete: settle })
-  }
-
-  const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
-    halt()
-    e.currentTarget.setPointerCapture(e.pointerId)
-    drag.current = { x: e.clientX, t: e.timeStamp, v: 0 }
-  }
-
-  const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
-    const last = drag.current
-
-    if (!last) return
-
-    const dx = e.clientX - last.x
-    const outward = Math.abs(yaw.current) >= LIMIT && Math.sign(dx) === Math.sign(yaw.current)
-    const step = dx * GAIN * (outward ? OVER : 1)
-
-    yaw.current += step
-    drag.current = { x: e.clientX, t: e.timeStamp, v: step / Math.max(1, e.timeStamp - last.t) }
-  }
-
-  const onPointerUp = () => {
-    const last = drag.current
-
-    drag.current = null
-
-    if (!last) return
-
-    if (Math.abs(yaw.current) > LIMIT) return springBack()
-
-    if (REDUCED || Math.abs(last.v) < 1e-5) return settle()
-
-    let v = last.v
-
-    const tick = (_time: number, dt: number) => {
-      yaw.current += v * dt
-      v *= 0.92 ** (dt / 16.7)
-
-      const edge = Math.abs(yaw.current) >= LIMIT
-
-      if (edge) yaw.current = Math.sign(yaw.current) * LIMIT
-
-      if (edge || Math.abs(v) < 1e-5) {
-        halt()
-        settle()
-      }
-    }
-
-    coast.current = tick
-    gsap.ticker.add(tick)
-  }
-
-  const reset = () => {
-    halt()
-
-    if (REDUCED) {
-      yaw.current = 0
-      settle()
-
-      return
-    }
-
-    gsap.to(yaw, { current: 0, duration: 0.8, ease: 'launch', onComplete: settle })
-  }
+  useEffect(() => () => void gsap.killTweensOf(fill), [])
 
   const toggleSectors = () => {
     const on = !sectors
@@ -184,15 +83,10 @@ function Stage({ info }: { info: CircuitInfo }) {
         className="stage"
         ref={box}
         style={vars}
-        data-yaw={deg}
         data-turns={turns ? 'on' : 'off'}
         data-sectors={sectors ? 'on' : 'off'}
         data-gl={ready ? '' : undefined}
         data-failed={failed ? '' : undefined}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
       >
         <img
           className="poster"
@@ -207,7 +101,7 @@ function Stage({ info }: { info: CircuitInfo }) {
           <div className="gl">
             <CircuitGuard onError={() => setFailed(true)}>
               <Suspense fallback={null}>
-                <Circuit model={info.model} layout="spin" fill={fill} pins={pins} yaw={yaw} onReady={() => setReady(true)} />
+                <Circuit model={info.model} layout="spin" fill={fill} pins={pins} replay={lap ? replay : undefined} onReady={() => setReady(true)} />
               </Suspense>
             </CircuitGuard>
           </div>
@@ -220,15 +114,12 @@ function Stage({ info }: { info: CircuitInfo }) {
               <span key={pin.turn} className="turn" data-pin={`turn-${pin.turn}`} style={place}>
                 <b className="mono">{String(pin.turn).padStart(2, '0')}</b>
                 {info.corner?.turn === pin.turn ? <i className="mono">{info.corner.name}</i> : null}
+                <em className="mono" data-apex />
               </span>
             )
           })}
         </div>
-        {deg !== 0 ? (
-          <button type="button" className="mono reset" onPointerDown={(e) => e.stopPropagation()} onClick={reset}>
-            Reset
-          </button>
-        ) : null}
+        {lap ? <PoleHud lap={lap} gp={grandPrix(info.gp)} stage={box} pins={pins} replay={replay} /> : null}
       </div>
       <div className="mono toggles">
         <button type="button" aria-pressed={turns} onClick={() => setTurns((on) => !on)}>
@@ -259,6 +150,9 @@ function Stage({ info }: { info: CircuitInfo }) {
 
 export function CircuitBand({ band }: { band: Band }) {
   const { info, facts } = band
+  const [near, setNear] = useState(false)
+  const onNear = useCallback(() => setNear(true), [])
+  const lap = usePoleLap(info?.id ?? '', near)
 
   return (
     <section className="band" data-theme="dark" aria-label="The circuit">
@@ -282,9 +176,9 @@ export function CircuitBand({ band }: { band: Band }) {
             ))}
           </ul>
         </div>
-        {info ? <Stage info={info} /> : null}
+        {info ? <Stage info={info} near={near} lap={lap} onNear={onNear} /> : null}
       </div>
-      {info ? <p className="mono credit">{CREDIT}</p> : null}
+      {info ? <p className="mono credit">{lap ? CREDIT + TELEMETRY : CREDIT}</p> : null}
     </section>
   )
 }

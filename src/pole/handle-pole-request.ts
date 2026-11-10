@@ -7,18 +7,20 @@ import type { PoleStore } from './store.ts'
 
 const encode = Schema.encodeEffect(PoleLapJson)
 
-const missing = (maxAge: number) => Response.json({ status: 'none' }, { status: 404, headers: { 'cache-control': `public, max-age=${maxAge}` } })
+const unknown = () => Response.json({ status: 'none' }, { status: 404, headers: { 'cache-control': 'public, max-age=3600' } })
+
+const empty = () => new Response(null, { status: 204, headers: { 'cache-control': 'public, max-age=300' } })
 
 export const handlePoleRequest = (store: PoleStore['Service'], id: string): Effect.Effect<Response> =>
   isModelled(id)
     ? store.read(id).pipe(
         Effect.flatMap((lap) =>
           lap === null
-            ? Effect.succeed(missing(300))
+            ? Effect.sync(empty)
             : encode(lap).pipe(
                 Effect.orDie,
                 Effect.map((json) => new Response(json, { headers: { 'content-type': 'application/json', 'cache-control': 'public, max-age=300' } })),
               ),
         ),
       )
-    : Effect.succeed(missing(3600))
+    : Effect.sync(unknown)

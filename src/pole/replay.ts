@@ -99,7 +99,7 @@ export const advance = (state: { t: number; hold: number }, dtSeconds: number, t
   return t >= time ? { t: time, hold: HOLD } : { t, hold: 0 }
 }
 
-const pointAt = (trace: Float32Array, u: number) => {
+export const pointAt = (trace: Float32Array, u: number) => {
   const n = trace.length / 2
   const at = wrap(u) * n
   const i = Math.floor(at) % n
