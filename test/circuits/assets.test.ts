@@ -32,3 +32,9 @@ it('ships every model without baked images', async () => {
     expect(json.images).toBeUndefined()
   }
 })
+
+it('leaves no themed poster behind', async () => {
+  const left = [...new Bun.Glob('*-{light,dark}*.webp').scanSync('public/circuits')]
+
+  expect(left).toEqual([])
+})

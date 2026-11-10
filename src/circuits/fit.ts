@@ -12,7 +12,7 @@ export const fitCrop = ([x0, y0, x1, y1]: Crop): Fit => {
   return { k, x: centre(left, right, x0, x1) - (k * (x0 + x1)) / 2, y: centre(top, bottom, y0, y1) - (k * (y0 + y1)) / 2 }
 }
 
-const SQUASH = Math.sin((44 * Math.PI) / 180)
+const SQUASH = Math.sin((36 * Math.PI) / 180)
 
 const ROOM = 0.86
 

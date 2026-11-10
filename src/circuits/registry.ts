@@ -36,7 +36,6 @@ export type CircuitInfo = {
   line: ReadonlyArray<LinePoint>
   crop: Crop
   cuts: readonly [number, number]
-  relief: 3 | 6
 }
 
 const pinsOf = (json: Record<string, ReadonlyArray<number> | null>): ReadonlyArray<Pin> =>
@@ -68,7 +67,6 @@ const CIRCUITS = {
     line: br1940Line,
     crop: cropOf(br1940),
     cuts: [0.282, 0.73],
-    relief: 3,
   },
   vegas: {
     ...fromCalendar(CALENDAR.vegas),
@@ -78,7 +76,6 @@ const CIRCUITS = {
     line: us2023Line,
     crop: cropOf(us2023),
     cuts: [0.243, 0.518],
-    relief: 3,
   },
   losail: {
     ...fromCalendar(CALENDAR.losail),
@@ -87,7 +84,6 @@ const CIRCUITS = {
     line: qa2004Line,
     crop: cropOf(qa2004),
     cuts: [0.343, 0.635],
-    relief: 6,
   },
   yas_marina: {
     ...fromCalendar(CALENDAR.yas_marina),
@@ -96,7 +92,6 @@ const CIRCUITS = {
     line: ae2009Line,
     crop: cropOf(ae2009),
     cuts: [0.211, 0.657],
-    relief: 6,
   },
   albert_park: {
     ...fromCalendar(CALENDAR.albert_park),
@@ -105,7 +100,6 @@ const CIRCUITS = {
     line: au1953Line,
     crop: cropOf(au1953),
     cuts: [0.328, 0.6],
-    relief: 6,
   },
 } satisfies Record<string, CircuitInfo>
 

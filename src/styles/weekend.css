@@ -57,9 +57,6 @@
 .weekend-page .band .turn b { padding-left: 4px; font-size: 11px; font-weight: 500; color: var(--ink); }
 .weekend-page .band .turn i { padding-left: 4px; font-size: 9px; font-style: normal; color: var(--muted); white-space: nowrap; }
 .weekend-page .band .stage[data-turns='off'] .turn { opacity: 0; }
-.weekend-page .band .sector { display: none; translate: -50% -50%; padding: 4px 6px; background: var(--bg); font-size: 11px; color: var(--ink); transition: opacity 0.6s var(--brake); }
-.weekend-page .band .stage[data-gl] .sector { display: block; }
-.weekend-page .band .stage[data-sectors='off'] .sector { opacity: 0; }
 .weekend-page .band .reset { position: absolute; right: var(--m); bottom: 12px; z-index: 3; padding: 8px 12px; border: 1px solid var(--line); background: var(--bg); font-size: 10px; }
 
 .weekend-page .band .toggles { display: flex; gap: 28px; margin-top: 8px; font-size: 11px; }
@@ -72,7 +69,7 @@
 .weekend-page .band .credit { margin-top: 14px; padding: 0 var(--m); font-size: 10px; color: var(--muted); }
 
 @media (prefers-reduced-motion: reduce) {
-  .weekend-page .band .turn, .weekend-page .band .sector { transition: none; }
+  .weekend-page .band .turn { transition: none; }
 }
 
 .weekend-page .latest { display: grid; grid-template-columns: 420px 1fr; column-gap: 92px; padding: 80px var(--m) 64px; }

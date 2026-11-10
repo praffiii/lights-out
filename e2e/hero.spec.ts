@@ -156,6 +156,34 @@ test('keeps the poster pins above the facts when the circuit model never loads',
   expect(await pinsBelowFacts(page)).toEqual([])
 })
 
+test('a phone loads the small map and credits it', async ({ page, errors }, info) => {
+  test.skip(info.project.name !== 'phone')
+
+  const maps: string[] = []
+
+  page.on('request', (r) => {
+    if (r.url().includes('-map')) maps.push(new URL(r.url()).pathname)
+  })
+  await page.goto('/')
+  await lifted(page)
+  await expect(page.locator('.hero .stage[data-gl]')).toHaveCount(1)
+
+  expect(maps).toEqual(['/circuits/br-1940-map-2048.webp'])
+  await expect(page.locator('.hero .note')).toContainText('Map © OpenStreetMap contributors (ODbL)')
+  await expect(page.locator('.hero .note')).not.toContainText('Contours')
+  expect(errors).toEqual([])
+})
+
+test('keeps the poster when the map never loads', async ({ page, errors }) => {
+  await page.route('**/circuits/*-map*.webp', () => new Promise(() => {}))
+  await page.goto('/')
+  await lifted(page)
+  await expect(page.locator('.hero .poster')).toBeVisible()
+  await page.waitForTimeout(1500)
+  await expect(page.locator('.hero .poster')).toBeVisible()
+  expect(errors).toEqual([])
+})
+
 for (const width of [320, 390, 760, 1470]) {
   test(`has no horizontal overflow and keeps the T1 pin above the tag at ${width}px`, async ({ page, errors }) => {
     await page.setViewportSize({ width, height: 844 })

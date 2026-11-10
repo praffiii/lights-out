@@ -166,8 +166,7 @@ test('dragging the stage moves turn 1, and Reset brings it back', async ({ page,
   expect(errors).toEqual([])
 })
 
-test('the spin stops at 45 degrees with every pin inside the stage', async ({ page, errors }, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop')
+test('the spin stops at 45 degrees with every pin inside the stage', async ({ page, errors }) => {
   await withGl(page, '/weekend?reduced')
   await drag(page, 600)
 
@@ -204,7 +203,7 @@ test('a vertical swipe on the stage scrolls the page', async ({ page, errors }, 
   expect(errors).toEqual([])
 })
 
-test('the Turns toggle hides the pins and the Sectors toggle hides the S labels', async ({ page, errors }, testInfo) => {
+test('the Turns toggle hides the pins and the Sectors toggle turns the sectors off', async ({ page, errors }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop')
   await withGl(page)
 
@@ -212,7 +211,26 @@ test('the Turns toggle hides the pins and the Sectors toggle hides the S labels'
   await expect(pin(page)).toHaveCSS('opacity', '0')
 
   await page.getByRole('button', { name: 'Sectors' }).click()
-  await expect(page.locator('.weekend-page [data-pin="S1"]')).toHaveCSS('opacity', '0')
+  await expect(stage(page)).toHaveAttribute('data-sectors', 'off')
+  expect(errors).toEqual([])
+})
+
+test('the sector names live on the map, not as pins, and the map is credited', async ({ page, errors }) => {
+  await withGl(page)
+
+  await expect(page.locator('.weekend-page .band .sector')).toHaveCount(0)
+  await expect(page.locator('.weekend-page .band .credit')).toContainText('Map © OpenStreetMap contributors (ODbL)')
+  expect(errors).toEqual([])
+})
+
+test('the band keeps its poster when the map never loads', async ({ page, errors }) => {
+  await page.route('**/circuits/*-map*.webp', () => new Promise(() => {}))
+  await loaded(page)
+  await stage(page).scrollIntoViewIfNeeded()
+
+  await expect(page.locator('.weekend-page .band .poster')).toBeVisible()
+  await page.waitForTimeout(1500)
+  await expect(page.locator('.weekend-page .band .poster')).toBeVisible()
   expect(errors).toEqual([])
 })
 

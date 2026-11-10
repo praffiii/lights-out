@@ -1,7 +1,7 @@
 import { expect, it } from 'bun:test'
 
-import { FREE, fitCrop } from '../../src/circuits/fit.ts'
-import { allCircuits, circuitFor } from '../../src/circuits/registry.ts'
+import { FREE, fitCrop, fitSpin } from '../../src/circuits/fit.ts'
+import { allCircuits } from '../../src/circuits/registry.ts'
 
 const placed = (crop: readonly [number, number, number, number]) => {
   const { k, x, y } = fitCrop(crop)
@@ -35,7 +35,10 @@ it('shrinks a crop taller than the free area to its height', () => {
   expect(y1 - y0).toBeCloseTo(FREE[3] - FREE[1], 9)
 })
 
-it('exaggerates flat circuits more, so their contours still show', () => {
-  expect(circuitFor('interlagos')?.relief).toBe(3)
-  expect(circuitFor('yas_marina')?.relief).toBe(6)
+it('spins a ground square seen at 36 degrees inside √2 of its resting size', () => {
+  const cw = 0.3 * 1.6
+  const ch = cw * Math.sin((36 * Math.PI) / 180)
+  const { h } = fitSpin([0.2, 0.4, 0.5, 0.4 + ch], 1.6)
+
+  expect(h).toBeCloseTo(0.86 * Math.min(1.6 / (Math.SQRT2 * cw), 1 / (Math.SQRT2 * ch)), 9)
 })

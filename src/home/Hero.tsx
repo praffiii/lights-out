@@ -196,7 +196,7 @@ function Stage({ info, car, at, fill, running, glReady, glFailed, onLap, onLapPr
   const [x0, y0, x1, y1] = info.crop
   const fit = fitCrop(info.crop)
   const crop: Vars = { '--x0': x0, '--y0': y0, '--x1': x1, '--y1': y1, '--fk': fit.k, '--fx': fit.x, '--fy': fit.y }
-  const poster = `/circuits/${info.model}-dark`
+  const poster = `/circuits/${info.model}`
 
   return (
     <div className="stage" style={crop} data-gl={glReady ? '' : undefined} data-waiting={!REDUCED && !glReady && !glFailed ? '' : undefined}>
@@ -216,7 +216,6 @@ function Stage({ info, car, at, fill, running, glReady, glFailed, onLap, onLapPr
             <Suspense fallback={null}>
               <Circuit
                 model={info.model}
-                theme="dark"
                 layout={narrow ? 'narrow' : 'wide'}
                 fill={fill}
                 pins={pins}
@@ -278,8 +277,7 @@ function Facts({ picked, info }: { picked: PickedRace; info: CircuitInfo }) {
       </dl>
       <div className="note mono">
         <p>{`${info.name} · ${info.gp} · ${WHEN[picked.kind]} · round ${picked.round} of ${picked.of}`}</p>
-        <p className="muted">{`Contours every ${info.relief === 3 ? 'metre' : 'half metre'} of real ground, height ×${info.relief}`}</p>
-        <p className="muted">Built in Blender from bacinger/f1-circuits (MIT) and NASA SRTM elevation</p>
+        <p className="muted">Built in Blender from bacinger/f1-circuits (MIT) and NASA SRTM elevation · Map © OpenStreetMap contributors (ODbL)</p>
       </div>
       <p className="key mono muted">
         <span>

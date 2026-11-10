@@ -1,7 +1,5 @@
 import * as THREE from 'three'
 
-import type { Theme } from '#/shell/theme.ts'
-
 export const SECTORS = {
   S1: '#A43BFF',
   S2: '#2BD45E',
@@ -12,158 +10,193 @@ export type Sector = keyof typeof SECTORS
 
 export const isSector = (name: string): name is Sector => name in SECTORS
 
-export const PALETTE = {
-  light: { bg: '#F4F3EF', ink: '#111214', unfilled: '#CAC8C1' },
-  dark: { bg: '#0E0F11', ink: '#F2F1EC', unfilled: '#3A3C42' },
-} as const
+const PAL = { haze: '#06080E', ground: '#0A0E18', blocks: '#131A2B', road: '#111726', start: '#FFFFFF' } as const
 
-const SIDE = 0.62
-const RELIEF = 0.35
-const LIGHT = [-0.6, 0.8] as const
+const FADE = 0.15
+const DIST = 2.7
+const GLOW = 1.6
+const UNFILLED = 0.25
+const HALO_K = 18
+const HALO_GAIN = 0.6
+const LABEL_HALO_GAIN = 0.35
+const TOP_LIGHT = 0.25
+const OFFSET = { polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -4 } as const
 
-const vertexShader = `
-  varying float vLap;
-  varying vec3 vNormal;
+const glsl = (n: number) => n.toFixed(3)
+
+const uvVertex = `
+  varying vec2 vUv;
   void main() {
-    vLap = uv.x;
-    vec3 n = normalize(mat3(modelMatrix) * normal);
-    vNormal = vec3(n.x, -n.z, n.y);
+    vUv = uv;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }`
 
-const fragmentShader = `
-  uniform vec3 uColor;
-  uniform vec3 uBase;
-  uniform float uFrom;
-  uniform float uTo;
-  varying float vLap;
-  varying vec3 vNormal;
-  void main() {
-    vec3 n = normalize(vNormal);
-    float shade = ${SIDE.toFixed(2)} + ${(1 - SIDE).toFixed(2)} * n.z + ${RELIEF.toFixed(2)} * n.z * dot(n.xy, vec2(${LIGHT[0].toFixed(2)}, ${LIGHT[1].toFixed(2)}));
-    shade = clamp(shade, 0.4, 1.15);
-    bool on = uFrom <= uTo ? (vLap >= uFrom && vLap <= uTo) : (vLap >= uFrom || vLap <= uTo);
-    vec3 c = on ? uColor : uBase;
-    gl_FragColor = vec4(c * shade, 1.0);
-    #include <colorspace_fragment>
-  }`
-
-export type Matte = {
-  material: THREE.ShaderMaterial
-  uniforms: { uColor: { value: THREE.Color }; uBase: { value: THREE.Color }; uFrom: { value: number }; uTo: { value: number } }
-}
-
-const matte = (color: string): Matte => {
-  const uniforms = {
-    uColor: { value: new THREE.Color(color) },
-    uBase: { value: new THREE.Color(color) },
-    uFrom: { value: 0 },
-    uTo: { value: 2 },
-  }
-
-  return { material: new THREE.ShaderMaterial({ vertexShader, fragmentShader, uniforms }), uniforms }
-}
-
-const made = new WeakMap<THREE.Material, { key: string; matte: Matte }>()
-
-export function mattify(scene: THREE.Object3D, colorOf: (material: string) => string) {
-  const byName = new Map<string, Matte>()
-
-  scene.traverse((o) => {
-    if (!(o instanceof THREE.Mesh) || Array.isArray(o.material) || !(o.material instanceof THREE.Material)) return
-
-    const known = made.get(o.material)
-    const key = known?.key ?? o.material.name
-    const m = byName.get(key) ?? known?.matte ?? matte(colorOf(key))
-
-    made.set(m.material, { key, matte: m })
-    byName.set(key, m)
-    o.material = m.material
-  })
-
-  return byName
-}
-
-const GROUND = {
-  dark: { ground: '#121316', line: '#737985', haze: '#1B1D22' },
-  light: { ground: '#EFEEE9', line: '#7E8187', haze: '#EDEBE6' },
-} as const
-
-const STEP = 3
-const PHASE = 0.37
-const FADE_RADIUS = 0.75
-const HAZE_BASE = 2.7
-const STRENGTH = 0.55
-const CROWD_FROM = 0.15
-const CROWD_TO = 0.5
-
 const groundVertex = `
+  varying vec2 vUv;
   varying vec3 vWorld;
-  varying vec3 vUp;
   void main() {
-    vUp = normalize(mat3(modelMatrix) * normal);
+    vUv = uv;
     vec4 world = modelMatrix * vec4(position, 1.0);
     vWorld = world.xyz;
     gl_Position = projectionMatrix * viewMatrix * world;
   }`
 
 const groundFragment = `
+  uniform sampler2D uMap;
   uniform vec3 uGround;
-  uniform vec3 uLine;
   uniform vec3 uHaze;
   uniform float uSpan;
+  varying vec2 vUv;
   varying vec3 vWorld;
-  varying vec3 vUp;
   void main() {
-    float h = vWorld.y;
-    float f = fract((h + ${STEP.toFixed(1)} * ${PHASE.toFixed(2)}) / ${STEP.toFixed(1)});
-    float w = max(fwidth(h / ${STEP.toFixed(1)}), 1e-4);
-    float line = 1.0 - smoothstep(0.0, w * 1.2, min(f, 1.0 - f));
-    line *= 1.0 - smoothstep(${CROWD_FROM.toFixed(2)}, ${CROWD_TO.toFixed(2)}, w);
-    line *= clamp(((1.0 - abs(normalize(vUp).y)) - 0.0004) / (0.002 - 0.0004), 0.0, 1.0);
-    float fade = pow(1.0 - min(length(vWorld.xz) / (uSpan * ${FADE_RADIUS.toFixed(2)}), 1.0), 1.6);
-    vec3 c = mix(uGround, uLine, line * fade * ${STRENGTH.toFixed(2)});
-    float near = uSpan * ${HAZE_BASE.toFixed(1)} * 0.7;
-    float far = uSpan * ${HAZE_BASE.toFixed(1)} * 1.9;
+    vec2 e = min(vUv, 1.0 - vUv);
+    float inside = smoothstep(0.0, ${glsl(FADE)}, min(e.x, e.y));
+    vec3 c = mix(uGround, texture2D(uMap, clamp(vUv, 0.0, 1.0)).rgb, inside);
+    float near = uSpan * ${glsl(DIST * 0.7)};
+    float far = uSpan * ${glsl(DIST * 1.9)};
     float haze = pow(clamp((distance(cameraPosition, vWorld) - near) / (far - near), 0.0, 1.0), 1.4);
     gl_FragColor = vec4(mix(c, uHaze, haze), 1.0);
     #include <colorspace_fragment>
   }`
 
-export type Contour = { material: THREE.ShaderMaterial; setTheme: (theme: Theme) => void }
+const stripFragment = `
+  uniform vec3 uColor;
+  uniform float uTo;
+  varying vec2 vUv;
+  void main() {
+    gl_FragColor = vec4(uColor * (vUv.x <= uTo ? ${glsl(GLOW)} : ${glsl(UNFILLED)}), 1.0);
+    #include <colorspace_fragment>
+  }`
 
-function contour(theme: Theme, span: number): Contour {
-  const uniforms = {
-    uGround: { value: new THREE.Color() },
-    uLine: { value: new THREE.Color() },
-    uHaze: { value: new THREE.Color() },
-    uSpan: { value: span },
+const haloFragment = `
+  uniform vec3 uColor;
+  uniform float uTo;
+  varying vec2 vUv;
+  void main() {
+    float d = vUv.y - 0.5;
+    float a = exp(${glsl(-HALO_K)} * d * d) * ${glsl(HALO_GAIN)} * (vUv.x <= uTo ? 1.0 : ${glsl(UNFILLED)});
+    gl_FragColor = vec4(uColor * a, 1.0);
+    #include <colorspace_fragment>
+  }`
+
+const labelFragment = (gain: number, additive: boolean) => `
+  uniform vec3 uColor;
+  uniform float uTo;
+  uniform vec2 uLap;
+  void main() {
+    float w = smoothstep(uLap.x, uLap.y, uTo);
+    gl_FragColor = ${additive ? `vec4(uColor * ${glsl(gain)} * w, 1.0)` : `vec4(uColor * ${glsl(gain)}, w)`};
+    #include <colorspace_fragment>
+  }`
+
+const blockVertex = `
+  varying vec3 vNormal;
+  void main() {
+    vNormal = normalize(mat3(modelMatrix) * normal);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }`
+
+const blockFragment = `
+  uniform vec3 uColor;
+  varying vec3 vNormal;
+  void main() {
+    gl_FragColor = vec4(uColor * (${glsl(1 - TOP_LIGHT)} + ${glsl(TOP_LIGHT)} * normalize(vNormal).y), 1.0);
+    #include <colorspace_fragment>
+  }`
+
+const flatFragment = `
+  uniform vec3 uColor;
+  void main() {
+    gl_FragColor = vec4(uColor, 1.0);
+    #include <colorspace_fragment>
+  }`
+
+type Uniform<T> = { value: T }
+
+export type Fill = { uniforms: { uTo: Uniform<number> } }
+
+export type Broadcast = { fills: ReadonlyArray<Fill> }
+
+const color = (hex: string) => ({ value: new THREE.Color(hex) })
+
+const additive = { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, ...OFFSET } as const
+
+const lapOf = (mesh: THREE.Mesh) => {
+  const uv = mesh.geometry.getAttribute('uv')
+  let lo = 1
+  let hi = 0
+
+  for (let i = 0; i < uv.count; i++) {
+    lo = Math.min(lo, uv.getX(i))
+    hi = Math.max(hi, uv.getX(i))
   }
 
-  const setTheme = (next: Theme) => {
-    const p = GROUND[next]
-
-    uniforms.uGround.value.set(p.ground)
-    uniforms.uLine.value.set(p.line)
-    uniforms.uHaze.value.set(p.haze)
-  }
-
-  setTheme(theme)
-
-  return { material: new THREE.ShaderMaterial({ name: 'ground', vertexShader: groundVertex, fragmentShader: groundFragment, uniforms }), setTheme }
+  return new THREE.Vector2(lo, hi)
 }
 
-const grounds = new WeakMap<THREE.Object3D, Contour>()
+const PART = /^(S[123])(-label)?(-halo)?$/
 
-export function groundOf(scene: THREE.Object3D, theme: Theme, span: number): Contour {
-  const ground = grounds.get(scene) ?? contour(theme, span)
+const prepared = new WeakMap<THREE.Object3D, { result: Broadcast; map: Uniform<THREE.Texture> }>()
 
-  grounds.set(scene, ground)
+export function broadcast(scene: THREE.Object3D, map: THREE.Texture, span: number): Broadcast {
+  const known = prepared.get(scene)
+
+  if (known) {
+    known.map.value = map
+
+    return known.result
+  }
+
+  const fill = (): Fill => ({ uniforms: { uTo: { value: 1 } } })
+  const fills = { S1: fill(), S2: fill(), S3: fill() } satisfies Record<Sector, Fill>
+  const laps = new Map<string, THREE.Vector2>()
+  const made = new Map<string, THREE.ShaderMaterial>()
+  const mapUniform = { value: map }
+
   scene.traverse((o) => {
-    if (o instanceof THREE.Mesh && o.name === 'ground') o.material = ground.material
+    if (o instanceof THREE.Mesh && isSector(o.name)) laps.set(o.name, lapOf(o))
   })
 
-  return ground
+  const create = (name: string, material: string) => {
+    const part = PART.exec(name)
+    const sector = part?.[1]
+
+    if (part && sector && isSector(sector)) {
+      const uniforms = { uColor: color(SECTORS[sector]), uTo: fills[sector].uniforms.uTo, uLap: { value: laps.get(sector) ?? new THREE.Vector2(0, 1) } }
+      const [label, halo] = [part[2] !== undefined, part[3] !== undefined]
+
+      if (label) return new THREE.ShaderMaterial({ name, uniforms, vertexShader: uvVertex, fragmentShader: labelFragment(halo ? LABEL_HALO_GAIN : GLOW, halo), ...(halo ? additive : { transparent: true, depthWrite: false, ...OFFSET }) })
+
+      if (halo) return new THREE.ShaderMaterial({ name, uniforms, vertexShader: uvVertex, fragmentShader: haloFragment, ...additive })
+
+      return new THREE.ShaderMaterial({ name, uniforms, vertexShader: uvVertex, fragmentShader: stripFragment })
+    }
+
+    if (name === 'ground') {
+      const uniforms = { uMap: mapUniform, uGround: color(PAL.ground), uHaze: color(PAL.haze), uSpan: { value: span } }
+
+      return new THREE.ShaderMaterial({ name, uniforms, vertexShader: groundVertex, fragmentShader: groundFragment })
+    }
+
+    if (name === 'blocks') return new THREE.ShaderMaterial({ name, uniforms: { uColor: color(PAL.blocks) }, vertexShader: blockVertex, fragmentShader: blockFragment })
+
+    return new THREE.ShaderMaterial({ name, uniforms: { uColor: color(material === 'start' ? PAL.start : PAL.road) }, vertexShader: uvVertex, fragmentShader: flatFragment })
+  }
+
+  scene.traverse((o) => {
+    if (!(o instanceof THREE.Mesh) || !(o.material instanceof THREE.Material)) return
+
+    const m = made.get(o.name) ?? create(o.name, o.material.name)
+
+    made.set(o.name, m)
+    o.material = m
+  })
+
+  const result = { fills: [fills.S1, fills.S2, fills.S3] }
+
+  prepared.set(scene, { result, map: mapUniform })
+
+  return result
 }
 
 const v = new THREE.Vector3()

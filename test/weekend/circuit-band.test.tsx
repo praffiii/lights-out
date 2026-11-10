@@ -47,7 +47,7 @@ it('shows the circuit stats and the schedule with the next session marked', () =
   expect(container.querySelector('.schedule .mono')?.textContent).toBe('Schedule · your time · GMT+7')
   expect(container.querySelectorAll('.schedule li')).toHaveLength(5)
   expect(container.querySelector('.schedule .is-next')?.textContent).toContain('Practice 3')
-  expect(container.querySelector('.credit')?.textContent).toBe('Blender model · layout bacinger/f1-circuits (MIT) · elevation SRTM (NASA)')
+  expect(container.querySelector('.credit')?.textContent).toBe('Blender model · layout bacinger/f1-circuits (MIT) · elevation SRTM (NASA) · Map © OpenStreetMap contributors (ODbL)')
 })
 
 it('the Turns toggle hides the turn numbers', () => {

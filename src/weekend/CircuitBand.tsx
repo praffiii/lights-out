@@ -23,9 +23,7 @@ const GAIN = 0.006
 
 const OVER = 0.3
 
-const SECTORS = ['S1', 'S2', 'S3'] as const
-
-const CREDIT = 'Blender model · layout bacinger/f1-circuits (MIT) · elevation SRTM (NASA)'
+const CREDIT = 'Blender model · layout bacinger/f1-circuits (MIT) · elevation SRTM (NASA) · Map © OpenStreetMap contributors (ODbL)'
 
 type Vars = CSSProperties & Record<`--${string}`, number | string>
 
@@ -61,7 +59,7 @@ function Stage({ info }: { info: CircuitInfo }) {
   const phone = useMedia(PHONE)
   const fit = fitSpin(info.crop, phone ? TALL : WIDE)
   const vars: Vars = { '--w': fit.w, '--h': fit.h, '--x': fit.x, '--y': fit.y }
-  const poster = `/circuits/${info.model}-dark`
+  const poster = `/circuits/${info.model}`
 
   useEffect(() => {
     const el = box.current
@@ -209,7 +207,7 @@ function Stage({ info }: { info: CircuitInfo }) {
           <div className="gl">
             <CircuitGuard onError={() => setFailed(true)}>
               <Suspense fallback={null}>
-                <Circuit model={info.model} theme="dark" layout="spin" fill={fill} pins={pins} yaw={yaw} onReady={() => setReady(true)} />
+                <Circuit model={info.model} layout="spin" fill={fill} pins={pins} yaw={yaw} onReady={() => setReady(true)} />
               </Suspense>
             </CircuitGuard>
           </div>
@@ -225,11 +223,6 @@ function Stage({ info }: { info: CircuitInfo }) {
               </span>
             )
           })}
-          {SECTORS.map((name) => (
-            <span key={name} className="sector mono" data-pin={name}>
-              {name}
-            </span>
-          ))}
         </div>
         {deg !== 0 ? (
           <button type="button" className="mono reset" onPointerDown={(e) => e.stopPropagation()} onClick={reset}>
