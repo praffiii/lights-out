@@ -14,21 +14,21 @@ DATA = os.path.join(HERE, "data")
 PUBLIC = os.path.join(HERE, "..", "..", "public", "circuits")
 PINS = os.path.join(HERE, "..", "..", "src", "circuits", "pins")
 
-WIDTH = 7.2
-HEIGHT = 1.2
+WIDTH = 24.0
+HEIGHT = 4.0
 STEP = 3.0
 CIRCUITS = {
-    "br-1940": {"turns": [6, 13, 21, 40, 49, 62, 70, 81, 92, 110, 121, 135, 141, 153, 163], "cuts": (0.282, 0.73), "rot": 90, "pitch": 44, "frame": 1.28, "relief": 3},
-    "us-2023": {"turns": [4, 8, 15, 19, 22, 27, 34, 38, 44, 49, 53, 58, 72, 82, 85, 88, 96], "cuts": (0.243, 0.518), "rot": 90, "pitch": 44, "frame": 1.24, "relief": 3},
-    "qa-2004": {"turns": [5, 12, 20, 24, 30, 37, 47, 57, 62, 68, 76, 80, 86, 90, 95, 102], "cuts": (0.343, 0.635), "rot": 60, "pitch": 44, "frame": 1.15, "relief": 6},
-    "ae-2009": {"turns": [4, 9, 17, 23, 33, 51, 55, 60, 75, 89, 94, 98, 103, 108, 119, 128], "cuts": (0.211, 0.657), "rot": 90, "pitch": 44, "frame": 1.15, "relief": 6},
-    "au-1953": {"turns": [4, 12, 26, 33, 38, 48, 53, 61, 95, 100, 116, 123, 130, 140], "cuts": (0.328, 0.6), "rot": 45, "pitch": 44, "frame": 1.15, "relief": 6},
+    "br-1940": {"turns": [6, 13, 21, 40, 49, 62, 70, 81, 92, 110, 121, 135, 141, 153, 163], "cuts": (0.282, 0.73), "rot": 90, "pitch": 44, "frame": 1.28},
+    "us-2023": {"turns": [4, 8, 15, 19, 22, 27, 34, 38, 44, 49, 53, 58, 72, 82, 85, 88, 96], "cuts": (0.243, 0.518), "rot": 90, "pitch": 44, "frame": 1.24},
+    "qa-2004": {"turns": [5, 12, 20, 24, 30, 37, 47, 57, 62, 68, 76, 80, 86, 90, 95, 102], "cuts": (0.343, 0.635), "rot": 60, "pitch": 44, "frame": 1.15},
+    "ae-2009": {"turns": [4, 9, 17, 23, 33, 51, 55, 60, 75, 89, 94, 98, 103, 108, 119, 128], "cuts": (0.211, 0.657), "rot": 90, "pitch": 44, "frame": 1.15},
+    "au-1953": {"turns": [4, 12, 26, 33, 38, 48, 53, 61, 95, 100, 116, 123, 130, 140], "cuts": (0.328, 0.6), "rot": 45, "pitch": 44, "frame": 1.15},
 }
 CID = os.environ.get("CIRCUIT", "br-1940")
 CFG = CIRCUITS[CID]
 SECTOR_CUTS = CFG["cuts"]
 TURNS = CFG["turns"]
-EXAGGERATE = float(CFG["relief"])
+EXAGGERATE = 1.5
 SMOOTH = 7
 
 THEMES = {
@@ -376,4 +376,5 @@ def export(path, animations=False):
         export_animations=animations,
         export_animation_mode="SCENE",
         export_force_sampling=True,
+        export_image_format="NONE",
     )

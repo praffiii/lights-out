@@ -1,105 +1,32 @@
 import json
-import math
 import os
 import sys
+import math
 
 import bpy
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from circuit import CID, HEIGHT, HERE, PINS, PUBLIC, SECTORS, THEMES, Track, build_track, camera, export, linear, project, recolour, setup_render
+import broadcast as b
+import circuit
+from circuit import CID, HEIGHT, HERE, PINS, PUBLIC, SECTORS, SECTOR_CUTS, TURNS, WIDTH, Track, camera, empty, export, project, setup_render
 from mathutils import Vector
 from bpy_extras.object_utils import world_to_camera_view
 
 OUT = os.path.join(HERE, ".out")
 LINES = os.path.join(HERE, "..", "..", "src", "circuits", "lines")
-PITCH, DIST, LENS, SHIFT_X, SHIFT_Y = 40.0, 2.7, 60.0, -0.06, 0.07
-GLOW = {"dark": 1.1, "light": 1.0}
-CONTOUR_STEP = 3.0
-FOG = 0.75
-FLAT_LO, FLAT_HI = 0.0004, 0.002
+PITCH, LENS, SHIFT_X, SHIFT_Y = 36.0, 60.0, -0.06, 0.07
 LINE_POINTS = 400
 CROP_MARGIN = 0.06
 FREE = (0.2, 0.41, 0.92, 0.785)
 FILL = 0.98
 AZIMUTHS = range(0, 360, 10)
+CANDIDATES = (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
 KEEP_OUT = ((0.0, 0.0, 0.31, 0.49), (0.79, 0.0, 1.0, 0.48))
-PALETTE = {
-    "dark": {"ground": "#121316", "line": "#737985", "haze": "#1B1D22"},
-    "light": {"ground": "#EFEEE9", "line": "#7E8187", "haze": "#EDEBE6"},
-}
-
-
-def contour_material(theme, mid, span):
-    pal = PALETTE[theme]
-    m = bpy.data.materials.new(f"contours-{theme}")
-    nodes, links = m.node_tree.nodes, m.node_tree.links
-    nodes.clear()
-
-    def op(kind, a, b=None):
-        n = nodes.new("ShaderNodeMath")
-        n.operation = kind
-        for slot, v in ((0, a), (1, b)):
-            if v is None:
-                continue
-            if isinstance(v, (int, float)):
-                n.inputs[slot].default_value = v
-            else:
-                links.new(v, n.inputs[slot])
-        return n.outputs[0]
-
-    geo = nodes.new("ShaderNodeNewGeometry")
-    pos = nodes.new("ShaderNodeSeparateXYZ")
-    links.new(geo.outputs["Position"], pos.inputs[0])
-    nrm = nodes.new("ShaderNodeSeparateXYZ")
-    links.new(geo.outputs["Normal"], nrm.inputs[0])
-    f = op("FRACT", op("DIVIDE", op("ADD", pos.outputs["Z"], CONTOUR_STEP * 0.37), CONTOUR_STEP))
-    d = op("MINIMUM", f, op("SUBTRACT", 1.0, f))
-    slope = op("MAXIMUM", op("SUBTRACT", 1.0, nrm.outputs["Z"]), 0.02)
-    width = op("MINIMUM", op("MULTIPLY", slope, 0.55), 0.06)
-    line = op("SUBTRACT", 1.0, op("DIVIDE", d, width))
-    dx = op("POWER", op("SUBTRACT", pos.outputs["X"], mid.x), 2)
-    dy = op("POWER", op("SUBTRACT", pos.outputs["Y"], mid.y), 2)
-    r = op("SQRT", op("ADD", dx, dy))
-    fade = op("POWER", op("SUBTRACT", 1.0, op("MINIMUM", op("DIVIDE", r, span * FOG), 1.0)), 1.6)
-    flat = op("MAXIMUM", op("MINIMUM", op("DIVIDE", op("SUBTRACT", op("SUBTRACT", 1.0, nrm.outputs["Z"]), FLAT_LO), FLAT_HI - FLAT_LO), 1.0), 0.0)
-    amount = op("MULTIPLY", op("MULTIPLY", op("MAXIMUM", op("MINIMUM", line, 1.0), 0.0), fade), flat)
-    mix = nodes.new("ShaderNodeMix")
-    mix.data_type = "RGBA"
-    links.new(amount, mix.inputs["Factor"])
-    mix.inputs["A"].default_value = (*linear(pal["ground"]), 1)
-    mix.inputs["B"].default_value = (*linear(pal["line"]), 1)
-    cam = nodes.new("ShaderNodeCameraData")
-    near, far = span * DIST * 0.7, span * DIST * 1.9
-    haze = op("POWER", op("MAXIMUM", op("MINIMUM", op("DIVIDE", op("SUBTRACT", cam.outputs["View Distance"], near), far - near), 1.0), 0.0), 1.4)
-    mix2 = nodes.new("ShaderNodeMix")
-    mix2.data_type = "RGBA"
-    links.new(haze, mix2.inputs["Factor"])
-    links.new(mix.outputs["Result"], mix2.inputs["A"])
-    mix2.inputs["B"].default_value = (*linear(pal["haze"]), 1)
-    emit = nodes.new("ShaderNodeEmission")
-    links.new(mix2.outputs["Result"], emit.inputs["Color"])
-    out = nodes.new("ShaderNodeOutputMaterial")
-    links.new(emit.outputs[0], out.inputs["Surface"])
-    return m
-
-
-def bloom(scene):
-    tree = bpy.data.node_groups.new("comp", "CompositorNodeTree")
-    scene.compositing_node_group = tree
-    rl = tree.nodes.new("CompositorNodeRLayers")
-    glare = tree.nodes.new("CompositorNodeGlare")
-    for key, val in (("Type", "Bloom"), ("Quality", "High"), ("Threshold", 1.0), ("Strength", 0.25), ("Size", 0.5)):
-        if key in glare.inputs:
-            glare.inputs[key].default_value = val
-    tree.interface.new_socket("Image", in_out="OUTPUT", socket_type="NodeSocketColor")
-    out = tree.nodes.new("NodeGroupOutput")
-    tree.links.new(rl.outputs["Image"], glare.inputs["Image"])
-    tree.links.new(glare.outputs["Image"], out.inputs[0])
 
 
 def aim(cam, mid, span, az_deg, target):
     az, pitch = math.radians(az_deg), math.radians(PITCH)
-    dist = span * DIST
+    dist = span * b.DIST
     cam.data.shift_x, cam.data.shift_y = SHIFT_X, SHIFT_Y
     cam.location = (
         mid.x + dist * math.cos(pitch) * math.sin(az),
@@ -112,36 +39,36 @@ def aim(cam, mid, span, az_deg, target):
     return dist
 
 
-def box(scene, cam, track):
-    pts = [world_to_camera_view(scene, cam, p + Vector((0, 0, HEIGHT))) for p in track.samples]
-    x0, x1 = min(p.x for p in pts), max(p.x for p in pts)
-    y0, y1 = min(1 - p.y for p in pts), max(1 - p.y for p in pts)
+def box(scene, cam, pts):
+    vs = [world_to_camera_view(scene, cam, p) for p in pts]
+    x0, x1 = min(v.x for v in vs), max(v.x for v in vs)
+    y0, y1 = min(1 - v.y for v in vs), max(1 - v.y for v in vs)
     mx, my = (x1 - x0) * CROP_MARGIN, (y1 - y0) * CROP_MARGIN
     return x0 - mx, y0 - my, x1 + mx, y1 + my
 
 
-def room(b):
-    return min((FREE[2] - FREE[0]) / (b[2] - b[0]), (FREE[3] - FREE[1]) / (b[3] - b[1]))
+def room(r):
+    return min((FREE[2] - FREE[0]) / (r[2] - r[0]), (FREE[3] - FREE[1]) / (r[3] - r[1]))
 
 
-def intrudes(scene, cam, track):
-    for p in track.samples:
-        v = world_to_camera_view(scene, cam, p + Vector((0, 0, HEIGHT)))
+def intrudes(scene, cam, pts):
+    for p in pts:
+        v = world_to_camera_view(scene, cam, p)
         if any(x0 <= v.x <= x1 and y0 <= 1 - v.y <= y1 for x0, y0, x1, y1 in KEEP_OUT):
             return True
     return False
 
 
-def place(scene, cam, track, mid, span, az, fill):
+def place(scene, cam, pts, mid, span, az, fill):
     cam.data.lens = LENS
     target = mid.copy()
     for _ in range(8):
         aim(cam, mid, span, az, target)
-        cam.data.lens *= room(box(scene, cam, track)) * fill
+        cam.data.lens *= room(box(scene, cam, pts)) * fill
         bpy.context.view_layer.update()
-        b = box(scene, cam, track)
-        dx = (FREE[0] + FREE[2]) / 2 - (b[0] + b[2]) / 2
-        dy = (FREE[1] + FREE[3]) / 2 - (b[1] + b[3]) / 2
+        r = box(scene, cam, pts)
+        dx = (FREE[0] + FREE[2]) / 2 - (r[0] + r[2]) / 2
+        dy = (FREE[1] + FREE[3]) / 2 - (r[1] + r[3]) / 2
         wide = (target - cam.location).length * cam.data.sensor_width / cam.data.lens
         tall = wide * scene.render.resolution_y / scene.render.resolution_x
         right, up = cam.matrix_world.col[0].xyz, cam.matrix_world.col[1].xyz
@@ -150,15 +77,20 @@ def place(scene, cam, track, mid, span, az, fill):
     return target
 
 
-def frame(scene, cam, track, mid, span):
+def fit(scene, cam, pts, mid, span, az):
+    fill = FILL
+    target = place(scene, cam, pts, mid, span, az, fill)
+    while intrudes(scene, cam, pts) and fill > 0.6:
+        fill -= 0.03
+        target = place(scene, cam, pts, mid, span, az, fill)
+    return target
+
+
+def frame(scene, cam, pts, mid, span):
     best = None
     for az in AZIMUTHS:
-        fill = FILL
-        target = place(scene, cam, track, mid, span, az, fill)
-        while intrudes(scene, cam, track) and fill > 0.6:
-            fill -= 0.03
-            target = place(scene, cam, track, mid, span, az, fill)
-        if not intrudes(scene, cam, track) and (best is None or cam.data.lens > best[0]):
+        target = fit(scene, cam, pts, mid, span, az)
+        if not intrudes(scene, cam, pts) and (best is None or cam.data.lens > best[0]):
             best = (cam.data.lens, az, target)
     lens, az, target = best
     dist = aim(cam, mid, span, az, target)
@@ -175,65 +107,79 @@ def centreline(track):
     return out
 
 
-def crop(scene, cam, track):
-    x0, y0, x1, y1 = box(scene, cam, track)
+def crop(scene, cam, pts):
+    x0, y0, x1, y1 = box(scene, cam, pts)
     return [round(max(0.0, v), 4) for v in (x0, y0)] + [round(min(1.0, v), 4) for v in (x1, y1)]
+
+
+def ribbons(track):
+    cuts = [0, SECTOR_CUTS[0] * track.lap, SECTOR_CUTS[1] * track.lap, track.lap]
+    edge = WIDTH / 2 - 1
+    spans = []
+    for i, (name, hex_) in enumerate(SECTORS):
+        idx, us = b.sector_span(track, cuts[i], cuts[i + 1])
+        b.strips(name, track, idx, us, [(0, b.CORE), (edge, b.EDGE), (-edge, b.EDGE)], HEIGHT + 0.1, b.glow_material(name, hex_))
+        b.strips(f"{name}-halo", track, idx, us, [(0, b.HALO)], HEIGHT + 0.05, b.halo_material(f"{name}-halo", hex_))
+        spans.append(([idx[int(len(idx) * f)] % len(track.samples) for f in CANDIDATES], {i % len(track.samples) for i in idx}))
+    return spans
 
 
 def main():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     scene = bpy.context.scene
     track = Track()
-    mats = build_track(track)
+    os.makedirs(OUT, exist_ok=True)
+    lo, hi = b.extent(track)
+    img, footprints = b.bake_map(scene, b.Local(track.mid), lo, hi, os.path.join(OUT, f"{CID}-map.png"))
+    b.save_webp(scene, img, os.path.join(PUBLIC, f"{CID}-map.webp"))
+    b.save_webp(scene, img, os.path.join(PUBLIC, f"{CID}-map-2048.webp"), 0.5)
+
+    top = [p + Vector((0, 0, HEIGHT)) for p in track.samples]
+    xs, ys, zs = [p.x for p in top], [p.y for p in top], [p.z for p in top]
+    mid = Vector(((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2, (min(zs) + max(zs)) / 2))
+    span = max(max(xs) - min(xs), max(ys) - min(ys))
+
+    ground = circuit.terrain(track, b.ground_material(img, span))
+    b.map_uvs(ground, lo, hi)
+    tree = b.ground_tree(ground)
+    solid, count = b.blocks(footprints, track, tree, circuit.material("blocks", b.PAL["block"]))
+    circuit.ribbon("road", track.samples, track.s, 0, track.lap, track.lap, circuit.material("road", b.PAL["road"]))
+    spans = ribbons(track)
+    mids = [ks[len(ks) // 2] for ks, _ in spans]
+    hues = dict(SECTORS)
+    circuit.bar(track, 0.0, "start", b.flat_emit("start", b.PAL["start"]), length=WIDTH + 3, depth=7, rise=0.5)
+    turns = [empty(f"turn-{n}", b.on_ground(tree, b.outward(track, track.starts[i], b.TURN_OUT))) for n, i in enumerate(TURNS, start=1)]
+    anchors = [b.on_ground(tree, b.outward(track, k, b.SECTOR_OUT)) for k in mids]
 
     bg = setup_render(scene)
+    bg.inputs["Color"].default_value = b.rgba(b.PAL["bg"])
     scene.render.resolution_x, scene.render.resolution_y = 2880, 1800
     scene.render.image_settings.file_format = "WEBP"
     scene.render.image_settings.color_mode = "RGB"
     scene.render.image_settings.quality = 82
     scene.eevee.taa_render_samples = 32
-    bloom(scene)
     cam = camera(scene, LENS)
-    ribbons = [scene.objects[name] for name, _ in SECTORS]
-    pts = [o.matrix_world @ v.co for o in ribbons for v in o.data.vertices]
-    lo = Vector((min(p.x for p in pts), min(p.y for p in pts), min(p.z for p in pts)))
-    hi = Vector((max(p.x for p in pts), max(p.y for p in pts), max(p.z for p in pts)))
-    mid = (lo + hi) / 2
-    span = max(hi.x - lo.x, hi.y - lo.y)
-    az, dist = frame(scene, cam, track, mid, span)
-    ground = scene.objects["ground"]
-    original = ground.data.materials[0]
+    az, dist = frame(scene, cam, top + [e.location.copy() for e in turns] + anchors, mid, span)
+    base = top + [e.location.copy() for e in turns]
+    corners = [c for n, (ks, own) in enumerate(spans, start=1) for c in b.sector_label(n, hues[f"S{n}"], track, ks, own, az, span, tree, b.ground_tree(solid), lambda cs: room(box(scene, cam, base + cs)))]
+    pts = base + corners
+    fit(scene, cam, pts, mid, span, az)
 
-    for theme, c in THEMES.items():
-        contours = contour_material(theme, mid, span)
-        ground.data.materials[0] = contours
-        bg.inputs["Color"].default_value = (*linear(c["bg"]), 1)
-        recolour(mats["ink"], c["ink"])
-        for o in ribbons:
-            o.active_material.node_tree.nodes["Emission"].inputs["Strength"].default_value = GLOW[theme]
-        for percent, suffix in ((100, ""), (50, "-1440")):
-            scene.render.resolution_percentage = percent
-            scene.render.filepath = os.path.join(PUBLIC, f"{CID}-{theme}{suffix}.webp")
-            bpy.ops.render.render(write_still=True)
-        scene.render.resolution_percentage = 100
-        ground.data.materials[0] = original
-        bpy.data.materials.remove(contours)
-    recolour(mats["ink"], THEMES["light"]["ink"])
-    for o in ribbons:
-        o.active_material.node_tree.nodes["Emission"].inputs["Strength"].default_value = 1.0
+    for percent, suffix in ((100, ""), (50, "-1440")):
+        scene.render.resolution_percentage = percent
+        scene.render.filepath = os.path.join(PUBLIC, f"{CID}{suffix}.webp")
+        bpy.ops.render.render(write_still=True)
+    scene.render.resolution_percentage = 100
 
-    turns = [o for o in scene.objects if o.type == "EMPTY" and o.name.startswith("turn-")]
     pins = project(scene, cam, turns)
+    pins["crop"] = crop(scene, cam, pts)
     os.makedirs(PINS, exist_ok=True)
-    os.makedirs(OUT, exist_ok=True)
-    pins["crop"] = crop(scene, cam, track)
     json.dump(pins, open(os.path.join(PINS, f"{CID}.json"), "w"), indent=1)
     os.makedirs(LINES, exist_ok=True)
     json.dump(centreline(track), open(os.path.join(LINES, f"{CID}.json"), "w"))
     export(os.path.join(OUT, f"{CID}.glb"))
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(HERE, f"{CID}.blend"))
-    zs = [p.z for p in track.samples]
-    print(f"done {CID}: lap {track.lap:.0f} m, camera {dist:.0f} m at {az} deg, lens {cam.data.lens:.1f} mm, crop {pins['crop']}, model height {min(zs):.0f}..{max(zs):.0f} m")
+    print(f"done {CID}: lap {track.lap:.0f} m, camera {dist:.0f} m at {az} deg, lens {cam.data.lens:.1f} mm, crop {pins['crop']}, blocks {count}, labels clear {not intrudes(scene, cam, pts)}, map {(hi.x - lo.x):.0f}x{(hi.y - lo.y):.0f} m")
 
 
 main()
