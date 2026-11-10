@@ -18,7 +18,7 @@ const strip = (name: string, from: number, to: number) => {
 const circuit = () => {
   const group = new THREE.Group()
 
-  group.add(strip('ground', 0, 1), strip('blocks', 0, 1), strip('S1', 0, 0.3), strip('S1-halo', 0, 0.3), strip('S1-label', 0, 1), strip('S1-label-halo', 0, 1))
+  group.add(strip('ground', 0, 1), strip('streets-major', 0, 1), strip('blocks', 0, 1), strip('S1', 0, 0.3), strip('S1-halo', 0, 0.3), strip('S1-label', 0, 1), strip('S1-label-halo', 0, 1))
 
   return group
 }
@@ -38,6 +38,20 @@ it('paints the ground with the baked map', () => {
   broadcast(group, map, 100)
 
   expect(shader(group, 'ground').uniforms.uMap?.value).toBe(map)
+})
+
+it('draws the streets as sharp lines that fade and haze with the map', () => {
+  const group = circuit()
+
+  broadcast(group, new THREE.Texture(), 100)
+
+  const ground = shader(group, 'ground')
+  const street = shader(group, 'streets-major')
+
+  expect(street.uniforms.uMap).toBeUndefined()
+  expect(street.uniforms.uColor?.value.getHexString()).toBe(new THREE.Color('#22304C').getHexString())
+  expect(street.uniforms.uGround?.value).toEqual(ground.uniforms.uGround?.value)
+  expect(street.uniforms.uSpan?.value).toBe(100)
 })
 
 it('fills a sector, its halo and its flat name from one value', () => {

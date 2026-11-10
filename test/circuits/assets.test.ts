@@ -7,8 +7,8 @@ const KB = 1024
 const BUDGETS = [
   ['.webp', 220],
   ['-1440.webp', 90],
-  ['-map.webp', 450],
-  ['-map-2048.webp', 180],
+  ['-map.webp', 160],
+  ['-map-2048.webp', 60],
   ['.glb', 800],
 ] as const
 
@@ -23,13 +23,24 @@ it('ships every circuit as a poster, a map and a model within budget', async () 
   }
 })
 
-it('ships every model without baked images', async () => {
-  for (const { model } of allCircuits()) {
-    const bytes = new DataView(await Bun.file(`public/circuits/${model}.glb`).arrayBuffer())
-    const length = bytes.getUint32(12, true)
-    const json: { images?: ReadonlyArray<object> } = JSON.parse(new TextDecoder().decode(new Uint8Array(bytes.buffer, 20, length)))
+type Gltf = { images?: ReadonlyArray<object>; nodes: ReadonlyArray<{ name?: string }> }
 
-    expect(json.images).toBeUndefined()
+const gltf = async (model: string): Promise<Gltf> => {
+  const bytes = new DataView(await Bun.file(`public/circuits/${model}.glb`).arrayBuffer())
+  const length = bytes.getUint32(12, true)
+
+  return JSON.parse(new TextDecoder().decode(new Uint8Array(bytes.buffer, 20, length)))
+}
+
+it('ships every model without baked images', async () => {
+  for (const { model } of allCircuits()) expect((await gltf(model)).images).toBeUndefined()
+})
+
+it('ships the streets as sharp geometry instead of baking them into the map', async () => {
+  for (const { model } of allCircuits()) {
+    const names = (await gltf(model)).nodes.map((n) => n.name)
+
+    expect([model, names.includes('streets-major'), names.includes('streets-minor')]).toEqual([model, true, true])
   }
 })
 

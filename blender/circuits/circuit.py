@@ -372,6 +372,7 @@ def export(path, animations=False):
         filepath=path,
         export_format="GLB",
         export_cameras=True,
+        export_normals=False,
         export_yup=True,
         export_animations=animations,
         export_animation_mode="SCENE",

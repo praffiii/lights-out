@@ -130,7 +130,7 @@ def main():
     track = Track()
     os.makedirs(OUT, exist_ok=True)
     lo, hi = b.extent(track)
-    img, footprints = b.bake_map(scene, b.Local(track.mid), lo, hi, os.path.join(OUT, f"{CID}-map.png"))
+    img, footprints, roads = b.bake_map(scene, b.Local(track.mid), lo, hi, os.path.join(OUT, f"{CID}-map.png"))
     b.save_webp(scene, img, os.path.join(PUBLIC, f"{CID}-map.webp"))
     b.save_webp(scene, img, os.path.join(PUBLIC, f"{CID}-map-2048.webp"), 0.5)
 
@@ -139,9 +139,10 @@ def main():
     mid = Vector(((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2, (min(zs) + max(zs)) / 2))
     span = max(max(xs) - min(xs), max(ys) - min(ys))
 
-    ground = circuit.terrain(track, b.ground_material(img, span))
+    ground = circuit.terrain(track, b.ground_material("ground", span, img=img))
     b.map_uvs(ground, lo, hi)
     tree = b.ground_tree(ground)
+    b.streets(roads, tree, span, lo, hi)
     circuit.ribbon("road", track.samples, track.s, 0, track.lap, track.lap, circuit.material("road", b.PAL["road"]))
     spans = ribbons(track)
     mids = [ks[len(ks) // 2] for ks, _ in spans]

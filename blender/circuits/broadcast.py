@@ -51,6 +51,8 @@ LABEL_CLEAR = 40.0
 LABEL_STEP = 20.0
 SEG = 40.0
 CURVE_STEPS = 3
+STREET_LIFT = 1.0
+STREET_STEP = 60.0
 WIDTHS = {"motorway": 22, "trunk": 20, "primary": 16, "secondary": 12, "tertiary": 10, "motorway_link": 10, "trunk_link": 10, "primary_link": 9, "secondary_link": 8, "residential": 6.5, "unclassified": 6.5, "living_street": 5, "service": 3.5}
 MAJOR = {"motorway", "trunk", "primary", "secondary", "motorway_link", "trunk_link", "primary_link"}
 GREEN = {"park", "pitch", "grass", "forest", "recreation_ground", "meadow"}
@@ -120,7 +122,7 @@ def polyline(bm, pts, w, z):
         a, b = pts[max(0, i - 1)], pts[min(len(pts) - 1, i + 1)]
         t = (b - a).normalized()
         n = Vector((-t.y, t.x, 0)) * (w / 2)
-        rows.append((bm.verts.new((p.x + n.x, p.y + n.y, z)), bm.verts.new((p.x - n.x, p.y - n.y, z))))
+        rows.append((bm.verts.new((p.x + n.x, p.y + n.y, p.z + z)), bm.verts.new((p.x - n.x, p.y - n.y, p.z + z))))
     for (a, b), (c, d) in zip(rows, rows[1:]):
         try:
             bm.faces.new((a, b, d, c))
@@ -141,16 +143,15 @@ def ways(local):
 
 
 def bake_map(scene, local, lo, hi, out):
-    layers = {k: bmesh.new() for k in ("green", "water", "foot", "minor", "major")}
-    footprints = []
+    layers = {k: bmesh.new() for k in ("green", "water", "foot")}
+    footprints, roads = [], []
     for tags, pts in ways(local):
         if "building" in tags:
             polygon(layers["foot"], pts, 0.2)
             footprints.append((tags, pts))
         elif "highway" in tags:
-            kind = tags["highway"]
-            if kind in WIDTHS:
-                polyline(layers["major" if kind in MAJOR else "minor"], pts, WIDTHS[kind], 0.4 if kind in MAJOR else 0.3)
+            if tags["highway"] in WIDTHS:
+                roads.append((tags["highway"], pts))
         elif tags.get("natural") == "water" or tags.get("waterway") == "riverbank":
             polygon(layers["water"], pts, 0.1)
         elif tags.get("leisure") in GREEN or tags.get("landuse") in GREEN:
@@ -180,7 +181,7 @@ def bake_map(scene, local, lo, hi, out):
     for ob in obs + [cam]:
         bpy.data.objects.remove(ob)
     print(f"map {r.resolution_x}x{r.resolution_y} px, {max(w, h) / MAP_PX:.2f} m/px")
-    return bpy.data.images.load(out), footprints
+    return bpy.data.images.load(out), footprints, roads
 
 
 def save_webp(scene, img, path, scale=1.0):
@@ -198,7 +199,7 @@ def map_uvs(ground, lo, hi):
     w, h = hi.x - lo.x, hi.y - lo.y
     for loop in me.loops:
         co = me.vertices[loop.vertex_index].co
-        uv.data[loop.index].uv = ((co.x - lo.x) / w, (co.y - lo.y) / h)
+        uv.data[loop.index].uv = (min(1.0, max(0.0, (co.x - lo.x) / w)), min(1.0, max(0.0, (co.y - lo.y) / h)))
 
 
 def haze(nodes, links, colour, span):
@@ -219,17 +220,18 @@ def haze(nodes, links, colour, span):
     return mix.outputs["Result"]
 
 
-def ground_material(img, span):
-    m = bpy.data.materials.new("ground")
+def ground_material(name, span, img=None, hex_=None):
+    m = bpy.data.materials.new(name)
     nodes, links = m.node_tree.nodes, m.node_tree.links
     nodes.clear()
     uv = nodes.new("ShaderNodeUVMap")
     uv.uv_map = "map"
-    tex = nodes.new("ShaderNodeTexImage")
-    tex.image = img
-    tex.extension = "CLIP"
-    tex.interpolation = "Cubic"
-    links.new(uv.outputs[0], tex.inputs["Vector"])
+    if img:
+        tex = nodes.new("ShaderNodeTexImage")
+        tex.image = img
+        tex.extension = "CLIP"
+        tex.interpolation = "Cubic"
+        links.new(uv.outputs[0], tex.inputs["Vector"])
     xy = nodes.new("ShaderNodeSeparateXYZ")
     links.new(uv.outputs[0], xy.inputs[0])
 
@@ -253,12 +255,48 @@ def ground_material(img, span):
     mix.data_type = "RGBA"
     links.new(ramp.outputs[0], mix.inputs["Factor"])
     mix.inputs["A"].default_value = rgba(PAL["ground"])
-    links.new(tex.outputs["Color"], mix.inputs["B"])
+    if img:
+        links.new(tex.outputs["Color"], mix.inputs["B"])
+    else:
+        mix.inputs["B"].default_value = rgba(hex_)
     e = nodes.new("ShaderNodeEmission")
     links.new(haze(nodes, links, mix.outputs["Result"], span), e.inputs["Color"])
     out = nodes.new("ShaderNodeOutputMaterial")
     links.new(e.outputs[0], out.inputs["Surface"])
     return m
+
+
+def clip(pts, lo, hi):
+    run = []
+    for p in pts:
+        if lo.x <= p.x <= hi.x and lo.y <= p.y <= hi.y:
+            run.append(p)
+        elif run:
+            yield run
+            run = []
+    if run:
+        yield run
+
+
+def densify(pts, step):
+    out = pts[:1]
+    for a, b in zip(pts, pts[1:]):
+        n = max(1, math.ceil((b - a).length / step))
+        out += [a.lerp(b, i / n) for i in range(1, n + 1)]
+    return out
+
+
+def streets(roads, tree, span, lo, hi):
+    for group in ("major", "minor"):
+        bm = bmesh.new()
+        for kind, pts in roads:
+            if (kind in MAJOR) != (group == "major"):
+                continue
+            for run in clip(pts, lo, hi):
+                line = [on_ground(tree, p) for p in densify(simplify(run, SIMPLIFY), STREET_STEP)]
+                polyline(bm, line, WIDTHS[kind], STREET_LIFT + (0.2 if group == "major" else 0))
+        ob = mesh_obj(f"streets-{group}", bm, ground_material(f"streets-{group}", span, hex_=PAL[group]))
+        map_uvs(ob, lo, hi)
 
 
 def simplify(pts, tol):

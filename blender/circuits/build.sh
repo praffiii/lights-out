@@ -12,6 +12,6 @@ fi
 mkdir -p ../../public/circuits
 CIRCUIT="$id" "$blender" -b -P build.py < /dev/null 2>&1 | grep -E "Traceback|Error|done" || true
 test -f ".out/$id.glb"
-bunx --bun @gltf-transform/cli meshopt ".out/$id.glb" "../../public/circuits/$id.glb" --quantize-position 16 --quantize-normal 10
+bunx --bun @gltf-transform/cli meshopt ".out/$id.glb" "../../public/circuits/$id.glb" --quantize-position 16
 rm ".out/$id.glb"
 ls -l "../../public/circuits/$id.glb"

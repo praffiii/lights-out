@@ -12,6 +12,10 @@ export const isSector = (name: string): name is Sector => name in SECTORS
 
 const PAL = { haze: '#06080E', ground: '#0A0E18', blocks: '#131A2B', road: '#111726', start: '#FFFFFF' } as const
 
+const STREETS = { 'streets-major': '#22304C', 'streets-minor': '#172033' } as const
+
+const isStreet = (name: string): name is keyof typeof STREETS => name in STREETS
+
 const FADE = 0.15
 const DIST = 2.7
 const GLOW = 1.6
@@ -41,8 +45,9 @@ const groundVertex = `
     gl_Position = projectionMatrix * viewMatrix * world;
   }`
 
-const groundFragment = `
+const groundFragment = (source: string) => `
   uniform sampler2D uMap;
+  uniform vec3 uColor;
   uniform vec3 uGround;
   uniform vec3 uHaze;
   uniform float uSpan;
@@ -51,7 +56,7 @@ const groundFragment = `
   void main() {
     vec2 e = min(vUv, 1.0 - vUv);
     float inside = smoothstep(0.0, ${glsl(FADE)}, min(e.x, e.y));
-    vec3 c = mix(uGround, texture2D(uMap, clamp(vUv, 0.0, 1.0)).rgb, inside);
+    vec3 c = mix(uGround, ${source}, inside);
     float near = uSpan * ${glsl(DIST * 0.7)};
     float far = uSpan * ${glsl(DIST * 1.9)};
     float haze = pow(clamp((distance(cameraPosition, vWorld) - near) / (far - near), 0.0, 1.0), 1.4);
@@ -89,18 +94,12 @@ const labelFragment = (gain: number, additive: boolean) => `
     #include <colorspace_fragment>
   }`
 
-const blockVertex = `
-  varying vec3 vNormal;
-  void main() {
-    vNormal = normalize(mat3(modelMatrix) * normal);
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }`
-
 const blockFragment = `
   uniform vec3 uColor;
-  varying vec3 vNormal;
+  varying vec3 vWorld;
   void main() {
-    gl_FragColor = vec4(uColor * (${glsl(1 - TOP_LIGHT)} + ${glsl(TOP_LIGHT)} * normalize(vNormal).y), 1.0);
+    vec3 n = normalize(cross(dFdx(vWorld), dFdy(vWorld)));
+    gl_FragColor = vec4(uColor * (${glsl(1 - TOP_LIGHT)} + ${glsl(TOP_LIGHT)} * n.y), 1.0);
     #include <colorspace_fragment>
   }`
 
@@ -172,13 +171,13 @@ export function broadcast(scene: THREE.Object3D, map: THREE.Texture, span: numbe
       return new THREE.ShaderMaterial({ name, uniforms, vertexShader: uvVertex, fragmentShader: stripFragment })
     }
 
-    if (name === 'ground') {
-      const uniforms = { uMap: mapUniform, uGround: color(PAL.ground), uHaze: color(PAL.haze), uSpan: { value: span } }
+    const surface = { uGround: color(PAL.ground), uHaze: color(PAL.haze), uSpan: { value: span } }
 
-      return new THREE.ShaderMaterial({ name, uniforms, vertexShader: groundVertex, fragmentShader: groundFragment })
-    }
+    if (name === 'ground') return new THREE.ShaderMaterial({ name, uniforms: { uMap: mapUniform, ...surface }, vertexShader: groundVertex, fragmentShader: groundFragment('texture2D(uMap, clamp(vUv, 0.0, 1.0)).rgb') })
 
-    if (name === 'blocks') return new THREE.ShaderMaterial({ name, uniforms: { uColor: color(PAL.blocks) }, vertexShader: blockVertex, fragmentShader: blockFragment })
+    if (isStreet(name)) return new THREE.ShaderMaterial({ name, uniforms: { uColor: color(STREETS[name]), ...surface }, vertexShader: groundVertex, fragmentShader: groundFragment('uColor'), ...OFFSET })
+
+    if (name === 'blocks') return new THREE.ShaderMaterial({ name, uniforms: { uColor: color(PAL.blocks) }, vertexShader: groundVertex, fragmentShader: blockFragment })
 
     return new THREE.ShaderMaterial({ name, uniforms: { uColor: color(material === 'start' ? PAL.start : PAL.road) }, vertexShader: uvVertex, fragmentShader: flatFragment })
   }
