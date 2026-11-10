@@ -1,7 +1,7 @@
 import { expect, it } from 'bun:test'
 import { Schema } from 'effect'
 
-import { CarResponse, LapsResponse, LocationResponse, PoleLapJson, WeatherResponse } from '../../src/pole/schema.ts'
+import { CarResponse, LapsResponse, LocationResponse, PoleLapJson, StintsResponse } from '../../src/pole/schema.ts'
 import { ResultResponse } from '../../src/season/openf1-schema.ts'
 
 const KEYS = [9854, 11408, 11230, 9846, 9835]
@@ -14,7 +14,7 @@ it.each(KEYS)('decodes every recorded pole response for session %d', async (key)
 
   expect(Schema.decodeUnknownSync(CarResponse)(await raw(key, 'car')).length).toBeGreaterThan(200)
   expect(Schema.decodeUnknownSync(LocationResponse)(await raw(key, 'location')).length).toBeGreaterThan(200)
-  expect(Schema.decodeUnknownSync(WeatherResponse)(await raw(key, 'weather')).length).toBeGreaterThan(0)
+  expect(Schema.decodeUnknownSync(StintsResponse)(await raw(key, 'stints')).length).toBeGreaterThan(0)
 
   const time = pole?.duration ?? null
 

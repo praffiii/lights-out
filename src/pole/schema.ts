@@ -2,6 +2,7 @@ import { Schema } from 'effect'
 
 export const OpenF1Lap = Schema.Struct({
   driver_number: Schema.Number,
+  lap_number: Schema.Number,
   lap_duration: Schema.NullOr(Schema.Number),
   date_start: Schema.NullOr(Schema.String),
   duration_sector_1: Schema.NullOr(Schema.Number),
@@ -29,12 +30,13 @@ export const LocationSample = Schema.Struct({
 
 export type LocationSample = typeof LocationSample.Type
 
-export const WeatherSample = Schema.Struct({
-  date: Schema.String,
-  rainfall: Schema.Number,
+export const Stint = Schema.Struct({
+  lap_start: Schema.NullOr(Schema.Number),
+  lap_end: Schema.NullOr(Schema.Number),
+  compound: Schema.NullOr(Schema.String),
 })
 
-export type WeatherSample = typeof WeatherSample.Type
+export type Stint = typeof Stint.Type
 
 export const LapsResponse = Schema.Array(OpenF1Lap)
 
@@ -42,7 +44,7 @@ export const CarResponse = Schema.Array(CarSample)
 
 export const LocationResponse = Schema.Array(LocationSample)
 
-export const WeatherResponse = Schema.Array(WeatherSample)
+export const StintsResponse = Schema.Array(Stint)
 
 const Row = Schema.Tuple([Schema.Number, Schema.Number, Schema.Number, Schema.Number, Schema.Number, Schema.Number])
 

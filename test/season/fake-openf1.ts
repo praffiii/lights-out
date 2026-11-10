@@ -1,7 +1,7 @@
 import { Effect, Layer, Schema } from 'effect'
 
 import { OpenF1Client } from '../../src/season/openf1-client.ts'
-import { CarResponse, LapsResponse, LocationResponse, WeatherResponse } from '../../src/pole/schema.ts'
+import { CarResponse, LapsResponse, LocationResponse, StintsResponse } from '../../src/pole/schema.ts'
 import { DriversResponse, ResultResponse, SessionsResponse } from '../../src/season/openf1-schema.ts'
 
 const fixture = (name: string) => Bun.file(`test/fixtures/openf1/${name}.json`).json()
@@ -24,7 +24,8 @@ const pole = await Promise.all(
     laps: Schema.decodeUnknownSync(LapsResponse)(await fixture(`pole/${key}-laps`)),
     car: Schema.decodeUnknownSync(CarResponse)(await fixture(`pole/${key}-car`)),
     location: Schema.decodeUnknownSync(LocationResponse)(await fixture(`pole/${key}-location`)),
-    weather: Schema.decodeUnknownSync(WeatherResponse)(await fixture(`pole/${key}-weather`)),
+    stints: Schema.decodeUnknownSync(StintsResponse)(await fixture(`pole/${key}-stints`)),
+    drivers: Schema.decodeUnknownSync(DriversResponse)(await fixture(`pole/${key}-drivers`)),
   })),
 )
 
@@ -52,8 +53,8 @@ export const fakeOpenF1Service: OpenF1Client['Service'] = {
   laps: (key) => Effect.succeed(poleOf(key)?.laps ?? []),
   carData: (key, _driver, from, to) => Effect.succeed(within(poleOf(key)?.car, from, to)),
   location: (key, _driver, from, to) => Effect.succeed(within(poleOf(key)?.location, from, to)),
-  weather: (key) => Effect.succeed(poleOf(key)?.weather ?? []),
-  drivers: (key) => Effect.succeed(driversOf(key)),
+  stints: (key) => Effect.succeed(poleOf(key)?.stints ?? []),
+  drivers: (key) => Effect.succeed(driversOf(key).length > 0 ? driversOf(key) : (poleOf(key)?.drivers ?? [])),
 }
 
 export const fakeOpenF1 = (overrides: Partial<OpenF1Client['Service']> = {}) => Layer.succeed(OpenF1Client, { ...fakeOpenF1Service, ...overrides })

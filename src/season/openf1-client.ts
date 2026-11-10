@@ -1,7 +1,7 @@
 import { Context, Data, Effect, Layer, Predicate, Schedule, Schema, Semaphore } from 'effect'
 import { HttpClient, HttpClientError, HttpClientRequest } from 'effect/http'
 
-import { CarResponse, LapsResponse, LocationResponse, WeatherResponse } from '../pole/schema.ts'
+import { CarResponse, LapsResponse, LocationResponse, StintsResponse } from '../pole/schema.ts'
 
 import { DriversResponse, ResultResponse, SessionsResponse } from './openf1-schema.ts'
 
@@ -34,7 +34,7 @@ export class OpenF1Client extends Context.Service<
     readonly laps: ReadDriver<typeof LapsResponse>
     readonly carData: ReadWindow<typeof CarResponse>
     readonly location: ReadWindow<typeof LocationResponse>
-    readonly weather: Read<typeof WeatherResponse>
+    readonly stints: ReadDriver<typeof StintsResponse>
   }
 >()('OpenF1Client') {
   static readonly layer = Layer.effect(
@@ -66,7 +66,7 @@ export class OpenF1Client extends Context.Service<
         laps: (key, driver) => empty(get(LapsResponse, `/laps?session_key=${key}&driver_number=${driver}`)),
         carData: (key, driver, from, to) => get(CarResponse, `/car_data?session_key=${key}&driver_number=${driver}&${window(from, to)}`),
         location: (key, driver, from, to) => get(LocationResponse, `/location?session_key=${key}&driver_number=${driver}&${window(from, to)}`),
-        weather: (key) => empty(get(WeatherResponse, `/weather?session_key=${key}`)),
+        stints: (key, driver) => empty(get(StintsResponse, `/stints?session_key=${key}&driver_number=${driver}`)),
       }
     }),
   )
