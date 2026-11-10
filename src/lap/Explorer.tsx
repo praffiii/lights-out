@@ -7,7 +7,7 @@ import { mapUrl, modelUrl } from '#/circuits/Circuit.tsx'
 import { lapProfile } from '#/circuits/lap.ts'
 import type { CircuitInfo } from '#/circuits/registry.ts'
 import { broadcast, isSector, screen, SECTORS } from '#/circuits/shaders.ts'
-import { gsap, onEnter, REDUCED } from '#/motion/motion.ts'
+import { gsap, HOVER, onEnter, REDUCED } from '#/motion/motion.ts'
 import { waitFor } from '#/shell/Loader.tsx'
 
 import { type Drive, LAP_PX, nextTurn, push, resume, seek, SETTLE, step, turnLaps, wrap } from './drive.ts'
@@ -24,7 +24,7 @@ const CHASE_FOV = 44
 const INTRO = 2.2
 const NEAR_TURN = 0.012
 const VISIBLE_AHEAD = 0.14
-const ROW_GAP = 0.018
+const ROW_PX = 15
 const LIFT = 3
 const TRAIL = 16
 const TRAIL_GAP = 0.0011
@@ -204,17 +204,14 @@ function run(host: HTMLElement, section: HTMLElement, info: CircuitInfo, gltf: G
   let lastTurn = -1
   let first = true
 
-  const marks = turns.map((t, i) => {
+  const marks = turns.map((t) => {
     const tick = document.createElement('button')
     const chip = document.createElement('span')
     const label = document.createElement('b')
-    const before = turns[i - 1]
-
     tick.type = 'button'
     tick.textContent = two(t.n)
     tick.setAttribute('aria-label', `Turn ${t.n}`)
     tick.style.left = `${t.u * 100}%`
-    tick.classList.toggle('high', before !== undefined && t.u - before.u < ROW_GAP && !ticksEl.lastElementChild?.classList.contains('high'))
     tick.addEventListener('pointerdown', (e) => e.stopPropagation())
     tick.addEventListener('click', () => {
       d = seek(d, t.u)
@@ -301,7 +298,23 @@ function run(host: HTMLElement, section: HTMLElement, info: CircuitInfo, gltf: G
 
   const size = { w: 1, h: 1 }
 
+  const stagger = () => {
+    const px = timeline.clientWidth
+    const rows = [-Infinity, -Infinity]
+
+    for (const { t, tick: mark } of marks) {
+      const x = t.u * px
+      const row = rows.findIndex((last) => x - last >= ROW_PX)
+
+      if (row >= 0) rows[row] = x
+
+      mark.classList.toggle('high', row === 1)
+      mark.classList.toggle('crowd', row < 0)
+    }
+  }
+
   const fit = () => {
+    stagger()
     size.w = host.clientWidth || 1
     size.h = host.clientHeight || 1
     renderer.setSize(size.w, size.h, false)
@@ -543,7 +556,7 @@ export default function Explorer({ info, stage, onReady, onFail }: Props) {
           <div className="sectors" data-sectors aria-hidden />
           <span className="head" data-head aria-hidden />
         </div>
-        <span className="hint">Scroll to drive · Tap a number to jump</span>
+        <span className="hint">{HOVER ? 'Scroll' : 'Swipe'} to drive · Tap a number to jump</span>
       </div>
     </div>
   )

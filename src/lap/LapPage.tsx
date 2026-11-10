@@ -60,6 +60,7 @@ export function LapPage({ circuit }: { circuit: string }) {
           </Suspense>
         </CircuitGuard>
       ) : null}
+      {failed ? <p className="mono note">The 3D lap could not load.</p> : null}
       <div className="hud top">
         <div className="where">
           <span className="mono kicker">Lap explorer</span>

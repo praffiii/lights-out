@@ -58,5 +58,31 @@ html:has(.lap), html:has(.lap) body { overflow: hidden; overscroll-behavior: non
 .lap .ticks button::after { content: ''; position: absolute; left: 50%; bottom: 0; width: 1px; height: 6px; background: currentColor; }
 .lap .ticks button.high { padding-bottom: 20px; }
 .lap .ticks button:hover, .lap .ticks button:focus-visible, .lap .ticks button.on { color: var(--ink); }
+.lap .ticks button.crowd { color: transparent; }
+.lap .ticks button.crowd::after { background: var(--muted); }
 .lap .head { position: absolute; bottom: 8px; width: 2px; height: 16px; translate: -50% 0; background: #fff; box-shadow: 0 0 12px #fff, 0 0 2px #fff; pointer-events: none; }
 .lap .hint { flex: none; color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; }
+.lap .note { position: absolute; left: 32px; bottom: 32px; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; }
+@media (max-width: 760px), (max-height: 500px) {
+  .lap .hud { left: 16px; right: 16px; gap: 12px; }
+  .lap .top { top: 20px; right: 72px; }
+  .lap h1 { font-size: 28px; }
+  .lap .close { top: 16px; right: 16px; width: 40px; height: 40px; }
+  .lap .read { top: 104px; left: 16px; right: auto; gap: 10px; }
+  .lap .read div { min-width: 0; padding: 8px 10px 10px; }
+  .lap .read div:nth-child(2) { display: none; }
+  .lap .read dd { font-size: 18px; }
+  .lap .bottom { bottom: 16px; flex-wrap: wrap; justify-content: space-between; }
+  .lap .timeline { order: -1; flex: 1 0 100%; height: 56px; }
+  .lap .callout { left: 16px; bottom: 150px; }
+  .lap .callout span { font-size: 52px; }
+  .lap .flash { right: 16px; font-size: 120px; }
+  .lap .note { left: 16px; bottom: 24px; }
+}
+@media (max-height: 500px) and (min-width: 761px) {
+  .lap .read { top: 16px; left: auto; right: 72px; }
+  .lap .read div:nth-child(2) { display: grid; }
+  .lap .bottom { flex-wrap: nowrap; }
+  .lap .timeline { order: 0; flex: 1; }
+  .lap .callout { bottom: 84px; }
+}

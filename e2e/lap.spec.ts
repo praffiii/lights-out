@@ -170,3 +170,97 @@ test('a second visit cruises at the normal pace', async ({ page, errors }) => {
   expect(await km(page)).toBeGreaterThan(before)
   expect(thrown(errors)).toEqual([])
 })
+
+test('reduced motion opens still on the overhead view', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'the tick tap needs the wide timeline')
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await drive(page)
+  await page.clock.runFor(3000)
+  await expect(page.locator('.lap')).toHaveAttribute('data-mode', 'you')
+  await expect(page.locator('[data-km]')).toHaveText('0.00')
+  await page.locator('.lap .ticks button', { hasText: /^05$/ }).click()
+  await page.clock.runFor(100)
+  await expect(page.locator('.lap .callout')).toContainText('T05')
+})
+
+test('a phone swipes to drive and loads the small map', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'phone', 'touch input')
+
+  const maps: string[] = []
+
+  page.on('request', (request) => {
+    if (request.url().includes('-map')) maps.push(request.url())
+  })
+  await drive(page)
+  await expect(page.locator('.lap .hint')).toHaveText('Swipe to drive · Tap a number to jump')
+  expect(maps.some((url) => url.endsWith('-map-2048.webp'))).toBe(true)
+  expect(maps.some((url) => url.endsWith('-map.webp'))).toBe(false)
+  expect(await page.locator('.lap').evaluate((el) => getComputedStyle(el).touchAction)).toBe('none')
+
+  const cdp = await page.context().newCDPSession(page)
+  const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', y: number) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x: 195, y }] })
+
+  await touch('touchStart', 500)
+
+  for (const y of [460, 420, 380, 340, 300]) await touch('touchMove', y)
+
+  await touch('touchEnd', 300)
+  await expect(page.locator('.lap')).toHaveAttribute('data-mode', 'you')
+  await page.locator('.lap .ticks button', { hasText: /^05$/ }).tap()
+  await page.clock.runFor(2000)
+  await expect(page.locator('.lap .callout')).toContainText('T05')
+})
+
+test('rotating mid-lap keeps the light and the HUD', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'phone', 'rotation is a phone case')
+  await drive(page)
+  await page.clock.runFor(3000)
+
+  const before = await km(page)
+
+  await page.setViewportSize({ width: 844, height: 390 })
+  await page.clock.runFor(1500)
+  expect(await km(page)).toBeGreaterThan(before)
+  expect(await page.locator('.lap canvas').evaluate((el) => el.clientWidth)).toBe(844)
+  await expect(page.locator('.lap .mode')).toBeInViewport()
+  expect(thrown(errors)).toEqual([])
+})
+
+test('keeps the poster when the model never loads', async ({ page, errors }) => {
+  await page.route('**/circuits/*.glb', () => new Promise<void>(() => {}))
+  await open(page, '/lap/vegas')
+  await expect(page.locator('.lap .poster')).toBeVisible()
+  await expect(page.locator('h1')).toHaveText('Las Vegas')
+  await page.getByRole('button', { name: 'Close' }).click()
+  await expect(page).toHaveURL(/\/weekend\/?$/)
+  expect(thrown(errors)).toEqual([])
+})
+
+test('says the 3D lap could not load when the model fails', async ({ page }) => {
+  await page.route('**/circuits/*.glb', (route) => route.abort())
+  await open(page, '/lap/vegas')
+  await expect(page.getByText('The 3D lap could not load.')).toBeVisible()
+  await expect(page.locator('.lap .poster')).toBeVisible()
+})
+
+test('no two turn numbers on the timeline overlap', async ({ page }) => {
+  test.setTimeout(120_000)
+
+  for (const id of Object.keys(IDS)) {
+    await drive(page, `/lap/${id}`)
+
+    const clashes = await page.locator('.lap .ticks').evaluate((ticks) => {
+      const boxes = [...ticks.querySelectorAll('button:not(.crowd)')].flatMap((b) => {
+        const range = document.createRange()
+
+        range.selectNodeContents(b)
+
+        return [{ n: b.textContent, r: range.getBoundingClientRect() }]
+      })
+
+      return boxes.flatMap((a, i) => boxes.slice(i + 1).filter((b) => a.r.left < b.r.right && b.r.left < a.r.right && a.r.top < b.r.bottom && b.r.top < a.r.bottom).map((b) => `${a.n}/${b.n}`))
+    })
+
+    expect(clashes, id).toEqual([])
+  }
+})
