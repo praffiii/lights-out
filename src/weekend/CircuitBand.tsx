@@ -9,6 +9,7 @@ import { useMedia } from '#/motion/client.ts'
 import { gsap, REDUCED } from '#/motion/motion.ts'
 import type { PoleLap } from '#/pole/schema.ts'
 import { usePoleLap } from '#/pole/use-pole-lap.ts'
+import { useShell } from '#/shell/context.ts'
 import { Go } from '#/shell/Go.tsx'
 
 import type { Band } from './page-model.ts'
@@ -50,6 +51,7 @@ function Stage({ info, near, lap, onNear }: { info: CircuitInfo; near: boolean; 
   const [turns, setTurns] = useState(true)
   const [sectors, setSectors] = useState(true)
   const phone = useMedia(PHONE)
+  const { go } = useShell()
   const fit = fitSpin(info.crop, phone ? TALL : WIDE)
   const vars: Vars = { '--w': fit.w, '--h': fit.h, '--x': fit.x, '--y': fit.y }
   const poster = `/circuits/${info.model}`
@@ -67,6 +69,16 @@ function Stage({ info, near, lap, onNear }: { info: CircuitInfo; near: boolean; 
   }, [onNear])
 
   useEffect(() => () => void gsap.killTweensOf(fill), [])
+
+  const dive = () => {
+    const el = box.current
+    const img = el?.querySelector('img.poster')
+    const rect = el?.getBoundingClientRect()
+
+    return rect ? { rect, image: { left: rect.left - fit.x * rect.width, top: rect.top - fit.y * rect.height, width: fit.w * rect.width, height: fit.h * rect.height }, poster: img instanceof HTMLImageElement && img.currentSrc ? img.currentSrc : `${poster}.webp` } : undefined
+  }
+
+  const pick = (u: number) => void go(`/lap/${info.id}?at=${u.toFixed(4)}`, dive())
 
   const toggleSectors = () => {
     const on = !sectors
@@ -119,7 +131,7 @@ function Stage({ info, near, lap, onNear }: { info: CircuitInfo; near: boolean; 
             )
           })}
         </div>
-        {lap ? <PoleHud lap={lap} gp={grandPrix(info.gp)} stage={box} pins={pins} replay={replay} /> : null}
+        {lap ? <PoleHud lap={lap} gp={grandPrix(info.gp)} stage={box} pins={pins} replay={replay} onPick={pick} /> : null}
       </div>
       <div className="mono toggles">
         <button type="button" aria-pressed={turns} onClick={() => setTurns((on) => !on)}>
@@ -134,13 +146,7 @@ function Stage({ info, near, lap, onNear }: { info: CircuitInfo; near: boolean; 
       <Go
         to={`/lap/${info.id}`}
         className="mono explore"
-        dive={() => {
-          const el = box.current
-          const img = el?.querySelector('img.poster')
-          const rect = el?.getBoundingClientRect()
-
-          return rect ? { rect, image: { left: rect.left - fit.x * rect.width, top: rect.top - fit.y * rect.height, width: fit.w * rect.width, height: fit.h * rect.height }, poster: img instanceof HTMLImageElement && img.currentSrc ? img.currentSrc : `${poster}.webp` } : undefined
-        }}
+        dive={dive}
       >
         Explore the lap in 3D
       </Go>

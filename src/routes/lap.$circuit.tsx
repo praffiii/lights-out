@@ -1,10 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { Option, Schema } from 'effect'
 
 import { circuitFor } from '#/circuits/registry.ts'
 import { LapPage } from '#/lap/LapPage.tsx'
 import lapCss from '#/styles/lap.css?url'
 
+const startOf = Schema.decodeUnknownOption(Schema.Number.check(Schema.isGreaterThanOrEqualTo(0), Schema.isLessThan(1)))
+
 export const Route = createFileRoute('/lap/$circuit')({
+  validateSearch: (search): { at?: number } => Option.match(startOf(search.at), { onNone: () => ({ at: undefined }), onSome: (at) => ({ at }) }),
   head: ({ params }) => {
     const info = circuitFor(params.circuit)
 
@@ -21,6 +25,7 @@ export const Route = createFileRoute('/lap/$circuit')({
 
 function Lap() {
   const { circuit } = Route.useParams()
+  const { at } = Route.useSearch()
 
-  return <LapPage circuit={circuit} />
+  return <LapPage circuit={circuit} start={at ?? 0} />
 }

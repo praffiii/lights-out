@@ -1,4 +1,4 @@
-import { type CSSProperties, type RefObject, useEffect, useRef } from 'react'
+import { type CSSProperties, type RefObject, useEffect, useLayoutEffect, useRef } from 'react'
 
 import type { Replay } from '#/circuits/Circuit.tsx'
 import { gsap, REDUCED } from '#/motion/motion.ts'
@@ -19,6 +19,7 @@ type Props = {
   stage: RefObject<HTMLDivElement | null>
   pins: RefObject<HTMLDivElement | null>
   replay: Replay
+  onPick: (u: number) => void
 }
 
 const near = (a: number, b: number) => Math.abs(a - b - Math.round(a - b)) < HIT
@@ -27,11 +28,16 @@ const write = (el: Element | null | undefined, text: string) => {
   if (el && el.textContent !== text) el.textContent = text
 }
 
-export function PoleHud({ lap, gp, stage, pins, replay }: Props) {
+export function PoleHud({ lap, gp, stage, pins, replay, onPick }: Props) {
   const hud = useRef<HTMLDivElement>(null)
   const card = useRef<HTMLDivElement>(null)
   const car = useRef<HTMLDivElement>(null)
+  const picked = useRef(onPick)
   const still = REDUCED ? lap.time : 0
+
+  useLayoutEffect(() => {
+    picked.current = onPick
+  }, [onPick])
 
   useEffect(() => {
     const el = stage.current
@@ -168,10 +174,16 @@ export function PoleHud({ lap, gp, stage, pins, replay }: Props) {
       el.removeAttribute('data-scrub')
     }
 
-    const onTap = (e: MouseEvent) => {
+    const onClick = (e: MouseEvent) => {
       const trace = replay.trace.current
 
-      if (!(e instanceof PointerEvent) || e.pointerType !== 'touch' || !trace) return
+      if (!(e instanceof PointerEvent && e.pointerType === 'touch')) {
+        if (scrub !== null) picked.current(scrub)
+
+        return
+      }
+
+      if (!trace) return
 
       const { x, y } = local(e)
       const u = nearestTurn(trace, replay.turns.current, x, y, TAP_PX)
@@ -190,7 +202,7 @@ export function PoleHud({ lap, gp, stage, pins, replay }: Props) {
     if (!REDUCED) {
       el.addEventListener('pointermove', onMove)
       el.addEventListener('pointerleave', onLeave)
-      el.addEventListener('click', onTap)
+      el.addEventListener('click', onClick)
     }
 
     return () => {
@@ -198,7 +210,7 @@ export function PoleHud({ lap, gp, stage, pins, replay }: Props) {
       document.removeEventListener('visibilitychange', sync)
       el.removeEventListener('pointermove', onMove)
       el.removeEventListener('pointerleave', onLeave)
-      el.removeEventListener('click', onTap)
+      el.removeEventListener('click', onClick)
       el.removeAttribute('data-scrub')
       gsap.ticker.remove(tick)
       replay.running.current = false
@@ -225,7 +237,7 @@ export function PoleHud({ lap, gp, stage, pins, replay }: Props) {
         </div>
         {REDUCED ? null : (
           <p className="mono hint">
-            <span className="fine">Hover the track to scrub</span>
+            <span className="fine">Hover the track to scrub · click to ride from there</span>
             <span className="coarse">Tap a turn to jump to it</span>
           </p>
         )}

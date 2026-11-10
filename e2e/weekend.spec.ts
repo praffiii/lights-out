@@ -66,6 +66,8 @@ const snapsTo = async (page: Page, turn: number) => {
 
     return Math.hypot(head.x - x, head.y - y)
   }).toBeLessThan(56)
+
+  return { x, y }
 }
 
 const overlaps = (page: Page, a: string, b: string) =>
@@ -441,5 +443,21 @@ test('the replay pauses off screen', async ({ page, errors }) => {
   await page.waitForTimeout(300)
 
   expect(Math.abs(seconds(await lapClock(page).textContent()) - before)).toBeLessThan(0.1)
+  expect(errors).toEqual([])
+})
+
+test('clicking the track opens the explorer there', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await withPole(page)
+
+  const { x, y } = await snapsTo(page, 14)
+
+  await page.mouse.click(x, y)
+  await expect(page).toHaveURL(/\/lap\/interlagos\?at=0\.\d{4}$/)
+  await expect(page.locator('.lap')).toHaveAttribute('data-ready', '', { timeout: 20_000 })
+
+  const at = Number(new URL(page.url()).searchParams.get('at'))
+
+  await expect.poll(async () => Math.abs(Number(await page.locator('[data-km]').textContent()) - at * 4.309)).toBeLessThan(0.2)
   expect(errors).toEqual([])
 })

@@ -69,7 +69,7 @@ function glowTexture() {
   return new THREE.CanvasTexture(c)
 }
 
-function run(host: HTMLElement, section: HTMLElement, info: CircuitInfo, gltf: GLTF, map: THREE.Texture, ready: () => void) {
+function run(host: HTMLElement, section: HTMLElement, info: CircuitInfo, start: number, gltf: GLTF, map: THREE.Texture, ready: () => void) {
   const el = (selector: string) => {
     const found = host.querySelector<HTMLElement>(selector)
 
@@ -198,7 +198,7 @@ function run(host: HTMLElement, section: HTMLElement, info: CircuitInfo, gltf: G
     return { s, fill }
   })
 
-  let d: Drive = { pos: 0, target: 0, mine: REDUCED, quiet: 0 }
+  let d: Drive = { pos: start, target: start, mine: REDUCED, quiet: 0 }
   let holding = false
   let started = REDUCED
   let since = -1
@@ -489,9 +489,9 @@ function run(host: HTMLElement, section: HTMLElement, info: CircuitInfo, gltf: G
   }
 }
 
-type Props = { info: CircuitInfo; stage: RefObject<HTMLElement | null>; onReady: () => void; onFail: () => void }
+type Props = { info: CircuitInfo; start: number; stage: RefObject<HTMLElement | null>; onReady: () => void; onFail: () => void }
 
-export default function Explorer({ info, stage, onReady, onFail }: Props) {
+export default function Explorer({ info, start, stage, onReady, onFail }: Props) {
   const root = useRef<HTMLDivElement>(null)
   const callbacks = useRef({ onReady, onFail })
 
@@ -516,7 +516,7 @@ export default function Explorer({ info, stage, onReady, onFail }: Props) {
     waitFor(loading)
     loading
       .then(([gltf, map]) => {
-        if (!gone) stop = run(host, section, info, gltf, map, () => callbacks.current.onReady())
+        if (!gone) stop = run(host, section, info, start, gltf, map, () => callbacks.current.onReady())
       })
       .catch(() => {
         if (!gone) callbacks.current.onFail()
@@ -526,7 +526,7 @@ export default function Explorer({ info, stage, onReady, onFail }: Props) {
       gone = true
       stop()
     }
-  }, [info, stage])
+  }, [info, start, stage])
 
   return (
     <div className="drive" ref={root}>

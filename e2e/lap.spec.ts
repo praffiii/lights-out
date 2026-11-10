@@ -88,6 +88,20 @@ const km = async (page: Page) => Number(await page.locator('[data-km]').textCont
 
 const thrown = (errors: string[]) => errors.filter((e) => e.startsWith('pageerror'))
 
+test('opens at the requested point', async ({ page, errors }) => {
+  await drive(page, '/lap/vegas?at=0.5')
+
+  await expect(page.locator('[data-km]')).toHaveText(/^(2\.9|3\.[0-2])\d$/)
+  expect(thrown(errors)).toEqual([])
+})
+
+test('ignores a bad at', async ({ page, errors }) => {
+  await drive(page, '/lap/vegas?at=1.5')
+
+  await expect(page.locator('[data-km]')).toHaveText(/^0\.[0-2]\d$/)
+  expect(thrown(errors)).toEqual([])
+})
+
 test('cruises by itself once the loader lifts', async ({ page, errors }) => {
   await drive(page)
   await page.clock.runFor(2000)
