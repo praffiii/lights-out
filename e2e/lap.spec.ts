@@ -258,7 +258,7 @@ test('no two turn numbers on the timeline overlap', async ({ page }) => {
         return [{ n: b.textContent, r: range.getBoundingClientRect() }]
       })
 
-      return boxes.flatMap((a, i) => boxes.slice(i + 1).filter((b) => a.r.left < b.r.right && b.r.left < a.r.right && a.r.top < b.r.bottom && b.r.top < a.r.bottom).map((b) => `${a.n}/${b.n}`))
+      return boxes.flatMap((a, i) => boxes.slice(i + 1).flatMap((b) => (a.r.left < b.r.right && b.r.left < a.r.right && a.r.top < b.r.bottom && b.r.top < a.r.bottom ? [`${a.n}/${b.n}`] : [])))
     })
 
     expect(clashes, id).toEqual([])
