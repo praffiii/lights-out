@@ -264,3 +264,63 @@ test('no two turn numbers on the timeline overlap', async ({ page }) => {
     expect(clashes, id).toEqual([])
   }
 })
+
+test('the title and callout keep their expanded display type', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'one type check is enough')
+  await drive(page)
+  await page.locator('.lap .ticks button', { hasText: /^05$/ }).click()
+  await page.clock.runFor(2000)
+
+  const type = (selector: string) => page.locator(selector).evaluate((el) => `${getComputedStyle(el).fontFamily} ${getComputedStyle(el).fontSize}`)
+
+  expect(await type('.lap h1')).toBe('Archivo, sans-serif 44px')
+  expect(await type('.lap .callout span')).toBe('Archivo, sans-serif 84px')
+})
+
+test('the title, readouts, close and callout never overlap at any size', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'sizes are set per step')
+  test.setTimeout(90_000)
+  await drive(page, '/lap/albert_park')
+  await page.locator('.lap .ticks button', { hasText: /^03$/ }).click()
+  await page.clock.runFor(2000)
+
+  for (const [width, height] of [[1470, 830], [1024, 768], [820, 1180], [768, 1024], [390, 844], [844, 390], [740, 360], [667, 375]] as const) {
+    await page.setViewportSize({ width, height })
+    await page.clock.runFor(500)
+
+    const clashes = await page.locator('.lap').evaluate((lap) => {
+      const parts = ['h1', '.read', '.close', '.callout span'].flatMap((selector) => {
+        const el = lap.querySelector(selector)
+
+        return el ? [{ selector, r: el.getBoundingClientRect() }] : []
+      })
+
+      return parts.flatMap((a, i) => parts.slice(i + 1).flatMap((b) => (a.r.left < b.r.right && b.r.left < a.r.right && a.r.top < b.r.bottom && b.r.top < a.r.bottom ? [`${a.selector}/${b.selector}`] : [])))
+    })
+
+    expect(clashes, `${width}×${height}`).toEqual([])
+  }
+})
+
+test('closing returns to where the visitor left the weekend page', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'one return check is enough')
+  await open(page, '/weekend')
+
+  const link = page.getByText('Explore the lap in 3D')
+
+  await page.mouse.move(700, 300)
+  await expect(async () => {
+    await page.mouse.wheel(0, 600)
+    await expect(link).toBeInViewport({ timeout: 500 })
+  }).toPass({ timeout: 20_000 })
+  await page.waitForTimeout(800)
+
+  const left = await page.evaluate(() => scrollY)
+
+  await link.click()
+  await expect(page.locator('.lap h1')).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page).toHaveURL(/\/weekend\/?$/)
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(left - 80)
+  await expect(link).toBeInViewport()
+})

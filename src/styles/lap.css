@@ -11,7 +11,7 @@ html:has(.lap), html:has(.lap) body { overflow: hidden; overscroll-behavior: non
 .lap .top { top: 28px; right: 96px; }
 .lap .where { display: grid; gap: 6px; }
 .lap .kicker { color: var(--accent); text-transform: uppercase; font-size: 10px; letter-spacing: 0.18em; transition: color 0.4s; }
-.lap h1 { font: 800 44px/0.95 Archivo, sans-serif; font-stretch: 125%; letter-spacing: -0.01em; text-transform: uppercase; }
+.lap h1 { font: 800 44px/0.95 Archivo, sans-serif; font-variation-settings: 'wdth' 125; letter-spacing: -0.01em; text-transform: uppercase; }
 .lap .sub { color: var(--muted); font-size: 10px; text-transform: uppercase; }
 .lap .close { position: absolute; top: 28px; right: 32px; width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 50%; background: rgb(10 14 24 / 0.6); backdrop-filter: blur(10px); cursor: pointer; }
 .lap .close:hover, .lap .close:focus-visible { border-color: var(--ink); }
@@ -34,9 +34,9 @@ html:has(.lap), html:has(.lap) body { overflow: hidden; overscroll-behavior: non
 .lap .gauge b { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
 .lap .callout { position: absolute; left: 32px; bottom: 120px; display: grid; gap: 4px; pointer-events: none; }
 .lap .callout[hidden] { display: none; }
-.lap .callout span { font: 900 84px/0.85 Archivo, sans-serif; font-stretch: 125%; color: transparent; -webkit-text-stroke: 1.5px var(--ink); opacity: 0.9; }
+.lap .callout span { font: 900 84px/0.85 Archivo, sans-serif; font-variation-settings: 'wdth' 125; color: transparent; -webkit-text-stroke: 1.5px var(--ink); opacity: 0.9; }
 .lap .callout em { font-style: normal; text-transform: uppercase; letter-spacing: 0.24em; font-size: 12px; color: var(--accent); }
-.lap .flash { position: absolute; right: 32px; top: 50%; translate: 0 -50%; font: 900 220px/0.8 Archivo, sans-serif; font-stretch: 125%; color: transparent; -webkit-text-stroke: 2px var(--accent); opacity: 0; pointer-events: none; text-shadow: 0 0 40px var(--accent); }
+.lap .flash { position: absolute; right: 32px; top: 50%; translate: 0 -50%; font: 900 220px/0.8 Archivo, sans-serif; font-variation-settings: 'wdth' 125; color: transparent; -webkit-text-stroke: 2px var(--accent); opacity: 0; pointer-events: none; text-shadow: 0 0 40px var(--accent); }
 .lap .chips { position: absolute; inset: 0; pointer-events: none; }
 .lap .chips span { position: absolute; left: 0; top: 0; display: grid; justify-items: center; padding-bottom: 16px; translate: -50% -100%; opacity: 0; transition: opacity 0.3s; }
 .lap .chips span::before { content: ''; position: absolute; left: 50%; bottom: 0; width: 1px; height: 16px; background: linear-gradient(to top, var(--ring), transparent); }
@@ -63,7 +63,7 @@ html:has(.lap), html:has(.lap) body { overflow: hidden; overscroll-behavior: non
 .lap .head { position: absolute; bottom: 8px; width: 2px; height: 16px; translate: -50% 0; background: #fff; box-shadow: 0 0 12px #fff, 0 0 2px #fff; pointer-events: none; }
 .lap .hint { flex: none; color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; }
 .lap .note { position: absolute; left: 32px; bottom: 32px; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; }
-@media (max-width: 760px), (max-height: 500px) {
+@media (max-width: 1023px), (max-height: 500px) {
   .lap .hud { left: 16px; right: 16px; gap: 12px; }
   .lap .top { top: 20px; right: 72px; }
   .lap h1 { font-size: 28px; }
@@ -79,9 +79,11 @@ html:has(.lap), html:has(.lap) body { overflow: hidden; overscroll-behavior: non
   .lap .flash { right: 16px; font-size: 120px; }
   .lap .note { left: 16px; bottom: 24px; }
 }
-@media (max-height: 500px) and (min-width: 761px) {
-  .lap .read { top: 16px; left: auto; right: 72px; }
+@media (min-width: 761px) {
   .lap .read div:nth-child(2) { display: grid; }
+}
+@media (max-height: 500px) {
+  .lap .read { top: 16px; left: auto; right: 72px; }
   .lap .bottom { flex-wrap: nowrap; }
   .lap .timeline { order: 0; flex: 1; }
   .lap .callout { bottom: 84px; }

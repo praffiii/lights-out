@@ -28,6 +28,7 @@ export function Shell() {
   const main = useRef<HTMLElement>(null)
   const sweepBar = useRef<HTMLDivElement>(null)
   const busy = useRef(false)
+  const left = useRef<{ path: string; y: number } | null>(null)
   const bare = path.startsWith('/lap/')
 
   useEffect(() => {
@@ -105,6 +106,8 @@ export function Shell() {
         ])
       }
 
+      if (to.startsWith('/lap/')) left.current = { path, y: scrollY }
+
       leave()
       setMenuOpen(false)
       await router.navigate({ href: to })
@@ -122,6 +125,15 @@ export function Shell() {
     },
     [path, router, lenis],
   )
+
+  useEffect(() => {
+    const back = left.current
+
+    if (!back || back.path !== path) return
+
+    left.current = null
+    requestAnimationFrame(() => scrollTo({ top: back.y, behavior: 'instant' }))
+  }, [path])
 
   const api = useMemo(() => ({ go }), [go])
   const closeMenu = useCallback(() => setMenuOpen(false), [])
