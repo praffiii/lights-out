@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 
 import type { Page } from '@playwright/test'
 
-import { expect, hiddenText, LOADER_MS, scrollToEnd, stubSeason, test, visibleBars } from './fixtures.ts'
+import { expect, hiddenText, LOADER_MS, scrollToEnd, stubPole, stubSeason, test, visibleBars } from './fixtures.ts'
 
 const WAITING = 'The weekend data is on its way. Try again in a minute.'
 
@@ -27,19 +27,47 @@ const centre = async (page: Page) => {
   return { x: (box?.x ?? 0) + (box?.width ?? 0) / 2, y: (box?.y ?? 0) + (box?.height ?? 0) / 2 }
 }
 
-const drag = async (page: Page, dx: number) => {
-  const { x, y } = await centre(page)
+const POLE = JSON.parse(readFileSync('test/fixtures/pole/interlagos.json', 'utf8'))
 
-  await page.mouse.move(x, y)
-  await page.mouse.down()
-  await page.mouse.move(x + dx, y, { steps: 12 })
-  await page.mouse.up()
+const lapClock = (page: Page) => page.locator('.weekend-page .replay .lapclock')
+
+const car = (page: Page) => page.locator('.weekend-page .band .car')
+
+const seconds = (text: string | null) => {
+  const [m, s] = (text ?? '').split(':')
+
+  return Number(m) * 60 + Number(s)
 }
 
-const at = async (page: Page) => {
-  const box = await pin(page).boundingBox()
+const ring = async (page: Page, turn: number) => {
+  const box = await page.locator(`.weekend-page [data-pin="turn-${turn}"]`).boundingBox()
 
-  return { x: box?.x ?? 0, y: box?.y ?? 0 }
+  return { x: (box?.x ?? 0) + (box?.width ?? 0) / 2, y: (box?.y ?? 0) + (box?.height ?? 0) }
+}
+
+const centreOf = async (page: Page, selector: string) => {
+  const box = await page.locator(selector).boundingBox()
+
+  return { x: (box?.x ?? 0) + (box?.width ?? 0) / 2, y: (box?.y ?? 0) + (box?.height ?? 0) / 2 }
+}
+
+const withPole = async (page: Page, path = '/weekend') => {
+  await stubPole(page, 'interlagos')
+  await withGl(page, path)
+}
+
+const snapsTo = async (page: Page, turn: number) => {
+  const { x, y } = await ring(page, turn)
+
+  await page.mouse.move(x, y)
+  await expect(stage(page)).toHaveAttribute('data-scrub', '')
+  await expect.poll(async () => {
+    const head = await centreOf(page, '.weekend-page .band .car .head')
+
+    return Math.hypot(head.x - x, head.y - y)
+  }).toBeLessThan(56)
+
+  return { x, y }
 }
 
 const overlaps = (page: Page, a: string, b: string) =>
@@ -151,43 +179,6 @@ test('the calendar button downloads the weekend as five events', async ({ page, 
   expect(errors).toEqual([])
 })
 
-test('dragging the stage moves turn 1, and Reset brings it back', async ({ page, errors }, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop')
-  await withGl(page)
-
-  const home = await at(page)
-
-  await drag(page, 200)
-  await expect.poll(async () => Math.abs((await at(page)).x - home.x) + Math.abs((await at(page)).y - home.y)).toBeGreaterThan(20)
-
-  await page.getByRole('button', { name: 'Reset' }).click()
-  await expect(stage(page)).toHaveAttribute('data-yaw', '0')
-  await expect.poll(async () => Math.max(Math.abs((await at(page)).x - home.x), Math.abs((await at(page)).y - home.y))).toBeLessThanOrEqual(2)
-  expect(errors).toEqual([])
-})
-
-test('the spin stops at 45 degrees with every pin inside the stage', async ({ page, errors }) => {
-  await withGl(page, '/weekend?reduced')
-  await drag(page, 600)
-
-  await expect(stage(page)).toHaveAttribute('data-yaw', '45')
-
-  const outside = await stage(page).evaluate((el) => {
-    const box = el.getBoundingClientRect()
-
-    return [...el.querySelectorAll<HTMLElement>('[data-pin]')].flatMap((p) => {
-      const b = p.getBoundingClientRect()
-      const shown = getComputedStyle(p).visibility !== 'hidden' && getComputedStyle(p).display !== 'none'
-      const out = b.left < box.left - 1 || b.right > box.right + 1 || b.top < box.top - 1 || b.bottom > box.bottom + 1
-
-      return shown && out ? [p.dataset.pin] : []
-    })
-  })
-
-  expect(outside).toEqual([])
-  expect(errors).toEqual([])
-})
-
 test('a vertical swipe on the stage scrolls the page', async ({ page, errors }, testInfo) => {
   test.skip(testInfo.project.name !== 'phone')
   await withGl(page)
@@ -199,7 +190,6 @@ test('a vertical swipe on the stage scrolls the page', async ({ page, errors }, 
   await cdp.send('Input.synthesizeScrollGesture', { x, y, yDistance: -300, gestureSourceType: 'touch', speed: 800 })
 
   expect(await page.evaluate(() => scrollY)).toBeGreaterThan(before + 100)
-  await expect(stage(page)).toHaveAttribute('data-yaw', '0')
   expect(errors).toEqual([])
 })
 
@@ -353,5 +343,163 @@ test('the P1 row fills with a bar as wide as the row', async ({ page, errors }, 
   })
 
   expect(sizes[0]).toBe(sizes[1])
+  expect(errors).toEqual([])
+})
+
+test('the pole lap runs: the clock moves and S1 fills with its real split', async ({ page, errors }) => {
+  await withPole(page)
+
+  const first = page.locator('.weekend-page .replay .splits li').first()
+
+  await page.clock.runFor(25_000)
+  await expect(first).toHaveAttribute('data-state', 'done')
+  await expect(first.locator('b')).toHaveText(POLE.sectors[0].toFixed(3))
+  expect(seconds(await lapClock(page).textContent())).toBeGreaterThan(POLE.sectors[0])
+  expect(errors).toEqual([])
+})
+
+test('the car first appears on the line with the lap clock at zero', async ({ page, errors }) => {
+  await page.addInitScript(() => {
+    new MutationObserver(() => {
+      const root = document.documentElement
+
+      if (root.dataset.firstClock !== undefined || !document.querySelector('.weekend-page .band .car[data-on]')) return
+
+      root.dataset.firstClock = document.querySelector('.weekend-page .replay .lapclock')?.textContent ?? ''
+    }).observe(document, { subtree: true, attributes: true, attributeFilter: ['data-on'] })
+  })
+  await withPole(page)
+  await expect(page.locator('html')).toHaveAttribute('data-first-clock', /\d/)
+  expect(seconds(await page.locator('html').getAttribute('data-first-clock'))).toBeLessThan(0.1)
+  expect(errors).toEqual([])
+})
+
+test('the car and its readout fade in instead of popping in', async ({ page, errors }) => {
+  await page.addInitScript(() => {
+    const seen = new Set<Element>()
+
+    new MutationObserver(() => {
+      for (const el of document.querySelectorAll('.weekend-page .band .car, .weekend-page .band .readout')) {
+        const style = getComputedStyle(el)
+
+        if (seen.has(el) || style.visibility !== 'visible') continue
+
+        seen.add(el)
+        document.documentElement.dataset.firstOpacity = `${document.documentElement.dataset.firstOpacity ?? ''}${style.opacity};`
+      }
+    }).observe(document, { subtree: true, attributes: true, attributeFilter: ['style', 'data-on'] })
+  })
+  await withPole(page)
+  await expect(page.locator('html')).toHaveAttribute('data-first-opacity', /^[\d.]+;[\d.]+;$/)
+
+  const first = (await page.locator('html').getAttribute('data-first-opacity')) ?? ''
+
+  expect(first.split(';').filter(Boolean).map(Number)).toEqual([0, 0])
+  await expect(car(page)).toHaveCSS('opacity', '1')
+  await expect(page.locator('.weekend-page .band .readout')).toHaveCSS('opacity', '1')
+  expect(errors).toEqual([])
+})
+
+test('hovering the track snaps the car and the clock jumps', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await withPole(page)
+  await expect(car(page)).toBeVisible()
+
+  const before = await lapClock(page).textContent()
+
+  await snapsTo(page, 14)
+  await expect(lapClock(page)).not.toHaveText(before ?? '')
+
+  const head = await centreOf(page, '.weekend-page .band .car .head')
+  const tail = await centreOf(page, '.weekend-page .band .car i:last-child')
+
+  expect(Math.hypot(tail.x - head.x, tail.y - head.y)).toBeLessThan(80)
+  await expect(stage(page)).toHaveCSS('cursor', 'pointer')
+  expect(errors).toEqual([])
+})
+
+test('hover still snaps after the window is resized', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await withPole(page)
+  await snapsTo(page, 14)
+
+  await page.setViewportSize({ width: 1100, height: 760 })
+  await stage(page).scrollIntoViewIfNeeded()
+  await page.waitForTimeout(600)
+  await snapsTo(page, 6)
+  expect(errors).toEqual([])
+})
+
+test('reduced motion shows the finished lap as a still', async ({ page, errors }) => {
+  await withPole(page, '/weekend?reduced')
+
+  await expect(lapClock(page)).toHaveText('1:27.470')
+  await expect(page.locator('.weekend-page .replay .splits li[data-state="done"]')).toHaveCount(3)
+  await expect(car(page)).toHaveCount(0)
+  await expect(page.locator('.weekend-page .band .readout')).toHaveCount(0)
+  expect(errors).toEqual([])
+})
+
+test('tapping a turn on a phone jumps the replay to it', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'phone')
+  await withPole(page)
+
+  const turn = page.locator('.weekend-page [data-pin="turn-8"]')
+  const { x, y } = await ring(page, 8)
+
+  await page.touchscreen.tap(x, y)
+  await expect(turn).toHaveAttribute('data-hit', '')
+  await expect(turn.locator('[data-apex]')).toContainText('km/h')
+
+  const inside = await stage(page).evaluate((el) => {
+    const box = el.getBoundingClientRect()
+    const card = el.querySelector('.readout')?.getBoundingClientRect()
+
+    return card !== undefined && card.left >= box.left - 1 && card.right <= box.right + 1 && card.top >= box.top - 1 && card.bottom <= box.bottom + 1
+  })
+
+  expect(inside).toBe(true)
+  expect(errors).toEqual([])
+})
+
+test("no stored lap keeps today's band", async ({ page, errors }) => {
+  await withGl(page)
+
+  await expect(page.locator('.weekend-page .replay')).toHaveCount(0)
+  await expect(page.locator('.weekend-page .band .credit')).not.toContainText('OpenF1')
+  expect(errors).toEqual([])
+})
+
+test('the replay pauses off screen', async ({ page, errors }) => {
+  await withPole(page)
+  await expect(car(page)).toBeVisible()
+  await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 1000)
+
+  const before = seconds(await lapClock(page).textContent())
+
+  await page.evaluate(() => scrollTo(0, 0))
+  await expect(stage(page)).not.toBeInViewport()
+  await page.waitForTimeout(300)
+  await page.clock.runFor(2000)
+  await stage(page).scrollIntoViewIfNeeded()
+  await page.waitForTimeout(300)
+
+  expect(Math.abs(seconds(await lapClock(page).textContent()) - before)).toBeLessThan(0.1)
+  expect(errors).toEqual([])
+})
+
+test('clicking the track opens the explorer there', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await withPole(page)
+
+  const { x, y } = await snapsTo(page, 14)
+
+  await page.mouse.click(x, y)
+  await expect(page).toHaveURL(/\/lap\/interlagos\?at=0\.\d{4}$/)
+  await expect(page.locator('.lap')).toHaveAttribute('data-ready', '', { timeout: 20_000 })
+
+  const at = Number(new URL(page.url()).searchParams.get('at'))
+
+  await expect.poll(async () => Math.abs(Number(await page.locator('[data-km]').textContent()) - at * 4.309)).toBeLessThan(0.2)
   expect(errors).toEqual([])
 })

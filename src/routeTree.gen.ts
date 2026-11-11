@@ -14,6 +14,7 @@ import { Route as SeasonRouteImport } from './routes/season'
 import { Route as WeekendRouteImport } from './routes/weekend'
 import { Route as ApiSeasonRouteImport } from './routes/api/season'
 import { Route as LapCircuitRouteImport } from './routes/lap.$circuit'
+import { Route as ApiPoleCircuitRouteImport } from './routes/api/pole.$circuit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +41,11 @@ const LapCircuitRoute = LapCircuitRouteImport.update({
   path: '/lap/$circuit',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPoleCircuitRoute = ApiPoleCircuitRouteImport.update({
+  id: '/api/pole/$circuit',
+  path: '/api/pole/$circuit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
   '/lap/$circuit': typeof LapCircuitRoute
+  '/api/pole/$circuit': typeof ApiPoleCircuitRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
   '/lap/$circuit': typeof LapCircuitRoute
+  '/api/pole/$circuit': typeof ApiPoleCircuitRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,14 +70,33 @@ export interface FileRoutesById {
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
   '/lap/$circuit': typeof LapCircuitRoute
+  '/api/pole/$circuit': typeof ApiPoleCircuitRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/season' | '/weekend' | '/api/season' | '/lap/$circuit'
+  fullPaths:
+    | '/'
+    | '/season'
+    | '/weekend'
+    | '/api/season'
+    | '/lap/$circuit'
+    | '/api/pole/$circuit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/season' | '/weekend' | '/api/season' | '/lap/$circuit'
+  to:
+    | '/'
+    | '/season'
+    | '/weekend'
+    | '/api/season'
+    | '/lap/$circuit'
+    | '/api/pole/$circuit'
   id:
-    '__root__' | '/' | '/season' | '/weekend' | '/api/season' | '/lap/$circuit'
+    | '__root__'
+    | '/'
+    | '/season'
+    | '/weekend'
+    | '/api/season'
+    | '/lap/$circuit'
+    | '/api/pole/$circuit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -78,6 +105,7 @@ export interface RootRouteChildren {
   WeekendRoute: typeof WeekendRoute
   ApiSeasonRoute: typeof ApiSeasonRoute
   LapCircuitRoute: typeof LapCircuitRoute
+  ApiPoleCircuitRoute: typeof ApiPoleCircuitRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -117,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LapCircuitRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/pole/$circuit': {
+      id: '/api/pole/$circuit'
+      path: '/api/pole/$circuit'
+      fullPath: '/api/pole/$circuit'
+      preLoaderRoute: typeof ApiPoleCircuitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -126,6 +161,7 @@ const rootRouteChildren: RootRouteChildren = {
   WeekendRoute: WeekendRoute,
   ApiSeasonRoute: ApiSeasonRoute,
   LapCircuitRoute: LapCircuitRoute,
+  ApiPoleCircuitRoute: ApiPoleCircuitRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

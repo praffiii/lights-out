@@ -9,6 +9,13 @@ export const SNAPSHOT_AT = new Date('2026-11-06T15:00:00Z')
 export const stubSeason = (page: Page, response: { status: number; body: string } = { status: 200, body: snapshot }) =>
   page.route('**/api/season', (route) => route.fulfill({ status: response.status, contentType: 'application/json', body: response.body }))
 
+export const stubPole = (page: Page, id: string | null) =>
+  page.route('**/api/pole/*', (route) =>
+    id === null
+      ? route.fulfill({ status: 204 })
+      : route.fulfill({ status: 200, contentType: 'application/json', body: readFileSync(`test/fixtures/pole/${id}.json`, 'utf8') }),
+  )
+
 export const watchErrors = (page: Page) => {
   const errors: string[] = []
 
@@ -53,6 +60,7 @@ export const test = base.extend<{ errors: string[] }>({
   errors: async ({ page }, use) => {
     await page.clock.install({ time: SNAPSHOT_AT })
     await stubSeason(page)
+    await stubPole(page, null)
     await use(watchErrors(page))
   },
 })

@@ -9,7 +9,7 @@ import { Go } from '#/shell/Go.tsx'
 
 const Explorer = lazy(() => import('./Explorer.tsx'))
 
-export function LapPage({ circuit }: { circuit: string }) {
+export function LapPage({ circuit, start }: { circuit: string; start: number }) {
   const info = circuitFor(circuit)
   const router = useRouter()
   const canGoBack = useCanGoBack()
@@ -61,7 +61,7 @@ export function LapPage({ circuit }: { circuit: string }) {
       {mounted && !failed ? (
         <CircuitGuard onError={broke}>
           <Suspense fallback={null}>
-            <Explorer info={info} stage={stage} onReady={shown} onFail={broke} />
+            <Explorer info={info} start={start} stage={stage} onReady={shown} onFail={broke} />
           </Suspense>
         </CircuitGuard>
       ) : null}
