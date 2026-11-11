@@ -1,7 +1,7 @@
 import { type CSSProperties, type RefObject, useEffect, useLayoutEffect, useRef } from 'react'
 
 import type { Replay } from '#/circuits/Circuit.tsx'
-import { gsap, REDUCED } from '#/motion/motion.ts'
+import { gsap, onEnter, REDUCED } from '#/motion/motion.ts'
 import { advance, apexes, clock, nearest, nearestTurn, pointAt, sampleAt, splits, timeAt } from '#/pole/replay.ts'
 import type { PoleLap } from '#/pole/schema.ts'
 
@@ -57,6 +57,7 @@ export function PoleHud({ lap, gp, stage, pins, replay, onPick }: Props) {
     let scrub: number | null = null
     let lit = -1
     let seen = false
+    let entered = false
     let ticking = false
     let pinEls: HTMLElement[] = []
 
@@ -131,13 +132,13 @@ export function PoleHud({ lap, gp, stage, pins, replay, onPick }: Props) {
     }
 
     const tick = (_time: number, dtMs: number) => {
-      if (scrub === null) state = advance(state, dtMs / 1000, lap.time)
+      if (scrub === null && car.current?.hasAttribute('data-on')) state = advance(state, dtMs / 1000, lap.time)
 
       draw()
     }
 
     const sync = () => {
-      const run = seen && !document.hidden
+      const run = seen && entered && !document.hidden
 
       replay.running.current = run
 
@@ -198,6 +199,11 @@ export function PoleHud({ lap, gp, stage, pins, replay, onPick }: Props) {
     observer.observe(el)
     document.addEventListener('visibilitychange', sync)
 
+    const off = onEnter(() => {
+      entered = true
+      sync()
+    })
+
     if (!REDUCED) {
       el.addEventListener('pointermove', onMove)
       el.addEventListener('pointerleave', onLeave)
@@ -205,6 +211,7 @@ export function PoleHud({ lap, gp, stage, pins, replay, onPick }: Props) {
     }
 
     return () => {
+      off()
       observer.disconnect()
       document.removeEventListener('visibilitychange', sync)
       el.removeEventListener('pointermove', onMove)

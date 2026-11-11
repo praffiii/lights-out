@@ -358,6 +358,22 @@ test('the pole lap runs: the clock moves and S1 fills with its real split', asyn
   expect(errors).toEqual([])
 })
 
+test('the car first appears on the line with the lap clock at zero', async ({ page, errors }) => {
+  await page.addInitScript(() => {
+    new MutationObserver(() => {
+      const root = document.documentElement
+
+      if (root.dataset.firstClock !== undefined || !document.querySelector('.weekend-page .band .car[data-on]')) return
+
+      root.dataset.firstClock = document.querySelector('.weekend-page .replay .lapclock')?.textContent ?? ''
+    }).observe(document, { subtree: true, attributes: true, attributeFilter: ['data-on'] })
+  })
+  await withPole(page)
+  await expect(page.locator('html')).toHaveAttribute('data-first-clock', /\d/)
+  expect(seconds(await page.locator('html').getAttribute('data-first-clock'))).toBeLessThan(0.1)
+  expect(errors).toEqual([])
+})
+
 test('the car and its readout fade in instead of popping in', async ({ page, errors }) => {
   await page.addInitScript(() => {
     const seen = new Set<Element>()
