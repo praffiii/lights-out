@@ -5,7 +5,7 @@ import { PHOTOS } from '#/home/content.ts'
 import { useSecond, useZone } from '#/motion/client.ts'
 import { block, gsap, ONCE, onEnter, REDUCED, reveal, roll, ScrollTrigger, sweep, useGSAP } from '#/motion/motion.ts'
 import { seasonQueryOptions, useSeason } from '#/season/use-season.ts'
-import { Soon } from '#/shell/Go.tsx'
+import { Go } from '#/shell/Go.tsx'
 import { waitFor } from '#/shell/Loader.tsx'
 
 import { Days } from './Days.tsx'
@@ -79,7 +79,9 @@ export function RaceWeekend() {
       <section className="opening" aria-labelledby="h1">
         <div className="top">
           <p className="mono muted label">How F1 works · Chapter 01 · 5 min</p>
-          <Soon className="mono nav">02 How overtaking works</Soon>
+          <Go to="/chapters/overtaking" className="mono nav">
+            02 How overtaking works →
+          </Go>
         </div>
         <h1 id="h1" className="display">
           <span className="hl">Three days.</span>
@@ -102,7 +104,7 @@ export function RaceWeekend() {
       {live?.circuit ? <PoleBand info={live.circuit} /> : null}
       <Ladder line={live?.ladder ?? null} />
       <Words keys={RACE_WEEKEND_WORDS} />
-      <Next n="02" min={5} title="How overtaking works." line="Why a pass starts a lap early" photo={next} to={null} />
+      <Next n="02" min={5} title="How overtaking works." line="Why a pass starts a lap early" photo={next} to="/chapters/overtaking" />
     </div>
   )
 }

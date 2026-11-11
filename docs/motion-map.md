@@ -120,7 +120,7 @@ From here on the pages are planned, not built. Read every "rises", "types on" an
 | Index (dark, 23 renders) | The headline rises. | The render swaps to its sector-coloured version and the name types on, 240 ms. A photo preview follows the cursor. | The tiles fade up row by row. |
 | Circuit page header | The name rises; the caption types on. | None | None |
 | Circuit band (Suzuka convention) | None | Layer chips (corners, sectors, speed trap, Overtake detection) toggle their layer with a 240 ms fade. | The 3D lap scrubs as on Home. The stat column counts up. |
-| Overtaking replay map | None | None | Pinned. Scroll drives the cars along the road. The detection line draws in purple when the chaser crosses it. |
+| Overtaking replay map | None | None | Pinned. Scroll drives the cars along the road. The detection line draws in purple when the chaser crosses it. Drag the timeline or ← → to step; the scroll follows. |
 
 ## The people
 

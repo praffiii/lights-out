@@ -242,3 +242,11 @@ test("Home's chapter 01 row leads to chapter 01", async ({ page, errors }) => {
   await expect(page.locator('.rows li').first().getByRole('link')).toHaveAttribute('href', '/chapters/race-weekend')
   expect(errors).toEqual([])
 })
+
+test("Home's chapter 02 row leads to chapter 02", async ({ page, errors }) => {
+  await page.goto('/')
+  await expect(page.locator('.loader')).toHaveCount(0, { timeout: LOADER_MS })
+
+  await expect(page.locator('.rows li:nth-child(2) a')).toHaveAttribute('href', '/chapters/overtaking')
+  expect(errors).toEqual([])
+})
