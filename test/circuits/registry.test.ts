@@ -28,3 +28,7 @@ it('gives every circuit a phone crop inside the poster', () => {
     expect(crop[2] - crop[0]).toBeGreaterThan(0.4)
   }
 })
+
+it('names every circuit by its registry id', () => {
+  for (const id of ['interlagos', 'vegas', 'losail', 'yas_marina', 'albert_park']) expect(circuitFor(id)?.id).toBe(id)
+})

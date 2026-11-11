@@ -26,6 +26,7 @@ export type CircuitFacts = {
 }
 
 export type CircuitInfo = {
+  id: string
   model: string
   name: string
   gp: string
@@ -101,9 +102,9 @@ const CIRCUITS = {
     crop: cropOf(au1953),
     cuts: [0.328, 0.6],
   },
-} satisfies Record<string, CircuitInfo>
+} satisfies Record<string, Omit<CircuitInfo, 'id'>>
 
-const byId = new Map<string, CircuitInfo>(Object.entries(CIRCUITS))
+const byId = new Map<string, CircuitInfo>(Object.entries(CIRCUITS).map(([id, c]) => [id, { ...c, id }]))
 
 export const circuitFor = (circuitId: string) => byId.get(circuitId)
 

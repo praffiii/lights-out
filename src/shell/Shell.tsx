@@ -1,12 +1,12 @@
 import { Outlet, useRouter, useRouterState } from '@tanstack/react-router'
 import type Lenis from 'lenis'
 import { ReactLenis, useLenis } from 'lenis/react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import { useMounted } from '#/motion/client.ts'
 import { enter, gsap, leave, REDUCED, ScrollTrigger } from '#/motion/motion.ts'
 
-import { ShellContext, type To } from './context.ts'
+import { type Dive, ShellContext, type To } from './context.ts'
 import { Footer } from './Footer.tsx'
 import { Header } from './Header.tsx'
 import { Loader } from './Loader.tsx'
@@ -16,6 +16,19 @@ import { useTheme } from './theme.ts'
 function scrollTop(lenis: Lenis | undefined, immediate: boolean) {
   if (lenis) lenis.scrollTo(0, { immediate, force: true })
   else window.scrollTo({ top: 0, behavior: immediate || REDUCED ? 'instant' : 'smooth' })
+}
+
+const FULL = 'inset(0px 0px 0px 0px)'
+
+const inset = ({ top, right, bottom, left }: Dive['rect']) => `inset(${top}px ${innerWidth - right}px ${innerHeight - bottom}px ${left}px)`
+
+const place = ({ left, top, width, height }: Dive['image']) => ({ backgroundSize: `${width}px ${height}px`, backgroundPosition: `${left}px ${top}px` })
+
+const spread = ({ width, height }: Dive['image']) => {
+  const w = Math.max(innerWidth, (innerHeight * width) / height)
+  const h = (w * height) / width
+
+  return place({ left: (innerWidth - w) / 2, top: (innerHeight - h) / 2, width: w, height: h })
 }
 
 export function Shell() {
@@ -28,6 +41,9 @@ export function Shell() {
   const main = useRef<HTMLElement>(null)
   const sweepBar = useRef<HTMLDivElement>(null)
   const busy = useRef(false)
+  const veil = useRef<HTMLDivElement>(null)
+  const left = useRef<{ path: string; y: number; dive: Dive | undefined } | null>(null)
+  const bare = path.startsWith('/lap/')
 
   useEffect(() => {
     if (theme) document.documentElement.dataset.theme = theme
@@ -81,7 +97,7 @@ export function Shell() {
   }, [menuOpen, lenis])
 
   const go = useCallback(
-    async (to: To) => {
+    async (to: To, dive?: Dive) => {
       if (busy.current) return
 
       if (to === path) {
@@ -94,9 +110,14 @@ export function Shell() {
       busy.current = true
 
       const line = sweepBar.current
-      const page = [main.current, document.querySelector('.footer')]
+      const cover = veil.current
+      const page = [main.current, document.querySelector('.footer')].filter((el) => el !== null)
+      const diving = dive !== undefined && !REDUCED && cover !== null
 
-      if (!REDUCED && line) {
+      if (diving) {
+        gsap.set(cover, { autoAlpha: 0, clipPath: inset(dive.rect), backgroundImage: `url("${dive.poster}")`, ...place(dive.image) })
+        await Promise.all([gsap.to(cover, { autoAlpha: 1, duration: 0.18, ease: 'power1.out' }), gsap.to(cover, { clipPath: FULL, ...spread(dive.image), duration: 0.8, ease: 'launch' })])
+      } else if (!REDUCED && line) {
         gsap.set(line, { transformOrigin: 'left center' })
         await Promise.all([
           gsap.to(line, { scaleX: 1, duration: 0.32, ease: 'launch' }),
@@ -104,15 +125,18 @@ export function Shell() {
         ])
       }
 
+      if (to.startsWith('/lap/')) left.current = { path, y: scrollY, dive: diving ? dive : undefined }
+
       leave()
       setMenuOpen(false)
-      await router.navigate({ to })
+      await router.navigate({ href: to })
       scrollTop(lenis, true)
       ScrollTrigger.refresh()
       gsap.set(page, { autoAlpha: 1 })
       enter()
 
-      if (!REDUCED && line) {
+      if (diving) await gsap.to(cover, { autoAlpha: 0, duration: 0.35, delay: 0.1, ease: 'power1.out' })
+      else if (!REDUCED && line) {
         gsap.set(line, { transformOrigin: 'right center' })
         await gsap.to(line, { scaleX: 0, duration: 0.3, ease: 'launch' })
       }
@@ -122,22 +146,61 @@ export function Shell() {
     [path, router, lenis],
   )
 
-  const api = useMemo(() => ({ go }), [go])
+  const surface = useCallback(async () => {
+    const cover = veil.current
+    const dive = left.current?.dive
+
+    if (REDUCED || !cover || !dive) return
+
+    await Promise.all(gsap.getTweensOf(cover))
+    gsap.set(cover, { autoAlpha: 0, clipPath: FULL, backgroundImage: `url("${dive.poster}")`, ...spread(dive.image) })
+    await gsap.to(cover, { autoAlpha: 1, duration: 0.3, ease: 'power1.inOut' })
+  }, [])
+
+  useLayoutEffect(() => {
+    const back = left.current
+    const cover = veil.current
+    const dive = back?.dive
+
+    if (!back || back.path !== path) return
+
+    left.current = null
+
+    const shrink = !REDUCED && cover !== null && dive !== undefined
+
+    if (shrink) gsap.set(cover, { autoAlpha: 1 })
+
+    requestAnimationFrame(() => {
+      scrollTo({ top: back.y, behavior: 'instant' })
+      ScrollTrigger.refresh()
+
+      for (const seen of ScrollTrigger.getAll()) if (!seen.vars.scrub && seen.start <= scrollY) seen.animation?.progress(1)
+
+      if (shrink) gsap.timeline().to(cover, { clipPath: inset(dive.rect), ...place(dive.image), duration: 0.8, ease: 'launch' }).to(cover, { autoAlpha: 0, duration: 0.35, ease: 'power1.out' })
+    })
+  }, [path])
+
+  const api = useMemo(() => ({ go, surface }), [go, surface])
   const closeMenu = useCallback(() => setMenuOpen(false), [])
 
   return (
     <ShellContext.Provider value={api}>
-      {mounted && !REDUCED && <ReactLenis root options={{ autoRaf: false, lerp: 0.1, anchors: true }} />}
+      {mounted && !REDUCED && !bare && <ReactLenis root options={{ autoRaf: false, lerp: 0.1, anchors: true }} />}
       <a className="skip" href="#main">
         Skip to content
       </a>
       <Loader />
-      <Header menuOpen={menuOpen} onMenu={() => setMenuOpen((o) => !o)} home={path === '/'} />
-      <Menu open={menuOpen} onClose={closeMenu} path={path} />
+      {bare ? null : (
+        <>
+          <Header menuOpen={menuOpen} onMenu={() => setMenuOpen((o) => !o)} home={path === '/'} />
+          <Menu open={menuOpen} onClose={closeMenu} path={path} />
+        </>
+      )}
       <main id="main" ref={main} tabIndex={-1}>
         <Outlet />
       </main>
-      <Footer />
+      {bare ? null : <Footer />}
+      <div className="veil" ref={veil} aria-hidden />
       <div className="sweep" ref={sweepBar} aria-hidden />
     </ShellContext.Provider>
   )
