@@ -1,4 +1,4 @@
-import { type CSSProperties, lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
+import { type CSSProperties, lazy, type ReactNode, type RefObject, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 
 import { grandPrix } from '#/circuits/calendar.ts'
 import type { Replay } from '#/circuits/Circuit.tsx'
@@ -7,6 +7,7 @@ import { fitSpin } from '#/circuits/fit.ts'
 import type { CircuitInfo } from '#/circuits/registry.ts'
 import { useMedia } from '#/motion/client.ts'
 import { gsap, REDUCED } from '#/motion/motion.ts'
+import type { Focus } from '#/pass/model.ts'
 import type { PoleLap } from '#/pole/schema.ts'
 import { usePoleLap } from '#/pole/use-pole-lap.ts'
 import { useShell } from '#/shell/context.ts'
@@ -30,6 +31,8 @@ type Vars = CSSProperties & Record<`--${string}`, number | string>
 
 export const stageCredit = (lap: PoleLap | null) => (lap ? CREDIT + TELEMETRY : CREDIT)
 
+export const TELEMETRY_CREDIT = CREDIT + TELEMETRY
+
 export function useNearLap(id: string) {
   const [near, setNear] = useState(false)
   const onNear = useCallback(() => setNear(true), [])
@@ -38,18 +41,31 @@ export function useNearLap(id: string) {
   return { near, onNear, lap }
 }
 
-export function CircuitStage({ info, near, lap, onNear }: { info: CircuitInfo; near: boolean; lap: PoleLap | null; onNear: () => void }) {
+type Hud = (ctx: { stage: RefObject<HTMLDivElement | null>; replay: Replay; ready: boolean }) => ReactNode
+
+type Props = {
+  info: CircuitInfo
+  near: boolean
+  lap: PoleLap | null
+  onNear: () => void
+  hud?: Hud
+  turns?: ReadonlyArray<{ turn: number; name?: string }>
+  focus?: RefObject<Focus | null>
+}
+
+export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus }: Props) {
   const box = useRef<HTMLDivElement>(null)
   const pins = useRef<HTMLDivElement>(null)
   const fill = useRef(1)
-  const replay = useRef<Replay>({ running: { current: false }, trace: { current: null }, turns: { current: [] } }).current
+  const replay = useRef<Replay>({ running: { current: false }, trace: { current: null }, turns: { current: [] }, focus, bare: hud !== undefined }).current
   const [ready, setReady] = useState(false)
   const [failed, setFailed] = useState(false)
   const [turns, setTurns] = useState(true)
   const [sectors, setSectors] = useState(true)
   const phone = useMedia(PHONE)
   const { go } = useShell()
-  const fit = fitSpin(info.crop, phone ? TALL : WIDE)
+  const [ratio, setRatio] = useState<number | null>(null)
+  const fit = fitSpin(info.crop, ratio ?? (phone ? TALL : WIDE))
   const vars: Vars = { '--w': fit.w, '--h': fit.h, '--x': fit.x, '--y': fit.y }
   const poster = `/circuits/${info.model}`
 
@@ -64,6 +80,18 @@ export function CircuitStage({ info, near, lap, onNear }: { info: CircuitInfo; n
 
     return () => observer.disconnect()
   }, [onNear])
+
+  useEffect(() => {
+    const el = box.current
+
+    if (!el) return
+
+    const observer = new ResizeObserver(() => el.clientHeight > 0 && setRatio(el.clientWidth / el.clientHeight))
+
+    observer.observe(el)
+
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => () => void gsap.killTweensOf(fill), [])
 
@@ -110,7 +138,7 @@ export function CircuitStage({ info, near, lap, onNear }: { info: CircuitInfo; n
           <div className="gl">
             <CircuitGuard onError={() => setFailed(true)}>
               <Suspense fallback={null}>
-                <Circuit model={info.model} layout="spin" fill={fill} pins={pins} replay={lap ? replay : undefined} onReady={() => setReady(true)} />
+                <Circuit model={info.model} layout="spin" fill={fill} pins={pins} replay={lap || hud ? replay : undefined} onReady={() => setReady(true)} />
               </Suspense>
             </CircuitGuard>
           </div>
@@ -118,35 +146,43 @@ export function CircuitStage({ info, near, lap, onNear }: { info: CircuitInfo; n
         <div className="pins" ref={pins} aria-hidden>
           {info.pins.map((pin) => {
             const place: Vars = { '--px': pin.x, '--py': pin.y }
+            const kept = only?.find((t) => t.turn === pin.turn)
+            const name = only ? kept?.name : info.corner?.turn === pin.turn ? info.corner.name : undefined
+
+            if (only && !kept) return null
 
             return (
               <span key={pin.turn} className="turn" data-pin={`turn-${pin.turn}`} style={place}>
                 <b className="mono">{String(pin.turn).padStart(2, '0')}</b>
-                {info.corner?.turn === pin.turn ? <i className="mono">{info.corner.name}</i> : null}
+                {name ? <i className="mono">{name}</i> : null}
                 <em className="mono" data-apex />
               </span>
             )
           })}
         </div>
-        {lap ? <PoleHud lap={lap} gp={grandPrix(info.gp)} stage={box} pins={pins} replay={replay} onPick={pick} /> : null}
+        {hud ? hud({ stage: box, replay, ready }) : lap ? <PoleHud lap={lap} gp={grandPrix(info.gp)} stage={box} pins={pins} replay={replay} onPick={pick} /> : null}
       </div>
-      <div className="mono toggles">
-        <button type="button" aria-pressed={turns} onClick={() => setTurns((on) => !on)}>
-          <i aria-hidden />
-          Turns
-        </button>
-        <button type="button" aria-pressed={sectors} disabled={!ready || failed} onClick={toggleSectors}>
-          <i aria-hidden />
-          Sectors
-        </button>
-      </div>
-      <Go
-        to={`/lap/${info.id}`}
-        className="mono explore"
-        dive={dive}
-      >
-        Explore the lap in 3D
-      </Go>
+      {hud ? null : (
+        <>
+          <div className="mono toggles">
+            <button type="button" aria-pressed={turns} onClick={() => setTurns((on) => !on)}>
+              <i aria-hidden />
+              Turns
+            </button>
+            <button type="button" aria-pressed={sectors} disabled={!ready || failed} onClick={toggleSectors}>
+              <i aria-hidden />
+              Sectors
+            </button>
+          </div>
+          <Go
+            to={`/lap/${info.id}`}
+            className="mono explore"
+            dive={dive}
+          >
+            Explore the lap in 3D
+          </Go>
+        </>
+      )}
     </>
   )
 }

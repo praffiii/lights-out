@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SeasonRouteImport } from './routes/season'
 import { Route as WeekendRouteImport } from './routes/weekend'
 import { Route as ApiSeasonRouteImport } from './routes/api/season'
+import { Route as ChaptersOvertakingRouteImport } from './routes/chapters.overtaking'
 import { Route as ChaptersRaceWeekendRouteImport } from './routes/chapters.race-weekend'
 import { Route as LapCircuitRouteImport } from './routes/lap.$circuit'
 import { Route as ApiPoleCircuitRouteImport } from './routes/api/pole.$circuit'
@@ -37,6 +38,11 @@ const ApiSeasonRoute = ApiSeasonRouteImport.update({
   path: '/api/season',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChaptersOvertakingRoute = ChaptersOvertakingRouteImport.update({
+  id: '/chapters/overtaking',
+  path: '/chapters/overtaking',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChaptersRaceWeekendRoute = ChaptersRaceWeekendRouteImport.update({
   id: '/chapters/race-weekend',
   path: '/chapters/race-weekend',
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
+  '/chapters/overtaking': typeof ChaptersOvertakingRoute
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
   '/lap/$circuit': typeof LapCircuitRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
+  '/chapters/overtaking': typeof ChaptersOvertakingRoute
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
   '/lap/$circuit': typeof LapCircuitRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
+  '/chapters/overtaking': typeof ChaptersOvertakingRoute
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
   '/lap/$circuit': typeof LapCircuitRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/season'
     | '/weekend'
     | '/api/season'
+    | '/chapters/overtaking'
     | '/chapters/race-weekend'
     | '/lap/$circuit'
     | '/api/pole/$circuit'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/season'
     | '/weekend'
     | '/api/season'
+    | '/chapters/overtaking'
     | '/chapters/race-weekend'
     | '/lap/$circuit'
     | '/api/pole/$circuit'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/season'
     | '/weekend'
     | '/api/season'
+    | '/chapters/overtaking'
     | '/chapters/race-weekend'
     | '/lap/$circuit'
     | '/api/pole/$circuit'
@@ -116,6 +128,7 @@ export interface RootRouteChildren {
   SeasonRoute: typeof SeasonRoute
   WeekendRoute: typeof WeekendRoute
   ApiSeasonRoute: typeof ApiSeasonRoute
+  ChaptersOvertakingRoute: typeof ChaptersOvertakingRoute
   ChaptersRaceWeekendRoute: typeof ChaptersRaceWeekendRoute
   LapCircuitRoute: typeof LapCircuitRoute
   ApiPoleCircuitRoute: typeof ApiPoleCircuitRoute
@@ -151,6 +164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSeasonRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/chapters/overtaking': {
+      id: '/chapters/overtaking'
+      path: '/chapters/overtaking'
+      fullPath: '/chapters/overtaking'
+      preLoaderRoute: typeof ChaptersOvertakingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/chapters/race-weekend': {
       id: '/chapters/race-weekend'
       path: '/chapters/race-weekend'
@@ -180,6 +200,7 @@ const rootRouteChildren: RootRouteChildren = {
   SeasonRoute: SeasonRoute,
   WeekendRoute: WeekendRoute,
   ApiSeasonRoute: ApiSeasonRoute,
+  ChaptersOvertakingRoute: ChaptersOvertakingRoute,
   ChaptersRaceWeekendRoute: ChaptersRaceWeekendRoute,
   LapCircuitRoute: LapCircuitRoute,
   ApiPoleCircuitRoute: ApiPoleCircuitRoute,

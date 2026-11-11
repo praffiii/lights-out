@@ -79,6 +79,19 @@ test('the pole band replays Interlagos and shows a still under reduced motion', 
   expect(errors).toEqual([])
 })
 
+test('chapter 01 leads on to chapter 02', async ({ page, errors }) => {
+  await loaded(page)
+
+  await expect(chapter(page, '.opening').getByRole('link', { name: /02 How overtaking works/ })).toHaveAttribute('href', '/chapters/overtaking')
+
+  const card = chapter(page, '.next').getByRole('link', { name: /Why a pass starts a lap early/ })
+
+  await expect(card).toHaveAttribute('href', '/chapters/overtaking')
+  await card.click()
+  await expect(page.locator('.overtaking-page h1')).toHaveText('Every pass starts longbefore the corner.')
+  expect(errors).toEqual([])
+})
+
 test('a 503 still teaches the weekend', async ({ page, errors }) => {
   await stubSeason(page, { status: 503, body: JSON.stringify({ status: 'warming' }) })
   await loaded(page)

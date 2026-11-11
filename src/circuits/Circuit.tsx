@@ -6,6 +6,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 import { turnLaps } from '#/lap/drive.ts'
 import { gsap, REDUCED } from '#/motion/motion.ts'
+import type { Focus } from '#/pass/model.ts'
 
 import { lapProfile } from './lap.ts'
 import { allCircuits } from './registry.ts'
@@ -23,6 +24,11 @@ const TAG_OFFSET = [-8, 8] as const
 const SMALL = 600
 const NEAR = 0.25
 const PHONE = '(max-width: 760px)'
+const LOOK = 0.012
+const YAW = 0.55
+const PITCH = 0.62
+const UP = new THREE.Vector3(0, 1, 0)
+const LABEL = /-label/
 
 const meshopt = (loader: GLTFLoader) => void loader.setMeshoptDecoder(MeshoptDecoder)
 
@@ -44,6 +50,8 @@ export type Replay = {
   running: RefObject<boolean>
   trace: RefObject<Float32Array | null>
   turns: RefObject<ReadonlyArray<{ turn: number; u: number }>>
+  focus?: RefObject<Focus | null>
+  bare?: boolean
 }
 
 type Props = {
@@ -197,6 +205,22 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
     if (replay) replay.turns.current = turns
   }, [replay, turns])
 
+  useEffect(() => {
+    if (!replay?.bare) return
+
+    const hidden: THREE.Object3D[] = []
+
+    gltf.scene.traverse((o) => {
+      if (LABEL.test(o.name) && o.visible) hidden.push(o)
+    })
+
+    for (const o of hidden) o.visible = false
+
+    return () => {
+      for (const o of hidden) o.visible = true
+    }
+  }, [gltf, replay])
+
   useEffect(
     () => () => {
       light.geometry.dispose()
@@ -218,13 +242,42 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
       camera.near = rest.at.distanceTo(rest.aim) * NEAR
       camera.far = rest.far
 
+      const focus = replay?.focus?.current
+
+      if (focus) {
+        const d0 = rest.at.distanceTo(rest.aim)
+        const dist = d0 / focus.k
+
+        sample(focus.u * n, spot)
+        sample(focus.u * n - LOOK * n, back)
+        sample(focus.u * n + LOOK * n, ahead)
+        heading.subVectors(ahead, back).setY(0).normalize()
+        side.crossVectors(heading, UP).normalize()
+        chase.copy(heading).multiplyScalar(-Math.cos(YAW)).addScaledVector(side, Math.sin(YAW)).multiplyScalar(Math.cos(PITCH)).addScaledVector(UP, Math.sin(PITCH)).normalize()
+        view.subVectors(rest.at, rest.aim).normalize().lerp(chase, focus.w).normalize()
+        target.copy(rest.aim).lerp(spot, focus.w)
+
+        camera.clearViewOffset()
+        camera.aspect = size.width / size.height
+        camera.near = dist * NEAR * 0.2
+        camera.updateProjectionMatrix()
+        camera.position.copy(target).addScaledVector(view, dist)
+        camera.lookAt(target)
+        camera.updateMatrixWorld()
+
+        return
+      }
+
       if (layout === 'spin') {
         const fit = fitSpin(rest.crop, size.width / size.height)
         const fullW = fit.w * size.width
         const fullH = fit.h * size.height
 
+        const x = fit.x * size.width + SHIFT_X * fullW
+        const y = fit.y * size.height - SHIFT_Y * fullW
+
         camera.aspect = REST_ASPECT
-        camera.setViewOffset(fullW, fullH, fit.x * size.width + SHIFT_X * fullW, fit.y * size.height - SHIFT_Y * fullW, size.width, size.height)
+        camera.setViewOffset(fullW, fullH, x, y, size.width, size.height)
       } else if (layout === 'wide') {
         const { k, x, y } = fitCrop(rest.crop)
 
@@ -247,6 +300,13 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
 
     const spot = new THREE.Vector3()
     const next = new THREE.Vector3()
+    const back = new THREE.Vector3()
+    const ahead = new THREE.Vector3()
+    const heading = new THREE.Vector3()
+    const side = new THREE.Vector3()
+    const chase = new THREE.Vector3()
+    const view = new THREE.Vector3()
+    const target = new THREE.Vector3()
     const { line } = rest
     const n = line.length
 
@@ -270,6 +330,7 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
     let compiled = false
     let lastFill = -1
     const trace = new Float32Array(n * 2)
+    let framedFocus = ''
 
     const project = () => {
       for (const [i, p] of line.entries()) {
@@ -288,7 +349,12 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
     const tick = (time: number, dt: number) => {
       if (!compiled || (replay && !replay.running.current)) return
 
-      if (camera instanceof THREE.PerspectiveCamera && camera.aspect !== (layout === 'wide' ? size.width / size.height : REST_ASPECT)) stale.current = true
+      const focus = replay?.focus?.current
+      const focusKey = focus ? `${focus.u} ${focus.k} ${focus.w}` : ''
+
+      if (focusKey !== framedFocus) stale.current = true
+
+      if (!focus && camera instanceof THREE.PerspectiveCamera && camera.aspect !== (layout === 'wide' ? size.width / size.height : REST_ASPECT)) stale.current = true
 
       const go = (running?.current ?? false) && !REDUCED
       const moved = fill.current !== lastFill
@@ -297,7 +363,10 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
 
       const framed = stale.current
 
-      if (framed) frame()
+      if (framed) {
+        frame()
+        framedFocus = focusKey
+      }
 
       if (replay) project()
 

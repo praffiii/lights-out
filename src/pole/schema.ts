@@ -54,7 +54,7 @@ export const LocationResponse = Schema.Array(LocationSample)
 
 export const StintsResponse = Schema.Array(Stint)
 
-const Row = Schema.Tuple([Schema.Number, Schema.Number, Schema.Number, Schema.Number, Schema.Number, Schema.Number])
+export const TelemetryRow = Schema.Tuple([Schema.Number, Schema.Number, Schema.Number, Schema.Number, Schema.Number, Schema.Number])
 
 export const PoleLap = Schema.Struct({
   sessionKey: Schema.Number,
@@ -63,11 +63,11 @@ export const PoleLap = Schema.Struct({
   wet: Schema.Boolean,
   time: Schema.Number,
   sectors: Schema.Tuple([Schema.Number, Schema.Number, Schema.Number]),
-  rows: Schema.Array(Row),
+  rows: Schema.Array(TelemetryRow),
 })
 
 export type PoleLap = typeof PoleLap.Type
 
-export type PoleRow = typeof Row.Type
+export type PoleRow = typeof TelemetryRow.Type
 
 export const PoleLapJson = Schema.fromJsonString(PoleLap)

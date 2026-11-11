@@ -518,9 +518,9 @@ test('clicking the track opens the explorer there', async ({ page, errors }, tes
   expect(errors).toEqual([])
 })
 
-test('the teaser leads to chapter 01', async ({ page, errors }) => {
+test('the teaser leads to chapter 02', async ({ page, errors }) => {
   await loaded(page)
 
-  await expect(page.locator('.weekend-page .teaser').getByRole('link', { name: /Read/ })).toHaveAttribute('href', '/chapters/race-weekend')
+  await expect(page.locator('.weekend-page .teaser').getByRole('link', { name: /Read/ })).toHaveAttribute('href', '/chapters/overtaking')
   expect(errors).toEqual([])
 })

@@ -57,6 +57,9 @@ export const fakeOpenF1Service: OpenF1Client['Service'] = {
   location: (key, _driver, from, to) => Effect.succeed(within(poleOf(key)?.location, from, to)),
   stints: (key) => Effect.succeed(poleOf(key)?.stints ?? []),
   drivers: (key) => Effect.succeed(driversOf(key).length > 0 ? driversOf(key) : (poleOf(key)?.drivers ?? [])),
+  overtakes: () => Effect.succeed([]),
+  pits: () => Effect.succeed([]),
+  intervals: () => Effect.succeed([]),
 }
 
 export const fakeOpenF1 = (overrides: Partial<OpenF1Client['Service']> = {}) => Layer.succeed(OpenF1Client, { ...fakeOpenF1Service, ...overrides })
