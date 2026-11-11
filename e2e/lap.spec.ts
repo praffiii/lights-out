@@ -103,8 +103,21 @@ test('cruises by itself once the loader lifts', async ({ page, errors }) => {
 test('a scroll takes the wheel and the light holds still', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'wheel, keys and the wide timeline are desktop input')
   await drive(page)
+
+  const start = await km(page)
+
   await page.mouse.wheel(0, 1400)
-  await page.clock.runFor(4000)
+  await expect
+    .poll(async () => {
+      const before = await km(page)
+
+      await page.clock.runFor(1000)
+
+      const after = await km(page)
+
+      return after > start + 1 && after === before
+    })
+    .toBe(true)
 
   const held = await km(page)
 
