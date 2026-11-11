@@ -19,7 +19,7 @@ const REST_ASPECT = 16 / 10
 const SHIFT_X = -0.06
 const SHIFT_Y = 0.07
 const TAG_OFFSET = [-8, 8] as const
-const SMALL = 900
+const SMALL = 600
 const NEAR = 0.25
 
 const meshopt = (loader: GLTFLoader) => void loader.setMeshoptDecoder(MeshoptDecoder)
@@ -65,7 +65,7 @@ function Scene({ model, layout, fill, pins, onReady, yaw, lap }: Props) {
   const lapped = lap !== undefined
   const onLap = lap?.onLap ?? NO_LAP
   const onLapProgress = lap?.onLapProgress ?? NO_LAP
-  const [small] = useState(() => innerWidth < SMALL)
+  const [small] = useState(() => Math.min(window.screen.width, window.screen.height) < SMALL)
   const url = mapUrl(model, small)
 
   useLoader.preload(THREE.TextureLoader, url)

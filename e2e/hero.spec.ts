@@ -179,6 +179,26 @@ test('the first turn reads 01 on a chip above a ring', async ({ page, errors }) 
   expect(errors).toEqual([])
 })
 
+test.describe('a phone held sideways', () => {
+  test.use({ viewport: { width: 932, height: 430 }, screen: { width: 932, height: 430 } })
+
+  test('still loads the small map', async ({ page, errors }, info) => {
+    test.skip(info.project.name !== 'phone')
+
+    const maps: string[] = []
+
+    page.on('request', (r) => {
+      if (r.url().includes('-map')) maps.push(new URL(r.url()).pathname)
+    })
+    await page.goto('/')
+    await lifted(page)
+    await expect(page.locator('.hero .stage[data-gl]')).toHaveCount(1)
+
+    expect(maps).toEqual(['/circuits/br-1940-map-2048.webp'])
+    expect(errors).toEqual([])
+  })
+})
+
 test('a phone loads the small map and credits it', async ({ page, errors }, info) => {
   test.skip(info.project.name !== 'phone')
 
