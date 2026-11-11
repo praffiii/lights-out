@@ -150,6 +150,10 @@
   .weekend-page .band .figures > div:first-child dd { font-size: 44px; }
   .weekend-page .band .figures dd { font-size: 28px; }
   .weekend-page .band .stage { margin: 20px calc(-1 * var(--m)) 0; aspect-ratio: 4 / 5; }
+  .weekend-page .band .turn { padding-bottom: 10px; }
+  .weekend-page .band .turn::before { height: 10px; }
+  .weekend-page .band .turn::after { width: 10px; height: 4px; }
+  .weekend-page .band .turn b { padding: 2px 3px 1px; font-size: 7px; }
   .weekend-page .band .schedule { order: 1; margin-top: 32px; }
   .weekend-page .band .schedule li { grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 12px; }
 
