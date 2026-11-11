@@ -108,12 +108,12 @@ main:focus { outline: none; }
 }
 .menu[hidden] { display: none; }
 .menu nav ol { list-style: none; display: grid; gap: 4px; }
-.menu nav a, .menu nav span.off {
+.menu nav .line > a, .menu nav span.off {
   display: flex; align-items: baseline; gap: 20px;
   font-size: clamp(32px, 3.6vw, 52px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.02;
   color: var(--muted); transition: color 0.24s;
 }
-.menu nav a:hover, .menu nav a:focus-visible, .menu nav .on > .line > a { color: var(--ink); }
+.menu nav .line > a:hover, .menu nav .line > a:focus-visible, .menu nav .on > .line > a { color: var(--ink); }
 .menu nav .on > .line > a::after { content: ''; width: 10px; height: 10px; margin-left: 4px; background: var(--purple); align-self: center; }
 .menu nav .line .mono { width: 24px; flex: none; letter-spacing: 0.04em; }
 .menu nav .line .soon { width: auto; }

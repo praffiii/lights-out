@@ -250,3 +250,14 @@ test("Home's chapter 02 row leads to chapter 02", async ({ page, errors }) => {
   await expect(page.locator('.rows li:nth-child(2) a')).toHaveAttribute('href', '/chapters/overtaking')
   expect(errors).toEqual([])
 })
+
+test('the menu fits the theme switch on screen with both chapters linked', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await page.goto('/')
+  await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
+  await page.getByRole('button', { name: 'Menu' }).click()
+
+  await expect(page.locator('.menu .subs a[href^="/chapters/"]')).toHaveCount(2)
+  await expect(page.getByRole('group', { name: 'Theme' })).toBeInViewport({ ratio: 1 })
+  expect(errors).toEqual([])
+})
