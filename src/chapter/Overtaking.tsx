@@ -1,13 +1,25 @@
+import { Schema } from 'effect'
 import { type CSSProperties, useRef } from 'react'
 
+import { circuitFor } from '#/circuits/registry.ts'
 import { PHOTOS } from '#/home/content.ts'
 import { block, gsap, ONCE, onEnter, REDUCED, reveal, sweep, useGSAP } from '#/motion/motion.ts'
+import { steps } from '#/pass/model.ts'
+import baked from '#/pass/pass.json'
+import { PassFile } from '#/pass/schema.ts'
 import { Go, Soon } from '#/shell/Go.tsx'
 
 import { Next } from './Next.tsx'
+import { Replay } from './Replay.tsx'
 import { Term } from './Term.tsx'
 import { Words } from './Words.tsx'
 import { OVERTAKING_WORDS } from './words.ts'
+
+const PASS = Schema.decodeUnknownSync(PassFile)(baked)
+
+const STEPS = steps(PASS)
+
+const INFO = circuitFor('interlagos')
 
 type Vars = CSSProperties & Record<`--${string}`, string>
 
@@ -155,18 +167,7 @@ export function Overtaking() {
         </div>
         <p className="mono muted credit">Photos Morio · CC BY-SA 4.0, via Wikimedia Commons</p>
       </section>
-      <section className="replay band" data-theme="dark" aria-labelledby="replay">
-        <div className="head">
-          <p className="mono muted label">The replay · Interlagos, Turn 12 to Turn 1</p>
-          <h2 id="replay" className="display headline">
-            <span className="hl">About 1.2 km</span>
-            <span className="hl">to make it stick.</span>
-          </h2>
-          <p className="body">
-            The same idea at Interlagos under the 2026 rules: a real pass from the São Paulo Grand Prix, on the real track and slowed down. Two cars, one straight, four steps. Scroll, or drag the timeline, to replay it.
-          </p>
-        </div>
-      </section>
+      {INFO && STEPS ? <Replay pass={PASS} all={STEPS} info={INFO} /> : null}
       <section className="air" aria-labelledby="air">
         <figure className="photo">
           <div className="frame">

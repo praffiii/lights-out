@@ -6,6 +6,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 import { turnLaps } from '#/lap/drive.ts'
 import { gsap, REDUCED } from '#/motion/motion.ts'
+import type { Focus } from '#/pass/model.ts'
 
 import { lapProfile } from './lap.ts'
 import { allCircuits } from './registry.ts'
@@ -44,6 +45,7 @@ export type Replay = {
   running: RefObject<boolean>
   trace: RefObject<Float32Array | null>
   turns: RefObject<ReadonlyArray<{ turn: number; u: number }>>
+  focus?: RefObject<Focus | null>
 }
 
 type Props = {
@@ -223,8 +225,25 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
         const fullW = fit.w * size.width
         const fullH = fit.h * size.height
 
+        const x = fit.x * size.width + SHIFT_X * fullW
+        const y = fit.y * size.height - SHIFT_Y * fullW
+        const focus = replay?.focus?.current
+
         camera.aspect = REST_ASPECT
-        camera.setViewOffset(fullW, fullH, fit.x * size.width + SHIFT_X * fullW, fit.y * size.height - SHIFT_Y * fullW, size.width, size.height)
+        camera.setViewOffset(fullW, fullH, x, y, size.width, size.height)
+
+        if (focus) {
+          camera.updateProjectionMatrix()
+          camera.position.copy(rest.at)
+          camera.lookAt(rest.aim)
+          camera.updateMatrixWorld()
+          sample(focus.u * n, spot).project(camera)
+
+          const cx = x + size.width / 2 + (((spot.x + 1) / 2) * size.width - size.width / 2) * focus.w
+          const cy = y + size.height / 2 + (((1 - spot.y) / 2) * size.height - size.height / 2) * focus.w
+
+          camera.setViewOffset(fullW * focus.k, fullH * focus.k, focus.k * cx - size.width / 2, focus.k * cy - size.height / 2, size.width, size.height)
+        }
       } else if (layout === 'wide') {
         const { k, x, y } = fitCrop(rest.crop)
 
@@ -270,6 +289,7 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
     let compiled = false
     let lastFill = -1
     const trace = new Float32Array(n * 2)
+    let framedFocus = ''
 
     const project = () => {
       for (const [i, p] of line.entries()) {
@@ -290,6 +310,11 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
 
       if (camera instanceof THREE.PerspectiveCamera && camera.aspect !== (layout === 'wide' ? size.width / size.height : REST_ASPECT)) stale.current = true
 
+      const focus = replay?.focus?.current
+      const focusKey = focus ? `${focus.u} ${focus.k} ${focus.w}` : ''
+
+      if (focusKey !== framedFocus) stale.current = true
+
       const go = (running?.current ?? false) && !REDUCED
       const moved = fill.current !== lastFill
 
@@ -297,7 +322,10 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
 
       const framed = stale.current
 
-      if (framed) frame()
+      if (framed) {
+        frame()
+        framedFocus = focusKey
+      }
 
       if (replay) project()
 

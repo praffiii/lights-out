@@ -56,3 +56,168 @@ test('the DRS table lists three tools', async ({ page }) => {
 
   await expect(chapter(page, '.rules tbody th')).toHaveText(['DRSUntil 2025', 'Straight mode', 'Overtake ModeNew'])
 })
+
+const replay = (page: Page, selector = '') => page.locator(`.chapter-page .replay ${selector}`.trim())
+
+const slider = (page: Page) => replay(page, '[role="slider"]')
+
+const now = async (page: Page) => Number(await slider(page).getAttribute('aria-valuenow'))
+
+const pinSpan = (page: Page) =>
+  page.evaluate(() => {
+    const spacer = document.querySelector('.replay .pin-spacer')
+    const top = (spacer?.getBoundingClientRect().top ?? 0) + scrollY
+
+    return { top, range: (spacer?.getBoundingClientRect().height ?? 0) - innerHeight }
+  })
+
+const scrollTo = (page: Page, y: number) => page.evaluate((to) => window.scrollTo(0, to), y)
+
+const spread = (page: Page) =>
+  page.evaluate(() => {
+    const at = (n: number) => {
+      const el = document.querySelector<HTMLElement>(`.replay [data-pin="turn-${n}"]`)
+      const r = el?.getBoundingClientRect()
+
+      return el && r && el.style.visibility !== 'hidden' ? { x: r.left + r.width / 2, y: r.bottom } : null
+    }
+
+    const a = at(1)
+    const b = at(2)
+
+    return a && b ? Math.hypot(a.x - b.x, a.y - b.y) : null
+  })
+
+test('the replay names the real pass', async ({ page }) => {
+  await loaded(page)
+
+  await expect(replay(page, '.who')).toContainText('São Paulo 2026 · Lap')
+  await expect(replay(page, '.credit')).toContainText('Telemetry: OpenF1 (unofficial)')
+})
+
+test('scrolling through the pin lights the steps in order', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await loaded(page)
+  await replay(page).scrollIntoViewIfNeeded()
+
+  const { top, range } = await pinSpan(page)
+  const end = Number(await slider(page).getAttribute('aria-valuemax'))
+  const chaser = replay(page, '.dot[data-car="chaser"]')
+  const lit: number[] = []
+
+  await scrollTo(page, top)
+  await expect.poll(() => now(page)).toBeLessThan(0.2)
+  await expect(replay(page, '.stage')).toHaveAttribute('data-gl', '', { timeout: 20_000 })
+  await expect.poll(() => chaser.evaluate((el) => el.style.translate)).not.toBe('')
+
+  const from = await chaser.evaluate((el) => el.style.translate)
+
+  for (const i of [1, 2, 3, 4]) {
+    await scrollTo(page, top + (range * i) / 4)
+    await expect.poll(async () => Math.abs((await now(page)) - (end * i) / 4)).toBeLessThan(0.3)
+    lit.push(await replay(page, '[data-step][data-lit]').count())
+  }
+
+  expect(lit).toEqual([...lit].sort((a, b) => a - b))
+  expect(lit.at(-1)).toBe(4)
+  expect(await chaser.evaluate((el) => el.style.translate)).not.toBe(from)
+  expect(errors).toEqual([])
+})
+
+test('the slider steps with the keys', async ({ page }) => {
+  await loaded(page)
+  await slider(page).focus()
+
+  await page.keyboard.press('End')
+  await expect(slider(page)).toHaveAttribute('aria-valuetext', /step 4 of 4, Brake later/)
+  await page.keyboard.press('Home')
+  await expect(slider(page)).toHaveAttribute('aria-valuetext', /^0\.0 s/)
+  await page.keyboard.press('ArrowRight')
+  await expect(slider(page)).toHaveAttribute('aria-valuetext', /step 1 of 4, Within one second/)
+})
+
+test('a drag then a scroll continue from the same moment', async ({ page }) => {
+  await loaded(page)
+  await slider(page).focus()
+  await page.keyboard.press('Home')
+  await expect(slider(page)).toHaveAttribute('aria-valuetext', /^0\.0 s/)
+
+  const box = await slider(page).boundingBox()
+
+  if (!box) throw new Error('the timeline has no box')
+
+  await page.mouse.move(box.x + 2, box.y + box.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 6 })
+  await page.mouse.up()
+  await expect.poll(() => now(page)).toBeGreaterThan(0)
+
+  const a = await now(page)
+
+  await page.mouse.wheel(0, 40)
+  await expect.poll(() => now(page)).toBeGreaterThanOrEqual(a)
+  expect(a / Number(await slider(page).getAttribute('aria-valuemax'))).toBeGreaterThan(0.4)
+})
+
+test('after a reload from inside the pin, scroll still maps to time', async ({ page }) => {
+  await loaded(page)
+  await replay(page).scrollIntoViewIfNeeded()
+
+  const before = await pinSpan(page)
+
+  await scrollTo(page, before.top + before.range * 0.6)
+  await expect.poll(() => now(page)).toBeGreaterThan(0)
+  await page.reload()
+  await expect(page.locator('.loader')).toHaveCount(0, { timeout: LOADER_MS })
+  await replay(page).scrollIntoViewIfNeeded()
+
+  const { top, range } = await pinSpan(page)
+  const end = Number(await slider(page).getAttribute('aria-valuemax'))
+
+  await scrollTo(page, top + range * 0.6)
+  await expect.poll(async () => Math.abs((await now(page)) - end * 0.6)).toBeLessThan(0.3)
+})
+
+test('reduced motion opens on the last frame, unpinned', async ({ page, errors }) => {
+  await loaded(page, `${PATH}?reduced`)
+
+  await expect(replay(page, '[data-step][data-lit]')).toHaveCount(4)
+  await expect(slider(page)).toHaveAttribute('aria-valuetext', /step 4 of 4/)
+  await expect(replay(page, '.pin-spacer')).toHaveCount(0)
+  expect(errors).toEqual([])
+})
+
+test('without WebGL the replay still steps', async ({ page, errors }) => {
+  await page.addInitScript({
+    content: `const get = HTMLCanvasElement.prototype.getContext; HTMLCanvasElement.prototype.getContext = function (type, ...rest) { return String(type).startsWith('webgl') ? null : get.call(this, type, ...rest) }`,
+  })
+  await loaded(page)
+  await slider(page).focus()
+
+  await expect(replay(page, '.poster')).toBeVisible()
+  await page.keyboard.press('End')
+  await expect(slider(page)).toHaveAttribute('aria-valuetext', /step 4 of 4/)
+  expect(errors.filter((e) => e.startsWith('pageerror'))).toEqual([])
+})
+
+test('the table drops Battery and footnotes Overtake Mode', async ({ page }) => {
+  await loaded(page)
+
+  await expect(replay(page, 'table')).not.toContainText('Battery')
+  await expect(replay(page, '.foot')).toContainText("Teams don't publish when a driver presses it.")
+})
+
+test('the camera pushes in on the stretch', async ({ page }) => {
+  await loaded(page)
+  await slider(page).focus()
+  await page.keyboard.press('Home')
+  await expect(replay(page, '.stage')).toHaveAttribute('data-gl', '', { timeout: 20_000 })
+  await expect.poll(() => spread(page)).toBeGreaterThan(0)
+
+  const home = (await spread(page)) ?? 0
+
+  await page.keyboard.press('End')
+  await expect.poll(async () => ((await spread(page)) ?? 0) / home, { timeout: 10_000 }).toBeGreaterThanOrEqual(2)
+  await page.keyboard.press('Home')
+  await expect.poll(async () => Math.abs(((await spread(page)) ?? 0) / home - 1), { timeout: 10_000 }).toBeLessThan(0.05)
+})
