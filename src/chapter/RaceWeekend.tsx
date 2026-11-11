@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 import { PHOTOS } from '#/home/content.ts'
 import { useSecond, useZone } from '#/motion/client.ts'
@@ -11,7 +11,9 @@ import { waitFor } from '#/shell/Loader.tsx'
 import { Days } from './Days.tsx'
 import { chapterLive } from './page-model.ts'
 import { Knockout, Ladder, PoleBand } from './Posters.tsx'
-import { CHAPTER_WORDS, WORDS, type WordKey } from './words.ts'
+import { Next } from './Next.tsx'
+import { Words } from './Words.tsx'
+import { RACE_WEEKEND_WORDS } from './words.ts'
 
 const all = (scope: HTMLElement, selector: string) => [...scope.querySelectorAll<HTMLElement>(selector)]
 
@@ -37,36 +39,6 @@ function motion(scope: HTMLElement) {
   const days = scope.querySelector('.days')
 
   if (days) ScrollTrigger.create({ trigger: days, start: 'top 55%', end: 'bottom 45%', onToggle: (self) => document.documentElement.classList.toggle('flip', self.isActive) })
-}
-
-function Words() {
-  const [open, setOpen] = useState<WordKey | null>(null)
-
-  return (
-    <section className="words" aria-labelledby="words">
-      <div className="head">
-        <h2 id="words" className="mono">
-          Words from this chapter
-        </h2>
-        <Soon className="mono">Full glossary</Soon>
-      </div>
-      <ul className="chips">
-        {CHAPTER_WORDS.map((k) => (
-          <li key={k}>
-            <button type="button" className="mono" aria-expanded={open === k} onClick={() => setOpen((o) => (o === k ? null : k))}>
-              {WORDS[k].term}
-            </button>
-          </li>
-        ))}
-      </ul>
-      {open ? (
-        <p className="def" role="note">
-          <b className="mono">{WORDS[open].term}</b>
-          {WORDS[open].def}
-        </p>
-      ) : null}
-    </section>
-  )
 }
 
 export function RaceWeekend() {
@@ -129,20 +101,8 @@ export function RaceWeekend() {
       <Knockout lines={live?.knockout ?? { q1: null, q2: null, pole: null }} />
       {live?.circuit ? <PoleBand info={live.circuit} /> : null}
       <Ladder line={live?.ladder ?? null} />
-      <Words />
-      <section className="next" aria-labelledby="next">
-        <div className="shot">
-          <img src={next.src} alt="" loading="lazy" />
-        </div>
-        <div className="caption">
-          <p className="mono">Next · Chapter 02 · 5 min</p>
-          <h2 id="next" className="display">
-            How overtaking works.
-          </h2>
-          <Soon className="read">Why a pass starts a lap early</Soon>
-        </div>
-        <p className="mono muted credit">{`${next.place} · ${next.credit}`}</p>
-      </section>
+      <Words keys={RACE_WEEKEND_WORDS} />
+      <Next n="02" min={5} title="How overtaking works." line="Why a pass starts a lap early" photo={next} to={null} />
     </div>
   )
 }
