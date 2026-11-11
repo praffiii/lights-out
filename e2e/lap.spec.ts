@@ -372,3 +372,41 @@ test('the band dives into the explorer and closing shrinks back into the band', 
   await expect(link).toBeInViewport()
   expect(thrown(errors)).toEqual([])
 })
+
+test('closing during the dive still shrinks back into the band', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'one transition check is enough')
+  await page.addInitScript(() => {
+    let lap = false
+    let back = 0
+
+    const watch = () => {
+      const root = document.documentElement
+      const veil = document.querySelector('.veil')
+
+      if (location.pathname.startsWith('/lap/')) lap = true
+      else if (lap && back === 0) back = performance.now()
+
+      if (back > 0 && veil && getComputedStyle(veil).visibility === 'hidden' && root.dataset.shrinkMs === undefined) root.dataset.shrinkMs = String(Math.round(performance.now() - back))
+
+      requestAnimationFrame(watch)
+    }
+
+    requestAnimationFrame(watch)
+  })
+  await open(page, '/weekend')
+
+  const link = page.getByText('Explore the lap in 3D')
+
+  await page.mouse.move(700, 300)
+  await expect(async () => {
+    await page.mouse.wheel(0, 600)
+    await expect(link).toBeInViewport({ timeout: 500 })
+  }).toPass({ timeout: 20_000 })
+  await page.waitForTimeout(800)
+  await link.click()
+  await expect(page.locator('.lap h1')).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('html')).toHaveAttribute('data-shrink-ms', /\d/, { timeout: 10_000 })
+  expect(Number(await page.locator('html').getAttribute('data-shrink-ms'))).toBeGreaterThan(700)
+  expect(thrown(errors)).toEqual([])
+})

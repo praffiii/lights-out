@@ -152,6 +152,7 @@ export function Shell() {
 
     if (REDUCED || !cover || !dive) return
 
+    await Promise.all(gsap.getTweensOf(cover))
     gsap.set(cover, { autoAlpha: 0, clipPath: FULL, backgroundImage: `url("${dive.poster}")`, ...spread(dive.image) })
     await gsap.to(cover, { autoAlpha: 1, duration: 0.3, ease: 'power1.inOut' })
   }, [])
