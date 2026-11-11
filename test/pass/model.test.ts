@@ -3,7 +3,7 @@ import { describe, expect, test } from 'bun:test'
 import { Schema } from 'effect'
 
 import baked from '#/pass/pass.json'
-import { brakeOnset, crossTime, focusAt, nextStep, prevStep, readout, sliderText, stepAt, steps } from '#/pass/model.ts'
+import { brakeOnset, crossTime, nextStep, prevStep, readout, sliderText, stepAt, steps } from '#/pass/model.ts'
 import { PassFile } from '#/pass/schema.ts'
 import type { PoleRow } from '#/pole/schema.ts'
 
@@ -143,29 +143,5 @@ describe('stepping', () => {
   test('sliderText names the step', () => {
     expect(sliderText(all, all[2].t)).toBe(`${all[2].t.toFixed(1)} s, step 3 of 4, Out of the tow`)
     expect(sliderText(all, 0)).toBe('0.0 s, before the detection point')
-  })
-})
-
-describe('focusAt', () => {
-  test('the camera pushes in slowly through the steps', () => {
-    expect(focusAt(pass, all, 0)).toMatchObject({ k: 1, w: 0 })
-    expect(focusAt(pass, all, all[0].t).k).toBeGreaterThan(1)
-    expect(focusAt(pass, all, all[0].t).k).toBeLessThan(2.6)
-    expect(focusAt(pass, all, all[1].t).k).toBeCloseTo(2.6, 9)
-    expect(focusAt(pass, all, all[3].t)).toMatchObject({ k: 3.4, w: 1 })
-    expect(focusAt(pass, all, end).k).toBe(3.4)
-
-    let last = 1
-
-    for (let t = 0; t <= end; t += 0.1) {
-      const f = focusAt(pass, all, t)
-      const now = readout(pass, t)
-
-      expect(f.k).toBeGreaterThanOrEqual(last)
-      expect(f.k - last).toBeLessThan(0.15)
-      expect(f.u).toBeGreaterThanOrEqual(Math.min(now.u.chaser, now.u.leader) - 1e-9)
-      expect(f.u).toBeLessThanOrEqual(Math.max(now.u.chaser, now.u.leader) + 1e-9)
-      last = f.k
-    }
   })
 })

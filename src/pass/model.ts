@@ -44,10 +44,6 @@ export type Focus = { u: number; k: number; w: number }
 
 const UNLOCK = 1
 
-const K_STRETCH = 2.6
-
-const K_TURN1 = 3.4
-
 const SAME = 1e-6
 
 const detectionGap = (pass: PassFile) => {
@@ -134,19 +130,4 @@ export const sliderText = (all: ReadonlyArray<Step>, t: number) => {
   const step = all[n - 1]
 
   return step ? `${t.toFixed(1)} s, step ${n} of ${all.length}, ${step.title}` : `${t.toFixed(1)} s, before the detection point`
-}
-
-const ease = (x: number) => {
-  const f = Math.min(1, Math.max(0, x))
-
-  return f < 0.5 ? 2 * f * f : 1 - (-2 * f + 2) ** 2 / 2
-}
-
-const span = (t: number, from: number, to: number) => (to <= from ? (t >= to ? 1 : 0) : (t - from) / (to - from))
-
-export const focusAt = (pass: PassFile, all: readonly [Step, Step, Step, Step], t: number): Focus => {
-  const now = readout(pass, t)
-  const k = 1 + (K_STRETCH - 1) * ease(span(t, 0, all[1].t)) + (K_TURN1 - K_STRETCH) * ease(span(t, all[2].t, all[3].t))
-
-  return { u: (now.u.chaser + now.u.leader) / 2, k, w: (k - 1) / (K_TURN1 - 1) }
 }

@@ -73,19 +73,12 @@ const pinSpan = (page: Page) =>
 
 const scrollTo = (page: Page, y: number) => page.evaluate((to) => window.scrollTo(0, to), y)
 
-const spread = (page: Page) =>
+const reach = (page: Page) =>
   page.evaluate(() => {
-    const at = (n: number) => {
-      const el = document.querySelector<HTMLElement>(`.replay [data-pin="turn-${n}"]`)
-      const r = el?.getBoundingClientRect()
+    const line = document.querySelector('.replay .pass-hud .line')
+    const r = line?.getBoundingClientRect()
 
-      return el && r && el.style.visibility !== 'hidden' ? { x: r.left + r.width / 2, y: r.bottom } : null
-    }
-
-    const a = at(1)
-    const b = at(2)
-
-    return a && b ? Math.hypot(a.x - b.x, a.y - b.y) : null
+    return r && r.width > 0 ? Math.hypot(r.width, r.height) : null
   })
 
 test('the replay names the real pass', async ({ page }) => {
@@ -102,7 +95,7 @@ test('scrolling through the pin lights the steps in order', async ({ page, error
 
   const { top, range } = await pinSpan(page)
   const end = Number(await slider(page).getAttribute('aria-valuemax'))
-  const chaser = replay(page, '.dot[data-car="chaser"]')
+  const chaser = replay(page, '.racer[data-car="chaser"]')
   const lit: number[] = []
 
   await scrollTo(page, top)
@@ -150,13 +143,15 @@ test('a drag then a scroll continue from the same moment', async ({ page }) => {
   await page.mouse.down()
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 6 })
   await page.mouse.up()
-  await expect.poll(() => now(page)).toBeGreaterThan(0)
+
+  const end = Number(await slider(page).getAttribute('aria-valuemax'))
+
+  await expect.poll(async () => (await now(page)) / end).toBeGreaterThan(0.4)
 
   const a = await now(page)
 
   await page.mouse.wheel(0, 40)
   await expect.poll(() => now(page)).toBeGreaterThanOrEqual(a)
-  expect(a / Number(await slider(page).getAttribute('aria-valuemax'))).toBeGreaterThan(0.4)
 })
 
 test('after a reload from inside the pin, scroll still maps to time', async ({ page }) => {
@@ -207,19 +202,29 @@ test('the table drops Battery and footnotes Overtake Mode', async ({ page }) => 
   await expect(replay(page, '.foot')).toContainText("Teams don't publish when a driver presses it.")
 })
 
-test('the camera pushes in on the stretch', async ({ page }) => {
+test('the camera flies in to follow the cars and back out', async ({ page }) => {
   await loaded(page)
   await slider(page).focus()
   await page.keyboard.press('Home')
   await expect(replay(page, '.stage')).toHaveAttribute('data-gl', '', { timeout: 20_000 })
-  await expect.poll(() => spread(page)).toBeGreaterThan(0)
+  await expect.poll(() => reach(page)).toBeGreaterThan(0)
 
-  const home = (await spread(page)) ?? 0
+  const home = (await reach(page)) ?? 0
 
-  await page.keyboard.press('End')
-  await expect.poll(async () => ((await spread(page)) ?? 0) / home, { timeout: 10_000 }).toBeGreaterThanOrEqual(2)
+  await page.keyboard.press('ArrowRight')
+  await page.keyboard.press('ArrowRight')
+  await expect.poll(async () => ((await reach(page)) ?? 0) / home, { timeout: 10_000 }).toBeGreaterThanOrEqual(2.5)
   await page.keyboard.press('Home')
-  await expect.poll(async () => Math.abs(((await spread(page)) ?? 0) / home - 1), { timeout: 10_000 }).toBeLessThan(0.05)
+  await expect.poll(async () => Math.abs(((await reach(page)) ?? 0) / home - 1), { timeout: 10_000 }).toBeLessThan(0.05)
+})
+
+test('each car wears its team colour', async ({ page }) => {
+  await loaded(page)
+
+  const colour = (name: string) => replay(page).evaluate((el, n) => getComputedStyle(el).getPropertyValue(n).trim().toUpperCase(), name)
+
+  expect(await colour('--chaser')).toBe('#F50537')
+  expect(await colour('--leader')).toBe('#0093CC')
 })
 
 test('the replay callouts stay inside the page at tablet width', async ({ page, errors }, testInfo) => {

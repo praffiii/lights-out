@@ -51,23 +51,21 @@ type Props = {
   hud?: Hud
   turns?: ReadonlyArray<{ turn: number; name?: string }>
   focus?: RefObject<Focus | null>
-  aspect?: number
 }
 
-export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus, aspect }: Props) {
+export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus }: Props) {
   const box = useRef<HTMLDivElement>(null)
   const pins = useRef<HTMLDivElement>(null)
   const fill = useRef(1)
-  const replay = useRef<Replay>({ running: { current: false }, trace: { current: null }, turns: { current: [] }, focus }).current
+  const replay = useRef<Replay>({ running: { current: false }, trace: { current: null }, turns: { current: [] }, focus, bare: hud !== undefined }).current
   const [ready, setReady] = useState(false)
   const [failed, setFailed] = useState(false)
   const [turns, setTurns] = useState(true)
   const [sectors, setSectors] = useState(true)
   const phone = useMedia(PHONE)
   const { go } = useShell()
-  const ratio = aspect ?? (phone ? TALL : WIDE)
-  const fit = fitSpin(info.crop, ratio)
-  const vars: Vars = { '--w': fit.w, '--h': fit.h, '--x': fit.x, '--y': fit.y, aspectRatio: aspect ? ratio : undefined }
+  const fit = fitSpin(info.crop, phone ? TALL : WIDE)
+  const vars: Vars = { '--w': fit.w, '--h': fit.h, '--x': fit.x, '--y': fit.y }
   const poster = `/circuits/${info.model}`
 
   useEffect(() => {

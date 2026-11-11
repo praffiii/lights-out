@@ -120,7 +120,7 @@ From here on the pages are planned, not built. Read every "rises", "types on" an
 | Index (dark, 23 renders) | The headline rises. | The render swaps to its sector-coloured version and the name types on, 240 ms. A photo preview follows the cursor. | The tiles fade up row by row. |
 | Circuit page header | The name rises; the caption types on. | None | None |
 | Circuit band (Suzuka convention) | None | Layer chips (corners, sectors, speed trap, Overtake detection) toggle their layer with a 240 ms fade. | The 3D lap scrubs as on Home. The stat column counts up. |
-| Overtaking replay map | None | None | Pinned. Scroll drives the cars along the road. The detection line draws in purple when the chaser crosses it. Drag the timeline or ← → to step; the scroll follows. |
+| Overtaking replay map | None | None | Pinned full screen for three screens of scroll. Replay time eases toward the scroll position, so the cars never jump. Over the first 2.4 s the camera flies from the overview to a low chase view behind the two cars, then follows them to Turn 1. The headline fades out once the cars move, and each step's chyron wipes in as it is reached. Drag the timeline or press ← → to jump; the scroll follows. Reduced motion opens on the last frame, unpinned. |
 
 ## The people
 
