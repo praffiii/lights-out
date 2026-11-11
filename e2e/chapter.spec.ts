@@ -107,3 +107,41 @@ test('no horizontal overflow at 390 px', async ({ page, errors }, testInfo) => {
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
   expect(errors).toEqual([])
 })
+
+test('the pole band poster fills the stage edge to edge', async ({ page, errors }) => {
+  await stubPole(page, 'interlagos')
+  await loaded(page)
+
+  const poster = chapter(page, '.band .stage img.poster')
+
+  await expect(poster).toBeAttached()
+  expect(await poster.evaluate((n) => getComputedStyle(n).padding)).toBe('0px')
+  expect(errors).toEqual([])
+})
+
+test('hovering a term keeps its definition on screen', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await loaded(page)
+
+  for (const name of ['parc fermé', 'pole']) {
+    await chapter(page, '.knockout').getByRole('button', { name, exact: true }).hover()
+    await expect(chapter(page, '.knockout .term .def:visible')).toHaveCount(1)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0)
+  }
+
+  expect(errors).toEqual([])
+})
+
+test('tapping a second term shows only its definition', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'phone')
+  await loaded(page)
+
+  const knockout = chapter(page, '.knockout')
+
+  await knockout.getByRole('button', { name: 'parc fermé', exact: true }).tap()
+  await knockout.getByRole('button', { name: 'grid', exact: true }).tap()
+
+  await expect(knockout.locator('.term .def:visible')).toHaveCount(1)
+  await expect(knockout.locator('.term .def:visible')).toContainText('Grid')
+  expect(errors).toEqual([])
+})

@@ -44,7 +44,7 @@
 .chapter-page .days .now { margin-top: 14px; }
 .chapter-page .days .now a { color: var(--purple); }
 
-.chapter-page .poster { padding: 0 var(--m); }
+.chapter-page > .poster { padding: 0 var(--m); }
 .chapter-page .poster .head { display: grid; grid-template-columns: minmax(0, 1fr) 380px; align-items: start; column-gap: 48px; }
 .chapter-page .poster .head .label { grid-column: 1 / -1; }
 .chapter-page .poster .head h2 { margin: 23px 0 0 -4px; }
@@ -87,7 +87,7 @@
 .chapter-page .def { display: block; max-width: 520px; padding: 12px 14px 13px; background: var(--ink); color: var(--bg); font: 400 14px/1.45 Archivo, sans-serif; letter-spacing: 0; text-transform: none; animation: pop 0.24s var(--brake); }
 .chapter-page .def[hidden] { display: none; }
 .chapter-page .def b { display: block; margin-bottom: 6px; color: var(--purple); }
-.chapter-page .term .def { position: absolute; left: 0; top: calc(100% + 6px); z-index: 5; width: 280px; }
+.chapter-page .term .def { position: absolute; right: 0; top: calc(100% + 6px); z-index: 5; width: 280px; }
 
 .chapter-page .words { margin-top: 74px; padding: 40px var(--m) 0; border-top: 1px solid var(--line); }
 .chapter-page .words .head { display: flex; justify-content: space-between; gap: 24px; }
@@ -122,6 +122,7 @@
   .chapter-page .days .name { font-size: 24px; }
   .chapter-page .ladder .rungs { gap: 24px; }
   .chapter-page .next .shot { height: 520px; }
+  .chapter-page .term .def { position: fixed; left: var(--m); right: var(--m); top: auto; bottom: 16px; width: auto; pointer-events: none; }
 }
 
 @media (max-width: 760px) {
@@ -154,7 +155,6 @@
   .chapter-page .ladder .rungs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: end; gap: 28px 8px; margin-top: 36px; }
   .chapter-page .band { margin-top: 72px; padding-top: 48px; }
   .chapter-page .band .stage { margin-top: 20px; }
-  .chapter-page .term .def { position: fixed; left: var(--m); right: var(--m); top: auto; bottom: 16px; width: auto; }
   .chapter-page .words { margin-top: 56px; }
   .chapter-page .next { margin-top: 72px; }
   .chapter-page .next .shot { height: auto; aspect-ratio: 4 / 3; }
