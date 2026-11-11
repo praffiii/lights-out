@@ -2,6 +2,7 @@
 .overtaking-page figcaption .what { margin-top: 8px; font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
 .overtaking-page .opening h1 { grid-column: 1 / -1; }
 .overtaking-page .opening .intro { grid-column: 2; margin: 32px 0 0; }
+.overtaking-page .photo-band img { object-position: 50% 90%; }
 .overtaking-page .head { display: grid; grid-template-columns: minmax(0, 1fr) 380px; align-items: end; column-gap: 48px; }
 .overtaking-page .head .label { grid-column: 1 / -1; }
 .overtaking-page .head h2 { margin: 23px 0 0 -4px; }
@@ -120,6 +121,10 @@
 .overtaking-page .rules [data-state='old'] { color: var(--muted); }
 .overtaking-page .rules [data-state='old'] th { text-decoration: line-through 2px; }
 .overtaking-page .rules [data-state='new'] .tag { border-color: var(--purple); background: var(--purple); color: #fff; }
+
+@media (min-width: 1280px) {
+  .overtaking-page .photo-band .shot { height: 780px; }
+}
 
 @media (max-width: 1199px) {
   .overtaking-page .head, .overtaking-page .rules { grid-template-columns: minmax(0, 1fr); }
