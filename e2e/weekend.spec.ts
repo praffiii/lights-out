@@ -314,7 +314,7 @@ test('a done tile goes nowhere', async ({ page, errors }, testInfo) => {
 test('the menu opens the Race weekend page', async ({ page, errors }) => {
   await loaded(page, '/')
   await page.getByRole('button', { name: 'Menu' }).click()
-  await page.locator('.menu .subs').getByRole('link', { name: 'Race weekend' }).click()
+  await page.locator('.menu .subs').getByRole('link', { name: 'Race weekend', exact: true }).click()
 
   await page.waitForURL('**/weekend')
   expect(errors).toEqual([])
@@ -515,5 +515,12 @@ test('clicking the track opens the explorer there', async ({ page, errors }, tes
   const at = Number(new URL(page.url()).searchParams.get('at'))
 
   await expect.poll(async () => Math.abs(Number(await page.locator('[data-km]').textContent()) - at * 4.309)).toBeLessThan(0.2)
+  expect(errors).toEqual([])
+})
+
+test('the teaser leads to chapter 01', async ({ page, errors }) => {
+  await loaded(page)
+
+  await expect(page.locator('.weekend-page .teaser').getByRole('link', { name: /Read/ })).toHaveAttribute('href', '/chapters/race-weekend')
   expect(errors).toEqual([])
 })

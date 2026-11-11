@@ -137,7 +137,7 @@ From here on the pages are planned, not built. Read every "rises", "types on" an
 | Section | Enter | Hover / tap | Scroll |
 |---|---|---|---|
 | How F1 works index | The headline rises. | The chapter rows behave as on Home. | Same as Home. |
-| Chapter hero *(spike: stub)* | The headline sweeps in, then the "Chapter 02 · 5 min" label; the photo arrives behind the bar. | "All chapters ←": the hover roll. | The photo drifts. |
+| Chapter hero | The headline sweeps in, then the "Chapter 02 · 5 min" label; the photo arrives behind the bar. | "All chapters ←": the hover roll. | The photo drifts. |
 | Body text | None | Glossary terms: the dotted underline turns solid and the definition pops in under the term (0.24 s). On touch, a tap toggles it. | Paragraph groups fade up 24 px. |
 | Diagram or render per chapter (switchback, grid, tyres) | None | Chips toggle layers. | Pinned and scrubbed through the moments (dive, apex, cross, exit). A mono caption types the current moment. |
 | Timing tower / race log rows | None | The row fills ink. | Rows rise; times count up; the payoff row fills purple last. |

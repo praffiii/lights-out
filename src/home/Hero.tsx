@@ -5,7 +5,7 @@ import { chipBelow, fitCrop } from '#/circuits/fit.ts'
 import { type CircuitInfo, circuitFor } from '#/circuits/registry.ts'
 import { useMedia, useMounted } from '#/motion/client.ts'
 import { gsap, onEnter, REDUCED, ScrollTrigger, sweep, useGSAP } from '#/motion/motion.ts'
-import { Soon } from '#/shell/Go.tsx'
+import { Go } from '#/shell/Go.tsx'
 import type { SeasonSnapshot } from '#/season/snapshot-schema.ts'
 import { useSeason } from '#/season/use-season.ts'
 import { type PickedRace, pickRace, type RaceKind } from '#/season/weekend.ts'
@@ -164,7 +164,7 @@ export function Hero() {
             ))}
           </h1>
           <p className="intro">{HERO.intro}</p>
-          <Soon className="cta">Start the guide</Soon>
+          <Go to="/chapters/race-weekend" className="cta">Start the guide</Go>
         </div>
         <Tracker at={at} onPick={setAt} lap={lap} paused={paused} onPause={() => setPaused((p) => !p)} />
         {circuit && <Facts {...circuit} />}

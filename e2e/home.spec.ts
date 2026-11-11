@@ -224,3 +224,21 @@ test('keeps the close button on screen while the menu is open, even if the page 
   await expect(page.getByRole('button', { name: 'Close' })).toBeInViewport()
   expect(errors).toEqual([])
 })
+
+test('Start the guide opens chapter 01', async ({ page, errors }) => {
+  await page.goto('/')
+  await expect(page.locator('.loader')).toHaveCount(0, { timeout: LOADER_MS })
+  await page.getByRole('link', { name: /Start the guide/ }).click()
+
+  await expect(page).toHaveURL(/\/chapters\/race-weekend$/)
+  await expect(page.locator('.chapter-page h1')).toBeVisible()
+  expect(errors).toEqual([])
+})
+
+test("Home's chapter 01 row leads to chapter 01", async ({ page, errors }) => {
+  await page.goto('/')
+  await expect(page.locator('.loader')).toHaveCount(0, { timeout: LOADER_MS })
+
+  await expect(page.locator('.rows li').first().getByRole('link')).toHaveAttribute('href', '/chapters/race-weekend')
+  expect(errors).toEqual([])
+})
