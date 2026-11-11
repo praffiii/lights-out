@@ -34,7 +34,7 @@ export const hiddenText = (page: Page) =>
     [...document.querySelectorAll('main *, footer *')].flatMap((el) => {
       const text = (el.textContent ?? '').trim()
       const style = getComputedStyle(el)
-      const hidden = el.children.length === 0 && text !== '' && (style.visibility === 'hidden' || style.opacity === '0') && el.getBoundingClientRect().width > 0
+      const hidden = el.children.length === 0 && text !== '' && !el.closest('[data-crowd]') && (style.visibility === 'hidden' || style.opacity === '0') && el.getBoundingClientRect().width > 0
 
       return hidden ? [`${el.tagName.toLowerCase()}.${el.className}: ${text.slice(0, 40)}`] : []
     }),
@@ -42,6 +42,17 @@ export const hiddenText = (page: Page) =>
 
 export const visibleBars = (page: Page) =>
   page.evaluate(() => [...document.querySelectorAll('.bar')].filter((el) => el.getBoundingClientRect().width > 0.5).length)
+
+export const crowdedChips = (page: Page, pins: string) =>
+  page.evaluate((selector) => {
+    const chips = [...document.querySelectorAll<HTMLElement>(selector)].flatMap((pin) =>
+      getComputedStyle(pin).visibility === 'visible' ? [{ name: pin.textContent, box: pin.querySelector('b')?.getBoundingClientRect() }] : [],
+    )
+
+    return chips.flatMap((a, i) =>
+      chips.slice(i + 1).flatMap((b) => (a.box && b.box && a.box.left < b.box.right && b.box.left < a.box.right && a.box.top < b.box.bottom && b.box.top < a.box.bottom ? [`${a.name}/${b.name}`] : [])),
+    )
+  }, pins)
 
 export const scrollToEnd = async (page: Page) => {
   for (let i = 0; i < 200; i++) {

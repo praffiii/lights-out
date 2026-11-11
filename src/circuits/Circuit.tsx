@@ -22,6 +22,7 @@ export const SHIFT_Y = 0.07
 const TAG_OFFSET = [-8, 8] as const
 const SMALL = 600
 const NEAR = 0.25
+const PHONE = '(max-width: 760px)'
 
 const meshopt = (loader: GLTFLoader) => void loader.setMeshoptDecoder(MeshoptDecoder)
 
@@ -56,6 +57,27 @@ type Props = {
 }
 
 const NO_LAP = () => {}
+
+const turnOf = (o: THREE.Object3D) => Number(o.name.slice('turn-'.length))
+
+function declutter(pins: HTMLElement[], phone: boolean) {
+  const boxes = pins.map((pin) => {
+    const r = phone ? pin.querySelector('b')?.getBoundingClientRect() : undefined
+
+    return r && new DOMRect(r.x - pin.offsetLeft, r.y - pin.offsetTop, r.width, r.height)
+  })
+
+  const kept: DOMRect[] = []
+
+  for (const [i, pin] of pins.entries()) {
+    const box = boxes[i]
+    const crowded = box !== undefined && kept.some((k) => box.left < k.right && k.left < box.right && box.top < k.bottom && k.top < box.bottom)
+
+    pin.toggleAttribute('data-crowd', crowded)
+
+    if (box && !crowded) kept.push(box)
+  }
+}
 
 const infoFor = (model: string) => {
   const info = allCircuits().find((c) => c.model === model)
@@ -122,6 +144,8 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
       if (o.name.startsWith('turn-')) markers.push(o)
     })
 
+    markers.sort((a, b) => turnOf(a) - turnOf(b))
+
     const source = gltf.cameras[0]
 
     if (!(source instanceof THREE.PerspectiveCamera)) throw new Error(`${model}.glb has no perspective camera`)
@@ -160,7 +184,7 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
     const turns = turnLaps(
       markers.map((o) => o.getWorldPosition(new THREE.Vector3())),
       info.line,
-    ).map((u, i) => ({ turn: Number(markers[i]?.name.slice('turn-'.length)), u }))
+    ).map((u, i) => ({ turn: markers[i] ? turnOf(markers[i]) : 0, u }))
 
     return { fills, markers, rest, light: { group, head, trail, geometry }, turns }
   }, [gltf, map, model])
@@ -241,6 +265,7 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
 
     stale.current = true
 
+    const phone = matchMedia(PHONE).matches
     let first = true
     let compiled = false
     let lastFill = -1
@@ -270,7 +295,9 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
 
       if (!go && !moved && !stale.current) return
 
-      if (stale.current) frame()
+      const framed = stale.current
+
+      if (framed) frame()
 
       if (replay) project()
 
@@ -308,6 +335,8 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
         }
       }
 
+      const shown: HTMLElement[] = []
+
       for (const o of markers) {
         const pin = pinEls.get(o.name)
         const at = pin && screen(o, camera, size.width, size.height)
@@ -316,8 +345,13 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
 
         pin.style.visibility = at ? '' : 'hidden'
 
-        if (at) pin.style.transform = `translate(${at[0]}px, ${at[1]}px)`
+        if (!at) continue
+
+        pin.style.transform = `translate(${at[0]}px, ${at[1]}px)`
+        shown.push(pin)
       }
+
+      if (framed) declutter(shown, phone)
 
       advance(time * 1000)
 
