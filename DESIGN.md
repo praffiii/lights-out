@@ -17,19 +17,19 @@ What the mocks use:
 - A paper (light) or tarmac (dark) background, with a lot of empty space.
 - One confident Archivo ExtraBold headline per section, and Martian Mono for labels and data.
 - Real F1 photography from Wikimedia Commons, credited on the page.
-- A generic car and real circuits, both as matte Blender-built 3D (see below).
+- A generic car and real circuits, both Blender-built 3D (see below): the car matte, the circuits glowing on their map.
 - Timing-screen data as the visual: a timing tower, sector colours, and a next-race countdown.
 
-What is gone: no atmospheric 3D environments (the rejected night straight), no glow effects, and no track used as a background.
+What is gone: no atmospheric 3D environments (the rejected night straight), no glow anywhere but the circuits, and no track used as a background.
 
 ### 3D first, built in Blender (Praffi's rule, 2026-11-07)
 
 **Everything that can be 3D is 3D, and it is made in Blender.** This replaces the earlier "3D for objects only" rule and the hand-drawn SVG circuits.
 
 - **Pipeline.** Each model is a `bpy` script in the repo, so it can be rebuilt from data, and a `.blend` file Praffi can refine by hand. It exports a `.glb`, and three.js (React Three Fiber) renders it.
-- **Look.** Matte and unlit. Top faces are the exact token colour and walls are the same colour at 62%. No glow and no lighting effects. Praffi picked this flat sector look over landonorris.com's glowing track.
-- **Poster frame.** Blender renders a still of every scene from the same camera, in both themes. The still shows first, it is the fallback for reduced motion, no WebGL, low-power phones and crawlers, and it matches the 3D end frame pixel for pixel.
-- **Circuits.** Built from the bacinger/f1-circuits layout (MIT) plus SRTM 30 m elevation (NASA, public domain), smoothed and exaggerated 3x. Each circuit is a road split into S1, S2 and S3, sitting on ground draped from the road's own heights: a smooth sheet, graded flat under the road (the road is a 1.2 m lip, never floating), running out to a flat plain 5 km away so a low camera sees a horizon, not the edge of a tile. Off-track terrain data (SRTM grid) was tried and dropped: its noise made smudges and grooves, and the clean surface reads better. Slopes get a soft matte hillshade (the same formula in Blender and GLSL), no lights and no glow. Turn numbers and sector labels are DOM pins placed from empties in the model. Proven in `spikes/circuit-3d`.
+- **Look.** Matte and unlit. Top faces are the exact token colour and walls are the same colour at 62%. No glow and no lighting effects. Circuits are the one exception (Praffi, 2026-11-09): the earlier flat sector road "felt 2D", so a circuit is now drawn the way F1's broadcast graphics show it (see Circuits).
+- **Poster frame.** Blender renders a still of every scene from the same camera, in both themes. Circuits get one dark poster, because a circuit section is always dark. The still shows first, it is the fallback for reduced motion, no WebGL, low-power phones and crawlers, and it matches the 3D end frame pixel for pixel.
+- **Circuits (broadcast look, Praffi, 2026-11-09).** Built from the bacinger/f1-circuits layout (MIT) plus SRTM 30 m elevation (NASA, public domain), exaggerated 1.5x. The road is a dark slab carrying three glowing strips per sector (a core and two edge lines) in S1 purple, S2 green and S3 yellow, over a soft additive halo. There is no bloom pass, so phones render no extra targets. It sits on its real OpenStreetMap surroundings, baked once per circuit by Blender and never fetched at runtime: water, parkland and ground as a fills texture, streets as sharp draped ribbon meshes, and large buildings near the track as low blocks. The map fades into haze over its outer edge. A low oblique camera frames it, as in the broadcast flyovers. Circuit sections (the Home hero and the weekend band) are always a dark broadcast screen (`#06080E`), even in the light theme. Sector names ("S1 / SECTOR 1") lie flat on the ground in the scene and fade with the Sectors toggle; turn numbers are DOM chips on a short beam above a ring. The map is credited "Map © OpenStreetMap contributors (ODbL)" beside the circuit credit wherever it shows. Raw OSM data stays out of the repo; only the baked textures and meshes are committed. Calendar tiles keep the flat look below.
 - **Calendar tiles.** Every calendar circuit is also a small Blender tile (`blender/circuits/tiles.sh`): the road on a narrow embankment, seen from the south at 32° through a 50 mm lens so north stays up and every shape is the one fans know. Four states (done, upcoming, now, hover) in both themes, 208 × 192 WEBP with a transparent film. The tiles are flat, because elevation does not read at this size, and the road widths are exaggerated so they read.
 - **Built once, then data (Praffi, 2026-11-08).** Nothing is modelled or rendered per race or per season. Three layers:
   - *Per circuit, built once:* the lap model with its sector cuts, turn pins and start line, about 24 in all. It is rebuilt only when a layout changes, so the season-start check is the only recurring 3D work.
@@ -115,10 +115,10 @@ Captures: `.playwright-mcp/study/` in the scratch workspace (`lando-*`, `merc/`,
 1. Every section is a poster: one image or one number, a headline, and a caption.
 2. A dense data widget appears at most once per page, and only where it teaches something: a circuit, a timing strip, a replay.
 3. Every photo has a caption block with a place and year, plus the Commons credit.
-4. A circuit is always the Blender-built 3D road on its terrain, in sector colours, with numbered turns. Layers (corners, sectors, speed trap, Overtake detection) switch on and off.
+4. A circuit is always the Blender-built 3D road glowing in sector colours on its OpenStreetMap map, with numbered turns, on a dark broadcast screen. Layers (turns, sectors) switch on and off.
 5. The strip, the menu and the footer carry real information: a live state, a photo for each link, and the next chapter.
 6. One ease family. No repeated feed blocks. No text-only pages.
-7. Each chapter's signature section (for example the overtaking replay) uses the opposite theme: tarmac on the light page, paper on the dark page. It is the page's one background shift.
+7. Each chapter's signature section (for example the overtaking replay) uses the opposite theme: tarmac on the light page, paper on the dark page. It is the page's one background shift. Circuit sections are exempt: they are always the dark broadcast screen, in either theme.
 
 ## Concept card
 
