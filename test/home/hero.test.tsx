@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import type { SeasonSnapshot } from '../../src/season/snapshot-schema.ts'
 import { seasonQueryOptions } from '../../src/season/use-season.ts'
+import { ShellContext } from '../../src/shell/context.ts'
 import { snapshotAt } from '../season/snapshot.ts'
 
 const { cleanup, render } = await import('@testing-library/react')
@@ -28,9 +29,11 @@ const renderWith = (snapshot: SeasonSnapshot) => {
   setSystemTime(new Date(NOW))
 
   return render(
-    <QueryClientProvider client={client}>
-      <Hero />
-    </QueryClientProvider>,
+    <ShellContext.Provider value={{ go: async () => {}, surface: async () => {} }}>
+      <QueryClientProvider client={client}>
+        <Hero />
+      </QueryClientProvider>
+    </ShellContext.Provider>,
   )
 }
 
