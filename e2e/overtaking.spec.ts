@@ -195,6 +195,32 @@ test('without WebGL the replay still steps', async ({ page, errors }) => {
   expect(errors.filter((e) => e.startsWith('pageerror'))).toEqual([])
 })
 
+test('without WebGL the poster keeps its shape on the full-screen stage', async ({ page }) => {
+  await page.addInitScript({
+    content: `const get = HTMLCanvasElement.prototype.getContext; HTMLCanvasElement.prototype.getContext = function (type, ...rest) { return String(type).startsWith('webgl') ? null : get.call(this, type, ...rest) }`,
+  })
+  await loaded(page)
+  await replay(page).scrollIntoViewIfNeeded()
+  await expect(replay(page, '.poster')).toBeVisible()
+
+  const ratio = await replay(page, '.poster').evaluate((el) => {
+    const r = el.getBoundingClientRect()
+
+    return el instanceof HTMLImageElement && el.naturalHeight > 0 ? r.width / r.height / (el.naturalWidth / el.naturalHeight) : 0
+  })
+
+  expect(ratio).toBeGreaterThan(0.97)
+  expect(ratio).toBeLessThan(1.03)
+})
+
+test('reduced motion stills the recording dot and the chyron wipe', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await loaded(page)
+
+  expect(await replay(page, '.rec').evaluate((el) => getComputedStyle(el).animationName)).toBe('none')
+  expect(await replay(page, '.chyron li').first().evaluate((el) => getComputedStyle(el).transitionDuration.split(',').every((d) => parseFloat(d) === 0))).toBe(true)
+})
+
 test('the table drops Battery and footnotes Overtake Mode', async ({ page }) => {
   await loaded(page)
 

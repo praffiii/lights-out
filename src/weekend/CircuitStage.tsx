@@ -64,7 +64,8 @@ export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus 
   const [sectors, setSectors] = useState(true)
   const phone = useMedia(PHONE)
   const { go } = useShell()
-  const fit = fitSpin(info.crop, phone ? TALL : WIDE)
+  const [ratio, setRatio] = useState<number | null>(null)
+  const fit = fitSpin(info.crop, ratio ?? (phone ? TALL : WIDE))
   const vars: Vars = { '--w': fit.w, '--h': fit.h, '--x': fit.x, '--y': fit.y }
   const poster = `/circuits/${info.model}`
 
@@ -79,6 +80,18 @@ export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus 
 
     return () => observer.disconnect()
   }, [onNear])
+
+  useEffect(() => {
+    const el = box.current
+
+    if (!el) return
+
+    const observer = new ResizeObserver(() => el.clientHeight > 0 && setRatio(el.clientWidth / el.clientHeight))
+
+    observer.observe(el)
+
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => () => void gsap.killTweensOf(fill), [])
 
