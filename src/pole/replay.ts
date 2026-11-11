@@ -27,18 +27,23 @@ const after = (rows: ReadonlyArray<PoleRow>, pick: (row: PoleRow) => number, val
 
 const mix = (a: number, b: number, f: number) => a + (b - a) * f
 
-export const sampleAt = (lap: PoleLap, t: number) => {
-  const time = Math.min(lap.time, Math.max(0, t))
-  const i = after(lap.rows, (row) => row[0], time)
-  const a = lap.rows[i - 1] ?? lap.rows[0]
-  const b = lap.rows[i] ?? a
+export const sampleRows = (rows: ReadonlyArray<PoleRow>, t: number) => {
+  const i = after(rows, (row) => row[0], t)
+  const a = rows[i - 1] ?? rows[0]
+  const b = rows[i] ?? a
 
   if (!a || !b) return { u: 0, speed: 0, gear: 0, throttle: 0, brake: 0 }
 
-  const f = b[0] === a[0] ? 0 : (time - a[0]) / (b[0] - a[0])
+  const f = b[0] === a[0] ? 0 : Math.min(1, Math.max(0, (t - a[0]) / (b[0] - a[0])))
   const near = f < 0.5 ? a : b
 
-  return { u: wrap(mix(a[1], b[1], f)), speed: mix(a[2], b[2], f), gear: near[3], throttle: mix(a[4], b[4], f), brake: near[5] }
+  return { u: mix(a[1], b[1], f), speed: mix(a[2], b[2], f), gear: near[3], throttle: mix(a[4], b[4], f), brake: near[5] }
+}
+
+export const sampleAt = (lap: PoleLap, t: number) => {
+  const now = sampleRows(lap.rows, Math.min(lap.time, Math.max(0, t)))
+
+  return { ...now, u: wrap(now.u) }
 }
 
 export const timeAt = (lap: PoleLap, u: number) => {

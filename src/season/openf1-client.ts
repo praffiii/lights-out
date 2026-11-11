@@ -1,6 +1,7 @@
 import { Context, Data, Effect, Layer, Predicate, Schedule, Schema, Semaphore } from 'effect'
 import { HttpClient, HttpClientError, HttpClientRequest } from 'effect/http'
 
+import { IntervalsResponse, OvertakesResponse, PitResponse } from '../pass/schema.ts'
 import { CarResponse, LapsResponse, LocationResponse, PoleResultResponse, StintsResponse } from '../pole/schema.ts'
 
 import { DriversResponse, ResultResponse, SessionsResponse } from './openf1-schema.ts'
@@ -36,6 +37,9 @@ export class OpenF1Client extends Context.Service<
     readonly carData: ReadWindow<typeof CarResponse>
     readonly location: ReadWindow<typeof LocationResponse>
     readonly stints: ReadDriver<typeof StintsResponse>
+    readonly overtakes: Read<typeof OvertakesResponse>
+    readonly pits: Read<typeof PitResponse>
+    readonly intervals: ReadWindow<typeof IntervalsResponse>
   }
 >()('OpenF1Client') {
   static readonly layer = Layer.effect(
@@ -69,6 +73,9 @@ export class OpenF1Client extends Context.Service<
         carData: (key, driver, from, to) => get(CarResponse, `/car_data?session_key=${key}&driver_number=${driver}&${window(from, to)}`),
         location: (key, driver, from, to) => get(LocationResponse, `/location?session_key=${key}&driver_number=${driver}&${window(from, to)}`),
         stints: (key, driver) => empty(get(StintsResponse, `/stints?session_key=${key}&driver_number=${driver}`)),
+        overtakes: (key) => empty(get(OvertakesResponse, `/overtakes?session_key=${key}`)),
+        pits: (key) => empty(get(PitResponse, `/pit?session_key=${key}`)),
+        intervals: (key, driver, from, to) => empty(get(IntervalsResponse, `/intervals?session_key=${key}&driver_number=${driver}&${window(from, to)}`)),
       }
     }),
   )
