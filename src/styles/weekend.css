@@ -58,6 +58,7 @@
 .weekend-page .band .turn b { padding: 3px 5px 2px; border-radius: 3px; background: var(--chip); backdrop-filter: blur(6px); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18); font-size: 10px; font-weight: 500; color: #fff; }
 .weekend-page .band .turn i { font-size: 9px; font-style: normal; color: var(--muted); white-space: nowrap; }
 .weekend-page .band .stage[data-turns='off'] .turn { opacity: 0; }
+.weekend-page .band .turn[data-crowd]:not([data-hit]) { visibility: hidden; }
 
 .weekend-page .band .toggles { display: flex; gap: 28px; margin-top: 8px; font-size: 11px; }
 .weekend-page .band .toggles button { display: inline-flex; align-items: center; gap: 8px; letter-spacing: inherit; text-transform: inherit; }

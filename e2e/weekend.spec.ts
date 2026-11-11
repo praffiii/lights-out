@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 
 import type { Page } from '@playwright/test'
 
-import { expect, hiddenText, LOADER_MS, scrollToEnd, stubPole, stubSeason, test, visibleBars } from './fixtures.ts'
+import { crowdedChips, expect, hiddenText, LOADER_MS, scrollToEnd, stubPole, stubSeason, test, visibleBars } from './fixtures.ts'
 
 const WAITING = 'The weekend data is on its way. Try again in a minute.'
 
@@ -213,6 +213,20 @@ test('a turn reads 01 on a chip above a ring', async ({ page, errors }) => {
   expect(await pin(page).evaluate((el) => getComputedStyle(el, '::after').borderRadius)).toBe('50%')
   expect(errors).toEqual([])
 })
+
+for (const id of ['interlagos', 'vegas']) {
+  test(`no two ${id} turn chips overlap on a phone`, async ({ page, errors }, testInfo) => {
+    test.skip(testInfo.project.name !== 'phone')
+    await page.route('**/api/season', async (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: readFileSync('test/fixtures/season-snapshot.json', 'utf8').replace('"circuitId": "interlagos"', `"circuitId": "${id}"`) }),
+    )
+    await withGl(page)
+
+    expect(await crowdedChips(page, '.weekend-page .band [data-pin]')).toEqual([])
+    await expect(pin(page)).toBeVisible()
+    expect(errors).toEqual([])
+  })
+}
 
 test('the sector names live on the map, not as pins, and the map is credited', async ({ page, errors }) => {
   await withGl(page)

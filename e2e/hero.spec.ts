@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 
 import type { Page } from '@playwright/test'
 
-import { expect, LOADER_MS, test } from './fixtures.ts'
+import { crowdedChips, expect, LOADER_MS, test } from './fixtures.ts'
 
 const current = '.tracker [aria-current="true"]'
 
@@ -153,6 +153,19 @@ for (const id of ['interlagos', 'vegas', 'losail', 'yas_marina', 'albert_park'])
     await page.clock.runFor(300)
     expect(await pinsBelowFacts(page)).toEqual([])
     expect(await pinsOverGallery(page)).toEqual([])
+    expect(errors).toEqual([])
+  })
+}
+
+for (const id of ['vegas', 'yas_marina']) {
+  test(`no two ${id} turn chips overlap on a phone`, async ({ page, errors }, info) => {
+    test.skip(info.project.name !== 'phone')
+    await withCircuit(page, id)
+    await page.goto('/')
+    await lifted(page)
+    await expect(page.locator('.hero .stage[data-gl]')).toHaveCount(1, { timeout: 20_000 })
+
+    expect(await crowdedChips(page, '.hero [data-pin]')).toEqual([])
     expect(errors).toEqual([])
   })
 }

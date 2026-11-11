@@ -140,6 +140,53 @@ test('a scroll takes the wheel and the light holds still', async ({ page }, test
   await expect(page.locator('.lap')).toHaveAttribute('data-mode', 'you')
 })
 
+const countDraws = (page: Page) =>
+  page.addInitScript(() => {
+    const gl = WebGL2RenderingContext.prototype
+    const { drawArrays, drawElements } = gl
+    let draws = 0
+
+    const tally = () => {
+      draws += 1
+      document.documentElement.dataset.draws = String(draws)
+    }
+
+    gl.drawArrays = function (mode, first, count) {
+      tally()
+      drawArrays.call(this, mode, first, count)
+    }
+
+    gl.drawElements = function (mode, count, type, offset) {
+      tally()
+      drawElements.call(this, mode, count, type, offset)
+    }
+  })
+
+const draws = async (page: Page) => Number(await page.locator('html').getAttribute('data-draws'))
+
+const drawsOver = async (page: Page, ms: number) => {
+  const before = await draws(page)
+
+  await page.clock.runFor(ms)
+
+  return (await draws(page)) - before
+}
+
+test('the scene stops drawing once the light settles and draws again when it moves', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'wheel, keys and the wide timeline are desktop input')
+  test.setTimeout(90_000)
+  await countDraws(page)
+  await drive(page)
+  await expect.poll(() => drawsOver(page, 500)).toBeGreaterThan(0)
+
+  await page.keyboard.press('ArrowRight')
+  await expect(page.locator('.lap')).toHaveAttribute('data-mode', 'you')
+  await expect.poll(() => drawsOver(page, 1000), { timeout: 30_000 }).toBe(0)
+
+  await page.keyboard.press('ArrowRight')
+  await expect.poll(() => drawsOver(page, 200)).toBeGreaterThan(0)
+})
+
 test('tapping a turn number glides to that corner', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'wheel, keys and the wide timeline are desktop input')
   await drive(page)

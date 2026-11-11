@@ -31,6 +31,7 @@ const TRAIL_GAP = 0.0011
 const GAUGE_KMH = 340
 const SMALL = 900
 const MAX_DT = 0.05
+const STILL = 1e-6
 
 const two = (n: number) => String(n).padStart(2, '0')
 
@@ -301,6 +302,8 @@ function run(host: HTMLElement, section: HTMLElement, info: CircuitInfo, start: 
 
   const size = { w: 1, h: 1 }
   const poster = { w: 1, h: 1, x: 0, y: 0 }
+  const drawn = { u: 0, blend: 0, started: false, pos: new THREE.Vector3(), look: new THREE.Vector3() }
+  let resized = true
 
   const stagger = () => {
     const px = timeline.clientWidth
@@ -326,6 +329,7 @@ function run(host: HTMLElement, section: HTMLElement, info: CircuitInfo, start: 
     poster.h = poster.w / REST_ASPECT
     poster.x = (poster.w - size.w) / 2 + SHIFT_X * poster.w
     poster.y = (poster.h - size.h) / 2 - SHIFT_Y * poster.w
+    resized = true
   }
 
   const observer = new ResizeObserver(fit)
@@ -456,7 +460,15 @@ function run(host: HTMLElement, section: HTMLElement, info: CircuitInfo, start: 
       if (xy) chip.style.transform = `translate(${xy[0]}px, ${xy[1]}px)`
     }
 
-    renderer.render(scene, camera)
+    const moved = resized || started !== drawn.started || blend !== drawn.blend || Math.abs(u - drawn.u) > STILL || camera.position.distanceToSquared(drawn.pos) > STILL || look.distanceToSquared(drawn.look) > STILL
+
+    if (moved) {
+      renderer.render(scene, camera)
+      Object.assign(drawn, { u, blend, started })
+      drawn.pos.copy(camera.position)
+      drawn.look.copy(look)
+      resized = false
+    }
 
     if (first) {
       first = false
