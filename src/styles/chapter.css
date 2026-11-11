@@ -63,7 +63,7 @@
 .chapter-page .ladder { padding-top: 120px; }
 .chapter-page .ladder .rungs { display: flex; align-items: flex-end; gap: 36px; margin-top: 60px; list-style: none; }
 .chapter-page .ladder .rungs li { display: grid; justify-items: start; row-gap: 18px; }
-.chapter-page .ladder .num { --s: 18px; font-size: max(16px, calc(var(--s) * var(--k))); }
+.chapter-page .ladder .num { --s: 18px; font-size: max(16px, calc(var(--s) * var(--k))); font-variation-settings: 'wdth' 100; }
 .chapter-page .ladder li:nth-child(1) .num { --s: 228px; color: var(--purple); }
 .chapter-page .ladder li:nth-child(2) .num { --s: 164px; }
 .chapter-page .ladder li:nth-child(3) .num { --s: 136px; }

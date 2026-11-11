@@ -145,3 +145,12 @@ test('tapping a second term shows only its definition', async ({ page, errors },
   await expect(knockout.locator('.term .def:visible')).toContainText('Grid')
   expect(errors).toEqual([])
 })
+
+test('the points ladder stays inside the window while fast scrolling widens the type', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await loaded(page, `${PATH}?reduced`)
+  await page.evaluate(() => document.querySelector('main')?.style.setProperty('--wdth', '112'))
+
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0)
+  expect(errors).toEqual([])
+})
