@@ -77,10 +77,18 @@ The mock was drawn on 2026-11-07. That was before the broadcast circuit stage an
 
 This is the page's one dense widget (DESIGN.md rule 2).
 
-**The stage.** It is the same broadcast circuit the weekend band and Chapter 01 use: Interlagos (`br-1940`), with its dark map, glowing ribbon and turn pins. It keeps the whole-circuit framing, as the mock does. **My call**, and it follows two Praffi decisions:
+**The stage.** It is the same broadcast circuit the weekend band and Chapter 01 use: Interlagos (`br-1940`), with its dark map, glowing ribbon and turn pins. **My call**, and it follows two Praffi decisions:
 
 - "Racecraft replays are a live-timing map, not 3D": two dots move along the real layout, beside the telemetry (DESIGN.md).
 - The broadcast circuits replaced flat maps (2026-11-09).
+
+**The camera pushes in, the way a broadcast does.** At full-circuit framing the two cars are dots about 14 px apart, so "nose alongside" and "brake later" would be invisible. Praffi agreed on 2026-11-11 that this falls below the bar. DESIGN.md's replay notes also say the map frames the Turn 12 → Turn 1 stretch. So:
+- The replay opens on the whole circuit, as the mock draws it, so the visitor sees where the stretch is.
+- As the replay starts, the camera does a long-lens push-in from the stage's own oblique angle. It is a zoom and pan of the same view, not a new camera path. It follows the midpoint of the two cars from Turn 12 up the hill.
+- It holds tight on Turn 1 for "Brake later". At that zoom the gap between the two braking points reads as real distance on the track.
+- The push-in is driven by the same time value as the cars, so scrubbing back pulls the camera back out.
+- With reduced motion, the camera jumps between framings with no tween.
+- On a phone the push-in matters even more, and it uses the same rule.
 
 On top of the stage:
 
@@ -170,7 +178,16 @@ The mock's Battery column is dropped, because no public data reports battery cha
 
 **No WebGL.** The stage falls back the way the weekend band does, to its poster still. The table, timeline and callouts keep working over the still, with the dots drawn on the HTML overlay.
 
-### 2. The words work inline
+### 2. The layout varies from section to section
+
+In the mock, the hero, "One move", the replay and "The air" all use the same block: a small label, the headline on the left, a grey paragraph on the right. That is the "every section is the same template" failure Praffi flagged on 2026-11-07. The copy stays, and the layouts change (agreed with Praffi on 2026-11-11):
+- **Hero:** keeps the mock's layout.
+- **One move:** photo-led, like Lando's captioned collages. The headline runs at mega size across the full width with no side column. The Malaysia paragraph becomes the lead caption of the big frame, above `01 · The straight`.
+- **The replay:** keeps the plain header. It is the one place the label, headline and side-line block stays.
+- **The air:** image first. The Haas photo opens the section with its callouts, and the label, headline and paragraph come after it, above the Tow and Dirty air rows.
+- **The 2026 rules:** the ghost "DRS" is already its own layout.
+
+### 3. The words work inline
 
 Chapter 01's term mechanism is reused: chips plus inline terms, one list of definitions. This chapter's terms:
 
@@ -187,7 +204,7 @@ Chapter 01's term mechanism is reused: chips plus inline terms, one list of defi
 
 `Full glossary →` stays `Soon`. The definitions are written in the mock's voice and checked against the 2026 rules.
 
-### 3. Wiring the guide in
+### 4. Wiring the guide in
 
 - **Route** `/chapters/overtaking`, with page title "How overtaking works · Lights Out". **My call** on the slug, next to `/chapters/race-weekend`.
 - **The chapter nav** in the hero: `← 01 A race weekend` links to Chapter 01, and `03 Tyres and strategy →` shows `Soon`.
@@ -275,6 +292,13 @@ Before ship, confirm these against the FIA 2026 Sporting and Technical Regulatio
   - reduced motion opens on the last frame, unpinned, with all four callouts visible;
   - the chapter nav and Chapter 01's links reach this page;
   - a term chip opens its definition.
+- **A bar check against the references, done in the browser by me, not delegated.** After the page and again after the replay are built:
+  - open landonorris.com and mercedesamgf1.com and compare them section by section with the live page;
+  - check the 7 rules in DESIGN.md;
+  - look for drawn stand-ins;
+  - check that no two neighbouring sections share a layout.
+
+  Anything below the bar is fixed before the task closes.
 - `bun run lint` and the project's checks pass. Live screenshots of the page for Praffi.
 - sol-loop before any PR. No council (Praffi's usual for Lights Out).
 

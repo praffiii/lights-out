@@ -147,7 +147,12 @@ git commit -m "feat(guide): a real São Paulo 2026 pass into Turn 1 is picked by
   - `stepAt(steps, t): 0 | 1 | 2 | 3 | 4`, where 0 means before step 1;
   - `prevStep(steps, t): number` and `nextStep(steps, t): number`, which return the target `t`;
   - `sliderText(steps, t): string`, for example `13.6 s, step 3 of 4, Out of the tow`;
-  - `CAR_M = 5.5`, the car length in metres.
+  - `CAR_M = 5.5`, the car length in metres;
+  - `type Focus = { u: number; k: number; w: number }`;
+  - `focusAt(pass, steps, t): Focus`, the camera's push-in:
+    - `u` is the midpoint of the two cars' unwrapped `u`;
+    - `k` is the zoom: 1 at t = 0, eased (`power2.inOut` shape, written as a pure function) to `K_STRETCH = 2.6` by step 1's t, held, then eased to `K_TURN1 = 3.4` between step 3's t and step 4's t, then held;
+    - `w = (k − 1) / (K_TURN1 − 1)`, which blends the framing from the plain centre to `u`.
 - In `src/pole/replay.ts`: `sampleRows(rows, t)` returns `{ u, speed, gear, throttle, brake }` with `u` unwrapped. `sampleAt` calls it and wraps `u`, so its behaviour is unchanged.
 
 - [ ] **Step 1: Write the failing tests** in `test/pass/model.test.ts`, on small synthetic rows plus the baked file:
@@ -161,6 +166,7 @@ git commit -m "feat(guide): a real São Paulo 2026 pass into Turn 1 is picked by
   - `cells`: throttle 0 / 50 / 100 → 0 / 3 / 5 (`Math.round(throttle / 20)`). `brake: true` when brake > 0.
   - `prevStep / nextStep`: from just after step 2 → step 2's t and step 3's t; before step 1 → 0 and step 1's t; after step 4 → step 4's t and the last row's t.
   - `sampleAt is unchanged`: the existing `test/pole/replay.test.ts` stays green.
+  - `the camera pushes in through the steps`: `focusAt` at t 0 gives `{ k: 1, w: 0 }`; at step 1, `k` is 2.6; at step 4 and after, `k` is 3.4 and `w` is 1; `k` never decreases as t increases; `u` lies between the two cars' `u`.
   - `the baked pass decodes and every step exists`: `Schema.decodeUnknownSync(PassFile)` on `src/pass/pass.json` succeeds and `steps(pass)` is not `null`.
 
 - [ ] **Step 2: Run it and watch it fail**
@@ -234,12 +240,17 @@ git commit -m "feat(guide): the overtaking replay derives its four steps and rea
 - [ ] **Step 4: Build the page**, top to bottom with the spec's copy. Root is `<div className="chapter-page overtaking-page">`.
   - **Hero** `.opening`: the label; the nav (`Go` to Chapter 01, `Soon` for 03); the headline in two `.hl` spans; the intro.
   - **Baku** `figure.photo-band` (`PHOTOS.ch02`).
-  - **`.frames`**: one big photo and two small ones, each with a `01 · The straight`-style mono label and caption, plus the side copy and one credit line.
+  - **`.frames`** (photo-led, spec §2):
+    - the label, then the headline at the mega size across the full width, with no side column;
+    - one big photo and two small ones;
+    - the Malaysia paragraph as the big frame's lead caption, above its `01 · The straight` label and caption;
+    - the two small frames with their own labels and captions;
+    - one credit line.
   - **`section.replay`**: a placeholder with the header copy only.
-  - **`.air`**:
-    - the Haas photo, with three `.callout` chips (dot, leader line, chip) at the mock's positions, as % of the photo;
-    - the caption block;
-    - the `Tow.`, `Dirty air.` and payoff rows (`.payoff` fills purple).
+  - **`.air`** (image first, spec §2):
+    - the Haas photo opens the section, with three `.callout` chips (dot, leader line, chip) at the mock's positions as % of the photo, and the caption block;
+    - then the label, headline and paragraph;
+    - then the `Tow.`, `Dirty air.` and payoff rows (`.payoff` fills purple).
   - **`.rules`**:
     - the ghost `DRS` (`aria-hidden`), a strike bar `<i className="strike">`, the caption, and the headline with its copy;
     - a `<table>` with the three rows, `Until 2025` and `New` tags.
@@ -270,7 +281,15 @@ git commit -m "feat(guide): the overtaking replay derives its four steps and rea
 
   Run: `bunx playwright test e2e/overtaking.spec.ts e2e/chapter.spec.ts && bun test && bun run lint`. Expected: all pass. Chapter 01 is unchanged by the `Words` and `Next` move.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 8: Bar check, done by me in the browser, not delegated.**
+  - Run the dev server and open `/chapters/overtaking` at 1440 and 390, light and dark.
+  - Open landonorris.com and mercedesamgf1.com beside it, and compare section by section: type scale, whitespace, photo crops and caption blocks, and how each section enters.
+  - Check the 7 rules in DESIGN.md's "Rules we take from both".
+  - Check that no two neighbouring sections share a layout family, and that there are no drawn stand-ins.
+
+  Fix anything below the bar, re-run step 7, and write one ledger line: `Task 3: bar check — <what was fixed or "nothing below the bar">`.
+
+- [ ] **Step 9: Commit**
 
 ```bash
 git add src/chapter src/routes/chapters.overtaking.tsx src/routeTree.gen.ts src/styles/overtaking.css src/home/content.ts public/img e2e/overtaking.spec.ts
@@ -285,6 +304,7 @@ git commit -m "feat(guide): chapter 02 teaches overtaking with three frames, the
 - Create: `src/chapter/Replay.tsx` (header, stage, table, timeline, scroll/drag/keys) and `src/chapter/PassHud.tsx` (segment, detection mark, two dots, callouts)
 - Modify:
   - `src/weekend/CircuitStage.tsx` (HUD slot and turn filter);
+  - `src/circuits/Circuit.tsx` (the optional `focus` on `Replay`);
   - `src/chapter/Overtaking.tsx` (mount `Replay`);
   - `src/styles/overtaking.css`;
   - `src/pass/interlagos.ts` (any `MARKS` left from Task 1 step 5);
@@ -294,6 +314,11 @@ git commit -m "feat(guide): chapter 02 teaches overtaking with three frames, the
 - `CircuitStage` gains optional props, and its behaviour without them is unchanged:
   - `hud?: (ctx: { stage: RefObject<HTMLDivElement | null>; replay: Replay; ready: boolean }) => ReactNode`. When given, it renders in place of `PoleHud`. The toggles and the "Explore the lap in 3D" link are left out. `replay` goes to `Circuit` even without a lap, and the HUD owns `replay.running`.
   - `turns?: ReadonlyArray<{ turn: number; name?: string }>`. When given, only these pins render, each with its name (`12` · `Junção`, `1` · `S do Senna`).
+- `Replay` (in `src/circuits/Circuit.tsx`) gains an optional `focus?: RefObject<Focus | null>`, where `Focus` comes from `#/pass/model.ts`. In the `spin` layout, `frame()` applies it on top of today's view offset:
+  - it scales the full view by `k`;
+  - it moves the offset so the line point at `u` (sampled from `rest.line`, projected with the unzoomed offset) lands at the stage centre, blended from today's centre by `w`.
+
+  `tick` re-frames when the focus differs from the last framed one. The trace and pins re-project as they do today. With no `focus`, framing is byte-for-byte today's.
 - `PassHud({ pass, stage, replay, time }: { pass: PassFile; stage; replay: Replay; time: RefObject<number> })`:
   - It draws on rAF while `replay.running`, reading `time.current`.
   - It uses `pointAt(trace, u)` from `#/pole/replay.ts`. When the cars are within `CAR_M`, it offsets them ±6 px along the screen normal of the trace at that point.
@@ -318,6 +343,7 @@ git commit -m "feat(guide): chapter 02 teaches overtaking with three frames, the
   - `reduced motion opens on the last frame, unpinned` (`?reduced`) → 4 lit callouts, `aria-valuetext` contains `step 4 of 4`, and no `.pin-spacer` in `.replay`.
   - `without WebGL the replay still steps` → `page.addInitScript` makes `HTMLCanvasElement.prototype.getContext` return `null` for `webgl`/`webgl2`. The poster is visible, `End` gives `step 4 of 4`, and `errors` is empty.
   - `the table drops Battery and footnotes Overtake Mode` → no `Battery` header, and the footnote contains `Teams don't publish when a driver presses it.`
+  - `the camera pushes in on the stretch` (desktop and phone) → once the GL stage is ready, read the screen distance between the `turn-15` and `turn-1` pins at `Home`, then at `End`. The `End` distance is ≥ 2× the `Home` distance. Back at `Home`, it returns to within 5 % of the first reading.
 - [ ] **Step 2: Run them and watch them fail.**
 
   Run: `bunx playwright test e2e/overtaking.spec.ts -g "replay|pin|slider|drag|reload|reduced|WebGL|Battery"`. Expected: FAIL.
@@ -333,7 +359,15 @@ git commit -m "feat(guide): chapter 02 teaches overtaking with three frames, the
 
   Run: `bun run lint && bun test && bunx playwright test`. Expected: all pass, apart from the known flakes on main (`weekend.spec.ts:363` phone, `lap.spec.ts` "closing returns…", `sections.spec.ts:71`). Re-run any of those alone to confirm they are flakes.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Bar check of the replay, by me in the browser.** Scrub the replay at 1440 and 390 and compare it with the Mercedes circuit page and a broadcast. Check that:
+  - the push-in reads as one smooth long-lens move;
+  - "nose alongside" and "brake later" are visible at their steps;
+  - the callouts never cover the cars;
+  - the table and timeline sit in the pinned frame without crowding.
+
+  Fix, re-run step 5, and write the ledger line `Task 4: bar check — …`.
+
+- [ ] **Step 7: Commit**
 
 ```bash
 git add src/chapter src/weekend/CircuitStage.tsx src/pass/interlagos.ts src/styles/overtaking.css e2e/overtaking.spec.ts
@@ -376,5 +410,6 @@ git commit -m "feat(guide): chapter 01, Home's chapter 02 row and the weekend te
 
 - [ ] **Step 1:** Run `bun run lint && bun test && bunx playwright test`. Everything should be green. Save the output to the workspace.
 - [ ] **Step 2:** Take live screenshots of `/chapters/overtaking` at 1440 and 390, in light and dark, top to bottom. Include the replay at steps 1 and 4 and the reduced-motion still. Save them in the scratchpad, not the repo, and delete any `.playwright-mcp/` folder the browser tools leave in the worktree.
-- [ ] **Step 3:** Run the final whole-branch review (executing-plans), then the `sol-loop` skill. Record what each round changed. The final round re-checks the head with no code changes.
-- [ ] **Step 4:** Report to Praffi with the screenshots and the chosen pass, then stop. Push, PR and deploy wait for Praffi's word.
+- [ ] **Step 3:** Run the last bar check of the whole page, top to bottom, against landonorris.com and mercedesamgf1.com, with the same checklist as Task 3 step 8. Fix anything below the bar before the review.
+- [ ] **Step 4:** Run the final whole-branch review (executing-plans), then the `sol-loop` skill. Record what each round changed. The final round re-checks the head with no code changes.
+- [ ] **Step 5:** Report to Praffi with the screenshots and the chosen pass, then stop. Push, PR and deploy wait for Praffi's word.
