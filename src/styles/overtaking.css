@@ -73,7 +73,8 @@
 .overtaking-page .replay .marks li[data-current] span { display: inline; }
 .overtaking-page .replay .marks li[data-lit] { color: var(--ink); }
 .overtaking-page .replay .marks li[data-lit] b { border-color: var(--purple); background: var(--purple); color: #fff; }
-.overtaking-page .replay .meta { display: flex; justify-content: space-between; gap: 24px; margin-top: 12px; font-size: 9px; color: var(--muted); }
+.overtaking-page .replay .hint, .overtaking-page .replay .foot { margin-top: 12px; font-size: 9px; color: var(--muted); }
+.overtaking-page .replay > .foot { margin: 8px var(--m) 0; }
 
 .overtaking-page .air { padding-top: 120px; }
 .overtaking-page .air .frame { display: grid; }
@@ -131,6 +132,13 @@
   .overtaking-page .rules .side { max-width: 560px; padding-bottom: 0; margin-top: 32px; }
 }
 
+@media (max-width: 1279px) {
+  .overtaking-page .replay .steps { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px 16px; padding: 12px 0 44px; }
+  .overtaking-page .replay .steps li { position: static; width: auto; padding: 0; background: none; backdrop-filter: none; grid-template-columns: 22px minmax(0, 1fr); }
+  .overtaking-page .replay .steps .text { display: none; }
+  .overtaking-page .replay .steps li[data-current] .text { position: absolute; left: 0; right: 0; bottom: 0; display: block; color: var(--ink); }
+}
+
 @media (max-width: 760px) {
   .overtaking-page { --mega: 64px; }
   .overtaking-page .opening h1, .overtaking-page .frames .headline { white-space: normal; }
@@ -143,13 +151,12 @@
   .overtaking-page .replay .who { margin-top: 8px; }
   .overtaking-page .replay .pin { justify-content: flex-start; padding: 8px 0; }
   .overtaking-page .replay .note { top: 12px; right: 12px; left: 12px; text-align: right; }
-  .overtaking-page .replay .steps { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; padding: 10px var(--m) 44px; }
-  .overtaking-page .replay .steps li { position: static; width: auto; padding: 0; background: none; backdrop-filter: none; grid-template-columns: 18px minmax(0, 1fr); column-gap: 8px; }
+  .overtaking-page .replay .steps { grid-template-columns: 1fr 1fr; padding-inline: var(--m); }
+  .overtaking-page .replay .steps li { grid-template-columns: 18px minmax(0, 1fr); column-gap: 8px; }
   .overtaking-page .replay .steps b { width: 18px; height: 18px; font-size: 10px; }
   .overtaking-page .replay .steps .title { font-size: 13px; }
-  .overtaking-page .replay .steps .text { display: none; }
-  .overtaking-page .replay .steps li[data-current] .text { position: absolute; left: var(--m); right: var(--m); bottom: 0; display: block; font-size: 12px; color: var(--ink); }
-  .overtaking-page .replay .board, .overtaking-page .replay .timeline, .overtaking-page .replay .meta { width: auto; margin-inline: var(--m); }
+  .overtaking-page .replay .steps li[data-current] .text { left: var(--m); right: var(--m); font-size: 12px; }
+  .overtaking-page .replay .board, .overtaking-page .replay .timeline { width: auto; margin-inline: var(--m); }
   .overtaking-page .replay .board thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   .overtaking-page .replay .board tr { display: grid; grid-template-columns: 1.3fr 1fr 0.5fr 1.1fr 1fr; column-gap: 8px; padding: 8px 0 6px; border-top: 1px solid var(--line); }
   .overtaking-page .replay .board tbody th { grid-column: 1 / -1; width: auto; margin-bottom: 4px; padding: 0 0 0 8px; border-top: 0; }
@@ -157,7 +164,6 @@
   .overtaking-page .replay .board td::before { content: attr(data-label); font: 400 8px/1.2 'Martian Mono', ui-monospace, monospace; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
   .overtaking-page .replay .meter i { width: 8px; height: 8px; }
   .overtaking-page .replay .marks li[data-current] span { display: none; }
-  .overtaking-page .replay .meta { display: block; }
   .overtaking-page .replay .hint { display: none; }
   .overtaking-page .air { padding-top: 72px; }
   .overtaking-page .air .leader { display: none; }

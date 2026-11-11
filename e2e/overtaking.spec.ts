@@ -221,3 +221,30 @@ test('the camera pushes in on the stretch', async ({ page }) => {
   await page.keyboard.press('Home')
   await expect.poll(async () => Math.abs(((await spread(page)) ?? 0) / home - 1), { timeout: 10_000 }).toBeLessThan(0.05)
 })
+
+test('the replay callouts stay inside the page at tablet width', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await page.setViewportSize({ width: 1024, height: 768 })
+  await loaded(page)
+  await replay(page).scrollIntoViewIfNeeded()
+
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+  const board = await replay(page, '.board').boundingBox()
+  const lowest = Math.max(...(await replay(page, '[data-step]').evaluateAll((els) => els.map((el) => el.getBoundingClientRect().bottom + scrollY))))
+
+  expect(overflow).toBeLessThanOrEqual(0)
+  expect(lowest).toBeLessThanOrEqual((board?.y ?? 0) + (await page.evaluate(() => scrollY)))
+  expect(errors).toEqual([])
+})
+
+test('the pinned replay fits a phone with its toolbars showing', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'phone')
+  await page.setViewportSize({ width: 390, height: 664 })
+  await loaded(page)
+  await replay(page).scrollIntoViewIfNeeded()
+
+  const { top } = await pinSpan(page)
+
+  await scrollTo(page, top + 10)
+  await expect.poll(() => replay(page, '.track').evaluate((el) => el.getBoundingClientRect().bottom <= innerHeight)).toBe(true)
+})

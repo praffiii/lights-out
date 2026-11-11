@@ -65,7 +65,7 @@ export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus,
   const [sectors, setSectors] = useState(true)
   const phone = useMedia(PHONE)
   const { go } = useShell()
-  const ratio = phone ? TALL : (aspect ?? WIDE)
+  const ratio = aspect ?? (phone ? TALL : WIDE)
   const fit = fitSpin(info.crop, ratio)
   const vars: Vars = { '--w': fit.w, '--h': fit.h, '--x': fit.x, '--y': fit.y, aspectRatio: aspect ? ratio : undefined }
   const poster = `/circuits/${info.model}`

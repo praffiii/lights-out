@@ -2,6 +2,7 @@ import { useLenis } from 'lenis/react'
 import { type CSSProperties, useCallback, useLayoutEffect, useRef, useState } from 'react'
 
 import type { CircuitInfo } from '#/circuits/registry.ts'
+import { useMedia } from '#/motion/client.ts'
 import { REDUCED, ScrollTrigger, useGSAP } from '#/motion/motion.ts'
 import { MARKS } from '#/pass/interlagos.ts'
 import { type Focus, focusAt, nextStep, prevStep, readout, type Step, sliderText, stepAt } from '#/pass/model.ts'
@@ -15,6 +16,10 @@ type Vars = CSSProperties & Record<`--${string}`, string>
 type Steps = readonly [Step, Step, Step, Step]
 
 const ASPECT = 21 / 9
+
+const PHONE_ASPECT = 5 / 4
+
+const PHONE = '(max-width: 760px)'
 
 const CELLS = 5
 
@@ -46,6 +51,7 @@ export function Replay({ pass, all, info }: { pass: PassFile; all: Steps; info: 
   const focus = useRef<Focus | null>(focusAt(pass, all, time.current))
   const lenis = useLenis()
   const scroller = useRef(lenis)
+  const phone = useMedia(PHONE)
   const [near, setNear] = useState(false)
   const onNear = useCallback(() => setNear(true), [])
   const km = (((MARKS.apex - MARKS.detection) * pass.lengthM) / 1000).toFixed(1)
@@ -225,7 +231,7 @@ export function Replay({ pass, all, info }: { pass: PassFile; all: Steps; info: 
             onNear={onNear}
             turns={TURNS}
             focus={focus}
-            aspect={ASPECT}
+            aspect={phone ? PHONE_ASPECT : ASPECT}
             hud={({ stage, replay, ready }) => <PassHud pass={pass} stage={stage} replay={replay} time={time} ready={ready} />}
           />
           <p className="mono note">{`Flat out from Junção to Turn 1 · about ${km} km`}</p>
@@ -291,11 +297,9 @@ export function Replay({ pass, all, info }: { pass: PassFile; all: Steps; info: 
             ))}
           </ol>
         </div>
-        <div className="mono meta">
-          <p className="hint">Drag the timeline, or use ← → to step through it.</p>
-          <p className="foot">Overtake Mode is shown where the rules unlock it. Teams don't publish when a driver presses it.</p>
-        </div>
+        <p className="mono hint">Drag the timeline, or use ← → to step through it.</p>
       </div>
+      <p className="mono foot">Overtake Mode is shown where the rules unlock it. Teams don't publish when a driver presses it.</p>
       <p className="mono credit">{TELEMETRY_CREDIT}</p>
     </section>
   )

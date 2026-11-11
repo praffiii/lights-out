@@ -146,7 +146,7 @@ const span = (t: number, from: number, to: number) => (to <= from ? (t >= to ? 1
 
 export const focusAt = (pass: PassFile, all: readonly [Step, Step, Step, Step], t: number): Focus => {
   const now = readout(pass, t)
-  const k = 1 + (K_STRETCH - 1) * ease(span(t, 0, all[0].t)) + (K_TURN1 - K_STRETCH) * ease(span(t, all[2].t, all[3].t))
+  const k = 1 + (K_STRETCH - 1) * ease(span(t, 0, all[1].t)) + (K_TURN1 - K_STRETCH) * ease(span(t, all[2].t, all[3].t))
 
   return { u: (now.u.chaser + now.u.leader) / 2, k, w: (k - 1) / (K_TURN1 - 1) }
 }
