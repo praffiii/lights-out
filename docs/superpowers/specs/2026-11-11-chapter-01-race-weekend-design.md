@@ -15,7 +15,7 @@ Figma `IPkJZWQnY0IKdIjf6Nuugl`, page "v2 — minimalist mocks", frames "Chapter 
 1. **Hero.** Label `How F1 works · Chapter 01 · 5 min`, right-aligned `Start here · 02 How overtaking works →`. Headline "Three days. / One race." Side line "Friday is practice, Saturday sets the order, Sunday pays the points."
 2. **Full-bleed photo** with a caption block: `01 · The grid · Shanghai, 2024` / "Norris, Hamilton and Alonso wait for the Sprint start." Credit underneath (`PHOTOS.ch01`, Liauzh, CC BY-SA 4.0).
 3. **The weekend (signature section, opposite theme).** Label `The weekend · Standard format` with a `Standard | Sprint` toggle. Three giant columns, "Fri." "Sat." "Sun.", with Sun. filled purple. Under each, one line ("Practice. Nothing counts yet." / "One lap decides where you start." / "The race pays the points.") and the sessions as big rows with a mono duration. A footnote on the sprint format.
-4. **Qualifying.** Label `Saturday · Qualifying · Knockout`, headline "Six out. Six out. / Ten fight for pole.", three giant numbers 22 → 16 → 10 (10 in purple), each with a mono caption (`Q1 · 18 min · Slowest six out` …).
+4. **Qualifying.** Label `Saturday · Qualifying · Knockout`, headline "Six out. Six out. / Ten fight for pole.", three giant numbers 22 → 16 → 10 (10 in purple), each with a mono caption (`Q1 · 18 min · Slowest six out` …). The mock's Q3 says 12 min; it is 13 min in 2026 (see "Facts to verify").
 5. **Points.** Label `Sunday · Points`, headline "Top ten score.", a shrinking big-type ladder 25 18 15 12 10 8 6 4 2 1 with 25 in purple, and a footnote ("No bonus point for fastest lap since 2025 · Sprints pay 8 to 1 to the top eight").
 6. **Words from this chapter.** A row of term chips and `Full glossary →`.
 7. **Next chapter.** A full-bleed photo with a caption card: `Next · Chapter 02 · 5 min`, "How overtaking works.", "Why a pass starts a lap early →".
@@ -90,8 +90,8 @@ In the dark theme, the signature section turns paper and the pole-lap band stays
 
 ## Facts to verify before ship
 
-Check every caption against the 2026 FIA Sporting Regulations, not memory:
-- the qualifying lengths (18 / 15 / 12 min) and six-six eliminations with 22 cars;
+Checked on 2026-11-11 against press coverage of the FIA's 2026 changes: with 22 cars, Q1 and Q2 each drop six. Q1 is 18 min and Q2 15 min. Q3 is **13 min**, because the FIA added a minute, so the mock's "12 min" is wrong. Sprint qualifying is 12 / 10 / 8 min. Sprints pay 8 to 1 to the top eight, across six sprint weekends. Parc fermé starts at sprint qualifying, lifts after the sprint, and locks again from Grand Prix qualifying. Still confirm against the 2026 FIA Sporting Regulations before ship:
+- the qualifying lengths (18 / 15 / 13 min) and six-six eliminations with 22 cars;
 - the sprint qualifying format and the sprint distance (about 100 km) and points (8 to 1, top eight);
 - race points 25–1 to the top ten, with no fastest-lap point since 2025;
 - practice lengths (60 min), the race time limit, and when parc fermé starts.
