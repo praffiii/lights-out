@@ -192,7 +192,8 @@ const study = Effect.gen(function* () {
     }
 
     const from = detC - LEAD_IN
-    const to = apex + LEAD_OUT
+    const ahead = chaser.find((r) => r[0] > apex && r[1] - sampleRows(leader, r[0]).u >= CAR_M / lengthM)?.[0] ?? apex
+    const to = Math.max(apex, ahead) + LEAD_OUT
     const cut = (rows: ReadonlyArray<PoleRow>) => rows.flatMap((r): PoleRow[] => (r[0] >= from && r[0] <= to ? [[Math.round((r[0] - from) * 1000) / 1000, r[1], r[2], r[3], r[4], r[5]]] : []))
 
     const car = (d: number, rows: ReadonlyArray<PoleRow>) => {
