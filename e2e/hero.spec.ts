@@ -131,8 +131,19 @@ const pinsBelowFacts = (page: Page) =>
     return [...document.querySelectorAll('.hero .pins > span')].flatMap((pin) => (pin.getBoundingClientRect().bottom > facts ? [pin.textContent] : []))
   })
 
+const pinsOverGallery = (page: Page) =>
+  page.evaluate(() => {
+    const gallery = [...document.querySelectorAll('.hero .tracker > *')].map((el) => el.getBoundingClientRect())
+
+    return [...document.querySelectorAll('.hero .pins > span')].flatMap((pin) => {
+      const p = pin.getBoundingClientRect()
+
+      return gallery.some((g) => p.left < g.right && p.right > g.left && p.top < g.bottom && p.bottom > g.top) ? [pin.textContent] : []
+    })
+  })
+
 for (const id of ['interlagos', 'vegas', 'losail', 'yas_marina', 'albert_park']) {
-  test(`keeps the ${id} track above the facts on desktop`, async ({ page, errors }, info) => {
+  test(`keeps the ${id} track above the facts and clear of the gallery on desktop`, async ({ page, errors }, info) => {
     test.skip(info.project.name === 'phone', 'the phone stacks the facts under the track')
     test.setTimeout(90_000)
     await withCircuit(page, id)
@@ -141,6 +152,7 @@ for (const id of ['interlagos', 'vegas', 'losail', 'yas_marina', 'albert_park'])
     await expect(page.locator('.hero .stage[data-gl]')).toHaveCount(1)
     await page.clock.runFor(300)
     expect(await pinsBelowFacts(page)).toEqual([])
+    expect(await pinsOverGallery(page)).toEqual([])
     expect(errors).toEqual([])
   })
 }
@@ -154,6 +166,65 @@ test('keeps the poster pins above the facts when the circuit model never loads',
   await expect(page.locator('.hero .poster')).toBeVisible()
   await expect(page.locator('.hero .pins > span').first()).toBeVisible()
   expect(await pinsBelowFacts(page)).toEqual([])
+})
+
+test('the first turn reads 01 on a chip above a ring', async ({ page, errors }) => {
+  await page.goto('/')
+  await lifted(page)
+
+  const t1 = page.locator('.hero [data-pin="turn-1"]')
+
+  await expect(t1.locator('b')).toHaveText('01')
+  expect(await t1.evaluate((el) => getComputedStyle(el, '::after').borderRadius)).toBe('50%')
+  expect(errors).toEqual([])
+})
+
+test.describe('a phone held sideways', () => {
+  test.use({ viewport: { width: 932, height: 430 }, screen: { width: 932, height: 430 } })
+
+  test('still loads the small map', async ({ page, errors }, info) => {
+    test.skip(info.project.name !== 'phone')
+
+    const maps: string[] = []
+
+    page.on('request', (r) => {
+      if (r.url().includes('-map')) maps.push(new URL(r.url()).pathname)
+    })
+    await page.goto('/')
+    await lifted(page)
+    await expect(page.locator('.hero .stage[data-gl]')).toHaveCount(1)
+
+    expect(maps).toEqual(['/circuits/br-1940-map-2048.webp'])
+    expect(errors).toEqual([])
+  })
+})
+
+test('a phone loads the small map and credits it', async ({ page, errors }, info) => {
+  test.skip(info.project.name !== 'phone')
+
+  const maps: string[] = []
+
+  page.on('request', (r) => {
+    if (r.url().includes('-map')) maps.push(new URL(r.url()).pathname)
+  })
+  await page.goto('/')
+  await lifted(page)
+  await expect(page.locator('.hero .stage[data-gl]')).toHaveCount(1)
+
+  expect(maps).toEqual(['/circuits/br-1940-map-2048.webp'])
+  await expect(page.locator('.hero .note')).toContainText('Map © OpenStreetMap contributors (ODbL)')
+  await expect(page.locator('.hero .note')).not.toContainText('Contours')
+  expect(errors).toEqual([])
+})
+
+test('keeps the poster when the map never loads', async ({ page, errors }) => {
+  await page.route('**/circuits/*-map*.webp', () => new Promise(() => {}))
+  await page.goto('/')
+  await lifted(page)
+  await expect(page.locator('.hero .poster')).toBeVisible()
+  await page.waitForTimeout(1500)
+  await expect(page.locator('.hero .poster')).toBeVisible()
+  expect(errors).toEqual([])
 })
 
 for (const width of [320, 390, 760, 1470]) {

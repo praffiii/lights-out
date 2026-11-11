@@ -12,7 +12,13 @@ export const fitCrop = ([x0, y0, x1, y1]: Crop): Fit => {
   return { k, x: centre(left, right, x0, x1) - (k * (x0 + x1)) / 2, y: centre(top, bottom, y0, y1) - (k * (y0 + y1)) / 2 }
 }
 
-const SQUASH = Math.sin((44 * Math.PI) / 180)
+const GALLERY = { left: 0.5, bottom: 0.48 } as const
+
+const CHIP = { half: 0.012, tall: 0.042 } as const
+
+export const chipBelow = (x: number, y: number, { k, x: fx, y: fy }: Fit) => k * x + fx + CHIP.half > GALLERY.left && k * y + fy - CHIP.tall < GALLERY.bottom
+
+const SQUASH = Math.sin((36 * Math.PI) / 180)
 
 const ROOM = 0.86
 

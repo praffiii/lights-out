@@ -3,6 +3,8 @@ import math
 import os
 import sys
 import time
+import urllib.error
+import urllib.parse
 import urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -49,5 +51,51 @@ def main(cid):
     print(cid, len(P), "points, lap", round(d[-1] + math.dist(P[-1], P[0])), "m, z", min(z), max(z))
 
 
+MIRRORS = ["https://overpass-api.de/api/interpreter", "https://overpass.private.coffee/api/interpreter", "https://overpass.kumi.systems/api/interpreter"]
+WAITS = [10, 30, 60]
+MARGIN = 1000.0
+KINDS = {
+    "building": '["building"]',
+    "highway": '["highway"~"^(motorway|trunk|primary|secondary|tertiary|motorway_link|trunk_link|primary_link|secondary_link|residential|unclassified|living_street|service)$"]',
+    "water": '["natural"="water"]',
+    "riverbank": '["waterway"="riverbank"]',
+    "leisure": '["leisure"~"^(park|pitch)$"]',
+    "landuse": '["landuse"~"^(grass|forest|recreation_ground|meadow)$"]',
+}
+
+
+def overpass(query):
+    body = urllib.parse.urlencode({"data": query}).encode()
+    for url in MIRRORS:
+        for wait in WAITS + [None]:
+            try:
+                req = urllib.request.Request(url, data=body, headers=UA)
+                return json.load(urllib.request.urlopen(req, timeout=240))
+            except (urllib.error.URLError, TimeoutError) as e:
+                code = getattr(e, "code", None)
+                if wait is None or (code is not None and code != 429 and code < 500):
+                    print(url, "gave up:", e)
+                    break
+                print(url, "retry in", wait, "s:", e)
+                time.sleep(wait)
+    raise SystemExit("every Overpass mirror failed")
+
+
+def osm(cid):
+    c, _ = layout(cid)
+    lons, lats = [p[0] for p in c], [p[1] for p in c]
+    dlat = math.degrees(MARGIN / R)
+    dlon = math.degrees(MARGIN / (R * math.cos(math.radians(lats[0]))))
+    box = f"{min(lats) - dlat:.6f},{min(lons) - dlon:.6f},{max(lats) + dlat:.6f},{max(lons) + dlon:.6f}"
+    parts = "".join(f"way{f}({box});relation{f}({box});" for f in KINDS.values())
+    data = overpass(f"[out:json][timeout:180];({parts});out geom;")
+    json.dump(data, open(os.path.join(DATA, f"{cid}-osm.json"), "w"))
+    counts = {k: sum(1 for e in data["elements"] if k in e.get("tags", {})) for k in ("building", "highway", "natural", "waterway", "leisure", "landuse")}
+    print(cid, len(data["elements"]), "elements", counts)
+
+
 if __name__ == "__main__":
-    main(sys.argv[1])
+    if sys.argv[1] == "osm":
+        osm(sys.argv[2])
+    else:
+        main(sys.argv[1])

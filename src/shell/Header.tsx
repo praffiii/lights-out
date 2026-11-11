@@ -6,7 +6,7 @@ import { Roll } from '#/motion/Roll.tsx'
 import { Go } from './Go.tsx'
 import { WeekendBox } from './WeekendBox.tsx'
 
-export function Header({ menuOpen, onMenu }: { menuOpen: boolean; onMenu: () => void }) {
+export function Header({ menuOpen, onMenu, home }: { menuOpen: boolean; onMenu: () => void; home: boolean }) {
   const [away, setAway] = useState(false)
   const [solid, setSolid] = useState(false)
 
@@ -27,9 +27,11 @@ export function Header({ menuOpen, onMenu }: { menuOpen: boolean; onMenu: () => 
 
   useEffect(() => setAway(false), [menuOpen])
 
+  const over = home && !solid && !menuOpen ? 'dark' : undefined
+
   return (
     <header className={['header', menuOpen ? 'menu-open' : away && 'away', solid && 'solid'].filter(Boolean).join(' ')}>
-      <Go to="/" className="logo" aria-label="Lights Out, home">
+      <Go to="/" className="logo" aria-label="Lights Out, home" data-theme={over}>
         <span className="dots" aria-hidden>
           <i />
           <i />
@@ -40,9 +42,9 @@ export function Header({ menuOpen, onMenu }: { menuOpen: boolean; onMenu: () => 
         Lights Out
       </Go>
       <div className="weekend-slot">
-        <WeekendBox />
+        <WeekendBox theme={over} />
       </div>
-      <button type="button" className="menu-btn mono" aria-expanded={menuOpen} aria-controls="menu" onClick={onMenu}>
+      <button type="button" className="menu-btn mono" data-theme={over} aria-expanded={menuOpen} aria-controls="menu" onClick={onMenu}>
         <Roll text={menuOpen ? 'Close' : 'Menu'} />
         <span className="bars" aria-hidden>
           <i />

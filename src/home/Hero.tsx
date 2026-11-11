@@ -1,12 +1,11 @@
 import { type CSSProperties, lazy, Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 
 import { CircuitGuard } from '#/circuits/CircuitGuard.tsx'
-import { fitCrop } from '#/circuits/fit.ts'
+import { chipBelow, fitCrop } from '#/circuits/fit.ts'
 import { type CircuitInfo, circuitFor } from '#/circuits/registry.ts'
 import { useMedia, useMounted } from '#/motion/client.ts'
 import { gsap, onEnter, REDUCED, ScrollTrigger, sweep, useGSAP } from '#/motion/motion.ts'
 import { Soon } from '#/shell/Go.tsx'
-import { useTheme } from '#/shell/theme.ts'
 import type { SeasonSnapshot } from '#/season/snapshot-schema.ts'
 import { useSeason } from '#/season/use-season.ts'
 import { type PickedRace, pickRace, type RaceKind } from '#/season/weekend.ts'
@@ -152,7 +151,7 @@ export function Hero() {
   const car = CARS[at] ?? CARS[0]
 
   return (
-    <section className="hero" ref={root} aria-labelledby="h1">
+    <section className="hero" data-theme="dark" ref={root} aria-labelledby="h1">
       <div className="hero-frame">
         {circuit && <Stage {...circuit} car={car} at={at} fill={fill} running={running} glReady={glReady} glFailed={glFailed} onLap={advance} onLapProgress={onLapProgress} onReady={onReady} onFail={onFail} />}
         <div className="hero-copy">
@@ -190,7 +189,6 @@ type StageProps = {
 }
 
 function Stage({ info, car, at, fill, running, glReady, glFailed, onLap, onLapProgress, onReady, onFail }: StageProps) {
-  const { theme } = useTheme()
   const mounted = useMounted()
   const narrow = useMedia(NARROW)
   const pins = useRef<HTMLDivElement>(null)
@@ -198,7 +196,7 @@ function Stage({ info, car, at, fill, running, glReady, glFailed, onLap, onLapPr
   const [x0, y0, x1, y1] = info.crop
   const fit = fitCrop(info.crop)
   const crop: Vars = { '--x0': x0, '--y0': y0, '--x1': x1, '--y1': y1, '--fk': fit.k, '--fx': fit.x, '--fy': fit.y }
-  const poster = `/circuits/${info.model}-${theme ?? 'light'}`
+  const poster = `/circuits/${info.model}`
 
   return (
     <div className="stage" style={crop} data-gl={glReady ? '' : undefined} data-waiting={!REDUCED && !glReady && !glFailed ? '' : undefined}>
@@ -212,13 +210,12 @@ function Stage({ info, car, at, fill, running, glReady, glFailed, onLap, onLapPr
           hidden={glReady}
         />
       </div>
-      {mounted && !REDUCED && theme && (
+      {mounted && !REDUCED && (
         <div className="gl">
           <CircuitGuard onError={onFail}>
             <Suspense fallback={null}>
               <Circuit
                 model={info.model}
-                theme={theme}
                 layout={narrow ? 'narrow' : 'wide'}
                 fill={fill}
                 pins={pins}
@@ -239,8 +236,8 @@ function Stage({ info, car, at, fill, running, glReady, glFailed, onLap, onLapPr
           const place: Vars = { '--px': pin.x, '--py': pin.y }
 
           return (
-            <span key={pin.turn} data-pin={`turn-${pin.turn}`} style={place}>
-              {pin.turn}
+            <span key={pin.turn} data-pin={`turn-${pin.turn}`} data-below={chipBelow(pin.x, pin.y, fit) ? '' : undefined} style={place}>
+              <b>{String(pin.turn).padStart(2, '0')}</b>
             </span>
           )
         })}
@@ -280,8 +277,7 @@ function Facts({ picked, info }: { picked: PickedRace; info: CircuitInfo }) {
       </dl>
       <div className="note mono">
         <p>{`${info.name} · ${info.gp} · ${WHEN[picked.kind]} · round ${picked.round} of ${picked.of}`}</p>
-        <p className="muted">{`Contours every ${info.relief === 3 ? 'metre' : 'half metre'} of real ground, height ×${info.relief}`}</p>
-        <p className="muted">Built in Blender from bacinger/f1-circuits (MIT) and NASA SRTM elevation</p>
+        <p className="muted">Built in Blender from bacinger/f1-circuits (MIT) and NASA SRTM elevation · Map © OpenStreetMap contributors (ODbL)</p>
       </div>
       <p className="key mono muted">
         <span>

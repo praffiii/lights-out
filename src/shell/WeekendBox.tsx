@@ -20,13 +20,13 @@ const STEPS = new Map([
   ['ArrowLeft', -1],
 ])
 
-export function WeekendBox() {
+export function WeekendBox({ theme: over }: { theme: 'dark' | undefined }) {
   const season = useSeason()
 
-  return season.data ? <Box snapshot={season.data} /> : null
+  return season.data ? <Box snapshot={season.data} over={over} /> : null
 }
 
-function Box({ snapshot }: { snapshot: SeasonSnapshot }) {
+function Box({ snapshot, over }: { snapshot: SeasonSnapshot; over: 'dark' | undefined }) {
   const now = useSecond()
   const { theme } = useTheme()
   const [open, setOpen] = useState(false)
@@ -73,7 +73,7 @@ function Box({ snapshot }: { snapshot: SeasonSnapshot }) {
 
   return (
     <div className="weekend-box" ref={root} onKeyDown={onKey}>
-      <button ref={button} type="button" className="weekend mono" aria-expanded={open} aria-controls={id} onClick={() => setOpen((o) => !o)}>
+      <button ref={button} type="button" className="weekend mono" data-theme={over} aria-expanded={open} aria-controls={id} onClick={() => setOpen((o) => !o)}>
         {state.kind === 'live' && (
           <>
             <span className="live">

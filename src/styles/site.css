@@ -9,6 +9,8 @@
 :root[data-theme='dark'], [data-theme='dark'], :root[data-theme='light'].flip {
   --bg: #0e0f11; --ink: #f2f1ec; --muted: #8a8d93; --line: #26282d; color-scheme: dark;
 }
+[data-theme] { color: var(--ink); }
+.hero, .band { --bg: #06080e; --ring: #cfe0ff; --chip: rgb(14 20 36 / 0.55); background: var(--bg); }
 :root {
   --purple: #a43bff; --s1: #a43bff; --s2: #2bd45e; --s3: #f5c400; --red: #ff1e1e;
   --launch: cubic-bezier(0.8, 0, 0.15, 1); --brake: cubic-bezier(0.05, 0.7, 0.1, 1);

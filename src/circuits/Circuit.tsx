@@ -1,15 +1,14 @@
 import { Canvas, useLoader, useThree } from '@react-three/fiber'
-import { type RefObject, Suspense, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import { type RefObject, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 import { gsap, REDUCED } from '#/motion/motion.ts'
-import type { Theme } from '#/shell/theme.ts'
 
 import { lapProfile } from './lap.ts'
 import { allCircuits } from './registry.ts'
-import { groundOf, isSector, mattify, PALETTE, screen, SECTORS } from './shaders.ts'
+import { broadcast, isSector, screen } from './shaders.ts'
 import { fitCrop, fitSpin } from './fit.ts'
 
 const LAP_SECONDS = 14
@@ -20,10 +19,14 @@ const REST_ASPECT = 16 / 10
 const SHIFT_X = -0.06
 const SHIFT_Y = 0.07
 const TAG_OFFSET = [-8, 8] as const
+const SMALL = 600
+const NEAR = 0.25
 
 const meshopt = (loader: GLTFLoader) => void loader.setMeshoptDecoder(MeshoptDecoder)
 
 export const modelUrl = (model: string) => `/circuits/${model}.glb`
+
+export const mapUrl = (model: string, small: boolean) => `/circuits/${model}-map${small ? '-2048' : ''}.webp`
 
 export const preloadCircuit = (model: string) => useLoader.preload(GLTFLoader, modelUrl(model), meshopt)
 
@@ -37,7 +40,6 @@ export type Lap = {
 
 type Props = {
   model: string
-  theme: Theme
   layout: 'wide' | 'narrow' | 'spin'
   fill: RefObject<number>
   pins: RefObject<HTMLDivElement | null>
@@ -45,8 +47,6 @@ type Props = {
   yaw?: RefObject<number>
   lap?: Lap
 }
-
-const SECTOR_NAMES = ['S1', 'S2', 'S3'] as const
 
 const NO_LAP = () => {}
 
@@ -58,14 +58,20 @@ const infoFor = (model: string) => {
   return info
 }
 
-function Scene({ model, theme, layout, fill, pins, onReady, yaw, lap }: Props) {
+function Scene({ model, layout, fill, pins, onReady, yaw, lap }: Props) {
   const restart = lap?.restart ?? 0
   const running = lap?.running
   const tag = lap?.tag
   const lapped = lap !== undefined
   const onLap = lap?.onLap ?? NO_LAP
   const onLapProgress = lap?.onLapProgress ?? NO_LAP
+  const [small] = useState(() => Math.min(window.screen.width, window.screen.height) < SMALL)
+  const url = mapUrl(model, small)
+
+  useLoader.preload(THREE.TextureLoader, url)
+
   const gltf = useLoader(GLTFLoader, modelUrl(model), meshopt)
+  const map = useLoader(THREE.TextureLoader, url)
   const camera = useThree((s) => s.camera)
   const size = useThree((s) => s.size)
   const advance = useThree((s) => s.advance)
@@ -86,9 +92,8 @@ function Scene({ model, theme, layout, fill, pins, onReady, yaw, lap }: Props) {
     stale.current = true
   }, [restart])
 
-  const { materials, ground, markers, rest, light, spin, inner } = useMemo(() => {
+  const { fills, markers, rest, light, spin, inner } = useMemo(() => {
     const info = infoFor(model)
-    const materials = mattify(gltf.scene, (name) => (isSector(name) ? SECTORS[name] : '#000000'))
     const track = new THREE.Box3()
 
     gltf.scene.updateMatrixWorld(true)
@@ -97,9 +102,13 @@ function Scene({ model, theme, layout, fill, pins, onReady, yaw, lap }: Props) {
     })
 
     const extent = track.getSize(new THREE.Vector3())
-    const ground = groundOf(gltf.scene, theme, Math.max(extent.x, extent.z))
 
-    materials.delete('ground')
+    map.flipY = false
+    map.colorSpace = THREE.SRGBColorSpace
+    map.anisotropy = 8
+    map.needsUpdate = true
+
+    const { fills } = broadcast(gltf.scene, map, Math.max(extent.x, extent.z))
     const markers: THREE.Object3D[] = []
 
     gltf.scene.traverse((o) => {
@@ -147,21 +156,8 @@ function Scene({ model, theme, layout, fill, pins, onReady, yaw, lap }: Props) {
     spin.position.copy(centre)
     inner.position.copy(centre).negate()
 
-    const [c1, c2] = info.cuts
-    const mids = [c1 / 2, (c1 + c2) / 2, (c2 + 1) / 2]
-
-    for (const [i, name] of SECTOR_NAMES.entries()) {
-      const target = mids[i] ?? 0
-      const nearest = info.line.reduce((best, p) => (Math.abs(p.u - target) < Math.abs(best.u - target) ? p : best))
-      const anchor = new THREE.Object3D()
-
-      anchor.name = name
-      anchor.position.set(nearest.x, nearest.y, nearest.z)
-      markers.push(anchor)
-    }
-
-    return { materials, ground, markers, rest, light: { group, head, trail, geometry }, spin, inner }
-  }, [gltf, model])
+    return { fills, markers, rest, light: { group, head, trail, geometry }, spin, inner }
+  }, [gltf, map, model])
 
   useEffect(() => {
     light.group.visible = lapped && !REDUCED
@@ -176,20 +172,6 @@ function Scene({ model, theme, layout, fill, pins, onReady, yaw, lap }: Props) {
     [light],
   )
 
-  useLayoutEffect(() => {
-    const t = PALETTE[theme]
-
-    for (const [name, m] of materials) {
-      if (isSector(name)) m.uniforms.uBase.value.set(t.unfilled)
-      else m.uniforms.uColor.value.set(t.ink)
-    }
-
-    for (const m of [light.head, ...light.trail]) if (m.material instanceof THREE.MeshBasicMaterial) m.material.color.set(t.ink)
-
-    ground.setTheme(theme)
-    stale.current = true
-  }, [theme, materials, ground, light])
-
   useEffect(() => {
     const pinEls = new Map<string, HTMLElement>()
 
@@ -199,7 +181,7 @@ function Scene({ model, theme, layout, fill, pins, onReady, yaw, lap }: Props) {
       if (!(camera instanceof THREE.PerspectiveCamera)) return
 
       camera.fov = rest.fov
-      camera.near = 10
+      camera.near = rest.at.distanceTo(rest.aim) * NEAR
       camera.far = rest.far
 
       if (layout === 'spin') {
@@ -276,8 +258,7 @@ function Scene({ model, theme, layout, fill, pins, onReady, yaw, lap }: Props) {
       lastYaw = yaw?.current ?? 0
       spin.rotation.y = lastYaw
 
-      for (const [name, m] of materials) if (isSector(name)) m.uniforms.uTo.value = fill.current
-
+      for (const f of fills) f.uniforms.uTo.value = fill.current
 
       if (go) {
         clock.current += Math.min(dt / 1000, 0.1)
@@ -330,7 +311,7 @@ function Scene({ model, theme, layout, fill, pins, onReady, yaw, lap }: Props) {
     gsap.ticker.add(tick)
 
     return () => gsap.ticker.remove(tick)
-  }, [materials, markers, rest, light, spin, camera, size, layout, advance, gl, scene, fill, running, pins, tag, yaw, lapped])
+  }, [fills, markers, rest, light, spin, camera, size, layout, advance, gl, scene, fill, running, pins, tag, yaw, lapped])
 
   return (
     <>
@@ -338,11 +319,6 @@ function Scene({ model, theme, layout, fill, pins, onReady, yaw, lap }: Props) {
         <primitive object={inner}>
           <primitive object={gltf.scene} />
           <primitive object={light.group} />
-          {markers
-            .filter((o) => !o.name.startsWith('turn-'))
-            .map((o) => (
-              <primitive key={o.name} object={o} />
-            ))}
         </primitive>
       </primitive>
     </>
