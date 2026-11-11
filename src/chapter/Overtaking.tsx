@@ -118,7 +118,7 @@ export function Overtaking() {
       </section>
       <figure className="photo-band">
         <div className="shot">
-          <img src={baku.src} alt="A McLaren leads a Ferrari and an Alpine down the main straight in Baku." />
+          <img src={baku.src} srcSet={baku.srcSet} sizes="100vw" alt="A McLaren leads a Ferrari and an Alpine down the main straight in Baku." />
         </div>
         <figcaption className="caption">
           <p className="mono">{`01 · ${baku.place}`}</p>
@@ -172,7 +172,7 @@ export function Overtaking() {
         <figure className="photo">
           <div className="frame">
             <div className="shot">
-              <img src={tow.src} alt="Two Haas cars nose to tail on the straight at Spa." loading="lazy" />
+              <img src={tow.src} srcSet={tow.srcSet} sizes="100vw" alt="Two Haas cars nose to tail on the straight at Spa." loading="lazy" />
             </div>
             <div className="pins" aria-hidden>
               {CALLOUTS.map((c) => (

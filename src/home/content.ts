@@ -1,16 +1,16 @@
 import type { To } from '#/shell/context.ts'
 
-export type Photo = { src: string; place: string; credit: string }
+export type Photo = { src: string; place: string; credit: string; srcSet?: string }
 
 export const PHOTOS = {
   heroLight: { src: '/img/hero-light.jpg', place: 'Lewis Hamilton · Ferrari SF-25 · Suzuka, 2025', credit: 'Photo Liauzh · CC BY-SA 4.0' },
   heroDark: { src: '/img/hero-dark.jpg', place: 'McLaren MCL39 · Las Vegas, 2025', credit: 'Photo DHSgov · Public domain' },
   ch01: { src: '/img/ch01.jpg', place: 'The grid · Shanghai, 2024', credit: 'Photo Liauzh · CC BY-SA 4.0' },
-  ch02: { src: '/img/ch02.jpg', place: 'Main straight · Baku, 2026', credit: 'Photo Press Service of the President of Azerbaijan · CC BY 4.0' },
+  ch02: { src: '/img/ch02.jpg', srcSet: '/img/ch02.jpg 1400w, /img/ch02-3543.jpg 3543w', place: 'Main straight · Baku, 2026', credit: 'Photo Press Service of the President of Azerbaijan · CC BY 4.0' },
   ch02Straight: { src: '/img/ch02-straight.jpg', place: 'The straight · Sepang, 2017', credit: 'Photo Morio · CC BY-SA 4.0' },
   ch02Turn1: { src: '/img/ch02-turn1.jpg', place: 'Turn 1 · Sepang, 2017', credit: 'Photo Morio · CC BY-SA 4.0' },
   ch02Exit: { src: '/img/ch02-exit.jpg', place: 'The exit · Sepang, 2017', credit: 'Photo Morio · CC BY-SA 4.0' },
-  ch02Tow: { src: '/img/ch02-tow.jpg', place: 'The tow · Spa-Francorchamps, 2026', credit: 'Photo Der Alf · CC BY 4.0' },
+  ch02Tow: { src: '/img/ch02-tow.jpg', srcSet: '/img/ch02-tow.jpg 2000w, /img/ch02-tow-3388.jpg 3388w', place: 'The tow · Spa-Francorchamps, 2026', credit: 'Photo Der Alf · CC BY 4.0' },
   ch03: { src: '/img/ch03.jpg', place: 'Pit lane · Suzuka, 2024', credit: 'Photo Cineyas · CC BY-SA 4.0' },
   ch04: { src: '/img/ch04.jpg', place: 'Safety car board · Zandvoort, 2024', credit: 'Photo Steffen Prößdorf · CC BY-SA 4.0' },
   ch05: { src: '/img/ch05.jpg', place: 'Oscar Piastri · McLaren MCL40 · Suzuka, 2026', credit: 'Photo Martin Lee · CC BY-SA 4.0' },
