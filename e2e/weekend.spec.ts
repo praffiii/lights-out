@@ -311,10 +311,10 @@ test('a done tile goes nowhere', async ({ page, errors }, testInfo) => {
   expect(errors).toEqual([])
 })
 
-test('the menu opens the Race weekend page', async ({ page, errors }) => {
+test("the menu's this-weekend line opens the Race weekend page", async ({ page, errors }) => {
   await loaded(page, '/')
   await page.getByRole('button', { name: 'Menu' }).click()
-  await page.locator('.menu .subs').getByRole('link', { name: 'Race weekend', exact: true }).click()
+  await page.locator('.menu').getByRole('link', { name: 'Round 20 · São Paulo GP this weekend', exact: true }).click()
 
   await page.waitForURL('**/weekend')
   expect(errors).toEqual([])

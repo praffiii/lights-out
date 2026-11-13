@@ -8,7 +8,7 @@ import { gsap, onEnter, REDUCED, ScrollTrigger, sweep, useGSAP } from '#/motion/
 import { Go } from '#/shell/Go.tsx'
 import type { SeasonSnapshot } from '#/season/snapshot-schema.ts'
 import { useSeason } from '#/season/use-season.ts'
-import { type PickedRace, pickRace, type RaceKind } from '#/season/weekend.ts'
+import { type PickedRace, pickRace, RACE_WHEN } from '#/season/weekend.ts'
 
 import { type Car, CARS } from './cars.ts'
 import { HERO } from './content.ts'
@@ -19,8 +19,6 @@ const Circuit = lazy(() => import('#/circuits/Circuit.tsx'))
 const LAP_S = 14
 
 const FILL_S = 1.6
-
-const WHEN: Record<RaceKind, string> = { 'this-weekend': 'this weekend', next: 'next race', finale: 'season finale' }
 
 const NARROW = '(max-width: 1199px)'
 
@@ -276,7 +274,7 @@ function Facts({ picked, info }: { picked: PickedRace; info: CircuitInfo }) {
         </div>
       </dl>
       <div className="note mono">
-        <p>{`${info.name} · ${info.gp} · ${WHEN[picked.kind]} · round ${picked.round} of ${picked.of}`}</p>
+        <p>{`${info.name} · ${info.gp} · ${RACE_WHEN[picked.kind]} · round ${picked.round} of ${picked.of}`}</p>
         <p className="muted">Built in Blender from bacinger/f1-circuits (MIT) and NASA SRTM elevation · Map © OpenStreetMap contributors (ODbL)</p>
       </div>
       <p className="key mono muted">
