@@ -17,6 +17,8 @@ export type RaceKind = 'this-weekend' | 'next' | 'finale'
 
 export type PickedRace = { race: Race; round: number; of: number; kind: RaceKind }
 
+export const RACE_WHEN: Record<RaceKind, string> = { 'this-weekend': 'this weekend', next: 'next race', finale: 'season finale' }
+
 export const bounds = (race: Race) => {
   const first = race.sessions[0]
   const final = race.sessions.find((session) => session.name === 'Race') ?? race.sessions.at(-1)

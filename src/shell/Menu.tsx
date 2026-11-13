@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 
 import { bar, ensureBar, gsap, REDUCED } from '#/motion/motion.ts'
 import { Roll } from '#/motion/Roll.tsx'
+import { gpName, pickRace, RACE_WHEN } from '#/season/weekend.ts'
+import { useSeason } from '#/season/use-season.ts'
 
 import { Go, Soon } from './Go.tsx'
 import { MENU } from './menu.ts'
@@ -35,7 +37,7 @@ export function Menu({ open, onClose, path }: { open: boolean; onClose: () => vo
       const t = gsap
         .timeline()
         .fromTo(el, { clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.6, ease: 'launch' })
-        .from(el.querySelectorAll('.subs > *'), { autoAlpha: 0, x: -8, duration: 0.5, stagger: 0.02 }, 0.7)
+        .from(el.querySelectorAll('.subs > *, nav .kicker'), { autoAlpha: 0, x: -8, duration: 0.5, stagger: 0.02 }, 0.7)
         .from(el.querySelector('.foot'), { autoAlpha: 0, duration: 0.4 }, 0.8)
 
       tl.current = t
@@ -107,6 +109,7 @@ export function Menu({ open, onClose, path }: { open: boolean; onClose: () => vo
         <ol>
           {MENU.map((m, i) => (
             <li key={m.label} className={m.to === path ? 'on' : undefined} onPointerEnter={() => setActive(i)}>
+              {m.weekend && <WeekendLine path={path} />}
               <span className="line">
                 {m.to ? (
                   <Go to={m.to} onFocus={() => setActive(i)} aria-current={m.to === path ? 'page' : undefined}>
@@ -120,19 +123,25 @@ export function Menu({ open, onClose, path }: { open: boolean; onClose: () => vo
                   </Soon>
                 )}
               </span>
-              {m.subs && (
-                <div className="subs mono">
-                  {m.subs.map((sub) =>
-                    sub.to ? (
-                      <Go key={sub.key} to={sub.to} aria-current={sub.to === path ? 'page' : undefined}>
-                        {sub.label}
+              {m.chapters && (
+                <div className="subs">
+                  {m.chapters.map((c) => {
+                    const row = (
+                      <>
+                        <span className="mono">{c.n}</span>
+                        <span className="title">{c.title.replace(/,.*/, '')}</span>
+                        <span className="mono min">{c.min} min</span>
+                      </>
+                    )
+
+                    return c.to ? (
+                      <Go key={c.n} to={c.to} aria-current={c.to === path ? 'page' : undefined}>
+                        {row}
                       </Go>
                     ) : (
-                      <Soon key={sub.key} className="muted">
-                        {sub.label}
-                      </Soon>
-                    ),
-                  )}
+                      <Soon key={c.n}>{row}</Soon>
+                    )
+                  })}
                 </div>
               )}
             </li>
@@ -163,5 +172,19 @@ export function Menu({ open, onClose, path }: { open: boolean; onClose: () => vo
         </div>
       </div>
     </div>
+  )
+}
+
+function WeekendLine({ path }: { path: string }) {
+  const season = useSeason()
+  const picked = season.data ? pickRace(season.data, new Date()) : null
+
+  if (!picked) return null
+
+  return (
+    <Go to="/weekend" className="kicker mono" aria-current={path === '/weekend' ? 'page' : undefined}>
+      {picked.kind === 'this-weekend' && <i aria-hidden />}
+      {`Round ${picked.round} · ${gpName(picked.race)} ${RACE_WHEN[picked.kind]}`}
+    </Go>
   )
 }
