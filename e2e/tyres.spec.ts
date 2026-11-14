@@ -65,11 +65,17 @@ test('a word chip opens its definition', async ({ page }) => {
   await expect(chapter(page, '.words > .def')).toContainText('Undercut')
 })
 
-test('the hero nav leads back to chapter 02', async ({ page }) => {
+test('the hero nav leads to chapters 02 and 04', async ({ page }) => {
   await loaded(page)
 
   await expect(chapter(page, '.opening').getByRole('link', { name: /02 How overtaking works/ })).toHaveAttribute('href', '/chapters/overtaking')
-  await expect(chapter(page, '.opening .nav .is-soon')).toContainText('04 Flags and what they mean')
+  await expect(chapter(page, '.opening').getByRole('link', { name: /04 Flags and what they mean/ })).toHaveAttribute('href', '/chapters/flags')
+})
+
+test('the next card leads to chapter 04', async ({ page }) => {
+  await loaded(page)
+
+  await expect(chapter(page, '.next .read')).toHaveAttribute('href', '/chapters/flags')
 })
 
 const replay = (page: Page, selector = '') => page.locator(`.chapter-page .replay ${selector}`.trim())

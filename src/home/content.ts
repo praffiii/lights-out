@@ -34,7 +34,7 @@ export const CHAPTERS: ReadonlyArray<ChapterEntry> = [
   { n: '01', title: 'A race weekend, Friday to Sunday', min: 5, photo: PHOTOS.ch01, to: '/chapters/race-weekend' },
   { n: '02', title: 'How overtaking works', min: 5, photo: PHOTOS.ch02, to: '/chapters/overtaking' },
   { n: '03', title: 'Tyres and strategy', min: 7, photo: PHOTOS.ch03, to: '/chapters/tyres-and-strategy' },
-  { n: '04', title: 'Flags and what they mean', min: 4, photo: PHOTOS.ch04, to: null },
+  { n: '04', title: 'Flags and what they mean', min: 4, photo: PHOTOS.ch04, to: '/chapters/flags' },
   { n: '05', title: 'Inside the car', min: 8, photo: PHOTOS.ch05, to: null },
 ]
 

@@ -5,7 +5,7 @@ import { circuitFor } from '#/circuits/registry.ts'
 
 import { PHOTOS } from '#/home/content.ts'
 import { block, gsap, ONCE, onEnter, REDUCED, reveal, sweep, useGSAP } from '#/motion/motion.ts'
-import { Go, Soon } from '#/shell/Go.tsx'
+import { Go } from '#/shell/Go.tsx'
 import baked from '#/tyres/miami.json'
 import { steps } from '#/tyres/model.ts'
 import { UndercutFile } from '#/tyres/schema.ts'
@@ -88,7 +88,7 @@ export function Tyres() {
           <nav className="mono nav" aria-label="Chapters">
             <Go to="/chapters/overtaking">← 02 How overtaking works</Go>
             <span aria-hidden> · </span>
-            <Soon>04 Flags and what they mean</Soon>
+            <Go to="/chapters/flags">04 Flags and what they mean →</Go>
           </nav>
         </div>
         <h1 id="h1" className="display">
@@ -209,7 +209,7 @@ export function Tyres() {
         </div>
       </section>
       <Words keys={TYRES_WORDS} />
-      <Next n="04" min={4} title="Flags and what they mean." line="What each colour asks of a driver" photo={PHOTOS.ch04} to={null} />
+      <Next n="04" min={4} title="Flags and what they mean." line="What each colour asks of a driver" photo={PHOTOS.ch04} to="/chapters/flags" />
     </div>
   )
 }
