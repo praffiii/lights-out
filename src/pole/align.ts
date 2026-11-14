@@ -14,7 +14,7 @@ type Input = {
 
 type Point = { x: number; y: number }
 
-type Fit = { mirror: number; scale: number; cos: number; sin: number; from: Point; to: Point; rms: number }
+export type Fit = { mirror: number; scale: number; cos: number; sin: number; from: Point; to: Point; rms: number }
 
 const MIN_SAMPLES = 50
 const MAX_MISS = 0.03
@@ -27,7 +27,7 @@ const wrap = (u: number) => u - Math.floor(u)
 
 const round = (x: number, places: number) => Math.round(x * 10 ** places) / 10 ** places
 
-const resample = (points: ReadonlyArray<Point>, n: number): Point[] => {
+export const resample = (points: ReadonlyArray<Point>, n: number): Point[] => {
   const along = [0]
 
   for (let i = 1; i < points.length; i++) {
@@ -63,7 +63,7 @@ const centroid = (points: ReadonlyArray<Point>) => {
   return { x: sum.x / points.length, y: sum.y / points.length }
 }
 
-const fit = (track: ReadonlyArray<Point>, model: ReadonlyArray<Point>): Fit | null => {
+export const fit = (track: ReadonlyArray<Point>, model: ReadonlyArray<Point>): Fit | null => {
   const n = model.length
   const to = centroid(model)
   const q = model.map((p) => ({ x: p.x - to.x, y: p.y - to.y }))
@@ -100,14 +100,14 @@ const fit = (track: ReadonlyArray<Point>, model: ReadonlyArray<Point>): Fit | nu
   return best && best.rms / Math.sqrt(qq / n) <= MAX_RMS ? best : null
 }
 
-const apply = (f: Fit, p: Point): Point => {
+export const apply = (f: Fit, p: Point): Point => {
   const x = p.x * f.mirror - f.from.x
   const y = p.y - f.from.y
 
   return { x: f.scale * (f.cos * x - f.sin * y) + f.to.x, y: f.scale * (f.sin * x + f.cos * y) + f.to.y }
 }
 
-const project = (model: ReadonlyArray<Point>, p: Point, near: number | null) => {
+export const project = (model: ReadonlyArray<Point>, p: Point, near: number | null) => {
   const n = model.length
   const reach = near === null ? n : Math.ceil(SEARCH * n)
   const centre = near === null ? 0 : Math.floor(near * n)

@@ -10,7 +10,7 @@ export const CAR_M = 5.5
 
 const mix = (a: number, b: number, f: number) => a + (b - a) * f
 
-export const crossTime = (rows: Rows, u: number): number | null => {
+export const crossTime = (rows: ReadonlyArray<readonly [number, number, ...ReadonlyArray<number>]>, u: number): number | null => {
   for (const [i, b] of rows.entries()) {
     if (b[1] < u) continue
 

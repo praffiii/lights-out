@@ -11,7 +11,15 @@ export const OvertakesResponse = Schema.Array(
   }),
 )
 
-export const PitResponse = Schema.Array(Schema.Struct({ driver_number: Schema.Number, lap_number: Schema.Number }))
+export const PitResponse = Schema.Array(
+  Schema.Struct({
+    date: Schema.String,
+    driver_number: Schema.Number,
+    lap_number: Schema.Number,
+    stop_duration: Schema.optional(Schema.NullOr(Schema.Number)),
+    lane_duration: Schema.optional(Schema.NullOr(Schema.Number)),
+  }),
+)
 
 const Lapped = Schema.String.pipe(Schema.decodeTo(Schema.Null, { decode: SchemaGetter.transform(() => null), encode: SchemaGetter.forbidden(() => 'OpenF1 responses are decode-only') }))
 
