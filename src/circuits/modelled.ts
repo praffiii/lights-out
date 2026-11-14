@@ -1,4 +1,4 @@
-export const MODELLED = ['interlagos', 'vegas', 'losail', 'yas_marina', 'albert_park'] as const
+export const MODELLED = ['interlagos', 'vegas', 'losail', 'yas_marina', 'albert_park', 'miami'] as const
 
 export type ModelledId = (typeof MODELLED)[number]
 
