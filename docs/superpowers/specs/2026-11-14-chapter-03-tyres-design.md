@@ -361,3 +361,18 @@ The bake script also times both cars at fixed points on the track, from the loca
 - Sharing Chapter 02's stage HUD, pin and slider code with this chapter, where that removes duplication rather than adds abstraction. Chapter 02's `Replay.tsx` and `PassHud.tsx` must not change behaviour.
 - The exact body copy and term definitions, in the mocks' voice.
 - The pin length, the scroll-to-time mapping, the camera framings, and the phone stage proportions within the approved frame.
+
+### Checked 2026-11-14 (Task 0)
+
+- **2026 tyres: confirmed.** Five dry compounds, C1 to C5, with three per race. C6 dropped. Fronts 25 mm and rears 30 mm narrower, on 18-inch rims. Intermediate and full wet. Sources: [F1](https://www.formula1.com/en/latest/article/pirelli-confirm-2026-tyre-compounds-as-f1-gets-set-for-a-new-era-of.6la0zKVsCYwWk9AAISz4Yw), [Motorsport.com](https://www.motorsport.com/f1/news/pirelli-sets-f1-2026-compounds-abandons-c6/10779540/).
+- **Two-compound rule: confirmed for 2026.** At least two dry specifications in a dry race. The Monaco-only two-stop clauses were deleted. Source: [GPFans quoting the FIA text](https://www.gpfans.com/en/f1-news/1077365/fia-f1-2026-rule-change-monaco-grand-prix/), and the FIA Section B, Iss 07.
+- **Pit loss: kept as the MultiViewer estimate.**
+  - PlanetF1 puts Miami at "around 20 s" under green and "about 11 s" under VSC. That backs "about 20 seconds", but not the 13.5 s VSC number exactly. The page keeps the `MultiViewer estimate` label on every figure.
+  - Source: [PlanetF1](https://www.planetf1.com/news/lando-norris-undercut-miami-gp-mclaren-strategy-kimi-antonelli).
+- **Miami story: confirmed.**
+  - Mercedes undercut. Norris stopped on lap 27 and "emerged just behind Antonelli".
+  - Stella blamed a combination of factors, including time lost in the pit lane and in-lap moments.
+  - Verstappen had pitted early under an earlier safety car, which is the off-strategy lead. Antonelli won by 3.264 s.
+  - One report says Norris stopped on lap 28. OpenF1's pit record and Silverstone both say 27, and the page uses the data.
+  - Sources: [Silverstone](https://www.silverstone.co.uk/news/f1-2026-miami-grand-prix-results-antonelli-holds-norris-secure-third-win-season), [PitDebrief](https://www.pitdebrief.com/?p=114812), [F1 Chronicle](https://f1chronicle.com/2026-miami-grand-prix-race-report/).
+- **Miami facts: confirmed.** 5.412 km, 57 laps, 308.326 km and 19 turns, per [F1's circuit guide](https://www.formula1.com/en/latest/article/circuit-guide-everything-you-need-to-know-about-the-miami-international-autodrome.zMEQ1nU4xZKuvc9EsGXDr). The direction is anticlockwise, from the layout's signed area. Interlagos and Las Vegas compute the same sign, and Lusail and Albert Park compute the opposite.
