@@ -14,7 +14,6 @@ export type Wall = {
   doubleYellow: number
   blue: number
   red: number
-  chequered: number
   redSessions: number
   blackWhite: number
   trackLimits: number
@@ -60,7 +59,6 @@ export function wallOf(tally: FlagTally): Wall {
     doubleYellow: sum(races, (r) => r.doubleYellow),
     blue: sum(races, (r) => r.blue),
     red: sum(races, (r) => r.red),
-    chequered: sum(races, (r) => r.chequered),
     redSessions: tally.redSessions,
     blackWhite: sum(races, (r) => r.blackWhite),
     trackLimits: sum(races, (r) => r.blackWhiteTrackLimits),

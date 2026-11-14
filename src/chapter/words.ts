@@ -29,6 +29,15 @@ export const WORDS = {
   overcut: { term: 'Overcut', def: 'Staying out longer than the car ahead. It works when new tyres are slow to warm up, or when clean air lets the driver push.' },
   safetyCar: { term: 'Safety car', def: 'A road car that leads the field at low speed after a crash. Everyone slows, so a pit stop costs far less.' },
   twoCompound: { term: 'Two-compound rule', def: 'In a dry race every driver must use at least two different dry compounds, so everyone stops at least once.' },
+  marshal: { term: 'Marshal', def: 'A volunteer at a post beside the track who waves the flags and clears crashes.' },
+  marshalSector: { term: 'Marshal sector', def: 'One of about 20 stretches of track, each watched by its own post. Flags are shown sector by sector.' },
+  yellowFlag: { term: 'Yellow flag', def: "Danger ahead. Slow down and don't overtake until the green." },
+  blueFlag: { term: 'Blue flag', def: 'A faster car is about to lap you. Let it by at the first chance, or be penalised.' },
+  lappedCar: { term: 'Lapped car', def: 'A car a full lap behind the leader. It must let the leaders through.' },
+  redFlag: { term: 'Red flag', def: 'The session is stopped. Every car returns slowly to the pit lane.' },
+  trackLimits: { term: 'Track limits', def: "The white lines at the track's edge. All four wheels past them and the lap time is deleted." },
+  blackWhiteFlag: { term: 'Black-and-white flag', def: "A warning shown with a car number. Do it again and it's a penalty." },
+  vsc: { term: 'Virtual safety car', def: 'Everyone slows to a set lap time without a car on track. Positions are frozen.' },
   drs: { term: 'DRS · until 2025', def: 'Drag Reduction System, 2011 to 2025. A flap in the rear wing that only the chasing car could open. Gone in 2026.' },
 } as const
 
@@ -39,3 +48,5 @@ export const RACE_WEEKEND_WORDS: ReadonlyArray<WordKey> = ['practice', 'qualifyi
 export const OVERTAKING_WORDS: ReadonlyArray<WordKey> = ['tow', 'slipstream', 'dirtyAir', 'detection', 'overtakeMode', 'straightMode', 'activeAero', 'brakingZone', 'insideLine', 'drs']
 
 export const TYRES_WORDS: ReadonlyArray<WordKey> = ['compound', 'stint', 'degradation', 'pitLoss', 'pitWindow', 'boxBox', 'undercut', 'overcut', 'safetyCar', 'twoCompound']
+
+export const FLAGS_WORDS: ReadonlyArray<WordKey> = ['marshal', 'marshalSector', 'yellowFlag', 'blueFlag', 'lappedCar', 'redFlag', 'trackLimits', 'blackWhiteFlag', 'vsc']
