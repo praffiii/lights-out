@@ -76,7 +76,7 @@
 .flags-page .tiles { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; margin-top: 72px; list-style: none; }
 .flags-page .tiles .flag { display: block; aspect-ratio: 256 / 200; }
 .flags-page .flag { box-shadow: inset 0 0 0 1px var(--line); }
-.flags-page .flag[data-flag='bw'] { background: linear-gradient(to bottom right, var(--dark) 50%, #fff 50%); box-shadow: inset 0 0 0 1.5px var(--dark); }
+.flags-page .flag[data-flag='bw'] { background: linear-gradient(to bottom right, var(--dark) 50%, #fff 50%); box-shadow: inset 0 0 0 1.5px var(--dark), 0 0 0 1px var(--line); }
 .flags-page .flag[data-flag='disc'] { background: radial-gradient(circle closest-side, #ff7a00 0 48%, var(--dark) 49%); }
 .flags-page .flag[data-flag='black'] { background: var(--dark); }
 .flags-page .flag[data-flag='stripes'] { background: repeating-linear-gradient(90deg, #e10600 0 12.5%, #f5c400 12.5% 25%); }
