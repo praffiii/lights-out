@@ -121,10 +121,6 @@ export const readout = (pass: PassFile, t: number) => {
 
 export const stepAt = (all: ReadonlyArray<Step>, t: number) => all.filter((s) => t >= s.t - SAME).length
 
-export const prevStep = (all: ReadonlyArray<Step>, t: number) => all.reduce((best, s) => (s.t < t - SAME && s.t > best ? s.t : best), 0)
-
-export const nextStep = (all: ReadonlyArray<Step>, t: number, end: number) => all.reduce((best, s) => (s.t > t + SAME && s.t < best ? s.t : best), end)
-
 export const sliderText = (all: ReadonlyArray<Step>, t: number) => {
   const n = stepAt(all, t)
   const step = all[n - 1]

@@ -3,7 +3,8 @@ import { describe, expect, test } from 'bun:test'
 import { Schema } from 'effect'
 
 import baked from '#/pass/pass.json'
-import { brakeOnset, crossTime, nextStep, prevStep, readout, sliderText, stepAt, steps } from '#/pass/model.ts'
+import { nextStop, prevStop } from '#/chapter/pace.ts'
+import { brakeOnset, crossTime, readout, sliderText, stepAt, steps } from '#/pass/model.ts'
 import { PassFile } from '#/pass/schema.ts'
 import type { PoleRow } from '#/pole/schema.ts'
 
@@ -129,15 +130,16 @@ describe('stepping', () => {
     expect(stepAt(all, end)).toBe(4)
   })
 
-  test('prevStep and nextStep move between steps', () => {
+  test('prevStop and nextStop move between steps', () => {
+    const stops = all.map((s) => s.t)
     const t = all[1].t + 0.2
 
-    expect(prevStep(all, t)).toBeCloseTo(all[1].t, 9)
-    expect(nextStep(all, t, end)).toBeCloseTo(all[2].t, 9)
-    expect(prevStep(all, 0)).toBe(0)
-    expect(nextStep(all, 0, end)).toBeCloseTo(all[0].t, 9)
-    expect(prevStep(all, end)).toBeCloseTo(all[3].t, 9)
-    expect(nextStep(all, end, end)).toBe(end)
+    expect(prevStop(stops, t)).toBeCloseTo(all[1].t, 9)
+    expect(nextStop(stops, t, end)).toBeCloseTo(all[2].t, 9)
+    expect(prevStop(stops, 0)).toBe(0)
+    expect(nextStop(stops, 0, end)).toBeCloseTo(all[0].t, 9)
+    expect(prevStop(stops, end)).toBeCloseTo(all[3].t, 9)
+    expect(nextStop(stops, end, end)).toBe(end)
   })
 
   test('sliderText names the step', () => {
