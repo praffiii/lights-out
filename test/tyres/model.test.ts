@@ -3,7 +3,7 @@ import { describe, expect, test } from 'bun:test'
 import { Schema } from 'effect'
 
 import baked from '#/tyres/miami.json'
-import { camAt, carAt, gapBehind, lapAt, positionAt, sliderText, statusAt, steps, tyreAt, windowLaps } from '#/tyres/model.ts'
+import { ageText, camAt, carAt, gapBehind, lapAt, positionAt, sliderText, statusAt, steps, tyreAt, windowLaps } from '#/tyres/model.ts'
 import { UndercutFile } from '#/tyres/schema.ts'
 
 const file = Schema.decodeUnknownSync(UndercutFile)(baked)
@@ -65,6 +65,10 @@ describe('readouts', () => {
     expect(tyreAt(file.early, file.early.stop.exit + 0.1)).toEqual({ compound: 'HARD', letter: 'H', age: 0 })
   })
 
+  test('tyre age reads New, then 1 lap, then laps', () => {
+    expect([0, 1, 27].map(ageText)).toEqual(['New', '1 lap', '27 laps'])
+  })
+
   test('old tyres count the lap being run', () => {
     expect(tyreAt(file.late, three.t - 1)).toEqual({ compound: 'MEDIUM', letter: 'M', age: 27 })
   })
@@ -74,6 +78,18 @@ describe('readouts', () => {
     expect(statusAt(file, 'early', file.early.stop.exit + 1)).toBe('Out-lap')
     expect(statusAt(file, 'late', (file.early.stop.exit + file.late.stop.entry) / 2)).toBe('Old tyres')
     expect(statusAt(file, 'late', 1)).toBe('')
+  })
+
+  test('statuses switch at the exact moment a car leaves the lane', () => {
+    expect(statusAt(file, 'early', file.early.stop.exit)).toBe('Out-lap')
+    expect(statusAt(file, 'late', file.late.stop.exit)).toBe('Out-lap')
+    expect(statusAt(file, 'late', file.early.stop.exit)).toBe('Old tyres')
+  })
+
+  test('step 4 lands once Norris is behind on track and in the timing, not at his lane exit', () => {
+    expect(four.t).toBeGreaterThan(file.late.stop.exit)
+    expect(gapBehind(file, four.t).behind).toBe('late')
+    expect(positionAt(file, 'late', four.t)).toBeGreaterThan(positionAt(file, 'early', four.t))
   })
 
   test('Antonelli drops then climbs', () => {
@@ -128,7 +144,24 @@ describe('camera and slider', () => {
     for (const s of all) expect(camAt(file, all, s.t).k).toBe(3)
 
     expect(camAt(file, all, (two.t + three.t) / 2).k).toBe(1)
-    expect(camAt(file, all, one.t).u).toBe(file.pit.u)
+  })
+
+  test('at each stop the camera centres on the car that is stopping', () => {
+    const at = (car: typeof file.early, t: number) => {
+      const u = carAt(car, t).u
+
+      return u - Math.floor(u)
+    }
+
+    expect(camAt(file, all, one.t).u).toBeCloseTo(at(file.early, one.t), 6)
+    expect(camAt(file, all, two.t).u).toBeCloseTo(at(file.early, two.t), 6)
+    expect(camAt(file, all, three.t).u).toBeCloseTo(at(file.late, three.t), 6)
+  })
+
+  test('the camera follows the pair, not the pit, when the order settles', () => {
+    const mid = (carAt(file.early, four.t).u + carAt(file.late, four.t).u) / 2
+
+    expect(camAt(file, all, four.t).u).toBeCloseTo(mid - Math.floor(mid), 6)
   })
 
   test('the slider names the lap and step', () => {

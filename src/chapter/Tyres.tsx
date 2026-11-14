@@ -1,13 +1,26 @@
+import { Schema } from 'effect'
 import { useRef } from 'react'
+
+import { circuitFor } from '#/circuits/registry.ts'
 
 import { PHOTOS } from '#/home/content.ts'
 import { block, gsap, ONCE, onEnter, REDUCED, reveal, sweep, useGSAP } from '#/motion/motion.ts'
 import { Go, Soon } from '#/shell/Go.tsx'
+import baked from '#/tyres/miami.json'
+import { steps } from '#/tyres/model.ts'
+import { UndercutFile } from '#/tyres/schema.ts'
 
 import { Next } from './Next.tsx'
 import { Term } from './Term.tsx'
+import { Undercut } from './Undercut.tsx'
 import { Words } from './Words.tsx'
 import { TYRES_WORDS } from './words.ts'
+
+const RACE = Schema.decodeUnknownSync(UndercutFile)(baked)
+
+const STEPS = steps(RACE)
+
+const INFO = circuitFor('miami')
 
 const COMPOUNDS = [
   { name: 'Soft', line: 'Fastest · wears first', tag: 'Dry', colour: '#ff1e1e' },
@@ -34,7 +47,7 @@ function hero(scope: HTMLElement) {
 function motion(scope: HTMLElement) {
   for (const el of all(scope, '.shot')) reveal(el)
 
-  for (const el of all(scope, '.tyres .headline .hl, .cost .headline .hl, .cheap .headline, .words h2')) sweep(el)
+  for (const el of all(scope, '.tyres .headline .hl, .cost .headline .hl, .undercut .headline .hl, .cheap .headline, .words h2')) sweep(el)
 
   for (const el of all(scope, '.cost .big, .cheap .stats li')) block(el)
 
@@ -42,7 +55,7 @@ function motion(scope: HTMLElement) {
 
   if (REDUCED) return
 
-  for (const el of all(scope, '.opening .intro, .tyres .body, .cost .body, .cost .source, .cheap .body')) rise(el, 24, 'top 90%')
+  for (const el of all(scope, '.opening .intro, .tyres .body, .cost .body, .cost .source, .undercut .head .body, .cheap .body')) rise(el, 24, 'top 90%')
 
   for (const el of all(scope, '.compounds li, .ways .rows li:not(.payoff)')) rise(el, 24, 'top 92%')
 }
@@ -141,6 +154,7 @@ export function Tyres() {
           <p className="mono muted source">Pit loss · MultiViewer estimate for Miami</p>
         </div>
       </section>
+      {INFO && STEPS ? <Undercut file={RACE} all={STEPS} info={INFO} /> : null}
       <section className="ways" aria-labelledby="ways">
         <h2 id="ways" className="mono muted label">
           Two ways to use a stop

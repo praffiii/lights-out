@@ -34,6 +34,12 @@ const smooth = (x: number) => {
   return f * f * (3 - 2 * f)
 }
 
+export const ageText = (age: number) => {
+  if (age === 0) return 'New'
+
+  return `${age} ${age === 1 ? 'lap' : 'laps'}`
+}
+
 export const endOf = (file: UndercutFile) => Math.max(file.early.rows.at(-1)?.[0] ?? 0, file.late.rows.at(-1)?.[0] ?? 0)
 
 export const carAt = (car: UndercutCar, t: number): Spot => {
@@ -68,6 +74,10 @@ export const gapBehind = (file: UndercutFile, t: number): Gap => {
   return { behind, seconds: passed === null ? null : t - passed }
 }
 
+const lateBehind = (file: UndercutFile, t: number) => gapBehind(file, t).behind === 'late' && positionAt(file, 'late', t) > positionAt(file, 'early', t)
+
+const settled = (file: UndercutFile) => file.late.rows.reduce<number | null>((at, [t]) => (t >= file.late.stop.exit && lateBehind(file, t) ? (at ?? t) : null), null)
+
 const lapOf = (car: UndercutCar, t: number) => car.laps.reduce((n, [lap, at]) => (at <= t && lap > n ? lap : n), 0) || car.stop.lap
 
 export const tyreAt = (car: UndercutCar, t: number): Tyre => {
@@ -89,13 +99,13 @@ export const statusAt = (file: UndercutFile, which: Which, t: number): Status =>
   const me = file[which]
   const you = file[other(which)]
 
-  if (t >= me.stop.entry && t <= me.stop.exit) return 'In pit'
+  if (t >= me.stop.entry && t < me.stop.exit) return 'In pit'
 
   const nextLap = me.laps.find(([, at]) => at > me.stop.exit)?.[1] ?? Infinity
 
-  if (t > me.stop.exit && t < nextLap) return 'Out-lap'
+  if (t >= me.stop.exit && t < nextLap) return 'Out-lap'
 
-  if (t < me.stop.exit && t > you.stop.exit) return 'Old tyres'
+  if (t < me.stop.exit && t >= you.stop.exit) return 'Old tyres'
 
   return ''
 }
@@ -115,8 +125,9 @@ export const steps = (file: UndercutFile): readonly [Step, Step, Step, Step] | n
   const end = endOf(file)
   const atBox = racingGap(file)
   const atEnd = gapBehind(file, end)
+  const behind = settled(file)
 
-  if (early.stop.exit >= late.stop.entry || atBox === null || atBox <= 0 || atEnd.behind !== 'late' || atEnd.seconds === null) return null
+  if (early.stop.exit >= late.stop.entry || atBox === null || atBox <= 0 || behind === null || atEnd.seconds === null) return null
 
   const e = surname(early)
   const l = surname(late)
@@ -127,7 +138,7 @@ export const steps = (file: UndercutFile): readonly [Step, Step, Step, Step] | n
     { n: 1, t: early.stop.entry, title: 'Box first.', text: `${atBox.toFixed(1)} s behind ${l}, on the same worn ${worn}. ${early.team} call him in.` },
     { n: 2, t: early.stop.exit, title: 'New tyres, one lap early.', text: `${e} is out on fresh ${fresh}. ${l} does one more lap on worn ${worn}.` },
     { n: 3, t: late.stop.entry, title: `${l} boxes.`, text: `${l} stops one lap later. His stop takes ${late.stop.stopS.toFixed(1)} s, against ${e}'s ${early.stop.stopS.toFixed(1)} s.` },
-    { n: 4, t: late.stop.exit, title: 'Out behind.', text: `${l} rejoins ${atEnd.seconds.toFixed(1)} s behind. Every tenth in the pit lane counted.` },
+    { n: 4, t: behind, title: 'Out behind.', text: `${l} rejoins ${atEnd.seconds.toFixed(1)} s behind. Every tenth in the pit lane counted.` },
   ]
 }
 
@@ -140,10 +151,13 @@ export const sliderText = (file: UndercutFile, all: ReadonlyArray<Step>, t: numb
 }
 
 export const camAt = (file: UndercutFile, all: ReadonlyArray<Step>, t: number): Focus => {
-  const near = all.reduce((d, s) => Math.min(d, Math.abs(s.t - t)), Infinity)
-  const w = smooth(1 - near / RAMP)
+  const near = all.reduce<Step | null>((best, s) => (best && Math.abs(best.t - t) <= Math.abs(s.t - t) ? best : s), null)
+  const w = near ? smooth(1 - Math.abs(near.t - t) / RAMP) : 0
+  const pair = wrap((carAt(file.early, t).u + carAt(file.late, t).u) / 2)
 
-  if (w <= 0) return { u: wrap((carAt(file.early, t).u + carAt(file.late, t).u) / 2), k: 1, w: 0 }
+  if (!near || w <= 0) return { u: pair, k: 1, w: 0 }
 
-  return { u: file.pit.u, k: 1 + (K_PIT - 1) * w, w }
+  const subject = near.n === all.length ? null : near.n <= 2 ? file.early : file.late
+
+  return { u: subject ? wrap(carAt(subject, near.t).u) : pair, k: 1 + (K_PIT - 1) * w, w }
 }
