@@ -19,6 +19,16 @@ export const WORDS = {
   activeAero: { term: 'Active aero', def: 'Wings that move. From 2026 every car switches between a low-drag straight mode and a high-grip corner mode.' },
   brakingZone: { term: 'Braking zone', def: 'The stretch before a corner where drivers brake. Braking later than the car ahead is how most passes finish.' },
   insideLine: { term: 'Inside line', def: "The side of the track nearest the corner's apex. Whoever holds it into the corner usually keeps it." },
+  compound: { term: 'Compound', def: "How soft a tyre's rubber is. Softer grips more and wears sooner. Pirelli makes five, from C1, the hardest, to C5, the softest." },
+  stint: { term: 'Stint', def: 'The laps a driver runs on one set of tyres, from the start or one stop to the next.' },
+  degradation: { term: 'Degradation', def: 'Tyres losing grip as they wear and overheat. Lap times creep up until a stop is worth its cost.' },
+  pitLoss: { term: 'Pit loss', def: 'The time a stop costs against staying on track: the pit lane speed limit, plus standing still. About 20 seconds in Miami.' },
+  pitWindow: { term: 'Pit window', def: 'The laps when a stop makes sense: tyres worn enough, and a gap in the traffic to rejoin into.' },
+  boxBox: { term: 'Box, box', def: 'The radio call that brings a driver into the pits at the end of this lap.' },
+  undercut: { term: 'Undercut', def: 'Stopping before the car ahead. New tyres are faster than worn ones, so the early stopper gains while the other car finishes its lap.' },
+  overcut: { term: 'Overcut', def: 'Staying out longer than the car ahead. It works when new tyres are slow to warm up, or when clean air lets the driver push.' },
+  safetyCar: { term: 'Safety car', def: 'A road car that leads the field at low speed after a crash. Everyone slows, so a pit stop costs far less.' },
+  twoCompound: { term: 'Two-compound rule', def: 'In a dry race every driver must use at least two different dry compounds, so everyone stops at least once.' },
   drs: { term: 'DRS · until 2025', def: 'Drag Reduction System, 2011 to 2025. A flap in the rear wing that only the chasing car could open. Gone in 2026.' },
 } as const
 
@@ -27,3 +37,5 @@ export type WordKey = keyof typeof WORDS
 export const RACE_WEEKEND_WORDS: ReadonlyArray<WordKey> = ['practice', 'qualifying', 'knockout', 'pole', 'grid', 'formationLap', 'lightsOut', 'sprint', 'points', 'constructors', 'parcFerme']
 
 export const OVERTAKING_WORDS: ReadonlyArray<WordKey> = ['tow', 'slipstream', 'dirtyAir', 'detection', 'overtakeMode', 'straightMode', 'activeAero', 'brakingZone', 'insideLine', 'drs']
+
+export const TYRES_WORDS: ReadonlyArray<WordKey> = ['compound', 'stint', 'degradation', 'pitLoss', 'pitWindow', 'boxBox', 'undercut', 'overcut', 'safetyCar', 'twoCompound']

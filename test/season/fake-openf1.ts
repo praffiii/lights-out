@@ -15,7 +15,7 @@ const byYear = new Map([
   [2025, sessions2025],
 ])
 
-export const POLE_KEYS = [9854, 11408, 11230, 9846, 9835]
+export const POLE_KEYS = [9854, 11408, 11230, 9846, 9835, 11276]
 
 const pole = await Promise.all(
   POLE_KEYS.map(async (key) => ({
@@ -60,6 +60,7 @@ export const fakeOpenF1Service: OpenF1Client['Service'] = {
   overtakes: () => Effect.succeed([]),
   pits: () => Effect.succeed([]),
   intervals: () => Effect.succeed([]),
+  positions: () => Effect.succeed([]),
 }
 
 export const fakeOpenF1 = (overrides: Partial<OpenF1Client['Service']> = {}) => Layer.succeed(OpenF1Client, { ...fakeOpenF1Service, ...overrides })

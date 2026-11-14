@@ -10,7 +10,7 @@ export const CAR_M = 5.5
 
 const mix = (a: number, b: number, f: number) => a + (b - a) * f
 
-export const crossTime = (rows: Rows, u: number): number | null => {
+export const crossTime = (rows: ReadonlyArray<readonly [number, number, ...ReadonlyArray<number>]>, u: number): number | null => {
   for (const [i, b] of rows.entries()) {
     if (b[1] < u) continue
 
@@ -120,10 +120,6 @@ export const readout = (pass: PassFile, t: number) => {
 }
 
 export const stepAt = (all: ReadonlyArray<Step>, t: number) => all.filter((s) => t >= s.t - SAME).length
-
-export const prevStep = (all: ReadonlyArray<Step>, t: number) => all.reduce((best, s) => (s.t < t - SAME && s.t > best ? s.t : best), 0)
-
-export const nextStep = (all: ReadonlyArray<Step>, t: number, end: number) => all.reduce((best, s) => (s.t > t + SAME && s.t < best ? s.t : best), end)
 
 export const sliderText = (all: ReadonlyArray<Step>, t: number) => {
   const n = stepAt(all, t)

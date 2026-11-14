@@ -7,7 +7,7 @@ import { block, gsap, ONCE, onEnter, REDUCED, reveal, sweep, useGSAP } from '#/m
 import { steps } from '#/pass/model.ts'
 import baked from '#/pass/pass.json'
 import { PassFile } from '#/pass/schema.ts'
-import { Go, Soon } from '#/shell/Go.tsx'
+import { Go } from '#/shell/Go.tsx'
 
 import { Next } from './Next.tsx'
 import { Replay } from './Replay.tsx'
@@ -105,7 +105,7 @@ export function Overtaking() {
           <nav className="mono nav" aria-label="Chapters">
             <Go to="/chapters/race-weekend">← 01 A race weekend</Go>
             <span aria-hidden> · </span>
-            <Soon>03 Tyres and strategy</Soon>
+            <Go to="/chapters/tyres-and-strategy">03 Tyres and strategy →</Go>
           </nav>
         </div>
         <h1 id="h1" className="display">
@@ -272,7 +272,7 @@ export function Overtaking() {
         </table>
       </section>
       <Words keys={OVERTAKING_WORDS} />
-      <Next n="03" min={7} title="Tyres and strategy." line="Why one pit stop can win a race" photo={PHOTOS.ch03} to={null} />
+      <Next n="03" min={7} title="Tyres and strategy." line="Why one pit stop can win a race" photo={PHOTOS.ch03} to="/chapters/tyres-and-strategy" />
     </div>
   )
 }

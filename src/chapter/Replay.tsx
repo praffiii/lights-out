@@ -1,15 +1,16 @@
-import { useLenis } from 'lenis/react'
-import { type CSSProperties, useCallback, useLayoutEffect, useRef, useState } from 'react'
+import { type CSSProperties, useCallback, useMemo, useRef, useState } from 'react'
 
 import type { CircuitInfo } from '#/circuits/registry.ts'
 import { TEAMS } from '#/home/cars.ts'
-import { gsap, REDUCED, ScrollTrigger, useGSAP } from '#/motion/motion.ts'
+import { REDUCED } from '#/motion/motion.ts'
 import { MARKS } from '#/pass/interlagos.ts'
-import { type Focus, nextStep, prevStep, readout, type Step, sliderText, stepAt } from '#/pass/model.ts'
+import { type Focus, readout, type Step, sliderText, stepAt } from '#/pass/model.ts'
 import type { PassFile } from '#/pass/schema.ts'
 import { CircuitStage, TELEMETRY_CREDIT } from '#/weekend/CircuitStage.tsx'
 
+import { linearPace } from './pace.ts'
 import { PassHud } from './PassHud.tsx'
+import { useScrub } from './useScrub.ts'
 
 type Vars = CSSProperties & Record<`--${string}`, string>
 
@@ -21,13 +22,7 @@ const K_CHASE = 4.2
 
 const FLY = 2.4
 
-const FOLLOW = 0.1
-
-const SETTLE = 0.002
-
 const LIVE = 0.4
-
-const SNAP_PX = 2
 
 const TURNS = [{ turn: 12, name: 'Junção' }, { turn: 1, name: 'S do Senna' }]
 
@@ -59,181 +54,67 @@ const camAt = (pass: PassFile, t: number): Focus => {
 export function Replay({ pass, all, info }: { pass: PassFile; all: Steps; info: CircuitInfo }) {
   const root = useRef<HTMLElement>(null)
   const end = pass.chaser.rows.at(-1)?.[0] ?? 0
-  const time = useRef(REDUCED ? end : 0)
-  const focus = useRef<Focus | null>(camAt(pass, time.current))
-  const lenis = useLenis()
-  const scroller = useRef(lenis)
+  const focus = useRef<Focus | null>(camAt(pass, REDUCED ? end : 0))
   const [near, setNear] = useState(false)
   const onNear = useCallback(() => setNear(true), [])
   const km = (((MARKS.apex - MARKS.detection) * pass.lengthM) / 1000).toFixed(1)
+  const stops = useMemo(() => all.map((s) => s.t), [all])
+  const pace = useMemo(() => linearPace(end), [end])
 
-  useLayoutEffect(() => {
-    scroller.current = lenis
-  }, [lenis])
+  const paint = (scope: HTMLElement) => {
+    const track = scope.querySelector('[role="slider"]')
+    const rows = CARS.map((car) => scope.querySelector(`tr[data-car="${car}"]`))
+    const callouts = [...scope.querySelectorAll<HTMLElement>('[data-step]')]
+    const marks = [...scope.querySelectorAll<HTMLElement>('[data-mark-step]')]
+    const played = scope.querySelector<HTMLElement>('.played')
+    const handle = scope.querySelector<HTMLElement>('.handle')
+    const clock = scope.querySelector('.now')
 
-  useGSAP(
-    () => {
-      const scope = root.current
-      const pin = scope?.querySelector<HTMLElement>('.pin')
-      const track = scope?.querySelector<HTMLElement>('[role="slider"]')
+    return (t: number) => {
+      const now = readout(pass, t)
+      const n = stepAt(all, t)
 
-      if (!scope || !pin || !track) return
+      focus.current = camAt(pass, t)
+      scope.toggleAttribute('data-live', t > LIVE)
+      track?.setAttribute('aria-valuenow', t.toFixed(1))
+      track?.setAttribute('aria-valuetext', sliderText(all, t))
+      write(clock, `${t.toFixed(1)} s`)
 
-      const rows = CARS.map((car) => scope.querySelector(`tr[data-car="${car}"]`))
-      const callouts = [...scope.querySelectorAll<HTMLElement>('[data-step]')]
-      const marks = [...scope.querySelectorAll<HTMLElement>('[data-mark-step]')]
-      const played = scope.querySelector<HTMLElement>('.played')
-      const handle = scope.querySelector<HTMLElement>('.handle')
-      const clock = scope.querySelector('.now')
-      let goal = time.current
-      let target: number | null = null
-      let st: ScrollTrigger | null = null
+      if (played) played.style.scale = `${t / end} 1`
 
-      const show = (t: number) => {
-        const now = readout(pass, t)
-        const n = stepAt(all, t)
+      if (handle) handle.style.left = `${(t / end) * 100}%`
 
-        time.current = t
-        focus.current = camAt(pass, t)
-        scope.toggleAttribute('data-live', t > LIVE)
-        track.setAttribute('aria-valuenow', t.toFixed(1))
-        track.setAttribute('aria-valuetext', sliderText(all, t))
-        write(clock, `${t.toFixed(1)} s`)
+      for (const el of callouts) {
+        const s = Number(el.dataset.step)
 
-        if (played) played.style.scale = `${t / end} 1`
-
-        if (handle) handle.style.left = `${(t / end) * 100}%`
-
-        for (const el of callouts) {
-          const s = Number(el.dataset.step)
-
-          el.toggleAttribute('data-lit', s <= n)
-          el.toggleAttribute('data-current', s === n)
-        }
-
-        for (const el of marks) {
-          const s = Number(el.dataset.markStep)
-
-          el.toggleAttribute('data-lit', s <= n)
-          el.toggleAttribute('data-current', s === n)
-        }
-
-        for (const [i, car] of CARS.entries()) {
-          const row = rows[i]
-          const r = now[car]
-
-          write(row?.querySelector('[data-speed]'), String(r.speed))
-          write(row?.querySelector('[data-gap]'), r.gap)
-          write(row?.querySelector('[data-gear]'), String(r.gear))
-          write(row?.querySelector('[data-mode]'), r.mode)
-          row?.querySelector('[data-mode]')?.toggleAttribute('data-on', r.mode === 'Overtake')
-          row?.querySelector('.meter')?.toggleAttribute('data-brake', r.brake)
-
-          for (const [j, cell] of [...(row?.querySelectorAll('.meter i') ?? [])].entries()) cell.toggleAttribute('data-on', j < r.cells)
-        }
+        el.toggleAttribute('data-lit', s <= n)
+        el.toggleAttribute('data-current', s === n)
       }
 
-      const follow = () => {
-        const d = goal - time.current
+      for (const el of marks) {
+        const s = Number(el.dataset.markStep)
 
-        if (d === 0) return
-
-        show(Math.abs(d) < SETTLE ? goal : time.current + d * (1 - (1 - FOLLOW) ** gsap.ticker.deltaRatio()))
+        el.toggleAttribute('data-lit', s <= n)
+        el.toggleAttribute('data-current', s === n)
       }
 
-      const fromScroll = (progress: number) => {
-        const t = progress * end
-        const span = st ? st.end - st.start : 0
-        const snap = span > 0 ? (SNAP_PX * end) / span : 0
+      for (const [i, car] of CARS.entries()) {
+        const row = rows[i]
+        const r = now[car]
 
-        if (target !== null && Math.abs(t - target) <= snap) {
-          goal = target
+        write(row?.querySelector('[data-speed]'), String(r.speed))
+        write(row?.querySelector('[data-gap]'), r.gap)
+        write(row?.querySelector('[data-gear]'), String(r.gear))
+        write(row?.querySelector('[data-mode]'), r.mode)
+        row?.querySelector('[data-mode]')?.toggleAttribute('data-on', r.mode === 'Overtake')
+        row?.querySelector('.meter')?.toggleAttribute('data-brake', r.brake)
 
-          return
-        }
-
-        target = null
-        goal = t
+        for (const [j, cell] of [...(row?.querySelectorAll('.meter i') ?? [])].entries()) cell.toggleAttribute('data-on', j < r.cells)
       }
+    }
+  }
 
-      const seek = (t: number) => {
-        goal = Math.min(end, Math.max(0, t))
-
-        if (!st) return show(goal)
-
-        target = goal
-
-        const y = st.start + (goal / end) * (st.end - st.start)
-        const lenisNow = scroller.current
-
-        if (lenisNow) lenisNow.scrollTo(y, { immediate: true, force: true })
-        else window.scrollTo(0, y)
-      }
-
-      if (!REDUCED) {
-        st = ScrollTrigger.create({
-          trigger: pin,
-          start: 'top top',
-          end: '+=300%',
-          pin: true,
-          onUpdate: (self) => fromScroll(self.progress),
-          onRefresh: (self) => fromScroll(self.progress),
-        })
-        fromScroll(st.progress)
-        show(goal)
-        gsap.ticker.add(follow)
-      } else show(end)
-
-      const fromX = (x: number) => {
-        const r = track.getBoundingClientRect()
-
-        return ((x - r.left) / r.width) * end
-      }
-
-      const onDown = (e: PointerEvent) => {
-        track.setPointerCapture(e.pointerId)
-        track.focus({ preventScroll: true })
-        seek(fromX(e.clientX))
-      }
-
-      const onMove = (e: PointerEvent) => {
-        if (track.hasPointerCapture(e.pointerId)) seek(fromX(e.clientX))
-      }
-
-      const back = () => prevStep(all, goal)
-      const on = () => nextStep(all, goal, end)
-
-      const keys = new Map([
-        ['ArrowLeft', back],
-        ['ArrowDown', back],
-        ['ArrowRight', on],
-        ['ArrowUp', on],
-        ['Home', () => 0],
-        ['End', () => end],
-      ])
-
-      const onKey = (e: KeyboardEvent) => {
-        const to = keys.get(e.key)
-
-        if (!to) return
-
-        e.preventDefault()
-        seek(to())
-      }
-
-      track.addEventListener('pointerdown', onDown)
-      track.addEventListener('pointermove', onMove)
-      track.addEventListener('keydown', onKey)
-
-      return () => {
-        gsap.ticker.remove(follow)
-        track.removeEventListener('pointerdown', onDown)
-        track.removeEventListener('pointermove', onMove)
-        track.removeEventListener('keydown', onKey)
-      }
-    },
-    { scope: root, dependencies: [pass, all, end] },
-  )
+  const time = useScrub(root, end, stops, pace, paint)
 
   return (
     <section className="replay cast circuit" data-theme="dark" aria-labelledby="replay" ref={root} style={colours(pass)}>

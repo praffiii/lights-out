@@ -81,6 +81,17 @@
 .chapter-page .band .card > h2 { margin: 23px 0 0 -4px; }
 .chapter-page .band .stage { margin: 24px calc(-1 * var(--m)) 0; }
 
+.chapter-page .rows { margin: 56px var(--m) 0; list-style: none; }
+.chapter-page .rows li { position: relative; display: grid; grid-template-columns: 200px minmax(0, 0.9fr) minmax(0, 1.1fr) 160px; align-items: baseline; column-gap: 32px; padding: 30px 0 28px; border-top: 1px solid var(--line); }
+.chapter-page .rows li > .bar { inset: 0; }
+.chapter-page .rows .where { color: var(--muted); }
+.chapter-page .rows .what { font-size: clamp(48px, 1rem + 4vw, 88px); }
+.chapter-page .rows .text { max-width: 440px; font-size: 17px; color: var(--muted); }
+.chapter-page .rows .verdict { justify-self: end; }
+.chapter-page .rows .payoff { margin: 0 calc(-1 * var(--m)); padding-inline: var(--m); border-top: 0; background: var(--purple); color: #111214; }
+.chapter-page .rows .payoff .where { color: inherit; }
+.chapter-page .rows .payoff .what { grid-column: 2 / 4; font-size: 32px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; }
+
 .chapter-page .term { position: relative; display: inline; }
 .chapter-page .term button { text-decoration: underline dotted 1px; text-underline-offset: 3px; letter-spacing: inherit; text-transform: inherit; }
 .chapter-page .term [aria-expanded='true'] { text-decoration-style: solid; color: var(--ink); }
@@ -122,6 +133,7 @@
   .chapter-page .days .name { font-size: 24px; }
   .chapter-page .ladder .rungs { gap: 24px; }
   .chapter-page .next .shot { height: 520px; }
+  .chapter-page .rows li { grid-template-columns: 140px minmax(0, 1fr) minmax(0, 1fr) 120px; column-gap: 20px; }
   .chapter-page .term .def { position: fixed; left: var(--m); right: var(--m); top: auto; bottom: 16px; width: auto; pointer-events: none; }
 }
 
@@ -156,6 +168,12 @@
   .chapter-page .band { margin-top: 72px; padding-top: 48px; }
   .chapter-page .band .stage { margin-top: 20px; }
   .chapter-page .words { margin-top: 56px; }
+  .chapter-page .rows { margin-top: 36px; }
+  .chapter-page .rows li { grid-template-columns: minmax(0, 1fr) auto; row-gap: 10px; padding: 22px 0 20px; }
+  .chapter-page .rows .what { grid-column: 1 / -1; grid-row: 2; font-size: 56px; }
+  .chapter-page .rows .text { grid-column: 1 / -1; grid-row: 3; font-size: 16px; }
+  .chapter-page .rows .verdict { grid-column: 2; grid-row: 1; }
+  .chapter-page .rows .payoff .what { grid-column: 1 / -1; font-size: 26px; }
   .chapter-page .next { margin-top: 72px; }
   .chapter-page .next .shot { height: auto; aspect-ratio: 4 / 3; }
   .chapter-page .next .caption { position: relative; right: 0; bottom: 0; width: auto; max-width: none; margin: -32px var(--m) 0; padding: 20px 16px; }

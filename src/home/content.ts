@@ -11,7 +11,9 @@ export const PHOTOS = {
   ch02Turn1: { src: '/img/ch02-turn1.jpg', place: 'Turn 1 · Sepang, 2017', credit: 'Photo Morio · CC BY-SA 4.0' },
   ch02Exit: { src: '/img/ch02-exit.jpg', place: 'The exit · Sepang, 2017', credit: 'Photo Morio · CC BY-SA 4.0' },
   ch02Tow: { src: '/img/ch02-tow.jpg', srcSet: '/img/ch02-tow.jpg 2000w, /img/ch02-tow-3388.jpg 3388w', place: 'The tow · Spa-Francorchamps, 2026', credit: 'Photo Der Alf · CC BY 4.0' },
-  ch03: { src: '/img/ch03.jpg', place: 'Pit lane · Suzuka, 2024', credit: 'Photo Cineyas · CC BY-SA 4.0' },
+  ch03: { src: '/img/ch03.jpg', place: 'Pit exit · Suzuka, 2024', credit: 'Photo Cineyas · CC BY-SA 4.0' },
+  ch03Medium: { src: '/img/ch03-medium.jpg', place: 'Medium slick · 2026', credit: 'Photo TaurusEmerald · CC BY-SA 4.0' },
+  ch03Sc: { src: '/img/ch03-sc.jpg', place: 'Safety car · Suzuka, 2026', credit: 'Photo Ysys3455 · CC0' },
   ch04: { src: '/img/ch04.jpg', place: 'Safety car board · Zandvoort, 2024', credit: 'Photo Steffen Prößdorf · CC BY-SA 4.0' },
   ch05: { src: '/img/ch05.jpg', place: 'Oscar Piastri · McLaren MCL40 · Suzuka, 2026', credit: 'Photo Martin Lee · CC BY-SA 4.0' },
   tyres: { src: '/img/tyres.jpg', place: 'Pirelli tyres, slicks to wets', credit: 'Photo Hullian111 · CC BY-SA 4.0' },
@@ -27,7 +29,7 @@ export type ChapterEntry = { n: string; title: string; min: number; photo: Photo
 export const CHAPTERS: ReadonlyArray<ChapterEntry> = [
   { n: '01', title: 'A race weekend, Friday to Sunday', min: 5, photo: PHOTOS.ch01, to: '/chapters/race-weekend' },
   { n: '02', title: 'How overtaking works', min: 5, photo: PHOTOS.ch02, to: '/chapters/overtaking' },
-  { n: '03', title: 'Tyres and strategy', min: 7, photo: PHOTOS.ch03, to: null },
+  { n: '03', title: 'Tyres and strategy', min: 7, photo: PHOTOS.ch03, to: '/chapters/tyres-and-strategy' },
   { n: '04', title: 'Flags and what they mean', min: 4, photo: PHOTOS.ch04, to: null },
   { n: '05', title: 'Inside the car', min: 8, photo: PHOTOS.ch05, to: null },
 ]

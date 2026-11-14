@@ -44,11 +44,12 @@ test('a word chip opens its definition', async ({ page }) => {
   await expect(chapter(page, '.words > .def')).toContainText('Overtake Mode')
 })
 
-test('the hero nav leads back to chapter 01', async ({ page }) => {
+test('the hero nav leads back to chapter 01 and on to chapter 03', async ({ page }) => {
   await loaded(page)
 
   await expect(chapter(page, '.opening').getByRole('link', { name: /01 A race weekend/ })).toHaveAttribute('href', '/chapters/race-weekend')
-  await expect(chapter(page, '.opening .nav .is-soon')).toContainText('03 Tyres and strategy')
+  await expect(chapter(page, '.opening').getByRole('link', { name: /03 Tyres and strategy/ })).toHaveAttribute('href', '/chapters/tyres-and-strategy')
+  await expect(chapter(page, '.next .read')).toHaveAttribute('href', '/chapters/tyres-and-strategy')
 })
 
 test('the DRS table lists three tools', async ({ page }) => {

@@ -30,5 +30,14 @@ it('gives every circuit a phone crop inside the poster', () => {
 })
 
 it('names every circuit by its registry id', () => {
-  for (const id of ['interlagos', 'vegas', 'losail', 'yas_marina', 'albert_park']) expect(circuitFor(id)?.id).toBe(id)
+  for (const id of ['interlagos', 'vegas', 'losail', 'yas_marina', 'albert_park', 'miami']) expect(circuitFor(id)?.id).toBe(id)
+})
+
+it('models Miami from the us-2022 build', () => {
+  const miami = circuitFor('miami')
+
+  expect(miami?.model).toBe('us-2022')
+  expect(miami?.cuts).toEqual([0.309, 0.648])
+  expect(miami?.facts.turns).toBe(19)
+  expect(miami?.pins).toHaveLength(19)
 })

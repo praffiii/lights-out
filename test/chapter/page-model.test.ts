@@ -60,7 +60,7 @@ it('follows the latest qualifying circuit when it has a model', () => {
 
 it('falls back to the weekend circuit, then the latest modelled one raced', () => {
   expect(live('2026-11-06T15:00:00Z').circuit?.id).toBe('interlagos')
-  expect(live('2026-10-09T00:00:00Z').circuit?.id).toBe('albert_park')
+  expect(live('2026-10-09T00:00:00Z').circuit?.id).toBe('miami')
 })
 
 it('writes the knockout and pole lines from the latest qualifying', () => {

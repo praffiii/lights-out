@@ -51,13 +51,14 @@ type Props = {
   hud?: Hud
   turns?: ReadonlyArray<{ turn: number; name?: string }>
   focus?: RefObject<Focus | null>
+  pit?: ReadonlyArray<readonly [number, number, number]>
 }
 
-export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus }: Props) {
+export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus, pit }: Props) {
   const box = useRef<HTMLDivElement>(null)
   const pins = useRef<HTMLDivElement>(null)
   const fill = useRef(1)
-  const replay = useRef<Replay>({ running: { current: false }, trace: { current: null }, turns: { current: [] }, focus, bare: hud !== undefined }).current
+  const replay = useRef<Replay>({ running: { current: false }, trace: { current: null }, turns: { current: [] }, focus, bare: hud !== undefined, pit: pit ? { points: pit, trace: { current: null } } : undefined }).current
   const [ready, setReady] = useState(false)
   const [failed, setFailed] = useState(false)
   const [turns, setTurns] = useState(true)

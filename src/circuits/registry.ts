@@ -8,6 +8,8 @@ import br1940Line from './lines/br-1940.json'
 import br1940 from './pins/br-1940.json'
 import qa2004Line from './lines/qa-2004.json'
 import qa2004 from './pins/qa-2004.json'
+import us2022Line from './lines/us-2022.json'
+import us2022 from './pins/us-2022.json'
 import us2023Line from './lines/us-2023.json'
 import us2023 from './pins/us-2023.json'
 
@@ -108,6 +110,15 @@ const CIRCUITS = {
     line: au1953Line,
     crop: cropOf(au1953),
     cuts: [0.328, 0.6],
+  },
+  miami: {
+    ...fromCalendar(CALENDAR.miami),
+    openf1: 'Miami',
+    facts: factsOf(CALENDAR.miami, { distanceKm: '308.326', turns: 19, direction: 'anticlockwise' }),
+    pins: pinsOf(us2022),
+    line: us2022Line,
+    crop: cropOf(us2022),
+    cuts: [0.309, 0.648],
   },
 } satisfies Record<ModelledId, Omit<CircuitInfo, 'id'>>
 

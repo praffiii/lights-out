@@ -1,11 +1,12 @@
 import { type RefObject, useEffect, useRef } from 'react'
 
 import type { Replay } from '#/circuits/Circuit.tsx'
-import { gsap, onEnter } from '#/motion/motion.ts'
 import { MARKS } from '#/pass/interlagos.ts'
 import { readout } from '#/pass/model.ts'
 import type { PassFile } from '#/pass/schema.ts'
 import { pointAt } from '#/pole/replay.ts'
+
+import { place, runWhileSeen } from './hud.ts'
 
 const SIDE_PX = 9
 const SPREAD_M = 40
@@ -20,10 +21,6 @@ const GATE_PX = 26
 const CHIP_PX = 36
 
 type Props = { pass: PassFile; stage: RefObject<HTMLDivElement | null>; replay: Replay; time: RefObject<number>; ready: boolean }
-
-const place = (el: Element | null | undefined, x: number, y: number) => {
-  if (el instanceof HTMLElement || el instanceof SVGElement) el.style.translate = `${x.toFixed(1)}px ${y.toFixed(1)}px`
-}
 
 const normalAt = (trace: Float32Array, u: number) => {
   const a = pointAt(trace, u - TANGENT)
@@ -73,9 +70,6 @@ export function PassHud({ pass, stage, replay, time, ready }: Props) {
     const cars = { chaser: root.querySelector('[data-car="chaser"]'), leader: root.querySelector('[data-car="leader"]') }
     const gap = root.querySelector('.gap')
     const gapText = gap?.querySelector('b')
-    let seen = false
-    let entered = false
-    let ticking = false
 
     const draw = () => {
       const trace = replay.trace.current
@@ -144,39 +138,7 @@ export function PassHud({ pass, stage, replay, time, ready }: Props) {
       if (gapText && gapText.textContent !== text) gapText.textContent = text
     }
 
-    const sync = () => {
-      const run = seen && entered && !document.hidden
-
-      replay.running.current = run
-
-      if (run === ticking) return
-
-      ticking = run
-
-      if (run) gsap.ticker.add(draw)
-      else gsap.ticker.remove(draw)
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-      seen = entries.at(-1)?.isIntersecting ?? seen
-      sync()
-    })
-
-    observer.observe(el)
-    document.addEventListener('visibilitychange', sync)
-
-    const off = onEnter(() => {
-      entered = true
-      sync()
-    })
-
-    return () => {
-      off()
-      observer.disconnect()
-      document.removeEventListener('visibilitychange', sync)
-      gsap.ticker.remove(draw)
-      replay.running.current = false
-    }
+    return runWhileSeen(el, replay, draw)
   }, [pass, stage, replay, time, ready])
 
   return (
