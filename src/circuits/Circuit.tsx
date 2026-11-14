@@ -52,6 +52,7 @@ export type Replay = {
   turns: RefObject<ReadonlyArray<{ turn: number; u: number }>>
   focus?: RefObject<Focus | null>
   bare?: boolean
+  pit?: { points: ReadonlyArray<readonly [number, number, number]>; trace: RefObject<Float32Array | null> }
 }
 
 type Props = {
@@ -330,16 +331,26 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
     let compiled = false
     let lastFill = -1
     const trace = new Float32Array(n * 2)
+    const pit = replay?.pit
+    const pitTrace = new Float32Array((pit?.points.length ?? 0) * 2)
     let framedFocus = ''
 
+    const toScreen = (out: Float32Array, i: number, x: number, y: number, z: number) => {
+      spot.set(x, y, z).project(camera)
+      out[i * 2] = ((spot.x + 1) / 2) * size.width
+      out[i * 2 + 1] = ((1 - spot.y) / 2) * size.height
+    }
+
     const project = () => {
-      for (const [i, p] of line.entries()) {
-        spot.set(p.x, p.y, p.z).project(camera)
-        trace[i * 2] = ((spot.x + 1) / 2) * size.width
-        trace[i * 2 + 1] = ((1 - spot.y) / 2) * size.height
-      }
+      for (const [i, p] of line.entries()) toScreen(trace, i, p.x, p.y, p.z)
 
       if (replay) replay.trace.current = trace
+
+      if (!pit) return
+
+      for (const [i, [x, y, z]] of pit.points.entries()) toScreen(pitTrace, i, x, y, z)
+
+      pit.trace.current = pitTrace
     }
 
     void gl.compileAsync(scene, camera).then(() => {
