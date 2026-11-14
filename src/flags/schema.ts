@@ -2,7 +2,6 @@ import { Schema } from 'effect'
 
 export const RaceControl = Schema.Struct({
   session_key: Schema.Number,
-  date: Schema.String,
   lap_number: Schema.NullOr(Schema.Number),
   category: Schema.String,
   flag: Schema.NullOr(Schema.String),

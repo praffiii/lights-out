@@ -102,3 +102,12 @@ it('a snapshot without flags still decodes', async () => {
 
   expect(snapshot.flags).toBeUndefined()
 })
+
+it('an empty refetch keeps the race already counted', async () => {
+  const previous = await full()
+  const { service } = recorder((key) => (key === 11412 ? [] : suzuka))
+  const result = await tally(2026, new Date(interlagosEnd + 24 * 3_600_000), previous, service)
+
+  expect(result?.races).toHaveLength(20)
+  expect(result?.races.at(-1)).toEqual(previous.races.at(-1))
+})

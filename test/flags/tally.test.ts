@@ -19,7 +19,7 @@ const session = (key: number) => {
   return found
 }
 
-const row = (fields: Partial<RaceControl>): RaceControl => ({ session_key: 11253, date: '2026-03-29T06:00:00+00:00', lap_number: 10, category: 'Other', flag: null, message: '', ...fields })
+const row = (fields: Partial<RaceControl>): RaceControl => ({ session_key: 11253, lap_number: 10, category: 'Other', flag: null, message: '', ...fields })
 
 it('counts Suzuka by the rules', () => {
   expect(countRace(session(11253), suzukaRows)).toMatchObject({
@@ -100,4 +100,10 @@ it('frozen after 48 hours', () => {
 
 it('redSessionCount skips testing days', () => {
   expect(redSessionCount(sessions2026, redRows)).toBe(26)
+})
+
+it('a row without a date still decodes', () => {
+  const decoded = Schema.decodeUnknownSync(RaceControlResponse)([{ session_key: 1, lap_number: 3, category: 'Flag', flag: 'BLUE', message: 'WAVED BLUE FLAG FOR CAR 1 (NOR)' }])
+
+  expect(decoded).toHaveLength(1)
 })

@@ -27,6 +27,7 @@ export const flagTally = (season: number, now: Date, previous: FlagTally | undef
       const rows = yield* openf1.raceControl(session.session_key)
 
       if (rows.length > 0) races.push(countRace(session, rows))
+      else if (old) races.push(old)
     }
 
     if (races.length === 0) return previous
