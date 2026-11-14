@@ -15,6 +15,10 @@ export const PHOTOS = {
   ch03Medium: { src: '/img/ch03-medium.jpg', place: 'Medium slick · 2026', credit: 'Photo TaurusEmerald · CC BY-SA 4.0' },
   ch03Sc: { src: '/img/ch03-sc.jpg', place: 'Safety car · Suzuka, 2026', credit: 'Photo Ysys3455 · CC0' },
   ch04: { src: '/img/ch04.jpg', place: 'Safety car board · Zandvoort, 2024', credit: 'Photo Steffen Prößdorf · CC BY-SA 4.0' },
+  ch04Marshal: { src: '/img/ch04-marshal.jpg', place: 'Track marshal · Zandvoort, 2024', credit: 'Photo Steffen Prößdorf · CC BY-SA 4.0' },
+  ch04Sweep: { src: '/img/ch04-sweep.jpg', place: 'Marshals clear the track · Melbourne, 2026', credit: 'Photo Yu Chu Chin · CC BY-SA 4.0' },
+  ch04Fire: { src: '/img/ch04-fire.jpg', place: 'A grass fire stops qualifying · Suzuka, 2025', credit: 'Photo Liauzh · CC BY-SA 4.0' },
+  ch04Board: { src: '/img/ch04-board.jpg', place: 'Yellow flag and SC board · Indianapolis, 2005', credit: 'Photo Dan Smith · CC BY-SA 2.0' },
   ch05: { src: '/img/ch05.jpg', place: 'Oscar Piastri · McLaren MCL40 · Suzuka, 2026', credit: 'Photo Martin Lee · CC BY-SA 4.0' },
   tyres: { src: '/img/tyres.jpg', place: 'Pirelli tyres, slicks to wets', credit: 'Photo Hullian111 · CC BY-SA 4.0' },
   williams: { src: '/img/williams.jpg', place: 'Williams FW48 · Shanghai, 2026', credit: 'Photo Liauzh · CC BY 4.0' },
@@ -30,7 +34,7 @@ export const CHAPTERS: ReadonlyArray<ChapterEntry> = [
   { n: '01', title: 'A race weekend, Friday to Sunday', min: 5, photo: PHOTOS.ch01, to: '/chapters/race-weekend' },
   { n: '02', title: 'How overtaking works', min: 5, photo: PHOTOS.ch02, to: '/chapters/overtaking' },
   { n: '03', title: 'Tyres and strategy', min: 7, photo: PHOTOS.ch03, to: '/chapters/tyres-and-strategy' },
-  { n: '04', title: 'Flags and what they mean', min: 4, photo: PHOTOS.ch04, to: null },
+  { n: '04', title: 'Flags and what they mean', min: 4, photo: PHOTOS.ch04, to: '/chapters/flags' },
   { n: '05', title: 'Inside the car', min: 8, photo: PHOTOS.ch05, to: null },
 ]
 

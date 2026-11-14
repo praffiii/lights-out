@@ -3151,5 +3151,671 @@
         "gap": 51.483
       }
     ]
+  },
+  "flags": {
+    "season": 2026,
+    "races": [
+      {
+        "sessionKey": 11234,
+        "circuit": "Melbourne",
+        "dateEnd": "2026-03-08T06:00:00+00:00",
+        "clear": 15,
+        "yellow": 4,
+        "doubleYellow": 9,
+        "blue": 93,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 0,
+        "blackWhiteTrackLimits": 0,
+        "safetyCars": 0,
+        "vscs": 3,
+        "samples": {
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 6"
+          },
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 7"
+          },
+          "blue": {
+            "lap": 14,
+            "message": "WAVED BLUE FLAG FOR CAR 77 (BOT) TIMED AT 15:23:22"
+          },
+          "chequered": {
+            "lap": 58,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11245,
+        "circuit": "Shanghai",
+        "dateEnd": "2026-03-15T09:00:00+00:00",
+        "clear": 16,
+        "yellow": 5,
+        "doubleYellow": 8,
+        "blue": 21,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 0,
+        "blackWhiteTrackLimits": 0,
+        "safetyCars": 1,
+        "vscs": 0,
+        "samples": {
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 12"
+          },
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 3"
+          },
+          "blue": {
+            "lap": 33,
+            "message": "WAVED BLUE FLAG FOR CAR 14 (ALO) TIMED AT 15:59:26"
+          },
+          "chequered": {
+            "lap": 56,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11253,
+        "circuit": "Suzuka",
+        "dateEnd": "2026-03-29T07:00:00+00:00",
+        "clear": 6,
+        "yellow": 2,
+        "doubleYellow": 2,
+        "blue": 10,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 1,
+        "blackWhiteTrackLimits": 0,
+        "safetyCars": 1,
+        "vscs": 0,
+        "samples": {
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 18"
+          },
+          "yellow": {
+            "lap": 22,
+            "message": "YELLOW IN TRACK SECTOR 21"
+          },
+          "blue": {
+            "lap": 45,
+            "message": "WAVED BLUE FLAG FOR CAR 77 (BOT) TIMED AT 15:29:34"
+          },
+          "chequered": {
+            "lap": 53,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11280,
+        "circuit": "Miami",
+        "dateEnd": "2026-05-03T19:00:00+00:00",
+        "clear": 24,
+        "yellow": 10,
+        "doubleYellow": 17,
+        "blue": 53,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 2,
+        "blackWhiteTrackLimits": 1,
+        "safetyCars": 1,
+        "vscs": 0,
+        "samples": {
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 18"
+          },
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 18"
+          },
+          "blue": {
+            "lap": 32,
+            "message": "WAVED BLUE FLAG FOR CAR 77 (BOT) TIMED AT 13:57:34"
+          },
+          "chequered": {
+            "lap": 57,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11291,
+        "circuit": "Montreal",
+        "dateEnd": "2026-05-24T22:00:00+00:00",
+        "clear": 17,
+        "yellow": 8,
+        "doubleYellow": 4,
+        "blue": 143,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 0,
+        "blackWhiteTrackLimits": 0,
+        "safetyCars": 0,
+        "vscs": 3,
+        "samples": {
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 15"
+          },
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 15"
+          },
+          "blue": {
+            "lap": 10,
+            "message": "WAVED BLUE FLAG FOR CAR 77 (BOT) TIMED AT 16:22:15"
+          },
+          "chequered": {
+            "lap": 68,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11299,
+        "circuit": "Monte Carlo",
+        "dateEnd": "2026-06-07T15:00:00+00:00",
+        "clear": 11,
+        "yellow": 6,
+        "doubleYellow": 6,
+        "blue": 126,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 1,
+        "blackWhiteTrackLimits": 1,
+        "safetyCars": 2,
+        "vscs": 0,
+        "samples": {
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 18"
+          },
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 18"
+          },
+          "blue": {
+            "lap": 10,
+            "message": "WAVED BLUE FLAG FOR CAR 87 (BEA) TIMED AT 15:16:01"
+          },
+          "chequered": {
+            "lap": 78,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11307,
+        "circuit": "Catalunya",
+        "dateEnd": "2026-06-14T15:00:00+00:00",
+        "clear": 9,
+        "yellow": 6,
+        "doubleYellow": 2,
+        "blue": 107,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 1,
+        "blackWhiteTrackLimits": 1,
+        "safetyCars": 0,
+        "vscs": 2,
+        "samples": {
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 12"
+          },
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 12"
+          },
+          "blue": {
+            "lap": 16,
+            "message": "WAVED BLUE FLAG FOR CAR 77 (BOT) TIMED AT 15:25:45"
+          },
+          "chequered": {
+            "lap": 66,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11315,
+        "circuit": "Spielberg",
+        "dateEnd": "2026-06-28T15:00:00+00:00",
+        "clear": 13,
+        "yellow": 5,
+        "doubleYellow": 6,
+        "blue": 116,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 1,
+        "blackWhiteTrackLimits": 1,
+        "safetyCars": 0,
+        "vscs": 2,
+        "samples": {
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 3"
+          },
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 14"
+          },
+          "blue": {
+            "lap": 23,
+            "message": "WAVED BLUE FLAG FOR CAR 18 (STR) TIMED AT 15:31:16"
+          },
+          "chequered": {
+            "lap": 71,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11326,
+        "circuit": "Silverstone",
+        "dateEnd": "2026-07-05T16:00:00+00:00",
+        "clear": 29,
+        "yellow": 25,
+        "doubleYellow": 5,
+        "blue": 110,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 3,
+        "blackWhiteTrackLimits": 3,
+        "safetyCars": 2,
+        "vscs": 2,
+        "samples": {
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 11"
+          },
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 11"
+          },
+          "blue": {
+            "lap": 7,
+            "message": "WAVED BLUE FLAG FOR CAR 23 (ALB) TIMED AT 15:14:18"
+          },
+          "chequered": {
+            "lap": 52,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11334,
+        "circuit": "Spa-Francorchamps",
+        "dateEnd": "2026-07-19T15:00:00+00:00",
+        "clear": 42,
+        "yellow": 12,
+        "doubleYellow": 30,
+        "blue": 21,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 0,
+        "blackWhiteTrackLimits": 0,
+        "safetyCars": 1,
+        "vscs": 2,
+        "samples": {
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 7"
+          },
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 13"
+          },
+          "blue": {
+            "lap": 26,
+            "message": "WAVED BLUE FLAG FOR CAR 18 (STR) TIMED AT 15:54:53"
+          },
+          "chequered": {
+            "lap": 44,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11342,
+        "circuit": "Hungaroring",
+        "dateEnd": "2026-07-26T15:00:00+00:00",
+        "clear": 6,
+        "yellow": 5,
+        "doubleYellow": 2,
+        "blue": 11,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 1,
+        "blackWhiteTrackLimits": 1,
+        "safetyCars": 0,
+        "vscs": 1,
+        "samples": {
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 19"
+          },
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 19"
+          },
+          "blue": {
+            "lap": 9,
+            "message": "WAVED BLUE FLAG FOR CAR 87 (BEA) TIMED AT 15:15:07"
+          },
+          "chequered": {
+            "lap": 70,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11353,
+        "circuit": "Zandvoort",
+        "dateEnd": "2026-08-23T15:00:00+00:00",
+        "clear": 65,
+        "yellow": 21,
+        "doubleYellow": 52,
+        "blue": 111,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 1,
+        "blackWhiteTrackLimits": 0,
+        "safetyCars": 0,
+        "vscs": 2,
+        "samples": {
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 18"
+          },
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 14"
+          },
+          "blue": {
+            "lap": 29,
+            "message": "WAVED BLUE FLAG FOR CAR 43 (COL) TIMED AT 16:11:36"
+          },
+          "chequered": {
+            "lap": 72,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11361,
+        "circuit": "Monza",
+        "dateEnd": "2026-09-06T15:00:00+00:00",
+        "clear": 31,
+        "yellow": 24,
+        "doubleYellow": 5,
+        "blue": 29,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 0,
+        "blackWhiteTrackLimits": 0,
+        "safetyCars": 1,
+        "vscs": 1,
+        "samples": {
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 1"
+          },
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 2"
+          },
+          "blue": {
+            "lap": 29,
+            "message": "WAVED BLUE FLAG FOR CAR 11 (PER) TIMED AT 16:19:41"
+          },
+          "chequered": {
+            "lap": 53,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11369,
+        "circuit": "Madring",
+        "dateEnd": "2026-09-13T15:00:00+00:00",
+        "clear": 11,
+        "yellow": 9,
+        "doubleYellow": 3,
+        "blue": 79,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 4,
+        "blackWhiteTrackLimits": 4,
+        "safetyCars": 0,
+        "vscs": 1,
+        "samples": {
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 10"
+          },
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 10"
+          },
+          "blue": {
+            "lap": 23,
+            "message": "WAVED BLUE FLAG FOR CAR 14 (ALO) TIMED AT 15:42:56"
+          },
+          "chequered": {
+            "lap": 57,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11377,
+        "circuit": "Baku",
+        "dateEnd": "2026-09-26T13:00:00+00:00",
+        "clear": 40,
+        "yellow": 25,
+        "doubleYellow": 12,
+        "blue": 6,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 0,
+        "blackWhiteTrackLimits": 0,
+        "safetyCars": 2,
+        "vscs": 0,
+        "samples": {
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 1"
+          },
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 1"
+          },
+          "blue": {
+            "lap": 25,
+            "message": "WAVED BLUE FLAG FOR CAR 77 (BOT) TIMED AT 15:47:32"
+          },
+          "chequered": {
+            "lap": 51,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11731,
+        "circuit": "Kuala Lumpur",
+        "dateEnd": "2026-10-04T09:00:00+00:00",
+        "clear": 104,
+        "yellow": 84,
+        "doubleYellow": 45,
+        "blue": 13,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 1,
+        "blackWhiteTrackLimits": 1,
+        "safetyCars": 2,
+        "vscs": 1,
+        "samples": {
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 6"
+          },
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 7"
+          },
+          "blue": {
+            "lap": 23,
+            "message": "WAVED BLUE FLAG FOR CAR 11 (PER) TIMED AT 17:17:46"
+          },
+          "chequered": {
+            "lap": 55,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11388,
+        "circuit": "Singapore",
+        "dateEnd": "2026-10-11T14:00:00+00:00",
+        "clear": 11,
+        "yellow": 8,
+        "doubleYellow": 1,
+        "blue": 71,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 2,
+        "blackWhiteTrackLimits": 2,
+        "safetyCars": 0,
+        "vscs": 2,
+        "samples": {
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 3"
+          },
+          "blue": {
+            "lap": 21,
+            "message": "WAVED BLUE FLAG FOR CAR 77 (BOT) TIMED AT 20:38:16"
+          },
+          "yellow": {
+            "lap": 31,
+            "message": "YELLOW IN TRACK SECTOR 6"
+          },
+          "chequered": {
+            "lap": 62,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11396,
+        "circuit": "Austin",
+        "dateEnd": "2026-10-25T22:00:00+00:00",
+        "clear": 28,
+        "yellow": 14,
+        "doubleYellow": 10,
+        "blue": 49,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 1,
+        "blackWhiteTrackLimits": 1,
+        "safetyCars": 0,
+        "vscs": 2,
+        "samples": {
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 12"
+          },
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 13"
+          },
+          "blue": {
+            "lap": 24,
+            "message": "WAVED BLUE FLAG FOR CAR 87 (BEA) TIMED AT 15:43:02"
+          },
+          "chequered": {
+            "lap": 56,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11404,
+        "circuit": "Mexico City",
+        "dateEnd": "2026-11-01T22:00:00+00:00",
+        "clear": 34,
+        "yellow": 18,
+        "doubleYellow": 16,
+        "blue": 11,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 0,
+        "blackWhiteTrackLimits": 0,
+        "safetyCars": 2,
+        "vscs": 1,
+        "samples": {
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 7"
+          },
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 7"
+          },
+          "blue": {
+            "lap": 27,
+            "message": "WAVED BLUE FLAG FOR CAR 77 (BOT) TIMED AT 14:40:20"
+          },
+          "chequered": {
+            "lap": 71,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      },
+      {
+        "sessionKey": 11412,
+        "circuit": "Interlagos",
+        "dateEnd": "2026-11-08T19:00:00+00:00",
+        "clear": 14,
+        "yellow": 7,
+        "doubleYellow": 7,
+        "blue": 107,
+        "red": 0,
+        "chequered": 1,
+        "blackWhite": 1,
+        "blackWhiteTrackLimits": 1,
+        "safetyCars": 0,
+        "vscs": 0,
+        "samples": {
+          "clear": {
+            "lap": 1,
+            "message": "CLEAR IN TRACK SECTOR 16"
+          },
+          "yellow": {
+            "lap": 1,
+            "message": "YELLOW IN TRACK SECTOR 13"
+          },
+          "blue": {
+            "lap": 17,
+            "message": "WAVED BLUE FLAG FOR CAR 11 (PER) TIMED AT 14:26:52"
+          },
+          "chequered": {
+            "lap": 71,
+            "message": "CHEQUERED FLAG"
+          }
+        }
+      }
+    ],
+    "redSessions": 26
   }
 }

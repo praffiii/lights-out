@@ -1,5 +1,8 @@
 import { Effect } from 'effect'
 
+import { flagTally } from '../flags/build.ts'
+import type { FlagTally } from '../flags/schema.ts'
+
 import { JolpicaClient, type JolpicaError } from './jolpica-client.ts'
 import { seasonHistory, type SeasonRace } from './history.ts'
 import { latestSession } from './latest-session.ts'
@@ -48,7 +51,7 @@ const history = (jolpica: JolpicaClient['Service'], season: number): Effect.Effe
     Effect.catch((error) => Effect.logWarning('season history skipped', error).pipe(Effect.as(undefined))),
   )
 
-export const buildSnapshot = (now: Date): Effect.Effect<SeasonSnapshot, JolpicaError, JolpicaClient | OpenF1Client> =>
+export const buildSnapshot = (now: Date, previous?: FlagTally): Effect.Effect<SeasonSnapshot, JolpicaError, JolpicaClient | OpenF1Client> =>
   Effect.gen(function* () {
     const jolpica = yield* JolpicaClient
     const { season, races } = yield* jolpica.races('current')
@@ -77,6 +80,7 @@ export const buildSnapshot = (now: Date): Effect.Effect<SeasonSnapshot, JolpicaE
 
     const past = driverStandings === null ? undefined : yield* history(jolpica, driverStandings.season)
     const session = yield* latestSession(races, season, now)
+    const flags = yield* flagTally(season, now, previous)
 
     const snapshot: SeasonSnapshot = {
       fetchedAt: now.toISOString(),
@@ -89,5 +93,5 @@ export const buildSnapshot = (now: Date): Effect.Effect<SeasonSnapshot, JolpicaE
       constructorStandings,
     }
 
-    return { ...snapshot, ...(past && { history: past }), ...(session && { latestSession: session }) }
+    return { ...snapshot, ...(past && { history: past }), ...(session && { latestSession: session }), ...(flags && { flags }) }
   })

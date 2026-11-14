@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SeasonRouteImport } from './routes/season'
 import { Route as WeekendRouteImport } from './routes/weekend'
 import { Route as ApiSeasonRouteImport } from './routes/api/season'
+import { Route as ChaptersFlagsRouteImport } from './routes/chapters.flags'
 import { Route as ChaptersOvertakingRouteImport } from './routes/chapters.overtaking'
 import { Route as ChaptersRaceWeekendRouteImport } from './routes/chapters.race-weekend'
 import { Route as ChaptersTyresAndStrategyRouteImport } from './routes/chapters.tyres-and-strategy'
@@ -37,6 +38,11 @@ const WeekendRoute = WeekendRouteImport.update({
 const ApiSeasonRoute = ApiSeasonRouteImport.update({
   id: '/api/season',
   path: '/api/season',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChaptersFlagsRoute = ChaptersFlagsRouteImport.update({
+  id: '/chapters/flags',
+  path: '/chapters/flags',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChaptersOvertakingRoute = ChaptersOvertakingRouteImport.update({
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
+  '/chapters/flags': typeof ChaptersFlagsRoute
   '/chapters/overtaking': typeof ChaptersOvertakingRoute
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
   '/chapters/tyres-and-strategy': typeof ChaptersTyresAndStrategyRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
+  '/chapters/flags': typeof ChaptersFlagsRoute
   '/chapters/overtaking': typeof ChaptersOvertakingRoute
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
   '/chapters/tyres-and-strategy': typeof ChaptersTyresAndStrategyRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
+  '/chapters/flags': typeof ChaptersFlagsRoute
   '/chapters/overtaking': typeof ChaptersOvertakingRoute
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
   '/chapters/tyres-and-strategy': typeof ChaptersTyresAndStrategyRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/season'
     | '/weekend'
     | '/api/season'
+    | '/chapters/flags'
     | '/chapters/overtaking'
     | '/chapters/race-weekend'
     | '/chapters/tyres-and-strategy'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/season'
     | '/weekend'
     | '/api/season'
+    | '/chapters/flags'
     | '/chapters/overtaking'
     | '/chapters/race-weekend'
     | '/chapters/tyres-and-strategy'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/season'
     | '/weekend'
     | '/api/season'
+    | '/chapters/flags'
     | '/chapters/overtaking'
     | '/chapters/race-weekend'
     | '/chapters/tyres-and-strategy'
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   SeasonRoute: typeof SeasonRoute
   WeekendRoute: typeof WeekendRoute
   ApiSeasonRoute: typeof ApiSeasonRoute
+  ChaptersFlagsRoute: typeof ChaptersFlagsRoute
   ChaptersOvertakingRoute: typeof ChaptersOvertakingRoute
   ChaptersRaceWeekendRoute: typeof ChaptersRaceWeekendRoute
   ChaptersTyresAndStrategyRoute: typeof ChaptersTyresAndStrategyRoute
@@ -176,6 +189,13 @@ declare module '@tanstack/react-router' {
       path: '/api/season'
       fullPath: '/api/season'
       preLoaderRoute: typeof ApiSeasonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chapters/flags': {
+      id: '/chapters/flags'
+      path: '/chapters/flags'
+      fullPath: '/chapters/flags'
+      preLoaderRoute: typeof ChaptersFlagsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chapters/overtaking': {
@@ -221,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   SeasonRoute: SeasonRoute,
   WeekendRoute: WeekendRoute,
   ApiSeasonRoute: ApiSeasonRoute,
+  ChaptersFlagsRoute: ChaptersFlagsRoute,
   ChaptersOvertakingRoute: ChaptersOvertakingRoute,
   ChaptersRaceWeekendRoute: ChaptersRaceWeekendRoute,
   ChaptersTyresAndStrategyRoute: ChaptersTyresAndStrategyRoute,
