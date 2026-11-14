@@ -28,3 +28,9 @@ it('round-trips a PoleLap through PoleLapJson', () => {
 
   expect(Schema.decodeUnknownSync(PoleLapJson)(json)).toEqual(lap)
 })
+
+it('a stint row without a tyre age still decodes, so the hourly pole refresh keeps working', () => {
+  const [stint] = Schema.decodeUnknownSync(StintsResponse)([{ lap_start: 1, lap_end: 20, compound: 'MEDIUM' }])
+
+  expect(stint?.tyre_age_at_start ?? null).toBeNull()
+})

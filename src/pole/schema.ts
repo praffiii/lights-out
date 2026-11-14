@@ -42,7 +42,7 @@ export const Stint = Schema.Struct({
   lap_start: Schema.NullOr(Schema.Number),
   lap_end: Schema.NullOr(Schema.Number),
   compound: Schema.NullOr(Schema.String),
-  tyre_age_at_start: Schema.NullOr(Schema.Number),
+  tyre_age_at_start: Schema.optional(Schema.NullOr(Schema.Number)),
 })
 
 export type Stint = typeof Stint.Type

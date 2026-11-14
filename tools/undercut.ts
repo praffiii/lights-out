@@ -256,7 +256,7 @@ const bake = Effect.gen(function* () {
     const s1 = track[i] ?? s0
     const u = s0 && s1 ? (s1.t === s0.t ? s0.u : s0.u + ((s1.u - s0.u) * (t - s0.t)) / (s1.t - s0.t)) : 0
 
-    return anchor.lap_number - 1 - u
+    return Math.round(anchor.lap_number - 1 - u)
   }
 
   const rowsOf = (which: 'early' | 'late'): Row[] => {

@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import { Schema } from 'effect'
 
+import { circuitFor } from '#/circuits/registry.ts'
 import baked from '#/tyres/miami.json'
 import { ageText, camAt, carAt, gapBehind, lapAt, positionAt, sliderText, statusAt, steps, tyreAt, windowLaps } from '#/tyres/model.ts'
 import { UndercutFile } from '#/tyres/schema.ts'
@@ -136,6 +137,29 @@ describe('readouts', () => {
     expect(carAt(car, 10.4).lane).toBeNull()
     expect(carAt(car, 10.6).lane).toBe(0.02)
     expect(carAt(car, 10.5).u).toBeCloseTo(25.925, 9)
+  })
+})
+
+describe('track position', () => {
+  const line = circuitFor('miami')?.line ?? []
+
+  const onLine = ([x, , z]: readonly [number, number, number]) => line.reduce((best, p) => (Math.hypot(p.x - x, p.z - z) < Math.hypot(best.x - x, best.z - z) ? p : best), line[0] ?? { u: 0, x: 0, y: 0, z: 0 }).u
+
+  const wrapped = (u: number) => u - Math.floor(u)
+
+  const apart = (a: number, b: number) => Math.min(Math.abs(a - b), 1 - Math.abs(a - b))
+
+  test('each car meets the pit lane where it leaves and rejoins the racing line', () => {
+    const entry = onLine(file.pit.points[0] ?? [0, 0, 0])
+    const exit = onLine(file.pit.points.at(-1) ?? [0, 0, 0])
+
+    for (const car of [file.early, file.late]) {
+      const before = car.rows.filter(([t, , lane]) => lane < 0 && t < car.stop.entry).at(-1)
+      const after = car.rows.find(([t, , lane]) => lane < 0 && t > car.stop.exit)
+
+      expect(apart(wrapped(before?.[1] ?? 0), entry)).toBeLessThan(0.005)
+      expect(apart(wrapped(after?.[1] ?? 0), exit)).toBeLessThan(0.005)
+    }
   })
 })
 
