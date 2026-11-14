@@ -2,8 +2,10 @@ import { expect, it } from 'bun:test'
 import { Effect, Layer, Logger, Schema } from 'effect'
 import { HttpClientError, HttpClientRequest, HttpClientResponse } from 'effect/http'
 
+import { RaceControlResponse } from '../../src/flags/schema.ts'
 import { JolpicaError } from '../../src/season/jolpica-client.ts'
 import { RacesResponse } from '../../src/season/jolpica-schema.ts'
+import { OpenF1Error } from '../../src/season/openf1-client.ts'
 import { refreshSnapshot } from '../../src/season/refresh.ts'
 import { SnapshotStore } from '../../src/season/store.ts'
 import { fakeJolpica } from './fake-jolpica.ts'
@@ -109,4 +111,21 @@ it('drops a stored latestSession from another season', async () => {
   await refreshAt('2026-11-07T15:00:00Z', kv, fakeOpenF1({ result: () => Effect.succeed([]) }))
 
   expect((await readBack(kv))?.latestSession).toBeUndefined()
+})
+
+it('keeps writing the snapshot and the previous flags when OpenF1 race control fails', async () => {
+  const { kv } = fakeKV()
+  const previous = await snapshotAt('2026-11-06T21:00:00Z')
+  const sample = { sessionKey: 11404, circuit: 'Mexico City', dateEnd: '2026-11-01T22:00:00+00:00', clear: 34, yellow: 18, doubleYellow: 16, blue: 11, red: 0, chequered: 1, blackWhite: 0, blackWhiteTrackLimits: 0, safetyCars: 2, vscs: 1, samples: {} }
+  const flags = { season: 2026, races: [sample], redSessions: 26 }
+  const broken = Schema.decodeUnknownEffect(RaceControlResponse)({}).pipe(Effect.mapError((cause) => new OpenF1Error({ path: '/race_control', cause })))
+
+  await store(kv, { ...previous, flags })
+
+  const result = await refreshAt('2026-11-07T20:00:00Z', kv, fakeOpenF1({ raceControl: () => broken }))
+  const stored = await readBack(kv)
+
+  expect(result).toBe('written')
+  expect(stored?.fetchedAt).toBe('2026-11-07T20:00:00.000Z')
+  expect(stored?.flags).toEqual(flags)
 })

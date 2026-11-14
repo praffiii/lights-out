@@ -61,6 +61,8 @@ export const fakeOpenF1Service: OpenF1Client['Service'] = {
   pits: () => Effect.succeed([]),
   intervals: () => Effect.succeed([]),
   positions: () => Effect.succeed([]),
+  raceControl: () => Effect.succeed([]),
+  redFlags: () => Effect.succeed([]),
 }
 
 export const fakeOpenF1 = (overrides: Partial<OpenF1Client['Service']> = {}) => Layer.succeed(OpenF1Client, { ...fakeOpenF1Service, ...overrides })
