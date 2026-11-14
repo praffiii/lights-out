@@ -39,6 +39,8 @@ const quote = (races: ReadonlyArray<FlagRace>, kind: Quoted): Quote | undefined 
 
 export const count = (n: number): string => n.toLocaleString('en-GB')
 
+export const races = (n: number): string => `${count(n)} ${n === 1 ? 'race' : 'races'}`
+
 export function wallOf(tally: FlagTally): Wall {
   const { races } = tally
   const quotes: Partial<Record<Quoted, Quote>> = {}

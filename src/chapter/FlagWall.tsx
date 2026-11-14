@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { count, type Quote, type Wall } from '#/flags/wall.ts'
+import { count, type Quote, races, type Wall } from '#/flags/wall.ts'
 import { type Photo, PHOTOS } from '#/home/content.ts'
 import { opposite, useTheme } from '#/shell/theme.ts'
 
@@ -14,7 +14,7 @@ type Poster = {
   order: ReadonlyArray<string>
   line: ReactNode
   count: (wall: Wall) => number
-  unit: (season: number) => string
+  unit: (wall: Wall) => string
   quote?: keyof Wall['quotes']
   photo?: { photo: Photo; n: string; alt: string }
 }
@@ -22,7 +22,7 @@ type Poster = {
 const RAIL: ReadonlyArray<Flag> = ['green', 'yellow', 'double', 'blue', 'red', 'chequered']
 
 const POSTERS: ReadonlyArray<Poster> = [
-  { flag: 'green', name: 'Green flag', order: ['Go.'], line: 'The danger is behind you. Race on.', count: (w) => w.clear, unit: (s) => `all-clears in ${s} races`, quote: 'clear' },
+  { flag: 'green', name: 'Green flag', order: ['Go.'], line: 'The danger is behind you. Race on.', count: (w) => w.clear, unit: (w) => `all-clears in ${w.season} races`, quote: 'clear' },
   {
     flag: 'yellow',
     name: 'Yellow flag',
@@ -33,7 +33,7 @@ const POSTERS: ReadonlyArray<Poster> = [
       </>
     ),
     count: (w) => w.yellow,
-    unit: (s) => `yellows in ${s} races`,
+    unit: (w) => `yellows in ${w.season} races`,
     quote: 'yellow',
   },
   {
@@ -42,7 +42,7 @@ const POSTERS: ReadonlyArray<Poster> = [
     order: ['Be ready', 'to stop.'],
     line: 'The track is blocked, or marshals are on it.',
     count: (w) => w.doubleYellow,
-    unit: (s) => `double yellows in ${s} races`,
+    unit: (w) => `double yellows in ${w.season} races`,
     photo: { photo: PHOTOS.ch04Sweep, n: '02', alt: 'Two marshals sweep debris off the kerb at Turn 11 in Melbourne.' },
   },
   {
@@ -55,7 +55,7 @@ const POSTERS: ReadonlyArray<Poster> = [
       </>
     ),
     count: (w) => w.blue,
-    unit: (s) => `blue flags in ${s} races`,
+    unit: (w) => `blue flags in ${w.season} races`,
     quote: 'blue',
   },
   {
@@ -64,10 +64,10 @@ const POSTERS: ReadonlyArray<Poster> = [
     order: ['Stop.'],
     line: 'Session stopped. Every car to the pit lane, slowly.',
     count: (w) => w.red,
-    unit: (s) => `times in a ${s} Grand Prix`,
+    unit: (w) => `times in a ${w.season} Grand Prix`,
     photo: { photo: PHOTOS.ch04Fire, n: '03', alt: 'A firefighter sprays a grass fire behind the fence at Suzuka.' },
   },
-  { flag: 'chequered', name: 'Chequered flag', order: ['It’s over.'], line: 'Race finished. One slow lap, then parc fermé.', count: (w) => w.races, unit: (s) => `races finished in ${s}`, quote: 'chequered' },
+  { flag: 'chequered', name: 'Chequered flag', order: ['It’s over.'], line: 'Race finished. One slow lap, then parc fermé.', count: (w) => w.races, unit: (w) => `${w.races === 1 ? 'race' : 'races'} finished in ${w.season}`, quote: 'chequered' },
 ]
 
 const pad = (n: number) => String(n).padStart(2, '0')
@@ -91,7 +91,7 @@ function Count({ poster, wall }: { poster: Poster; wall: Wall | undefined }) {
       {wall ? (
         <>
           <span className="display num">{count(poster.count(wall))}</span>
-          <span className="mono unit">{poster.unit(wall.season)}</span>
+          <span className="mono unit">{poster.unit(wall)}</span>
         </>
       ) : null}
     </p>
@@ -148,7 +148,7 @@ export function FlagWall({ wall }: { wall: Wall | undefined }) {
     <section className="wall" data-theme={theme ? opposite(theme) : undefined} aria-labelledby="wall">
       <div className="head">
         <p className="mono label">{wall ? `The flag wall · ${wall.season} season` : 'The flag wall'}</p>
-        <p className="mono tag">{wall ? `OpenF1 race control · ${wall.races} races` : null}</p>
+        <p className="mono tag">{wall ? `OpenF1 race control · ${races(wall.races)}` : null}</p>
         <h2 id="wall" className="display headline">
           <span className="hl">Six colours.</span>
           <span className="hl">Six orders.</span>

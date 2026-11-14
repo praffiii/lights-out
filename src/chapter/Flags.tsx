@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 
-import { count, wallOf } from '#/flags/wall.ts'
+import { count, races, wallOf } from '#/flags/wall.ts'
 import { PHOTOS } from '#/home/content.ts'
 import { block, gsap, ONCE, onEnter, REDUCED, reveal, sweep, useGSAP } from '#/motion/motion.ts'
 import { useSeason } from '#/season/use-season.ts'
@@ -158,7 +158,7 @@ export function Flags() {
               <li key={b.what}>
                 <p className="display num">{b.num === null ? null : count(b.num)}</p>
                 <p className="mono what">{b.what}</p>
-                <p className="mono muted races">{wall && b.races !== null ? `${b.races} races in ${wall.season}` : null}</p>
+                <p className="mono muted races">{wall && b.races !== null ? `${races(b.races)} in ${wall.season}` : null}</p>
               </li>
             ))}
           </ul>

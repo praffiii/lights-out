@@ -2,7 +2,7 @@ import { expect, it } from 'bun:test'
 import { Schema } from 'effect'
 
 import type { FlagRace } from '../../src/flags/schema.ts'
-import { count, wallOf } from '../../src/flags/wall.ts'
+import { count, races, wallOf } from '../../src/flags/wall.ts'
 import { SeasonSnapshotJson } from '../../src/season/snapshot-schema.ts'
 
 const fixture = Schema.decodeUnknownSync(SeasonSnapshotJson)(await Bun.file('test/fixtures/season-snapshot.json').text())
@@ -60,4 +60,9 @@ it("the season in the copy is the tally's", () => {
 
 it('count groups thousands the British way', () => {
   expect(count(1287)).toBe('1,287')
+})
+
+it('one race reads as one race', () => {
+  expect(races(1)).toBe('1 race')
+  expect(races(20)).toBe('20 races')
 })

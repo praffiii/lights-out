@@ -48,6 +48,7 @@
 .flags-page .chip:empty { background: transparent; }
 .flags-page .chip .where { font-size: 11px; color: rgb(244 243 239 / 0.6); }
 .flags-page .chip .msg { margin-top: 8px; font-weight: 500; }
+.flags-page .poster .term [aria-expanded='true'] { color: inherit; }
 
 .flags-page .poster:has(.photo) .field { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto minmax(0, 1fr) auto auto; grid-template-areas: 'index' 'sub' 'order' '.' 'line' 'count'; }
 .flags-page .poster:has(.photo) .order { margin-top: 40px; }
@@ -109,6 +110,10 @@
 .flags-page .boards .photo .caption { padding: 22px 24px 20px; border-top: 3px solid var(--purple); background: var(--dark); color: var(--paper); }
 .flags-page .boards .photo .credit { margin-top: 10px; color: rgb(244 243 239 / 0.62); }
 .flags-page .boards .short { display: none; }
+
+@media (min-width: 1200px) {
+  .flags-page .poster .term .def { top: auto; bottom: calc(100% + 6px); }
+}
 
 @media (max-width: 1199px) {
   .flags-page .field { grid-template-columns: minmax(0, 1fr) 340px; }

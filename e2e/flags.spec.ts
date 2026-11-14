@@ -112,6 +112,32 @@ test('a word chip opens its definition', async ({ page }) => {
   await expect(chapter(page, '.words > .def')).toContainText('Track limits')
 })
 
+test('a word inside a poster opens inside the poster, in its ink', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await loaded(page)
+
+  const yellow = poster(page, 'yellow')
+  const term = yellow.locator('.term button')
+
+  await page.evaluate(() => {
+    const list = document.querySelector('.posters')
+    const first = list?.querySelector('li')
+
+    if (list && first) window.scrollTo(0, list.getBoundingClientRect().top + scrollY + first.offsetHeight)
+  })
+  await page.waitForTimeout(1500)
+  await term.hover()
+
+  const def = yellow.locator('.term .def')
+
+  await expect(def).toBeVisible()
+
+  const [box, inside] = await Promise.all([yellow.boundingBox(), def.boundingBox()])
+
+  expect(inside && box && inside.y >= box.y && inside.y + inside.height <= box.y + box.height).toBe(true)
+  await expect(term).toHaveCSS('color', 'rgb(17, 18, 20)')
+})
+
 test('the boards link back to chapter 03', async ({ page }) => {
   await loaded(page)
 
