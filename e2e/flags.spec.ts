@@ -65,6 +65,24 @@ test("six posters in race order with the season's counts", async ({ page, errors
   expect(errors).toEqual([])
 })
 
+test('a count sits above its label, never on it', async ({ page, errors }) => {
+  await loaded(page)
+  await expect(poster(page, 'blue').locator('.num')).toHaveText('1,287')
+
+  const gaps = await chapter(page, '.poster .count').evaluateAll((els) =>
+    els.flatMap((el) => {
+      const num = el.querySelector('.num')
+      const unit = el.querySelector('.unit')
+
+      return num && unit && getComputedStyle(el).display === 'block' ? [unit.getBoundingClientRect().top - num.getBoundingClientRect().bottom] : []
+    }),
+  )
+
+  expect(gaps.length).toBeGreaterThan(0)
+  expect(gaps.every((gap) => gap >= 0)).toBe(true)
+  expect(errors).toEqual([])
+})
+
 test('track limits and boards read the tally', async ({ page, errors }) => {
   await loaded(page)
 
