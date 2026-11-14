@@ -1,0 +1,93 @@
+.tyres-page { --rule: 1px solid var(--line); --dark: #111214; --paper: #f4f3ef; }
+.tyres-page .opening h1 { grid-column: 1; }
+.tyres-page .opening .intro { grid-column: 2; }
+.tyres-page .photo-band img { object-position: 50% 60%; }
+.tyres-page .photo .caption { padding: 22px 24px 20px; border-top: 3px solid var(--purple); background: var(--dark); color: var(--paper); }
+.tyres-page .photo .caption .mono { color: rgb(244 243 239 / 0.62); }
+.tyres-page .photo .caption .what { margin-top: 10px; font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+.tyres-page .photo > .credit { margin-top: 12px; }
+.tyres-page .side .label { color: var(--muted); }
+
+.tyres-page .tyres { display: grid; grid-template-columns: minmax(0, 640px) minmax(0, 1fr); column-gap: 88px; margin: 120px var(--m) 0; padding-top: 44px; border-top: var(--rule); }
+.tyres-page .tyres > .label, .tyres-page .tyres > .headline { grid-column: 1 / -1; }
+.tyres-page .tyres > .headline { margin: 23px 0 0 -4px; }
+.tyres-page .tyres .photo { margin-top: 56px; }
+.tyres-page .tyres .photo .shot { aspect-ratio: 1; }
+.tyres-page .tyres .side { margin-top: 56px; }
+.tyres-page .tyres .body { max-width: 500px; }
+.tyres-page .compounds { margin-top: 60px; list-style: none; border-bottom: var(--rule); }
+.tyres-page .compounds li { position: relative; display: grid; grid-template-columns: 26px minmax(0, 1fr) minmax(0, 200px) 40px; align-items: center; column-gap: 20px; padding: 26px 0 24px; border-top: var(--rule); }
+.tyres-page .compounds li > .bar { inset: 0; }
+.tyres-page .ring { width: 26px; height: 26px; border-radius: 50%; box-shadow: 0 0 0 1px var(--line); }
+.tyres-page .ring::after { content: ''; display: block; margin: 7px; width: 12px; height: 12px; border-radius: 50%; background: var(--dark); }
+.tyres-page .compounds .name { font-size: clamp(32px, 1rem + 1.6vw, 44px); line-height: 1; letter-spacing: -0.03em; }
+.tyres-page .compounds .tag { justify-self: end; }
+.tyres-page .compounds [data-tag='Wet'] .tag { color: var(--muted); }
+.tyres-page .facts { margin-top: 28px; color: var(--purple); }
+
+.tyres-page .cost { display: grid; grid-template-columns: minmax(0, 1fr) 380px; align-items: center; column-gap: 48px; margin: 120px var(--m) 0; padding-top: 44px; border-top: var(--rule); }
+.tyres-page .cost > .label { grid-column: 1 / -1; }
+.tyres-page .cost .big { margin: 20px 0 0 -0.06em; font-size: clamp(120px, 1rem + 22vw, 340px); line-height: 0.84; }
+.tyres-page .cost .headline { font-size: 44px; line-height: 1; }
+.tyres-page .cost .body { margin-top: 36px; }
+.tyres-page .cost .source { margin-top: 48px; }
+
+.tyres-page .ways { padding-top: 120px; }
+.tyres-page .ways > .label { margin: 0 var(--m); }
+.tyres-page .ways .rows { margin-top: 32px; }
+
+.tyres-page .cheap { display: grid; grid-template-columns: minmax(0, 560px) minmax(0, 1fr); column-gap: 72px; margin: 72px var(--m) 0; padding-top: 44px; border-top: var(--rule); }
+.tyres-page .cheap > .label { grid-column: 1 / -1; }
+.tyres-page .cheap .photo { margin-top: 34px; }
+.tyres-page .cheap .photo .shot { aspect-ratio: 7 / 5; }
+.tyres-page .cheap .photo .caption { padding: 20px 24px 18px; border-top: 0; }
+.tyres-page .cheap .photo .caption > .mono:first-child { color: var(--paper); }
+.tyres-page .cheap .photo .credit { margin-top: 10px; }
+.tyres-page .cheap .side { margin-top: 34px; }
+.tyres-page .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 16px; list-style: none; }
+.tyres-page .stats li { position: relative; }
+.tyres-page .stats li > .bar { inset: 0; }
+.tyres-page .stats .num { font-size: clamp(40px, 1rem + 3vw, 64px); color: var(--muted); }
+.tyres-page .stats .what { margin-top: 22px; color: var(--muted); }
+.tyres-page .stats [data-on] .num { color: var(--ink); }
+.tyres-page .stats [data-on] .what { color: var(--purple); }
+.tyres-page .cheap .headline { margin-top: 80px; font-size: 44px; line-height: 1; }
+.tyres-page .cheap .body { max-width: 420px; margin-top: 24px; }
+
+@media (max-width: 1199px) {
+  .tyres-page .opening .intro { grid-column: 1; }
+  .tyres-page .tyres { grid-template-columns: minmax(0, 1fr); }
+  .tyres-page .tyres .photo { max-width: 560px; }
+  .tyres-page .cost { grid-template-columns: minmax(0, 1fr); }
+  .tyres-page .cost .side { max-width: 520px; margin-top: 32px; }
+  .tyres-page .cheap { grid-template-columns: minmax(0, 1fr); }
+  .tyres-page .cheap .photo { max-width: 560px; }
+  .tyres-page .cheap .side { margin-top: 48px; }
+  .tyres-page .cheap .headline { margin-top: 56px; }
+}
+
+@media (max-width: 760px) {
+  .tyres-page .tyres, .tyres-page .cost { margin-top: 72px; padding-top: 32px; }
+  .tyres-page .tyres .photo, .tyres-page .tyres .side { margin-top: 32px; }
+  .tyres-page .photo .caption { padding: 16px 16px 14px; }
+  .tyres-page .photo .caption .what { font-size: 17px; }
+  .tyres-page .compounds { margin-top: 36px; }
+  .tyres-page .compounds li { grid-template-columns: 22px minmax(0, 1fr) auto; row-gap: 6px; column-gap: 14px; padding: 18px 0 16px; }
+  .tyres-page .ring { width: 22px; height: 22px; }
+  .tyres-page .ring::after { margin: 6px; width: 10px; height: 10px; }
+  .tyres-page .compounds .name { font-size: 30px; }
+  .tyres-page .compounds .line { grid-column: 2; grid-row: 2; }
+  .tyres-page .compounds .tag { grid-column: 3; grid-row: 1; }
+  .tyres-page .cost .big { font-size: 30vw; }
+  .tyres-page .cost .headline, .tyres-page .cheap .headline { font-size: 34px; }
+  .tyres-page .cost .body { margin-top: 20px; }
+  .tyres-page .cost .source { margin-top: 24px; }
+  .tyres-page .ways { padding-top: 72px; }
+  .tyres-page .cheap { margin-top: 56px; padding-top: 32px; }
+  .tyres-page .cheap .photo { margin-top: 24px; }
+  .tyres-page .cheap .photo .caption { padding: 14px 16px 12px; }
+  .tyres-page .stats { gap: 12px; }
+  .tyres-page .stats .num { font-size: 32px; }
+  .tyres-page .stats .what { margin-top: 12px; font-size: 10px; }
+  .tyres-page .cheap .headline { margin-top: 40px; }
+}

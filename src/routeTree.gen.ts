@@ -15,6 +15,7 @@ import { Route as WeekendRouteImport } from './routes/weekend'
 import { Route as ApiSeasonRouteImport } from './routes/api/season'
 import { Route as ChaptersOvertakingRouteImport } from './routes/chapters.overtaking'
 import { Route as ChaptersRaceWeekendRouteImport } from './routes/chapters.race-weekend'
+import { Route as ChaptersTyresAndStrategyRouteImport } from './routes/chapters.tyres-and-strategy'
 import { Route as LapCircuitRouteImport } from './routes/lap.$circuit'
 import { Route as ApiPoleCircuitRouteImport } from './routes/api/pole.$circuit'
 
@@ -48,6 +49,12 @@ const ChaptersRaceWeekendRoute = ChaptersRaceWeekendRouteImport.update({
   path: '/chapters/race-weekend',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChaptersTyresAndStrategyRoute =
+  ChaptersTyresAndStrategyRouteImport.update({
+    id: '/chapters/tyres-and-strategy',
+    path: '/chapters/tyres-and-strategy',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LapCircuitRoute = LapCircuitRouteImport.update({
   id: '/lap/$circuit',
   path: '/lap/$circuit',
@@ -66,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/api/season': typeof ApiSeasonRoute
   '/chapters/overtaking': typeof ChaptersOvertakingRoute
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
+  '/chapters/tyres-and-strategy': typeof ChaptersTyresAndStrategyRoute
   '/lap/$circuit': typeof LapCircuitRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
 }
@@ -76,6 +84,7 @@ export interface FileRoutesByTo {
   '/api/season': typeof ApiSeasonRoute
   '/chapters/overtaking': typeof ChaptersOvertakingRoute
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
+  '/chapters/tyres-and-strategy': typeof ChaptersTyresAndStrategyRoute
   '/lap/$circuit': typeof LapCircuitRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
 }
@@ -87,6 +96,7 @@ export interface FileRoutesById {
   '/api/season': typeof ApiSeasonRoute
   '/chapters/overtaking': typeof ChaptersOvertakingRoute
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
+  '/chapters/tyres-and-strategy': typeof ChaptersTyresAndStrategyRoute
   '/lap/$circuit': typeof LapCircuitRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
 }
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/api/season'
     | '/chapters/overtaking'
     | '/chapters/race-weekend'
+    | '/chapters/tyres-and-strategy'
     | '/lap/$circuit'
     | '/api/pole/$circuit'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/api/season'
     | '/chapters/overtaking'
     | '/chapters/race-weekend'
+    | '/chapters/tyres-and-strategy'
     | '/lap/$circuit'
     | '/api/pole/$circuit'
   id:
@@ -119,6 +131,7 @@ export interface FileRouteTypes {
     | '/api/season'
     | '/chapters/overtaking'
     | '/chapters/race-weekend'
+    | '/chapters/tyres-and-strategy'
     | '/lap/$circuit'
     | '/api/pole/$circuit'
   fileRoutesById: FileRoutesById
@@ -130,6 +143,7 @@ export interface RootRouteChildren {
   ApiSeasonRoute: typeof ApiSeasonRoute
   ChaptersOvertakingRoute: typeof ChaptersOvertakingRoute
   ChaptersRaceWeekendRoute: typeof ChaptersRaceWeekendRoute
+  ChaptersTyresAndStrategyRoute: typeof ChaptersTyresAndStrategyRoute
   LapCircuitRoute: typeof LapCircuitRoute
   ApiPoleCircuitRoute: typeof ApiPoleCircuitRoute
 }
@@ -178,6 +192,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChaptersRaceWeekendRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/chapters/tyres-and-strategy': {
+      id: '/chapters/tyres-and-strategy'
+      path: '/chapters/tyres-and-strategy'
+      fullPath: '/chapters/tyres-and-strategy'
+      preLoaderRoute: typeof ChaptersTyresAndStrategyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lap/$circuit': {
       id: '/lap/$circuit'
       path: '/lap/$circuit'
@@ -202,6 +223,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiSeasonRoute: ApiSeasonRoute,
   ChaptersOvertakingRoute: ChaptersOvertakingRoute,
   ChaptersRaceWeekendRoute: ChaptersRaceWeekendRoute,
+  ChaptersTyresAndStrategyRoute: ChaptersTyresAndStrategyRoute,
   LapCircuitRoute: LapCircuitRoute,
   ApiPoleCircuitRoute: ApiPoleCircuitRoute,
 }

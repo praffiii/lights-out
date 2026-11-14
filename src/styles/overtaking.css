@@ -36,16 +36,6 @@
 .overtaking-page .air .caption .what { margin: 0; }
 .overtaking-page .air .credit { margin: 6px var(--m) 0; }
 .overtaking-page .air > .head { margin-top: 88px; padding: 0 var(--m); }
-.overtaking-page .air .rows { margin: 56px var(--m) 0; list-style: none; }
-.overtaking-page .air .rows li { position: relative; display: grid; grid-template-columns: 200px minmax(0, 0.9fr) minmax(0, 1.1fr) 160px; align-items: baseline; column-gap: 32px; padding: 30px 0 28px; border-top: 1px solid var(--line); }
-.overtaking-page .air .rows li > .bar { inset: 0; }
-.overtaking-page .air .rows .where { color: var(--muted); }
-.overtaking-page .air .rows .what { font-size: clamp(48px, 1rem + 4vw, 88px); }
-.overtaking-page .air .rows .text { max-width: 440px; font-size: 17px; color: var(--muted); }
-.overtaking-page .air .rows .verdict { justify-self: end; }
-.overtaking-page .air .rows .payoff { margin: 0 calc(-1 * var(--m)); padding-inline: var(--m); border-top: 0; background: var(--purple); color: #111214; }
-.overtaking-page .air .payoff .where { color: inherit; }
-.overtaking-page .air .payoff .what { grid-column: 2 / 4; font-size: 32px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; }
 
 .overtaking-page .rules { display: grid; grid-template-columns: minmax(0, 1fr) 380px; align-items: end; column-gap: 48px; padding: 140px var(--m) 0; }
 .overtaking-page .rules > .label { grid-column: 1 / -1; }
@@ -162,7 +152,6 @@
   .overtaking-page .frames .grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: none; }
   .overtaking-page .frames .lead { grid-column: 1 / -1; grid-row: auto; max-width: 640px; }
   .overtaking-page .frames .big { grid-column: 1 / -1; grid-row: auto; }
-  .overtaking-page .air .rows li { grid-template-columns: 140px minmax(0, 1fr) minmax(0, 1fr) 120px; column-gap: 20px; }
   .overtaking-page .rules .side { max-width: 560px; padding-bottom: 0; margin-top: 32px; }
 }
 
@@ -181,12 +170,6 @@
   .overtaking-page .air .callouts [data-side='down'] { translate: none; }
   .overtaking-page .air .caption { flex-direction: column; gap: 6px; }
   .overtaking-page .air > .head { margin-top: 56px; }
-  .overtaking-page .air .rows { margin-top: 36px; }
-  .overtaking-page .air .rows li { grid-template-columns: minmax(0, 1fr) auto; row-gap: 10px; padding: 22px 0 20px; }
-  .overtaking-page .air .rows .what { grid-column: 1 / -1; grid-row: 2; font-size: 56px; }
-  .overtaking-page .air .rows .text { grid-column: 1 / -1; grid-row: 3; font-size: 16px; }
-  .overtaking-page .air .rows .verdict { grid-column: 2; grid-row: 1; }
-  .overtaking-page .air .payoff .what { grid-column: 1 / -1; font-size: 26px; }
   .overtaking-page .rules { padding-top: 88px; }
   .overtaking-page .rules .letters, .overtaking-page .rules .strike { font-size: 44vw; }
   .overtaking-page .rules table { margin-top: 44px; }
