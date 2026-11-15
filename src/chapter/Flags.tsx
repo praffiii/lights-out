@@ -4,7 +4,7 @@ import { count, races, wallOf } from '#/flags/wall.ts'
 import { PHOTOS } from '#/home/content.ts'
 import { block, gsap, ONCE, onEnter, REDUCED, reveal, sweep, useGSAP } from '#/motion/motion.ts'
 import { useSeason } from '#/season/use-season.ts'
-import { Go, Soon } from '#/shell/Go.tsx'
+import { Go } from '#/shell/Go.tsx'
 
 import { FlagWall } from './FlagWall.tsx'
 import { Next } from './Next.tsx'
@@ -83,7 +83,7 @@ export function Flags() {
           <nav className="mono nav" aria-label="Chapters">
             <Go to="/chapters/tyres-and-strategy">← 03 Tyres and strategy</Go>
             <span aria-hidden> · </span>
-            <Soon>05 Inside the car</Soon>
+            <Go to="/chapters/inside-the-car">05 Inside the car →</Go>
           </nav>
         </div>
         <h1 id="h1" className="display">
@@ -180,7 +180,7 @@ export function Flags() {
         </figure>
       </section>
       <Words keys={FLAGS_WORDS} />
-      <Next n="05" min={8} title="Inside the car." line="What every part of a 2026 car does" photo={PHOTOS.ch05} to={null} />
+      <Next n="05" min={8} title="Inside the car." line="What every part of a 2026 car does" photo={PHOTOS.ch05} to="/chapters/inside-the-car" />
     </div>
   )
 }

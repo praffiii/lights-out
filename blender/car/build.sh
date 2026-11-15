@@ -10,7 +10,7 @@ run prep.py -- "$mag80"
 test -f car.blend
 run render.py -- rig
 for theme in light dark; do
-  for view in exploded exploded-phone top top-phone side; do
+  for view in exploded exploded-phone top top-phone side side-corner; do
     run render.py -- "$view" "$theme"
     python3 -I post.py "$view-$theme"
   done

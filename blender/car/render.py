@@ -4,6 +4,7 @@ import os
 import sys
 
 import bpy
+from bpy_extras.object_utils import world_to_camera_view
 from mathutils import Matrix, Vector
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -23,6 +24,9 @@ PART_PULL = 0.55
 PART_D = 0.72
 SIDE = {"target": Vector((1.85, 0, 0.55)), "d": 12.0, "el": 9, "scale": 6.0}
 TOP_SCALE = 6.2
+TOP_X = 1.85
+WHEELBASE = 3.4
+WIDTH = 1.9
 
 
 def rgb(h):
@@ -183,22 +187,13 @@ def write(sc, name):
     print("rendered", name)
 
 
-def render(view, theme):
-    palette = PALETTES[theme]
-    if view.startswith("exploded"):
-        explode()
-    if view == "side":
-        open_flaps()
-    for o in meshes():
-        colour(o, palette, view == "side")
-        o.hide_render = (view.startswith("exploded") and o["part"] == "suspension") or (view == "side" and o["part"] == "rearWing" and o.get("role") == "endplate")
-    sc, cam = stage(-0.5 if view.startswith("exploded") else 0)
+def frame(view, sc, cam):
     cam.data.lens = LENS
     if view.startswith("exploded"):
         phone = view == "exploded-phone"
         sc.render.resolution_x, sc.render.resolution_y = (1800, 1500) if phone else (2880, 1800)
         aim(cam, orbit(OVERVIEW["target"], PHONE_D if phone else OVERVIEW["d"], OVERVIEW["az"], OVERVIEW["el"]), OVERVIEW["target"])
-    elif view == "side":
+    elif view.startswith("side"):
         sc.render.resolution_x, sc.render.resolution_y = 2880, 900
         cam.data.type = "ORTHO"
         cam.data.ortho_scale = SIDE["scale"]
@@ -208,9 +203,38 @@ def render(view, theme):
         sc.render.resolution_x, sc.render.resolution_y = (1300, 2880) if phone else (2880, 1300)
         cam.data.type = "ORTHO"
         cam.data.ortho_scale = TOP_SCALE
-        cam.location = Vector((1.85, 0, 12))
+        cam.location = Vector((TOP_X, 0, 12))
         cam.rotation_euler = (0, 0, -math.pi / 2 if phone else math.pi)
+
+
+def render(view, theme):
+    palette = PALETTES[theme]
+    if view.startswith("exploded"):
+        explode()
+    if view == "side":
+        open_flaps()
+    for o in meshes():
+        colour(o, palette, view.startswith("side"))
+        o.hide_render = (view.startswith("exploded") and o["part"] == "suspension") or (view.startswith("side") and o["part"] == "rearWing" and o.get("role") == "endplate")
+    sc, cam = stage(-0.5 if view.startswith("exploded") else 0)
+    frame(view, sc, cam)
     write(sc, f"{view}-{theme}")
+
+
+def pins(view, marks):
+    sc = bpy.context.scene
+    cam = bpy.data.objects.new(view, bpy.data.cameras.new(view))
+    sc.collection.objects.link(cam)
+    frame(view, sc, cam)
+    bpy.context.view_layer.update()
+    return {pid: [round(c, 4) for c in (lambda q: (q.x, 1 - q.y))(world_to_camera_view(sc, cam, at))] for pid, at in marks.items()}
+
+
+def top_dims():
+    short = TOP_SCALE * 1300 / 2880
+    along = sorted(round(0.5 - (x - TOP_X) / TOP_SCALE, 4) for x in (0.0, WHEELBASE))
+    across = [round(0.5 - WIDTH / 2 / short, 4), round(0.5 + WIDTH / 2 / short, 4)]
+    return {"along": along, "across": across}
 
 
 def rig():
@@ -230,6 +254,8 @@ def rig():
         "assembled": {"position": gltf(orbit(t, d, OVERVIEW["az"], OVERVIEW["el"])), "target": gltf(t)},
         "side": {"position": gltf(orbit(SIDE["target"], SIDE["d"], 90, SIDE["el"])), "target": gltf(SIDE["target"]), "scale": SIDE["scale"]},
         "parts": framings,
+        "posters": {"exploded": pins("exploded", marks), "explodedPhone": pins("exploded-phone", marks)},
+        "top": top_dims(),
         "nodes": nodes,
         "hidden": ["suspension"],
         "flaps": flaps,

@@ -20,6 +20,9 @@ export const PHOTOS = {
   ch04Fire: { src: '/img/ch04-fire.jpg', place: 'A grass fire stops qualifying · Suzuka, 2025', credit: 'Photo Liauzh · CC BY-SA 4.0' },
   ch04Board: { src: '/img/ch04-board.jpg', place: 'Yellow flag and SC board · Indianapolis, 2005', credit: 'Photo Dan Smith · CC BY-SA 2.0' },
   ch05: { src: '/img/ch05.jpg', place: 'Oscar Piastri · McLaren MCL40 · Suzuka, 2026', credit: 'Photo Martin Lee · CC BY-SA 4.0' },
+  ch05History1950: { src: '/img/ch05-1950.jpg', place: 'Zandvoort, 1950', credit: 'Photo Nationaal Archief · CC0' },
+  ch05History1978: { src: '/img/ch05-1978.jpg', place: 'Zandvoort, 1978 · Lotus 79', credit: 'Mario Andretti leads Ronnie Peterson · Photo Koen Suyk / Anefo, Nationaal Archief · CC0' },
+  ch05History2026: { src: '/img/ch05-2026.jpg', place: 'Suzuka, 2026 · Mercedes W17', credit: 'Kimi Antonelli · Photo Martin Lee · CC BY-SA 4.0' },
   tyres: { src: '/img/tyres.jpg', place: 'Pirelli tyres, slicks to wets', credit: 'Photo Hullian111 · CC BY-SA 4.0' },
   williams: { src: '/img/williams.jpg', place: 'Williams FW48 · Shanghai, 2026', credit: 'Photo Liauzh · CC BY 4.0' },
   brm: { src: '/img/y1973.jpg', place: 'BRM mechanics · Anderstorp, 1973', credit: 'Photo Markku Lepola · CC BY 4.0' },
@@ -35,7 +38,7 @@ export const CHAPTERS: ReadonlyArray<ChapterEntry> = [
   { n: '02', title: 'How overtaking works', min: 5, photo: PHOTOS.ch02, to: '/chapters/overtaking' },
   { n: '03', title: 'Tyres and strategy', min: 7, photo: PHOTOS.ch03, to: '/chapters/tyres-and-strategy' },
   { n: '04', title: 'Flags and what they mean', min: 4, photo: PHOTOS.ch04, to: '/chapters/flags' },
-  { n: '05', title: 'Inside the car', min: 8, photo: PHOTOS.ch05, to: null },
+  { n: '05', title: 'Inside the car', min: 8, photo: PHOTOS.ch05, to: '/chapters/inside-the-car' },
 ]
 
 export const HERO = {

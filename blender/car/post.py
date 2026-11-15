@@ -7,7 +7,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, ".out")
 PUBLIC = os.path.join(HERE, "..", "..", "public", "car")
 BG = {"light": (0xF4, 0xF3, 0xEF), "dark": (0x0E, 0x0F, 0x11)}
-WIDTH = {"exploded": 1920, "exploded-phone": 1000, "top": 2200, "top-phone": 700, "side": 2400}
+WIDTH = {"exploded": 1920, "exploded-phone": 1000, "top": 2200, "top-phone": 700, "side": 2400, "side-corner": 2400}
 QUALITY = 80
 
 

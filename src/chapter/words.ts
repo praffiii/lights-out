@@ -38,6 +38,12 @@ export const WORDS = {
   trackLimits: { term: 'Track limits', def: "The white lines at the track's edge. All four wheels past them and the lap time is deleted." },
   blackWhiteFlag: { term: 'Black-and-white flag', def: "A warning shown with a car number. Do it again and it's a penalty." },
   vsc: { term: 'Virtual safety car', def: 'Everyone slows to a set lap time without a car on track. Positions are frozen.' },
+  survivalCell: { term: 'Survival cell', def: 'The carbon tub the driver sits in, built to survive a crash.' },
+  halo: { term: 'Halo', def: "The titanium hoop over the cockpit that protects the driver's head." },
+  sidepod: { term: 'Sidepod', def: 'The bodywork on each side of the driver. It feeds air to the radiators.' },
+  floor: { term: 'Floor', def: 'The flat underside of the car. Air under it pulls the car down.' },
+  groundEffect: { term: 'Ground effect', def: 'Grip made by air flowing fast under the car, sucking it onto the track.' },
+  powerUnit: { term: 'Power unit', def: 'The engine and its electric motor and battery, working as one.' },
   drs: { term: 'DRS · until 2025', def: 'Drag Reduction System, 2011 to 2025. A flap in the rear wing that only the chasing car could open. Gone in 2026.' },
 } as const
 
@@ -50,3 +56,5 @@ export const OVERTAKING_WORDS: ReadonlyArray<WordKey> = ['tow', 'slipstream', 'd
 export const TYRES_WORDS: ReadonlyArray<WordKey> = ['compound', 'stint', 'degradation', 'pitLoss', 'pitWindow', 'boxBox', 'undercut', 'overcut', 'safetyCar', 'twoCompound']
 
 export const FLAGS_WORDS: ReadonlyArray<WordKey> = ['marshal', 'marshalSector', 'yellowFlag', 'blueFlag', 'lappedCar', 'redFlag', 'trackLimits', 'blackWhiteFlag', 'vsc']
+
+export const CAR_WORDS: ReadonlyArray<WordKey> = ['survivalCell', 'halo', 'sidepod', 'floor', 'groundEffect', 'powerUnit', 'activeAero', 'straightMode', 'overtakeMode']

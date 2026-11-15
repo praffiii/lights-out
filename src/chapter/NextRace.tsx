@@ -8,7 +8,7 @@ export function NextRace({ photo }: { photo: Photo }) {
   const race = nextRace(useSeason().data, new Date())
 
   return (
-    <section className="next next-race" aria-labelledby="next">
+    <section className="next next-weekend" aria-labelledby="next">
       <div className="shot">
         <img src={photo.src} alt="" loading="lazy" />
       </div>
