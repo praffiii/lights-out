@@ -4,11 +4,15 @@ cd "$(dirname "$0")"
 blender="${BLENDER:-/Applications/Blender.app/Contents/MacOS/Blender}"
 mag80="${MAG80:-../../../lights-out-private/car-mag80/scene.gltf}"
 run() {
-  "$blender" -b -P "$@" < /dev/null 2>&1 | grep -E "Traceback|Error|TRIANGLES|rendered|rig " || true
+  "$blender" -b -P "$@" < /dev/null 2>&1 | grep -E "Traceback|Error|TRIANGLES|rendered|rig |peak|exported" || true
 }
 run prep.py -- "$mag80"
 test -f car.blend
 run render.py -- rig
+run bake.py -- .out/car.glb
+test -f .out/car.glb
+bunx --bun @gltf-transform/cli meshopt .out/car.glb ../../public/car/car.glb --quantize-position 16
+rm .out/car.glb
 for theme in light dark; do
   for view in exploded exploded-phone top top-phone side side-corner; do
     run render.py -- "$view" "$theme"

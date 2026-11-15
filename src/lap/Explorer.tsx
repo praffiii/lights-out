@@ -1,6 +1,5 @@
 import { type RefObject, useEffect, useLayoutEffect, useRef } from 'react'
 import * as THREE from 'three'
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { type GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 import { mapUrl, modelUrl, REST_ASPECT, SHIFT_X, SHIFT_Y } from '#/circuits/Circuit.tsx'
@@ -9,6 +8,7 @@ import type { CircuitInfo } from '#/circuits/registry.ts'
 import { broadcast, isSector, screen, SECTORS } from '#/circuits/shaders.ts'
 import { gsap, HOVER, onEnter, REDUCED } from '#/motion/motion.ts'
 import { waitFor } from '#/shell/Loader.tsx'
+import { meshopt } from '#/three/meshopt.ts'
 
 import { type Drive, LAP_PX, nextTurn, push, resume, seek, SETTLE, step, turnLaps, wrap } from './drive.ts'
 
@@ -519,7 +519,7 @@ export default function Explorer({ info, start, stage, onReady, onFail }: Props)
 
     const loader = new GLTFLoader()
 
-    loader.setMeshoptDecoder(MeshoptDecoder)
+    meshopt(loader)
 
     const loading = Promise.all([loader.loadAsync(modelUrl(info.model)), new THREE.TextureLoader().loadAsync(mapUrl(info.model, innerWidth < SMALL))])
     let gone = false

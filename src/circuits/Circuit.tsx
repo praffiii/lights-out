@@ -1,12 +1,12 @@
 import { Canvas, useLoader, useThree } from '@react-three/fiber'
 import { type RefObject, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 import { turnLaps } from '#/lap/drive.ts'
 import { gsap, REDUCED } from '#/motion/motion.ts'
 import type { Focus } from '#/pass/model.ts'
+import { meshopt } from '#/three/meshopt.ts'
 
 import { lapProfile } from './lap.ts'
 import { allCircuits } from './registry.ts'
@@ -29,8 +29,6 @@ const YAW = 0.55
 const PITCH = 0.62
 const UP = new THREE.Vector3(0, 1, 0)
 const LABEL = /-label/
-
-const meshopt = (loader: GLTFLoader) => void loader.setMeshoptDecoder(MeshoptDecoder)
 
 export const modelUrl = (model: string) => `/circuits/${model}.glb`
 
