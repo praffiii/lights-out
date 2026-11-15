@@ -2,7 +2,8 @@ import { expect, it } from 'bun:test'
 import { Schema } from 'effect'
 
 import { type RaceControl, RaceControlResponse } from '../../src/flags/schema.ts'
-import { countRace, finishedRaces, frozen, redSessionCount } from '../../src/flags/tally.ts'
+import { countRace, redSessionCount } from '../../src/flags/tally.ts'
+import { finishedRaces, frozen } from '../../src/season/finished.ts'
 import { sessions2026 } from '../season/fake-openf1.ts'
 
 const rows = async (name: string) => Schema.decodeUnknownSync(RaceControlResponse)(await Bun.file(`test/fixtures/openf1/${name}.json`).json())
