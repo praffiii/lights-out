@@ -1,0 +1,404 @@
+{
+  "lens": 85,
+  "assembled": {
+    "position": [
+      15.3194,
+      8.4797,
+      -10.6016
+    ],
+    "target": [
+      1.75,
+      0.45,
+      -0.0
+    ]
+  },
+  "side": {
+    "position": [
+      1.85,
+      2.4272,
+      -11.8523
+    ],
+    "target": [
+      1.85,
+      0.55,
+      -0.0
+    ],
+    "scale": 6.0
+  },
+  "parts": [
+    {
+      "id": "frontWing",
+      "anchor": [
+        4.8764,
+        0.2525,
+        -0.4439
+      ],
+      "camera": {
+        "position": [
+          13.1977,
+          6.1168,
+          -7.6331
+        ],
+        "target": [
+          3.4277,
+          0.3353,
+          0.0
+        ]
+      }
+    },
+    {
+      "id": "survivalCell",
+      "anchor": [
+        2.8204,
+        0.7229,
+        0.0433
+      ],
+      "camera": {
+        "position": [
+          11.5293,
+          6.2354,
+          -7.6313
+        ],
+        "target": [
+          1.7594,
+          0.454,
+          0.0018
+        ]
+      }
+    },
+    {
+      "id": "halo",
+      "anchor": [
+        2.2877,
+        1.5444,
+        0.0033
+      ],
+      "camera": {
+        "position": [
+          11.75,
+          6.7762,
+          -7.6313
+        ],
+        "target": [
+          1.98,
+          0.9948,
+          0.0018
+        ]
+      }
+    },
+    {
+      "id": "sidepods",
+      "anchor": [
+        1.6776,
+        0.6869,
+        -1.1036
+      ],
+      "camera": {
+        "position": [
+          11.3164,
+          6.2932,
+          -7.6313
+        ],
+        "target": [
+          1.5464,
+          0.5118,
+          0.0018
+        ]
+      }
+    },
+    {
+      "id": "floor",
+      "anchor": [
+        1.3206,
+        -0.3665,
+        -0.825
+      ],
+      "camera": {
+        "position": [
+          11.1512,
+          5.8499,
+          -7.6313
+        ],
+        "target": [
+          1.3812,
+          0.0684,
+          0.0018
+        ]
+      }
+    },
+    {
+      "id": "powerUnit",
+      "anchor": [
+        0.55,
+        0.83,
+        -0.11
+      ],
+      "camera": {
+        "position": [
+          10.9617,
+          6.3398,
+          -7.6331
+        ],
+        "target": [
+          1.1917,
+          0.5583,
+          -0.0
+        ]
+      }
+    },
+    {
+      "id": "rearWing",
+      "anchor": [
+        -1.3866,
+        1.2384,
+        -0.3319
+      ],
+      "camera": {
+        "position": [
+          9.8772,
+          6.5444,
+          -7.6329
+        ],
+        "target": [
+          0.1072,
+          0.763,
+          0.0002
+        ]
+      }
+    },
+    {
+      "id": "tyres",
+      "anchor": [
+        3.3667,
+        0.0733,
+        -1.4682
+      ],
+      "camera": {
+        "position": [
+          11.4768,
+          6.1778,
+          -7.6409
+        ],
+        "target": [
+          1.7068,
+          0.3964,
+          -0.0078
+        ]
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "name": "floor",
+      "part": "floor",
+      "offset": [
+        0.0,
+        -0.45,
+        -0.0
+      ]
+    },
+    {
+      "name": "frontWing_body",
+      "part": "frontWing",
+      "offset": [
+        0.75,
+        0.0,
+        -0.0
+      ]
+    },
+    {
+      "name": "frontWing_endplate",
+      "part": "frontWing",
+      "offset": [
+        0.75,
+        0.0,
+        -0.0
+      ]
+    },
+    {
+      "name": "frontWing_flap1",
+      "part": "frontWing",
+      "offset": [
+        0.75,
+        0.0,
+        -0.0
+      ]
+    },
+    {
+      "name": "frontWing_flap2",
+      "part": "frontWing",
+      "offset": [
+        0.75,
+        0.0,
+        -0.0
+      ]
+    },
+    {
+      "name": "halo",
+      "part": "halo",
+      "offset": [
+        0.0,
+        0.6,
+        -0.0
+      ]
+    },
+    {
+      "name": "powerUnit",
+      "part": "powerUnit",
+      "offset": [
+        0.0,
+        0.35,
+        -0.0
+      ]
+    },
+    {
+      "name": "rearWing_body",
+      "part": "rearWing",
+      "offset": [
+        -0.75,
+        0.35,
+        -0.0
+      ]
+    },
+    {
+      "name": "rearWing_endplate",
+      "part": "rearWing",
+      "offset": [
+        -0.75,
+        0.35,
+        -0.0
+      ]
+    },
+    {
+      "name": "rearWing_flap1",
+      "part": "rearWing",
+      "offset": [
+        -0.75,
+        0.35,
+        -0.0
+      ]
+    },
+    {
+      "name": "rearWing_pylon",
+      "part": "rearWing",
+      "offset": [
+        -0.75,
+        0.35,
+        -0.0
+      ]
+    },
+    {
+      "name": "sidepods_L",
+      "part": "sidepods",
+      "offset": [
+        0.0,
+        0.12,
+        -0.55
+      ]
+    },
+    {
+      "name": "sidepods_R",
+      "part": "sidepods",
+      "offset": [
+        0.0,
+        0.12,
+        0.55
+      ]
+    },
+    {
+      "name": "sidepods_cover",
+      "part": "sidepods",
+      "offset": [
+        0.0,
+        0.85,
+        -0.0
+      ]
+    },
+    {
+      "name": "survivalCell",
+      "part": "survivalCell",
+      "offset": [
+        0.0,
+        0.0,
+        -0.0
+      ]
+    },
+    {
+      "name": "suspension",
+      "part": "suspension",
+      "offset": [
+        0.0,
+        0.0,
+        -0.0
+      ]
+    },
+    {
+      "name": "tyres_L_rim",
+      "part": "tyres",
+      "offset": [
+        0.0,
+        0.0,
+        -0.55
+      ]
+    },
+    {
+      "name": "tyres_L_tyre",
+      "part": "tyres",
+      "offset": [
+        0.0,
+        0.0,
+        -0.55
+      ]
+    },
+    {
+      "name": "tyres_R_rim",
+      "part": "tyres",
+      "offset": [
+        0.0,
+        0.0,
+        0.55
+      ]
+    },
+    {
+      "name": "tyres_R_tyre",
+      "part": "tyres",
+      "offset": [
+        0.0,
+        0.0,
+        0.55
+      ]
+    }
+  ],
+  "hidden": [
+    "suspension"
+  ],
+  "flaps": [
+    {
+      "node": "frontWing_flap1",
+      "axis": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "angle": -0.2618
+    },
+    {
+      "node": "frontWing_flap2",
+      "axis": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "angle": -0.2618
+    },
+    {
+      "node": "rearWing_flap1",
+      "axis": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "angle": -0.6109
+    }
+  ]
+}
