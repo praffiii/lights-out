@@ -62,6 +62,7 @@ export const fakeOpenF1Service: OpenF1Client['Service'] = {
   intervals: () => Effect.succeed([]),
   positions: () => Effect.succeed([]),
   raceControl: () => Effect.succeed([]),
+  sessionLaps: () => Effect.succeed([]),
   redFlags: () => Effect.succeed([]),
 }
 

@@ -9,7 +9,7 @@ export const refreshSnapshot = (now: Date): Effect.Effect<'written' | 'kept-prev
   SnapshotStore.use((store) =>
     Effect.gen(function* () {
       const previous = yield* store.read
-      const snapshot = yield* buildSnapshot(now, previous?.flags)
+      const snapshot = yield* buildSnapshot(now, previous ?? undefined)
       const kept = previous?.latestSession
 
       yield* store.write(kept && !snapshot.latestSession && kept.season === snapshot.season ? { ...snapshot, latestSession: kept } : snapshot)

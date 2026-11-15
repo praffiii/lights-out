@@ -4,6 +4,7 @@ import { HttpClient, HttpClientError, HttpClientRequest } from 'effect/http'
 import { RaceControlResponse } from '../flags/schema.ts'
 import { IntervalsResponse, OvertakesResponse, PitResponse } from '../pass/schema.ts'
 import { CarResponse, LapsResponse, LocationResponse, PoleResultResponse, StintsResponse } from '../pole/schema.ts'
+import { SpeedLapsResponse } from '../speed/schema.ts'
 import { PositionResponse } from '../tyres/schema.ts'
 
 import { DriversResponse, ResultResponse, SessionsResponse } from './openf1-schema.ts'
@@ -44,6 +45,7 @@ export class OpenF1Client extends Context.Service<
     readonly intervals: ReadWindow<typeof IntervalsResponse>
     readonly positions: ReadWindow<typeof PositionResponse>
     readonly raceControl: Read<typeof RaceControlResponse>
+    readonly sessionLaps: Read<typeof SpeedLapsResponse>
     readonly redFlags: (year: number) => Effect.Effect<typeof RaceControlResponse.Type, OpenF1Error>
   }
 >()('OpenF1Client') {
@@ -83,6 +85,7 @@ export class OpenF1Client extends Context.Service<
         intervals: (key, driver, from, to) => empty(get(IntervalsResponse, `/intervals?session_key=${key}&driver_number=${driver}&${window(from, to)}`)),
         positions: (key, driver, from, to) => empty(get(PositionResponse, `/position?session_key=${key}&driver_number=${driver}&${window(from, to)}`)),
         raceControl: (key) => empty(get(RaceControlResponse, `/race_control?session_key=${key}`)),
+        sessionLaps: (key) => empty(get(SpeedLapsResponse, `/laps?session_key=${key}`)),
         redFlags: (year) => empty(get(RaceControlResponse, `/race_control?flag=RED&${window(`${year}-01-01`, `${year + 1}-01-01`)}`)),
       }
     }),
