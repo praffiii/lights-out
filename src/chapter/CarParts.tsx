@@ -1,10 +1,10 @@
-import { type CSSProperties, type KeyboardEvent, lazy, type ReactNode, Suspense, useEffect, useRef, useState } from 'react'
+import { type CSSProperties, type KeyboardEvent, lazy, type ReactNode, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import { type Part, PARTS, rig } from '#/car/parts.ts'
 import { END, partLabel, stageAt, STOPS } from '#/car/stage.ts'
 import { CircuitGuard } from '#/circuits/CircuitGuard.tsx'
 import { useMedia } from '#/motion/client.ts'
-import { REDUCED } from '#/motion/motion.ts'
+import { REDUCED, ScrollTrigger } from '#/motion/motion.ts'
 import { opposite, useTheme } from '#/shell/theme.ts'
 
 import { linearPace } from './pace.ts'
@@ -64,6 +64,7 @@ export function Job({ part }: { part: Part }) {
 }
 
 const painter = (redraw: { current: () => void }) => (scope: HTMLElement) => {
+  const list = scope.querySelector('.parts')
   const rows = [...scope.querySelectorAll<HTMLElement>('.parts li')]
   const ticks = [...scope.querySelectorAll<HTMLElement>('.rail i')]
   const tags = [...scope.querySelectorAll<HTMLElement>('[data-tag]')]
@@ -86,9 +87,15 @@ const painter = (redraw: { current: () => void }) => (scope: HTMLElement) => {
 
     const at = lit ?? 0
 
+    const typing = list?.contains(document.activeElement) ?? false
+
     for (const [i, row] of rows.entries()) {
+      const button = row.querySelector<HTMLElement>('.row')
+
       row.toggleAttribute('data-active', i === lit)
-      row.querySelector('.row')?.setAttribute('aria-expanded', String(i === lit))
+      button?.setAttribute('aria-expanded', String(i === lit))
+
+      if (typing && i === lit) button?.focus({ preventScroll: true })
     }
 
     for (const [i, tick] of ticks.entries()) tick.toggleAttribute('data-on', i === at)
@@ -131,6 +138,10 @@ export function CarParts() {
 
   useEffect(() => setLive(!REDUCED), [])
 
+  useLayoutEffect(() => {
+    if (live) ScrollTrigger.refresh()
+  }, [live])
+
   useEffect(() => {
     const el = root.current
 
@@ -160,7 +171,6 @@ export function CarParts() {
     if (step === undefined || to < 0 || to >= PARTS.length) return
 
     e.preventDefault()
-    root.current?.querySelectorAll<HTMLButtonElement>('.parts .row')[to]?.focus({ preventScroll: true })
     seek.current(to + 1)
   }
 

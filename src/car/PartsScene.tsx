@@ -22,6 +22,8 @@ const LOW = -0.45
 
 const HALF_SENSOR = 18
 
+const SCREEN_FADE = 0.2
+
 const PART_INDEX = new Map<string, number>(PARTS.map((p, i) => [p.id, i]))
 
 const ANCHORS = rig.parts.map((p) => {
@@ -52,7 +54,7 @@ const v3 = (v: Vec) => new THREE.Vector3(...v)
 function build(scene: THREE.Group, shadows: ReadonlyArray<THREE.Texture>): Built {
   const root = scene.clone(true)
   const [assembled, exploded] = shadows
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(...rig.shadow.size).rotateX(-Math.PI / 2), shadowMaterial(assembled ?? new THREE.Texture(), exploded ?? new THREE.Texture()))
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(...rig.shadow.size).rotateX(-Math.PI / 2), shadowMaterial(assembled ?? new THREE.Texture(), exploded ?? new THREE.Texture(), SCREEN_FADE))
   const centre = v3(rig.assembled.target)
   const inner = new THREE.Group()
   const pivot = new THREE.Group()

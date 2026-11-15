@@ -54,25 +54,35 @@ export function clayMaterial(clay: string) {
 
 export const SHADOWS = ['/car/shadow-assembled.webp', '/car/shadow-exploded.webp']
 
+const PLANE_FADE = 0.06
+
 const shadowVertex = `
   varying vec2 vUv;
+  varying vec4 vClip;
   void main() {
     vUv = uv;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    vClip = gl_Position;
   }`
 
 const shadowFragment = `
   uniform sampler2D uA;
   uniform sampler2D uB;
   uniform float uMix;
+  uniform float uEdge;
   varying vec2 vUv;
+  varying vec4 vClip;
   void main() {
-    gl_FragColor = vec4(0.0, 0.0, 0.0, mix(texture2D(uA, vUv).r, texture2D(uB, vUv).r, uMix));
+    vec2 ndc = abs(vClip.xy / vClip.w);
+    vec2 rim = min(vUv, 1.0 - vUv);
+    float screen = uEdge > 0.0 ? 1.0 - smoothstep(1.0 - uEdge, 1.0, max(ndc.x, ndc.y)) : 1.0;
+    float plane = smoothstep(0.0, ${PLANE_FADE.toFixed(2)}, min(rim.x, rim.y));
+    gl_FragColor = vec4(0.0, 0.0, 0.0, mix(texture2D(uA, vUv).r, texture2D(uB, vUv).r, uMix) * screen * plane);
   }`
 
-export function shadowMaterial(a: THREE.Texture, b: THREE.Texture) {
+export function shadowMaterial(a: THREE.Texture, b: THREE.Texture, edge: number) {
   return new THREE.ShaderMaterial({
-    uniforms: { uA: { value: a }, uB: { value: b }, uMix: { value: 0 } },
+    uniforms: { uA: { value: a }, uB: { value: b }, uMix: { value: 0 }, uEdge: { value: edge } },
     vertexShader: shadowVertex,
     fragmentShader: shadowFragment,
     transparent: true,

@@ -31,7 +31,7 @@ function build(scene: THREE.Group, shadow: THREE.Texture): Built {
   const root = scene.clone(true)
   const hinges = rig.flaps.map((f) => f.node)
   const meshes: Built['meshes'] = []
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(...rig.shadow.size).rotateX(-Math.PI / 2), shadowMaterial(shadow, shadow))
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(...rig.shadow.size).rotateX(-Math.PI / 2), shadowMaterial(shadow, shadow, 0))
 
   root.traverse((o) => {
     if (HIDDEN.has(o.name)) o.visible = false

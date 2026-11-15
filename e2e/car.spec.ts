@@ -126,6 +126,19 @@ test('the band draws the live car once it is near', async ({ page, errors }) => 
   expect(errors).toEqual([])
 })
 
+test('arriving from chapter 04 the pinned band fits the screen', async ({ page, errors }) => {
+  await page.goto('/chapters/flags')
+  await expect(page.locator('.loader')).toHaveCount(0, { timeout: LOADER_MS })
+  await chapter(page, '.opening').getByRole('link', { name: /05 Inside the car/ }).click()
+  await expect(chapter(page, 'h1')).toHaveText('Eight parts.One car.')
+
+  const top = await band(page).evaluate((el) => el.getBoundingClientRect().top + scrollY)
+
+  await page.evaluate((y) => window.scrollTo(0, y + innerHeight), top)
+  await expect.poll(() => band(page, '.foot').evaluate((el) => el.getBoundingClientRect().bottom <= innerHeight)).toBe(true)
+  expect(errors).toEqual([])
+})
+
 test('a row takes the car to its part', async ({ page, errors }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop')
   await loaded(page)
@@ -140,6 +153,66 @@ test('a row takes the car to its part', async ({ page, errors }, testInfo) => {
   await expect(band(page, '.row[aria-expanded="true"]')).toHaveCount(1)
   await expect(band(page, '[role="slider"]')).toHaveAttribute('aria-valuetext', 'Part 02 of 08 · Survival cell')
   expect(errors).toEqual([])
+})
+
+test('arrow keys walk the rows and keep focus when only the active row shows', async ({ page, errors }) => {
+  await page.setViewportSize({ width: 1000, height: 830 })
+  await loaded(page)
+  await band(page).evaluate((el) => window.scrollTo(0, el.getBoundingClientRect().top + scrollY))
+  await row(page, 1).click()
+  await expect(band(page, '.count')).toHaveText('Part 01 of 08')
+
+  await page.keyboard.press('ArrowDown')
+  await expect(band(page, '.count')).toHaveText('Part 02 of 08')
+  await expect(row(page, 2)).toBeFocused()
+
+  await page.keyboard.press('ArrowDown')
+  await expect(band(page, '.count')).toHaveText('Part 03 of 08')
+  await expect(row(page, 3)).toBeFocused()
+  expect(errors).toEqual([])
+})
+
+test('the ground shadow fades out before the edge of the 3D layer', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.emulateMedia({ colorScheme: 'dark' })
+  await loaded(page)
+  await band(page).evaluate((el) => window.scrollTo(0, el.getBoundingClientRect().top + scrollY))
+  await expect(band(page, '.stage')).toHaveAttribute('data-gl', '', { timeout: 20_000 })
+  await row(page, 7).click()
+  await expect(band(page, '.count')).toHaveText('Part 07 of 08')
+  await page.evaluate(() => document.querySelector<HTMLElement>(':focus')?.blur())
+  await page.waitForTimeout(1500)
+
+  const box = await band(page, '.gl').boundingBox()
+  const list = await band(page, '.parts').boundingBox()
+  const foot = await band(page, '.foot').boundingBox()
+  const x = Math.round(box?.x ?? 0)
+  const from = Math.round((list?.y ?? 0) + (list?.height ?? 0) + 4)
+  const to = Math.round(Math.min((box?.y ?? 0) + (box?.height ?? 0), foot?.y ?? 0) - 4)
+
+  expect(to - from).toBeGreaterThan(20)
+
+  const shot = await page.screenshot({ clip: { x: x - 4, y: from, width: 8, height: to - from } })
+
+  const step = await page.evaluate(async (png) => {
+    const bitmap = await createImageBitmap(await (await fetch(`data:image/png;base64,${png}`)).blob())
+    const ctx = new OffscreenCanvas(bitmap.width, bitmap.height).getContext('2d')
+
+    if (!ctx) return 255
+
+    ctx.drawImage(bitmap, 0, 0)
+
+    const { data, width, height } = ctx.getImageData(0, 0, bitmap.width, bitmap.height)
+    const lum = (px: number, y: number) => data[(y * width + px) * 4] ?? 0
+    let worst = 0
+
+    for (let y = 0; y < height; y++) worst = Math.max(worst, Math.abs(lum(0, y) - lum(width - 1, y)))
+
+    return worst
+  }, shot.toString('base64'))
+
+  expect(step).toBeLessThanOrEqual(2)
 })
 
 test('the band follows a theme switch and keeps drawing', async ({ page, errors }) => {
