@@ -110,3 +110,78 @@ test('chapter 04 leads here', async ({ page }) => {
   await expect(chapter(page, '.opening').getByRole('link', { name: /05 Inside the car/ })).toHaveAttribute('href', PATH)
   await expect(chapter(page, '.next .read')).toHaveAttribute('href', PATH)
 })
+
+const NO_WEBGL = `const get = HTMLCanvasElement.prototype.getContext; HTMLCanvasElement.prototype.getContext = function (type, ...rest) { return String(type).startsWith('webgl') ? null : get.call(this, type, ...rest) }`
+
+const band = (page: Page, selector = '') => page.locator(`.chapter-page .apart ${selector}`.trim())
+
+const row = (page: Page, n: number) => band(page, `.parts li:nth-child(${n}) .row`)
+
+test('the band draws the live car once it is near', async ({ page, errors }) => {
+  await loaded(page)
+  await band(page).scrollIntoViewIfNeeded()
+
+  await expect(band(page, '.stage')).toHaveAttribute('data-gl', '', { timeout: 20_000 })
+  await expect(band(page, '.stage canvas')).toBeVisible()
+  expect(errors).toEqual([])
+})
+
+test('a row takes the car to its part', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await loaded(page)
+  await band(page).scrollIntoViewIfNeeded()
+
+  await row(page, 6).click()
+  await expect(row(page, 6)).toHaveAttribute('aria-expanded', 'true')
+  await expect(band(page, '.count')).toHaveText('Part 06 of 08')
+
+  await row(page, 2).click()
+  await expect(band(page, '.count')).toHaveText('Part 02 of 08')
+  await expect(band(page, '.row[aria-expanded="true"]')).toHaveCount(1)
+  await expect(band(page, '[role="slider"]')).toHaveAttribute('aria-valuetext', 'Part 02 of 08 · Survival cell')
+  expect(errors).toEqual([])
+})
+
+test('the band follows a theme switch and keeps drawing', async ({ page, errors }) => {
+  await page.emulateMedia({ colorScheme: 'light' })
+  await loaded(page)
+  await band(page).scrollIntoViewIfNeeded()
+  await expect(band(page, '.stage')).toHaveAttribute('data-gl', '', { timeout: 20_000 })
+
+  const before = await band(page).evaluate((el) => getComputedStyle(el).backgroundColor)
+
+  await page.emulateMedia({ colorScheme: 'dark' })
+  await expect.poll(() => band(page).evaluate((el) => getComputedStyle(el).backgroundColor)).not.toBe(before)
+  await expect(band(page, '.stage')).toHaveAttribute('data-gl', '', { timeout: 20_000 })
+  await expect(band(page, '.stage canvas')).toBeVisible()
+  expect(errors).toEqual([])
+})
+
+test('without WebGL the poster shows and the rows still work', async ({ page, errors }, testInfo) => {
+  await page.addInitScript({ content: NO_WEBGL })
+  await loaded(page)
+  await band(page).scrollIntoViewIfNeeded()
+
+  await expect(band(page, '.stage picture img')).toBeVisible()
+  await band(page, '[role="slider"]').focus()
+  await page.keyboard.press('End')
+  await expect(band(page, '.count')).toHaveText('Part 08 of 08')
+
+  if (testInfo.project.name === 'desktop') {
+    await row(page, 3).click()
+    await expect(band(page, '.count')).toHaveText('Part 03 of 08')
+  }
+
+  expect(errors.filter((e) => e.startsWith('pageerror'))).toEqual([])
+})
+
+test('reduced motion keeps the band still with every job open', async ({ page, errors }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await loaded(page)
+
+  await expect(band(page, '.pin-spacer')).toHaveCount(0)
+  await expect(band(page, 'canvas')).toHaveCount(0)
+
+  for (const job of await band(page, '.job').all()) await expect(job).toBeVisible()
+  expect(errors).toEqual([])
+})

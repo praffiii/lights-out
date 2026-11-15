@@ -101,7 +101,7 @@ export function Undercut({ file, all, info }: { file: UndercutFile; all: Steps; 
     }
   }
 
-  const time = useScrub(root, end, stops, pace, paint)
+  const { time } = useScrub(root, end, stops, pace, paint)
 
   return (
     <section className="undercut" data-theme={theme ? opposite(theme) : undefined} aria-labelledby="replay" style={colours(file)}>

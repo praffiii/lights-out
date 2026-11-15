@@ -5,7 +5,7 @@ import { rig } from '../../src/car/parts.ts'
 
 const KB = 1024
 
-const POSTERS = ['exploded', 'exploded-phone', 'top', 'top-phone', 'side', 'side-corner'].flatMap((view) => [`${view}-light`, `${view}-dark`])
+const POSTERS = ['shadow-assembled', 'shadow-exploded', ...['exploded', 'exploded-phone', 'top', 'top-phone', 'side', 'side-corner'].flatMap((view) => [`${view}-light`, `${view}-dark`])]
 
 it('ships every car poster within budget', async () => {
   for (const name of POSTERS) {

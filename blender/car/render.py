@@ -27,6 +27,7 @@ TOP_SCALE = 6.2
 TOP_X = 1.85
 WHEELBASE = 3.4
 WIDTH = 1.9
+SHADOW = {"centre": (1.7, 0.0), "size": (12.0, 6.0), "px": (1600, 800)}
 
 
 def rgb(h):
@@ -221,6 +222,21 @@ def render(view, theme):
     write(sc, f"{view}-{theme}")
 
 
+def shadow(pose):
+    if pose == "exploded":
+        explode()
+    for o in meshes():
+        o.visible_camera = False
+        o.hide_render = pose == "exploded" and o["part"] == "suspension"
+    sc, cam = stage(-0.5 if pose == "exploded" else 0)
+    sc.render.resolution_x, sc.render.resolution_y = SHADOW["px"]
+    cam.data.type = "ORTHO"
+    cam.data.ortho_scale = SHADOW["size"][0]
+    cam.location = Vector((SHADOW["centre"][0], SHADOW["centre"][1], 12))
+    cam.rotation_euler = (0, 0, 0)
+    write(sc, f"shadow-{pose}")
+
+
 def pins(view, marks):
     sc = bpy.context.scene
     cam = bpy.data.objects.new(view, bpy.data.cameras.new(view))
@@ -259,6 +275,7 @@ def rig():
         "nodes": nodes,
         "hidden": ["suspension"],
         "flaps": flaps,
+        "shadow": {"centre": gltf(Vector((*SHADOW["centre"], 0))), "size": list(SHADOW["size"]), "drop": -0.5},
     }
     with open(RIG, "w") as f:
         json.dump(data, f, indent=2)
@@ -273,6 +290,8 @@ def main():
     os.makedirs(os.path.dirname(RIG), exist_ok=True)
     if args[0] == "rig":
         rig()
+    elif args[0] == "shadow":
+        shadow(args[1])
     else:
         render(args[0], args[1])
 

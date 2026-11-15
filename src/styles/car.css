@@ -3,23 +3,59 @@
 .car-page .photo-band .shot { height: 780px; }
 .car-page .photo-band img { object-position: 50% 60%; }
 
-.car-page .apart { margin-top: 140px; padding: 64px var(--m) 72px; background: var(--bg); color: var(--ink); }
-.car-page .apart .head { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 48px; }
+.car-page .apart { margin-top: 140px; background: var(--bg); color: var(--ink); }
+.car-page .apart .pin { padding: 64px var(--m) 72px; }
+.car-page .apart .head { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 48px; pointer-events: none; }
 .car-page .apart .head .label { grid-column: 1 / -1; color: var(--muted); }
 .car-page .apart .head .headline { margin: 18px 0 0 -4px; font-size: clamp(56px, 1rem + 5.4vw, 96px); line-height: 1; }
 .car-page .apart .hint { color: var(--muted); }
+.car-page .apart:not([data-live]) :is(.hint, .foot) { display: none; }
 .car-page .apart .deck { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); align-items: center; margin-top: 56px; }
-.car-page .parts { position: relative; z-index: 1; list-style: none; border-top: var(--rule); }
-.car-page .parts li { padding: 15px 16px 14px 0; border-bottom: var(--rule); }
-.car-page .parts .row { display: grid; grid-template-columns: 60px minmax(0, 1fr) auto; align-items: baseline; column-gap: 0; }
+.car-page .parts { position: relative; z-index: 2; list-style: none; border-top: var(--rule); }
+.car-page .parts li { border-bottom: var(--rule); transition: background 0.3s var(--brake), color 0.3s var(--brake); }
+.car-page .parts .row { display: grid; grid-template-columns: 60px minmax(0, 1fr) auto; align-items: baseline; width: 100%; padding: 15px 16px 0 0; text-align: left; letter-spacing: inherit; }
 .car-page .parts .n { padding-left: 16px; font-size: 12px; color: var(--muted); }
 .car-page .parts .name { font-size: 20px; font-weight: 600; letter-spacing: -0.015em; }
 .car-page .parts .fact { font-size: 12px; color: var(--muted); }
-.car-page .parts .job { margin: 6px 0 0 60px; font-size: 14px; line-height: 1.4; color: var(--muted); }
-.car-page .apart .stage { position: relative; margin: 0 calc(-1 * var(--m)) 0 -78px; aspect-ratio: 1920 / 1200; }
-.car-page .apart .stage img { display: block; width: 100%; height: 100%; }
-.car-page .apart .tag { position: absolute; left: var(--x); top: var(--y); display: flex; align-items: center; gap: 4px; padding: 1px 5px 1px 0; translate: -3px -50%; font-size: 11px; color: var(--ink); }
-.car-page .apart .tag::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 2px var(--bg); }
+.car-page .parts .job { margin: 6px 16px 0 60px; padding-bottom: 14px; font-size: 14px; line-height: 1.4; color: var(--muted); }
+.car-page .apart .stage { position: relative; margin: 0 calc(-1 * var(--m)) 0 -78px; }
+.car-page .apart .frame { position: relative; aspect-ratio: 1920 / 1200; }
+.car-page .apart .frame img { display: block; width: 100%; height: 100%; transition: opacity 0.6s var(--brake); }
+.car-page .apart .stage[data-gl] img { opacity: 0; }
+.car-page .apart .gl { position: absolute; inset: 0; pointer-events: none; }
+.car-page .apart .tags { position: absolute; inset: 0; pointer-events: none; }
+.car-page .apart .tag { position: absolute; left: var(--x); top: var(--y); display: flex; align-items: center; gap: 4px; padding: 1px 5px 1px 0; translate: -3px -50%; font-size: 11px; color: var(--ink); transition: color 0.3s var(--brake); }
+.car-page .apart .tag::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 2px var(--bg); transition: background 0.3s var(--brake); }
+.car-page .apart .tag[data-lit] { color: var(--purple); }
+.car-page .apart .tag[data-lit]::before { background: var(--purple); }
+.car-page .apart .chip { position: absolute; left: var(--x); top: var(--y); display: flex; flex-direction: column; align-items: center; translate: -50% 0; }
+.car-page .apart .chip[hidden] { display: none; }
+.car-page .apart .chip[data-up] { flex-direction: column-reverse; translate: -50% -100%; }
+.car-page .apart .chip::before { content: ''; width: 1px; height: 88px; background: var(--purple); }
+.car-page .apart .chip b { padding: 5px 10px 4px; background: var(--purple); color: var(--dark); font-size: 12px; font-weight: 500; white-space: nowrap; }
+.car-page .apart .fail { position: absolute; left: 78px; bottom: 0; font-size: 11px; }
+.car-page .apart .foot { position: relative; z-index: 2; display: flex; align-items: center; gap: 24px; }
+.car-page .apart .rail { display: flex; align-items: center; gap: 8px; padding: 14px 0; cursor: pointer; touch-action: none; }
+.car-page .apart .rail i { width: 40px; height: 2px; background: var(--line); transition: width 0.3s var(--brake), background 0.3s var(--brake); }
+.car-page .apart .rail i[data-on] { width: 64px; background: var(--purple); }
+.car-page .apart .scroll { margin-left: auto; color: var(--muted); }
+.car-page .apart .count { color: var(--muted); }
+
+.car-page .apart[data-live] .pin { box-sizing: border-box; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: 100svh; min-height: 640px; padding: 96px var(--m) 24px; }
+.car-page .apart[data-live] .head .headline { font-size: clamp(48px, 1rem + 4vw, 80px); }
+.car-page .apart[data-live] .deck { grid-template-rows: minmax(0, 1fr); min-height: 0; margin-top: 16px; }
+.car-page .apart[data-live] .stage { align-self: stretch; }
+.car-page .apart[data-live] .frame { position: absolute; left: 0; right: 0; top: 50%; translate: 0 -50%; }
+.car-page .apart[data-live] .parts .job { display: none; }
+.car-page .apart[data-live] .parts [data-active] { background: var(--purple); color: var(--dark); border-color: var(--purple); }
+.car-page .apart[data-live] .parts [data-active] :is(.n, .fact, .job) { color: inherit; }
+.car-page .apart[data-live] .parts [data-active] .job { display: block; }
+.car-page .apart[data-live] .parts [data-active] .term [aria-expanded='true'] { color: inherit; }
+.car-page .apart[data-live] .parts .row { padding: 11px 16px 11px 0; cursor: pointer; }
+.car-page .apart[data-live] .parts .name { font-size: 18px; }
+.car-page .apart[data-live] .parts .job { padding-bottom: 12px; }
+.car-page .apart[data-live] .parts [data-active] .row { padding-bottom: 0; }
+.car-page .apart[data-live] .parts .row:hover .name { text-decoration: underline 1px; text-underline-offset: 4px; }
 .car-page .apart-credit { margin: 14px var(--m) 0; }
 
 .car-page .size { margin: 140px var(--m) 0; }
@@ -104,7 +140,14 @@
   .car-page .apart .hint { margin-top: 12px; }
   .car-page .apart .deck { grid-template-columns: minmax(0, 1fr); }
   .car-page .apart .stage { grid-row: 1; margin: 0 calc(-1 * var(--m)); }
+  .car-page .apart .fail { left: var(--m); }
   .car-page .parts { margin-top: 32px; }
+  .car-page .apart[data-live] .deck { grid-template-rows: minmax(0, 1fr) auto; align-items: center; }
+  .car-page .apart[data-live] .parts { margin-top: 8px; }
+  .car-page .apart[data-live] .parts li:not([data-active]) { display: none; }
+  .car-page .apart[data-live] .parts:not(:has([data-active])) li:first-child { display: block; }
+  .car-page .apart .scroll { display: none; }
+  .car-page .apart .count { margin-left: auto; }
   .car-page .size .big { grid-template-columns: minmax(0, 1fr); row-gap: 16px; }
   .car-page .size h2 { display: flex; flex-direction: column; gap: 12px; }
   .car-page .size .aside { grid-column: 1; grid-row: 2; margin-top: 0; }
@@ -119,12 +162,20 @@
   .car-page .full { display: none; }
   .car-page .short { display: inline; }
   .car-page .photo-band .shot { height: auto; aspect-ratio: 4 / 3; }
-  .car-page .apart { margin-top: 56px; padding: 44px var(--m) 32px; }
-  .car-page .apart .head .headline { margin-top: 12px; font-size: 40px; }
+  .car-page .apart { margin-top: 56px; }
+  .car-page .apart .pin { padding: 44px var(--m) 32px; }
+  .car-page .apart[data-live] .pin { min-height: 560px; padding: 72px var(--m) 12px; }
+  .car-page .apart .head .headline, .car-page .apart[data-live] .head .headline { margin-top: 12px; font-size: 40px; }
   .car-page .apart .hint { margin-top: 10px; font-size: 12px; color: var(--ink); }
   .car-page .apart .deck { margin-top: 24px; }
-  .car-page .apart .stage { aspect-ratio: 1000 / 833; }
+  .car-page .apart .frame { aspect-ratio: 1000 / 833; }
   .car-page .apart .tag { left: var(--px); top: var(--py); font-size: 10px; }
+  .car-page .apart .chip { left: var(--px); top: var(--py); }
+  .car-page .apart .chip::before { height: 40px; }
+  .car-page .apart .chip b { font-size: 11px; }
+  .car-page .apart .rail { flex: 1; gap: 4px; }
+  .car-page .apart .rail i { flex: 1; width: auto; }
+  .car-page .apart .rail i[data-on] { flex: 1.6; width: auto; }
   .car-page .parts .name { font-size: 18px; }
   .car-page .parts .job { font-size: 13px; }
   .car-page .apart-credit { margin-top: 12px; }

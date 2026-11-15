@@ -13,6 +13,10 @@ run bake.py -- .out/car.glb
 test -f .out/car.glb
 bunx --bun @gltf-transform/cli meshopt .out/car.glb ../../public/car/car.glb --quantize-position 16
 rm .out/car.glb
+for pose in assembled exploded; do
+  run render.py -- shadow "$pose"
+  python3 -I post.py "shadow-$pose"
+done
 for theme in light dark; do
   for view in exploded exploded-phone top top-phone side side-corner; do
     run render.py -- "$view" "$theme"

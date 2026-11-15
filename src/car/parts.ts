@@ -41,6 +41,7 @@ export const CarRig = Schema.Struct({
   nodes: Schema.Array(Schema.Struct({ name: Schema.String, part: Schema.String, offset: Vec })),
   hidden: Schema.Array(Schema.String),
   flaps: Schema.Array(Schema.Struct({ node: Schema.String, axis: Vec, angle: Schema.Number })),
+  shadow: Schema.Struct({ centre: Vec, size: Pair, drop: Schema.Number }),
 })
 
 export type CarRig = typeof CarRig.Type

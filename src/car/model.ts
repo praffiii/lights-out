@@ -51,3 +51,31 @@ export function clayMaterial(clay: string) {
     fragmentShader,
   })
 }
+
+export const SHADOWS = ['/car/shadow-assembled.webp', '/car/shadow-exploded.webp']
+
+const shadowVertex = `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }`
+
+const shadowFragment = `
+  uniform sampler2D uA;
+  uniform sampler2D uB;
+  uniform float uMix;
+  varying vec2 vUv;
+  void main() {
+    gl_FragColor = vec4(0.0, 0.0, 0.0, mix(texture2D(uA, vUv).r, texture2D(uB, vUv).r, uMix));
+  }`
+
+export function shadowMaterial(a: THREE.Texture, b: THREE.Texture) {
+  return new THREE.ShaderMaterial({
+    uniforms: { uA: { value: a }, uB: { value: b }, uMix: { value: 0 } },
+    vertexShader: shadowVertex,
+    fragmentShader: shadowFragment,
+    transparent: true,
+    depthWrite: false,
+  })
+}

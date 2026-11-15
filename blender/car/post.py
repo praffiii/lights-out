@@ -9,6 +9,7 @@ PUBLIC = os.path.join(HERE, "..", "..", "public", "car")
 BG = {"light": (0xF4, 0xF3, 0xEF), "dark": (0x0E, 0x0F, 0x11)}
 WIDTH = {"exploded": 1920, "exploded-phone": 1000, "top": 2200, "top-phone": 700, "side": 2400, "side-corner": 2400}
 QUALITY = 80
+SHADOW = (1024, 512)
 
 
 def poster(name):
@@ -23,6 +24,14 @@ def poster(name):
     print("poster", name, flat.size, os.path.getsize(path) // 1024, "KB")
 
 
+def shadow(name):
+    shot = Image.open(os.path.join(OUT, name + ".png")).convert("RGBA")
+    alpha = shot.getchannel("A").resize(SHADOW, Image.LANCZOS)
+    path = os.path.join(PUBLIC, name + ".webp")
+    alpha.save(path, "WEBP", quality=QUALITY, method=6)
+    print("shadow", name, alpha.size, os.path.getsize(path) // 1024, "KB")
+
+
 os.makedirs(PUBLIC, exist_ok=True)
 for name in sys.argv[1:]:
-    poster(name)
+    (shadow if name.startswith("shadow-") else poster)(name)
