@@ -139,6 +139,14 @@ test('arriving from chapter 04 the pinned band fits the screen', async ({ page, 
   expect(errors).toEqual([])
 })
 
+test('the part tags stay inside the page before the band is reached', async ({ page, errors }) => {
+  await loaded(page)
+  await expect(band(page, '.stage')).toHaveAttribute('data-gl', '', { timeout: 20_000 })
+
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0)
+  expect(errors).toEqual([])
+})
+
 test('a row takes the car to its part', async ({ page, errors }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop')
   await loaded(page)

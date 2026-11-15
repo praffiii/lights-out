@@ -116,6 +116,7 @@ function aim(camera: THREE.Camera, t: number, phone: boolean, aspect: number) {
 
   camera.position.copy(eye)
   camera.lookAt(look)
+  camera.updateMatrixWorld()
 
   if (camera instanceof THREE.PerspectiveCamera) {
     const fov = THREE.MathUtils.radToDeg(2 * Math.atan(HALF_SENSOR / rig.lens / aspect))
