@@ -2,9 +2,6 @@ import type { OpenF1Session } from '../season/openf1-schema.ts'
 
 import type { FlagRace, FlagSample, RaceControl } from './schema.ts'
 
-const LIVE_MS = 30 * 60_000
-const FROZEN_MS = 48 * 3_600_000
-
 type Kind = 'clear' | 'yellow' | 'doubleYellow' | 'blue' | 'red' | 'chequered' | 'blackWhite'
 
 const KINDS = new Map<string | null, Kind>([
@@ -24,13 +21,6 @@ type Quoted = (typeof QUOTED)[number]
 const RED_SESSIONS = new Set(['Practice 1', 'Practice 2', 'Practice 3', 'Qualifying', 'Sprint Qualifying', 'Sprint'])
 
 const quoted = (kind: Kind | undefined): kind is Quoted => QUOTED.some((q) => q === kind)
-
-export const finishedRaces = (sessions: ReadonlyArray<OpenF1Session>, now: Date): ReadonlyArray<OpenF1Session> =>
-  sessions
-    .filter((s) => s.session_name === 'Race' && !s.is_cancelled && Date.parse(s.date_end) + LIVE_MS < now.getTime())
-    .sort((a, b) => Date.parse(a.date_start) - Date.parse(b.date_start))
-
-export const frozen = (race: { readonly dateEnd: string }, now: Date): boolean => Date.parse(race.dateEnd) + FROZEN_MS < now.getTime()
 
 export function countRace(session: OpenF1Session, rows: ReadonlyArray<RaceControl>): FlagRace {
   const counts: Record<Kind, number> = { clear: 0, yellow: 0, doubleYellow: 0, blue: 0, red: 0, chequered: 0, blackWhite: 0 }

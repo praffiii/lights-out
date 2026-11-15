@@ -13,8 +13,11 @@ const SNAP_PX = 2
 
 type Paint = (scope: HTMLElement) => (t: number) => void
 
-export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops: ReadonlyArray<number>, pace: Pace, paint: Paint): RefObject<number> {
+export type Scrub = { time: RefObject<number>; seek: RefObject<(t: number) => void> }
+
+export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops: ReadonlyArray<number>, pace: Pace, paint: Paint): Scrub {
   const time = useRef(REDUCED ? end : 0)
+  const seeker = useRef<(t: number) => void>(() => {})
   const lenis = useLenis()
   const scroller = useRef(lenis)
   const painter = useRef(paint)
@@ -79,6 +82,8 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
         else window.scrollTo(0, y)
       }
 
+      seeker.current = seek
+
       if (!REDUCED) {
         st = ScrollTrigger.create({
           trigger: pin,
@@ -135,6 +140,8 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
       track.addEventListener('keydown', onKey)
 
       return () => {
+        seeker.current = () => {}
+
         gsap.ticker.remove(follow)
         track.removeEventListener('pointerdown', onDown)
         track.removeEventListener('pointermove', onMove)
@@ -144,5 +151,5 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
     { scope: root, dependencies: [end, stops, pace] },
   )
 
-  return time
+  return { time, seek: seeker }
 }

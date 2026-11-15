@@ -1,9 +1,10 @@
 import { Effect } from 'effect'
 
+import { finishedRaces, frozen } from '../season/finished.ts'
 import { OpenF1Client } from '../season/openf1-client.ts'
 
 import type { FlagRace, FlagTally } from './schema.ts'
-import { countRace, finishedRaces, frozen, redSessionCount } from './tally.ts'
+import { countRace, redSessionCount } from './tally.ts'
 
 const skipped = (previous: FlagTally | undefined, cause: string) => Effect.logWarning('flag tally skipped', cause).pipe(Effect.as(previous))
 

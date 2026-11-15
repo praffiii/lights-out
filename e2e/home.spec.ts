@@ -267,13 +267,21 @@ test("Home's chapter 04 row leads to chapter 04", async ({ page, errors }) => {
   expect(errors).toEqual([])
 })
 
-test('the menu fits the theme switch on screen with four chapters linked', async ({ page, errors }, testInfo) => {
+test("Home's chapter 05 row leads to chapter 05", async ({ page, errors }) => {
+  await page.goto('/')
+  await expect(page.locator('.loader')).toHaveCount(0, { timeout: LOADER_MS })
+
+  await expect(page.locator('.rows li:nth-child(5) a')).toHaveAttribute('href', '/chapters/inside-the-car')
+  expect(errors).toEqual([])
+})
+
+test('the menu fits the theme switch on screen with five chapters linked', async ({ page, errors }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop')
   await page.goto('/')
   await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
   await page.getByRole('button', { name: 'Menu' }).click()
 
-  await expect(page.locator('.menu .subs a[href^="/chapters/"]')).toHaveCount(4)
+  await expect(page.locator('.menu .subs a[href^="/chapters/"]')).toHaveCount(5)
   await expect(page.getByRole('group', { name: 'Theme' })).toBeInViewport({ ratio: 1 })
   expect(errors).toEqual([])
 })

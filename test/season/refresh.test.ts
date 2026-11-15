@@ -3,6 +3,7 @@ import { Effect, Layer, Logger, Schema } from 'effect'
 import { HttpClientError, HttpClientRequest, HttpClientResponse } from 'effect/http'
 
 import { RaceControlResponse } from '../../src/flags/schema.ts'
+import { SpeedLapsResponse } from '../../src/speed/schema.ts'
 import { JolpicaError } from '../../src/season/jolpica-client.ts'
 import { RacesResponse } from '../../src/season/jolpica-schema.ts'
 import { OpenF1Error } from '../../src/season/openf1-client.ts'
@@ -128,4 +129,18 @@ it('keeps writing the snapshot and the previous flags when OpenF1 race control f
   expect(result).toBe('written')
   expect(stored?.fetchedAt).toBe('2026-11-07T20:00:00.000Z')
   expect(stored?.flags).toEqual(flags)
+})
+
+it('keeps writing the snapshot and the previous top speed when OpenF1 laps fail', async () => {
+  const { kv } = fakeKV()
+  const previous = await snapshotAt('2026-11-06T21:00:00Z')
+  const topSpeed = { season: 2026, races: [{ sessionKey: 11404, circuit: 'Mexico City', dateEnd: '2026-11-01T22:00:00+00:00', kmh: 361, driverNumber: 10, surname: 'Gasly', lap: 48 }] }
+  const broken = Schema.decodeUnknownEffect(SpeedLapsResponse)({}).pipe(Effect.mapError((cause) => new OpenF1Error({ path: '/laps', cause })))
+
+  await store(kv, { ...previous, topSpeed })
+
+  const result = await refreshAt('2026-11-07T20:00:00Z', kv, fakeOpenF1({ sessionLaps: () => broken }))
+
+  expect(result).toBe('written')
+  expect((await readBack(kv))?.topSpeed).toEqual(topSpeed)
 })

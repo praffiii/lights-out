@@ -14,6 +14,7 @@ import { Route as SeasonRouteImport } from './routes/season'
 import { Route as WeekendRouteImport } from './routes/weekend'
 import { Route as ApiSeasonRouteImport } from './routes/api/season'
 import { Route as ChaptersFlagsRouteImport } from './routes/chapters.flags'
+import { Route as ChaptersInsideTheCarRouteImport } from './routes/chapters.inside-the-car'
 import { Route as ChaptersOvertakingRouteImport } from './routes/chapters.overtaking'
 import { Route as ChaptersRaceWeekendRouteImport } from './routes/chapters.race-weekend'
 import { Route as ChaptersTyresAndStrategyRouteImport } from './routes/chapters.tyres-and-strategy'
@@ -43,6 +44,11 @@ const ApiSeasonRoute = ApiSeasonRouteImport.update({
 const ChaptersFlagsRoute = ChaptersFlagsRouteImport.update({
   id: '/chapters/flags',
   path: '/chapters/flags',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChaptersInsideTheCarRoute = ChaptersInsideTheCarRouteImport.update({
+  id: '/chapters/inside-the-car',
+  path: '/chapters/inside-the-car',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChaptersOvertakingRoute = ChaptersOvertakingRouteImport.update({
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
   '/chapters/flags': typeof ChaptersFlagsRoute
+  '/chapters/inside-the-car': typeof ChaptersInsideTheCarRoute
   '/chapters/overtaking': typeof ChaptersOvertakingRoute
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
   '/chapters/tyres-and-strategy': typeof ChaptersTyresAndStrategyRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
   '/chapters/flags': typeof ChaptersFlagsRoute
+  '/chapters/inside-the-car': typeof ChaptersInsideTheCarRoute
   '/chapters/overtaking': typeof ChaptersOvertakingRoute
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
   '/chapters/tyres-and-strategy': typeof ChaptersTyresAndStrategyRoute
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
   '/chapters/flags': typeof ChaptersFlagsRoute
+  '/chapters/inside-the-car': typeof ChaptersInsideTheCarRoute
   '/chapters/overtaking': typeof ChaptersOvertakingRoute
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
   '/chapters/tyres-and-strategy': typeof ChaptersTyresAndStrategyRoute
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/weekend'
     | '/api/season'
     | '/chapters/flags'
+    | '/chapters/inside-the-car'
     | '/chapters/overtaking'
     | '/chapters/race-weekend'
     | '/chapters/tyres-and-strategy'
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/weekend'
     | '/api/season'
     | '/chapters/flags'
+    | '/chapters/inside-the-car'
     | '/chapters/overtaking'
     | '/chapters/race-weekend'
     | '/chapters/tyres-and-strategy'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/weekend'
     | '/api/season'
     | '/chapters/flags'
+    | '/chapters/inside-the-car'
     | '/chapters/overtaking'
     | '/chapters/race-weekend'
     | '/chapters/tyres-and-strategy'
@@ -154,6 +166,7 @@ export interface RootRouteChildren {
   WeekendRoute: typeof WeekendRoute
   ApiSeasonRoute: typeof ApiSeasonRoute
   ChaptersFlagsRoute: typeof ChaptersFlagsRoute
+  ChaptersInsideTheCarRoute: typeof ChaptersInsideTheCarRoute
   ChaptersOvertakingRoute: typeof ChaptersOvertakingRoute
   ChaptersRaceWeekendRoute: typeof ChaptersRaceWeekendRoute
   ChaptersTyresAndStrategyRoute: typeof ChaptersTyresAndStrategyRoute
@@ -196,6 +209,13 @@ declare module '@tanstack/react-router' {
       path: '/chapters/flags'
       fullPath: '/chapters/flags'
       preLoaderRoute: typeof ChaptersFlagsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chapters/inside-the-car': {
+      id: '/chapters/inside-the-car'
+      path: '/chapters/inside-the-car'
+      fullPath: '/chapters/inside-the-car'
+      preLoaderRoute: typeof ChaptersInsideTheCarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chapters/overtaking': {
@@ -242,6 +262,7 @@ const rootRouteChildren: RootRouteChildren = {
   WeekendRoute: WeekendRoute,
   ApiSeasonRoute: ApiSeasonRoute,
   ChaptersFlagsRoute: ChaptersFlagsRoute,
+  ChaptersInsideTheCarRoute: ChaptersInsideTheCarRoute,
   ChaptersOvertakingRoute: ChaptersOvertakingRoute,
   ChaptersRaceWeekendRoute: ChaptersRaceWeekendRoute,
   ChaptersTyresAndStrategyRoute: ChaptersTyresAndStrategyRoute,

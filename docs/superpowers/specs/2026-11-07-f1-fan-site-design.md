@@ -88,7 +88,7 @@ English. **[my call]**
 ## 7. The site: eight sections
 
 1. **Cinematic intro.** A short opening act built from original motion, typography, and sound, not footage. It plays on the first visit. It can be skipped, and a visitor can replay it. **[my call]** **Dropped by Praffi on 2026-11-09, never shipped; see "Intro (dropped)" in DESIGN.md.**
-2. **The car.** The visitor takes the car apart piece by piece. The interaction pattern comes from <https://skills.wheresryan.sh/anatomy>:
+2. **The car.** **Built on 2026-11-15 as How F1 works Chapter 05, "Inside the car"; see "The car" in DESIGN.md. It is scroll-driven, with no hover or drag.** The visitor takes the car apart piece by piece. The interaction pattern comes from <https://skills.wheresryan.sh/anatomy>:
    - The car is a real object, not a diagram.
    - Exactly one part is lit with an accent color at any moment.
    - Hovering or dragging explodes the car into its assemblies.
@@ -120,7 +120,7 @@ History is woven in: a car's evolution, a legend's story, a classic corner's pas
 2. **The intro** (storyboard in DESIGN.md). It plays before Home on the first visit. **[my call]** on its place in the order. **Dropped by Praffi on 2026-11-09, never shipped; see "Intro (dropped)" in DESIGN.md.**
 3. **This season.**
 4. **How F1 works:** the index, then one chapter at a time.
-5. **The car**, **the engine**, **the tracks** (index and circuit page), **the people** (index and driver page).
+5. **The car**, **the engine**, **the tracks** (index and circuit page), **the people** (index and driver page). The car shipped as How F1 works Chapter 05 (`docs/superpowers/plans/2026-11-15-chapter-05-inside-the-car.md`).
 6. **Glossary, credits, 404.**
 
 Praffi can reorder anything after Home. Links to a design that isn't built yet show "Soon".

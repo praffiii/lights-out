@@ -114,7 +114,7 @@ export function Replay({ pass, all, info }: { pass: PassFile; all: Steps; info: 
     }
   }
 
-  const time = useScrub(root, end, stops, pace, paint)
+  const { time } = useScrub(root, end, stops, pace, paint)
 
   return (
     <section className="replay cast circuit" data-theme="dark" aria-labelledby="replay" ref={root} style={colours(pass)}>
