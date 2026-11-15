@@ -112,8 +112,10 @@
 .car-page .modes [aria-selected='true'] { padding-bottom: 8px; border-bottom: 3px solid var(--ink); color: var(--ink); }
 .car-page .modes [aria-selected='true'] .name { font-weight: 600; }
 .car-page .sub-active { display: none; }
-.car-page .wings .stage { margin-top: 28px; aspect-ratio: 2400 / 750; }
-.car-page .wings .stage img { display: block; width: 100%; height: 100%; }
+.car-page .wings .stage { position: relative; margin-top: 28px; aspect-ratio: 2400 / 750; }
+.car-page .wings .stage img { display: block; width: 100%; height: 100%; transition: opacity 0.6s var(--brake); }
+.car-page .wings .stage[data-gl] img { opacity: 0; }
+.car-page .wings .gl { position: absolute; inset: 0; pointer-events: none; }
 .car-page .payoff { display: grid; grid-template-columns: 112px minmax(0, 1fr) auto; align-items: center; column-gap: 24px; margin-top: 56px; padding: 24px; background: var(--purple); color: var(--dark); }
 .car-page .payoff .so { font-size: 12px; }
 .car-page .payoff .what { font-size: 26px; font-weight: 600; letter-spacing: -0.015em; }

@@ -185,3 +185,48 @@ test('reduced motion keeps the band still with every job open', async ({ page, e
   for (const job of await band(page, '.job').all()) await expect(job).toBeVisible()
   expect(errors).toEqual([])
 })
+
+const wings = (page: Page, selector = '') => page.locator(`.chapter-page .wings ${selector}`.trim())
+
+const tab = (page: Page, name: RegExp) => wings(page).getByRole('tab', { name })
+
+const placeStage = (page: Page, at: 'before' | 'after') =>
+  wings(page, '.stage').evaluate((el, where) => {
+    const r = el.getBoundingClientRect()
+    const y = r.top + scrollY
+
+    window.scrollTo(0, where === 'before' ? y - innerHeight * 0.98 : y + r.height - innerHeight * 0.05)
+  }, at)
+
+test('scrolling through the wings opens the flaps', async ({ page, errors }) => {
+  await loaded(page)
+  await wings(page).scrollIntoViewIfNeeded()
+  await expect(wings(page, '.stage')).toHaveAttribute('data-gl', '', { timeout: 20_000 })
+
+  await placeStage(page, 'before')
+  await expect(tab(page, /Corner Mode/)).toHaveAttribute('aria-selected', 'true')
+
+  await placeStage(page, 'after')
+  await expect(tab(page, /Straight Mode/)).toHaveAttribute('aria-selected', 'true')
+  expect(errors).toEqual([])
+})
+
+test('a wing tab sets the mode', async ({ page, errors }) => {
+  await loaded(page)
+  await wings(page).scrollIntoViewIfNeeded()
+
+  await tab(page, /Corner Mode/).click()
+  await expect(tab(page, /Corner Mode/)).toHaveAttribute('aria-selected', 'true')
+  await expect(tab(page, /Straight Mode/)).toHaveAttribute('aria-selected', 'false')
+  expect(errors).toEqual([])
+})
+
+test('reduced motion opens on Straight Mode with the poster', async ({ page, errors }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await loaded(page)
+
+  await expect(tab(page, /Straight Mode/)).toHaveAttribute('aria-selected', 'true')
+  await expect(wings(page, 'canvas')).toHaveCount(0)
+  await expect(wings(page, '.stage img')).toBeVisible()
+  expect(errors).toEqual([])
+})
