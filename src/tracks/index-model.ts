@@ -2,6 +2,8 @@ import { CALENDAR, type CalendarCircuit, labelOf } from '#/circuits/calendar.ts'
 import { pickRace } from '#/season/weekend.ts'
 import type { SeasonSnapshot } from '#/season/snapshot-schema.ts'
 
+import { TRACK_PAGES } from './pages.ts'
+
 export type IndexCell = { id: string; tile: string; round: number; label: string; lengthKm: string; to: `/tracks/${string}` | null; lit: boolean }
 
 export type IndexFacts = {
@@ -13,7 +15,7 @@ export type IndexFacts = {
 
 export const SEASON = 2026
 
-export const PAGED: ReadonlySet<string> = new Set(['vegas'])
+const PAGED: ReadonlySet<string> = new Set(Object.keys(TRACK_PAGES))
 
 const circuits: ReadonlyArray<[string, CalendarCircuit]> = Object.entries(CALENDAR)
 
