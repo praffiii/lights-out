@@ -21,6 +21,8 @@ for (const colorScheme of ['light', 'dark'] as const) {
     await expect(page).toHaveTitle('Glossary · Lights Out')
     await expect(page.locator('.glossary-page .opening .label')).toHaveText('Glossary · 46 words · from 5 chapters')
     await expect(rows(page)).toHaveCount(46)
+    await expect(page.locator('.glossary-page .next .hl').first()).toHaveCSS('display', 'block')
+    await expect(page.locator('.glossary-page .next img')).toHaveAttribute('srcset', /3543w/)
     expect(errors).toEqual([])
   })
 }

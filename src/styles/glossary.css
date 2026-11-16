@@ -39,6 +39,8 @@
 .glossary-page .list .none { padding-top: 30px; font-size: 20px; font-weight: 600; }
 .glossary-page .list .none:empty { display: none; }
 
+.glossary-page .next .hl { display: block; }
+
 @media (max-width: 1199px) {
   .glossary-page .find { grid-template-columns: minmax(0, 1fr); row-gap: 28px; padding-bottom: 64px; }
   .glossary-page .letters { justify-content: flex-start; gap: 14px; overflow-x: auto; scrollbar-width: none; }
