@@ -272,7 +272,7 @@ export function Overtaking() {
         </table>
       </section>
       <Words keys={OVERTAKING_WORDS} />
-      <Next n="03" min={7} title="Tyres and strategy." line="Why one pit stop can win a race" photo={PHOTOS.ch03} to="/chapters/tyres-and-strategy" />
+      <Next label="Next · Chapter 03 · 7 min" title="Tyres and strategy." line="Why one pit stop can win a race" photo={PHOTOS.ch03} to="/chapters/tyres-and-strategy" />
     </div>
   )
 }

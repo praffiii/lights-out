@@ -2,7 +2,7 @@ import { CALENDAR, type CalendarCircuit, labelOf } from '#/circuits/calendar.ts'
 import { pickRace } from '#/season/weekend.ts'
 import type { SeasonSnapshot } from '#/season/snapshot-schema.ts'
 
-export type IndexCell = { id: string; tile: string; round: number; label: string; lengthKm: string; to: string | null; lit: boolean }
+export type IndexCell = { id: string; tile: string; round: number; label: string; lengthKm: string; to: `/tracks/${string}` | null; lit: boolean }
 
 export type IndexFacts = {
   count: number
@@ -10,6 +10,8 @@ export type IndexFacts = {
   shortest: { label: string; km: string }
   newest: { label: string; line: string }
 }
+
+export const SEASON = 2026
 
 export const PAGED: ReadonlySet<string> = new Set(['vegas'])
 

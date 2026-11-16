@@ -209,7 +209,7 @@ export function Tyres() {
         </div>
       </section>
       <Words keys={TYRES_WORDS} />
-      <Next n="04" min={4} title="Flags and what they mean." line="What each colour asks of a driver" photo={PHOTOS.ch04} to="/chapters/flags" />
+      <Next label="Next · Chapter 04 · 4 min" title="Flags and what they mean." line="What each colour asks of a driver" photo={PHOTOS.ch04} to="/chapters/flags" />
     </div>
   )
 }

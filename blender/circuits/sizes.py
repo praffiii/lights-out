@@ -273,7 +273,7 @@ def main():
         halo.data.materials[0], core.data.materials[0] = cool_halo, cool_core
         x0, y0, x1, y1 = border
         cells[cid] = {"patch": [x0, y0, x1 - x0, y1 - y0], "label": label}
-    json.dump({"w": W * SS, "h": H * SS, "cells": cells}, open(os.path.join(OUT, f"{MODE}.json"), "w"))
+    json.dump({"w": W * SS, "h": H * SS, "km": round(PX_PER_KM * SS), "cells": cells}, open(os.path.join(OUT, f"{MODE}.json"), "w"))
     print("done sizes", MODE, len(cells))
 
 

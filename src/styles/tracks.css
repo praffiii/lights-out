@@ -1,0 +1,62 @@
+.tracks-page .opening { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 528px); column-gap: 48px; align-items: start; padding: 128px var(--m) 96px; }
+.tracks-page .opening .label { grid-column: 1 / -1; }
+.tracks-page .opening h1 { display: contents; }
+.tracks-page .opening .count { grid-row: 2 / span 2; margin: 4px 0 0 -14px; font-size: clamp(160px, 22vw, 320px); font-weight: 900; line-height: 0.82; letter-spacing: -0.06em; }
+.tracks-page .opening .lead { grid-column: 2; margin-top: 44px; font-size: clamp(56px, 2rem + 4vw, 88px); line-height: 0.92; letter-spacing: -0.045em; }
+.tracks-page .opening .lead .hl { display: block; }
+.tracks-page .opening .side { grid-column: 2; }
+.tracks-page .opening .intro { max-width: 380px; margin-top: 28px; font-size: 18px; color: var(--muted); }
+.tracks-page .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 28px; margin-top: 64px; }
+.tracks-page .facts > div { padding-top: 14px; border-top: 1px solid var(--line); }
+.tracks-page .facts dd { display: grid; gap: 10px; margin-top: 12px; }
+.tracks-page .facts b { font-size: 30px; font-weight: 700; line-height: 1; letter-spacing: -0.035em; }
+
+.tracks-page .sizes { padding-top: 64px; }
+.tracks-page .sizes .head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 528px) auto; column-gap: 48px; align-items: start; padding: 0 var(--m); }
+.tracks-page .sizes .head .label { grid-column: 1 / -1; color: var(--muted); }
+.tracks-page .sizes h2 { margin: 10px 0 0 -3px; font-size: clamp(48px, 1.5rem + 3vw, 64px); line-height: 0.95; letter-spacing: -0.04em; }
+.tracks-page .sizes h2 .hl { display: block; }
+.tracks-page .sizes .body { max-width: 380px; margin-top: 24px; font-size: 16px; }
+.tracks-page .sizes .hint { margin-top: 28px; color: var(--muted); white-space: nowrap; }
+.tracks-page .sizes .stage { position: relative; container-type: inline-size; width: 100%; margin: 0; overflow: clip; }
+.tracks-page .sizes .stage.phone { display: none; }
+.tracks-page .sizes .stage img { position: absolute; display: block; }
+.tracks-page .sizes .base { inset: 0; width: 100%; height: 100%; }
+.tracks-page .sizes .cell { position: absolute; display: flex; gap: 10px; color: var(--muted); font-size: 10px; white-space: nowrap; }
+.tracks-page .sizes .cell b { font-weight: 400; color: var(--muted); }
+.tracks-page .sizes a.cell { color: var(--ink); }
+.tracks-page .sizes a.cell:hover { color: var(--purple); }
+.tracks-page .sizes .chip { margin: -4px 0 0 -8px; padding: 4px 8px; background: var(--purple); color: #fff; }
+.tracks-page .sizes a.chip:hover { color: #fff; }
+.tracks-page .sizes .scale { position: absolute; display: grid; gap: 6px; margin-top: -22px; color: var(--ink); font-size: 10px; }
+.tracks-page .sizes .scale i { width: calc(var(--k) * 100cqw); height: 6px; border: 1px solid currentcolor; border-top: 0; }
+.tracks-page .sizes-note { padding: 18px var(--m) 0; font-size: 10px; }
+
+.tracks-page .next .shot { width: min(640px, 50%); height: 680px; margin-left: auto; margin-right: var(--m); }
+.tracks-page .next .caption { left: var(--m); right: auto; top: 0; bottom: auto; padding: 24px 0 0; border-top: 0; background: none; }
+.tracks-page .next .credit { text-align: right; }
+
+@media (max-width: 1199px) {
+  .tracks-page .opening { grid-template-columns: minmax(0, 1fr); }
+  .tracks-page .opening .count, .tracks-page .opening .lead, .tracks-page .opening .side { grid-column: 1; grid-row: auto; }
+  .tracks-page .sizes .head { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 760px) {
+  .tracks-page .opening { padding: 156px var(--m) 56px; }
+  .tracks-page .opening .count { margin: 20px 0 0 -8px; font-size: 200px; }
+  .tracks-page .opening .lead { margin-top: 20px; font-size: 52px; }
+  .tracks-page .facts { grid-template-columns: minmax(0, 1fr); row-gap: 24px; margin-top: 40px; }
+  .tracks-page .sizes { padding-top: 48px; }
+  .tracks-page .sizes .hint { margin-top: 16px; }
+  .tracks-page .sizes .stage.desk { display: none; }
+  .tracks-page .sizes .stage.phone { display: block; margin-top: 8px; }
+  .tracks-page .sizes .cell { gap: 6px; font-size: 9px; }
+  .tracks-page .next .shot { width: auto; height: auto; margin: 0; aspect-ratio: 4 / 5; }
+  .tracks-page .next .caption { position: static; padding: 0 var(--m) 24px; }
+  .tracks-page .next .credit { text-align: left; }
+}
+
+.tracks-missing { display: grid; place-content: center; justify-items: center; gap: 20px; min-height: 70svh; padding: 24px; text-align: center; }
+.tracks-missing h1 { font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; }
+.tracks-missing a { font-size: 11px; color: var(--purple); text-transform: uppercase; letter-spacing: 0.12em; }

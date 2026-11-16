@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CreditsRouteImport } from './routes/credits'
 import { Route as GlossaryRouteImport } from './routes/glossary'
 import { Route as SeasonRouteImport } from './routes/season'
+import { Route as TracksRouteImport } from './routes/tracks'
 import { Route as WeekendRouteImport } from './routes/weekend'
 import { Route as ApiSeasonRouteImport } from './routes/api/season'
 import { Route as ChaptersFlagsRouteImport } from './routes/chapters.flags'
@@ -21,6 +22,7 @@ import { Route as ChaptersOvertakingRouteImport } from './routes/chapters.overta
 import { Route as ChaptersRaceWeekendRouteImport } from './routes/chapters.race-weekend'
 import { Route as ChaptersTyresAndStrategyRouteImport } from './routes/chapters.tyres-and-strategy'
 import { Route as LapCircuitRouteImport } from './routes/lap.$circuit'
+import { Route as TracksCircuitRouteImport } from './routes/tracks.$circuit'
 import { Route as ApiPoleCircuitRouteImport } from './routes/api/pole.$circuit'
 
 const IndexRoute = IndexRouteImport.update({
@@ -41,6 +43,11 @@ const GlossaryRoute = GlossaryRouteImport.update({
 const SeasonRoute = SeasonRouteImport.update({
   id: '/season',
   path: '/season',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TracksRoute = TracksRouteImport.update({
+  id: '/tracks',
+  path: '/tracks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WeekendRoute = WeekendRouteImport.update({
@@ -84,6 +91,11 @@ const LapCircuitRoute = LapCircuitRouteImport.update({
   path: '/lap/$circuit',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TracksCircuitRoute = TracksCircuitRouteImport.update({
+  id: '/$circuit',
+  path: '/$circuit',
+  getParentRoute: () => TracksRoute,
+} as any)
 const ApiPoleCircuitRoute = ApiPoleCircuitRouteImport.update({
   id: '/api/pole/$circuit',
   path: '/api/pole/$circuit',
@@ -95,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/credits': typeof CreditsRoute
   '/glossary': typeof GlossaryRoute
   '/season': typeof SeasonRoute
+  '/tracks': typeof TracksRouteWithChildren
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
   '/chapters/flags': typeof ChaptersFlagsRoute
@@ -103,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
   '/chapters/tyres-and-strategy': typeof ChaptersTyresAndStrategyRoute
   '/lap/$circuit': typeof LapCircuitRoute
+  '/tracks/$circuit': typeof TracksCircuitRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
 }
 export interface FileRoutesByTo {
@@ -110,6 +124,7 @@ export interface FileRoutesByTo {
   '/credits': typeof CreditsRoute
   '/glossary': typeof GlossaryRoute
   '/season': typeof SeasonRoute
+  '/tracks': typeof TracksRouteWithChildren
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
   '/chapters/flags': typeof ChaptersFlagsRoute
@@ -118,6 +133,7 @@ export interface FileRoutesByTo {
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
   '/chapters/tyres-and-strategy': typeof ChaptersTyresAndStrategyRoute
   '/lap/$circuit': typeof LapCircuitRoute
+  '/tracks/$circuit': typeof TracksCircuitRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
 }
 export interface FileRoutesById {
@@ -126,6 +142,7 @@ export interface FileRoutesById {
   '/credits': typeof CreditsRoute
   '/glossary': typeof GlossaryRoute
   '/season': typeof SeasonRoute
+  '/tracks': typeof TracksRouteWithChildren
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
   '/chapters/flags': typeof ChaptersFlagsRoute
@@ -134,6 +151,7 @@ export interface FileRoutesById {
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
   '/chapters/tyres-and-strategy': typeof ChaptersTyresAndStrategyRoute
   '/lap/$circuit': typeof LapCircuitRoute
+  '/tracks/$circuit': typeof TracksCircuitRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
 }
 export interface FileRouteTypes {
@@ -143,6 +161,7 @@ export interface FileRouteTypes {
     | '/credits'
     | '/glossary'
     | '/season'
+    | '/tracks'
     | '/weekend'
     | '/api/season'
     | '/chapters/flags'
@@ -151,6 +170,7 @@ export interface FileRouteTypes {
     | '/chapters/race-weekend'
     | '/chapters/tyres-and-strategy'
     | '/lap/$circuit'
+    | '/tracks/$circuit'
     | '/api/pole/$circuit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -158,6 +178,7 @@ export interface FileRouteTypes {
     | '/credits'
     | '/glossary'
     | '/season'
+    | '/tracks'
     | '/weekend'
     | '/api/season'
     | '/chapters/flags'
@@ -166,6 +187,7 @@ export interface FileRouteTypes {
     | '/chapters/race-weekend'
     | '/chapters/tyres-and-strategy'
     | '/lap/$circuit'
+    | '/tracks/$circuit'
     | '/api/pole/$circuit'
   id:
     | '__root__'
@@ -173,6 +195,7 @@ export interface FileRouteTypes {
     | '/credits'
     | '/glossary'
     | '/season'
+    | '/tracks'
     | '/weekend'
     | '/api/season'
     | '/chapters/flags'
@@ -181,6 +204,7 @@ export interface FileRouteTypes {
     | '/chapters/race-weekend'
     | '/chapters/tyres-and-strategy'
     | '/lap/$circuit'
+    | '/tracks/$circuit'
     | '/api/pole/$circuit'
   fileRoutesById: FileRoutesById
 }
@@ -189,6 +213,7 @@ export interface RootRouteChildren {
   CreditsRoute: typeof CreditsRoute
   GlossaryRoute: typeof GlossaryRoute
   SeasonRoute: typeof SeasonRoute
+  TracksRoute: typeof TracksRouteWithChildren
   WeekendRoute: typeof WeekendRoute
   ApiSeasonRoute: typeof ApiSeasonRoute
   ChaptersFlagsRoute: typeof ChaptersFlagsRoute
@@ -228,6 +253,13 @@ declare module '@tanstack/react-router' {
       path: '/season'
       fullPath: '/season'
       preLoaderRoute: typeof SeasonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tracks': {
+      id: '/tracks'
+      path: '/tracks'
+      fullPath: '/tracks'
+      preLoaderRoute: typeof TracksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/weekend': {
@@ -286,6 +318,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LapCircuitRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tracks/$circuit': {
+      id: '/tracks/$circuit'
+      path: '/$circuit'
+      fullPath: '/tracks/$circuit'
+      preLoaderRoute: typeof TracksCircuitRouteImport
+      parentRoute: typeof TracksRoute
+    }
     '/api/pole/$circuit': {
       id: '/api/pole/$circuit'
       path: '/api/pole/$circuit'
@@ -296,11 +335,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface TracksRouteChildren {
+  TracksCircuitRoute: typeof TracksCircuitRoute
+}
+
+const TracksRouteChildren: TracksRouteChildren = {
+  TracksCircuitRoute: TracksCircuitRoute,
+}
+
+const TracksRouteWithChildren =
+  TracksRoute._addFileChildren(TracksRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CreditsRoute: CreditsRoute,
   GlossaryRoute: GlossaryRoute,
   SeasonRoute: SeasonRoute,
+  TracksRoute: TracksRouteWithChildren,
   WeekendRoute: WeekendRoute,
   ApiSeasonRoute: ApiSeasonRoute,
   ChaptersFlagsRoute: ChaptersFlagsRoute,

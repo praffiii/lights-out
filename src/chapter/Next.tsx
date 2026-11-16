@@ -1,16 +1,17 @@
-import type { ChapterPath, Photo } from '#/home/content.ts'
+import type { Photo } from '#/home/content.ts'
+import type { To } from '#/shell/context.ts'
 import { Go, Soon } from '#/shell/Go.tsx'
 
-type Props = { n: string; min: number; title: string; line: string; photo: Photo; to: ChapterPath | null }
+type Props = { label: string; title: string; line: string; photo: Photo; to: To | null }
 
-export function Next({ n, min, title, line, photo, to }: Props) {
+export function Next({ label, title, line, photo, to }: Props) {
   return (
     <section className="next" aria-labelledby="next">
       <div className="shot">
         <img src={photo.src} alt="" loading="lazy" />
       </div>
       <div className="caption">
-        <p className="mono">{`Next · Chapter ${n} · ${min} min`}</p>
+        <p className="mono">{label}</p>
         <h2 id="next" className="display">
           {title}
         </h2>
