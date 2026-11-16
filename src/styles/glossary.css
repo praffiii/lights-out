@@ -12,6 +12,8 @@
 .glossary-page .letters a:hover { color: var(--purple); }
 
 .glossary-page .tap { padding: 64px var(--m) 220px; border-block: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.glossary-page[data-searching] .tap { display: none; }
+.glossary-page[data-searching] .list { padding-top: 0; }
 .glossary-page .tap .head { display: grid; grid-template-columns: minmax(0, 1fr) 380px; column-gap: 48px; align-items: start; }
 .glossary-page .tap .label { color: var(--muted); }
 .glossary-page .tap .how { justify-self: end; color: var(--purple); }
@@ -41,7 +43,9 @@
   .glossary-page .find { grid-template-columns: minmax(0, 1fr); row-gap: 28px; padding-bottom: 64px; }
   .glossary-page .letters { justify-content: flex-start; gap: 14px; overflow-x: auto; scrollbar-width: none; }
   .glossary-page .tap { padding-bottom: 72px; }
-  .glossary-page .tap .head { grid-template-columns: minmax(0, 1fr); }
+  .glossary-page[data-searching] .tap { display: none; }
+.glossary-page[data-searching] .list { padding-top: 0; }
+.glossary-page .tap .head { grid-template-columns: minmax(0, 1fr); }
   .glossary-page .tap .how { grid-row: 1; justify-self: start; display: none; }
   .glossary-page .tap .say { margin-top: 56px; }
   .glossary-page .tap .term .def { left: var(--m); right: var(--m); top: auto; width: auto; }

@@ -9,7 +9,7 @@ const USED_ON = {
   heroLight: 'Menu',
   heroDark: 'Chapter 05, Menu',
   ch01: 'Home, Chapter 01, Menu',
-  ch02: 'Home, Chapters 01 and 02, Race weekend, Glossary',
+  ch02: 'Home, Chapters 01 and 02, Race weekend, Glossary, Menu',
   ch02Straight: 'Chapter 02',
   ch02Turn1: 'Chapter 02',
   ch02Exit: 'Chapter 02',
@@ -50,10 +50,12 @@ const entry = (photo: { src: string; place: string; credit: string; source?: str
   return { src: photo.src, place: photo.place, ...parts, source: photo.source ?? null, usedOn }
 }
 
+const drivers = new Map<string, string>(CARS.map((car) => [car.code, car.driver]))
+
 const every: ReadonlyArray<Credit> = [
   ...Object.entries(PHOTOS).map(([key, photo]) => entry(photo, used.get(key) ?? '')),
   ...Object.values(CALENDAR).map(({ photo }) => entry({ ...photo, src: photo.small }, 'This season, Race weekend')),
-  ...Object.values(PORTRAITS).flatMap((photo) => (photo ? [entry(photo, 'This season, Race weekend')] : [])),
+  ...Object.entries(PORTRAITS).flatMap(([code, photo]) => (photo ? [entry({ ...photo, place: [drivers.get(code), photo.place].filter(Boolean).join(' · ') }, 'This season, Race weekend')] : [])),
   ...CARS.map((car) => entry({ src: car.src, place: `${car.team} ${car.car} · Shanghai, 2026`, credit: car.credit, source: car.commons }, 'Home')),
 ]
 

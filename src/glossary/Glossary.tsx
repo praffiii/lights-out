@@ -19,7 +19,7 @@ function motion(scope: HTMLElement) {
 
   if (REDUCED) return
 
-  for (const el of all(scope, '.opening .intro, .find, .tap .body, .tap .say')) gsap.from(el, { y: 24, opacity: 0, duration: 0.8, ease: 'brake', scrollTrigger: { trigger: el, start: 'top 92%', ...ONCE } })
+  for (const el of all(scope, '.opening .intro, .find, .tap .body, .tap .say')) gsap.from(el, { y: 24, opacity: 0, duration: 0.8, ease: 'brake', clearProps: 'transform', scrollTrigger: { trigger: el, start: 'top 92%', ...ONCE } })
 }
 
 export function Glossary() {
@@ -42,7 +42,7 @@ export function Glossary() {
   )
 
   return (
-    <div className="chapter-page glossary-page" ref={root}>
+    <div className="chapter-page glossary-page" data-searching={query.trim() ? '' : undefined} ref={root}>
       <section className="opening" aria-labelledby="h1">
         <div className="top">
           <p className="mono muted label">{`Glossary · ${ENTRIES.length} words · from 5 chapters`}</p>

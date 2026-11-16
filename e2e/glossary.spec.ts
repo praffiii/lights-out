@@ -95,3 +95,28 @@ test('everything is readable at once under reduced motion', async ({ page, error
   await expect(rows(page).first()).toBeVisible()
   expect(errors).toEqual([])
 })
+
+test('search results show right under the search field', async ({ page, errors }) => {
+  await loaded(page)
+  await page.getByRole('searchbox', { name: 'Search' }).fill('undercut')
+
+  await expect(row(page, 'undercut')).toBeInViewport()
+  expect(errors).toEqual([])
+})
+
+test('on a small screen the demo word opens its note at the bottom of the screen', async ({ page, errors }) => {
+  test.skip((page.viewportSize()?.width ?? 0) >= 1200, 'the note opens beside the word on wide screens')
+  await loaded(page)
+
+  const word = page.locator('.glossary-page .tap .term button')
+
+  await word.scrollIntoViewIfNeeded()
+  await expect(page.locator('.glossary-page .tap .say')).toHaveCSS('opacity', '1')
+  await word.tap()
+
+  const gap = await page.locator('.glossary-page .tap .def').evaluate((el) => innerHeight - el.getBoundingClientRect().bottom)
+
+  expect(gap).toBeGreaterThanOrEqual(0)
+  expect(gap).toBeLessThan(40)
+  expect(errors).toEqual([])
+})

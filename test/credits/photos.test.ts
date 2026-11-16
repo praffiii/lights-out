@@ -25,3 +25,8 @@ it('counts every photo once, with or without a confirmed page', () => {
   expect(COUNTS.photographers).toBe(new Set(CREDITS.map((c) => c.by)).size)
   expect(CREDITS.some((c) => c.usedOn === '')).toBe(false)
 })
+
+it('names the driver on every portrait row', () => {
+  expect(CREDITS.find((c) => c.src === '/img/drivers/LEC.webp')?.place).toBe('Charles Leclerc · Cannes, 2026')
+  expect(CREDITS.find((c) => c.src === '/img/ch02.jpg')?.usedOn).toContain('Menu')
+})
