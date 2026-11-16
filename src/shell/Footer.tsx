@@ -88,7 +88,7 @@ export function Footer() {
             {MENU.map((entry, i) => (
               <li key={entry.label}>
                 <span className="mono muted">{pad(i + 1)}</span>
-                {entry.to ? <Go to={entry.to}>{entry.label}</Go> : <Soon>{entry.label}</Soon>}
+                {entry.to ? <Go to={entry.to}>{entry.label}</Go> : entry.href ? <a href={entry.href}>{entry.label}</a> : <Soon>{entry.label}</Soon>}
               </li>
             ))}
           </ol>
@@ -96,9 +96,17 @@ export function Footer() {
         <div className="site">
           <p className="mono muted">This site</p>
           <ul>
-            {FOOTER_LINKS.map((label) => (
+            {FOOTER_LINKS.map(({ label, to, href }) => (
               <li key={label}>
-                <Soon>{label}</Soon>
+                {to ? (
+                  <Go to={to}>{label}</Go>
+                ) : href ? (
+                  <a href={href} rel="noreferrer">
+                    {label}
+                  </a>
+                ) : (
+                  <Soon>{label}</Soon>
+                )}
               </li>
             ))}
             <li>

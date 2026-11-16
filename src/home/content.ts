@@ -67,7 +67,7 @@ export const CAR_STATS = [
   { k: 'Aerodynamics', v: 'Active, two modes', count: null },
 ] as const
 
-export const READ_NEXT = [
-  { title: 'Why one pit stop can win a race.', kind: 'Strategy', photo: PHOTOS.tyres, alt: 'Pirelli tyres on display, from slicks to wets.' },
-  { title: 'Swedish Grand Prix, 1973.', kind: 'History', photo: PHOTOS.brm, alt: 'Mechanics at work on the number 20 BRM at the 1973 Swedish Grand Prix.' },
-] as const
+export const READ_NEXT: ReadonlyArray<{ title: string; kind: string; photo: Photo; alt: string; to: ChapterPath | null }> = [
+  { title: 'Why one pit stop can win a race.', kind: 'Strategy', photo: PHOTOS.tyres, alt: 'Pirelli tyres on display, from slicks to wets.', to: '/chapters/tyres-and-strategy' },
+  { title: 'Swedish Grand Prix, 1973.', kind: 'History', photo: PHOTOS.brm, alt: 'Mechanics at work on the number 20 BRM at the 1973 Swedish Grand Prix.', to: null },
+]

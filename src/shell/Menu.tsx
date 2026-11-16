@@ -116,6 +116,11 @@ export function Menu({ open, onClose, path }: { open: boolean; onClose: () => vo
                     <span className="mono">{number(i)}</span>
                     <Roll text={m.label} />
                   </Go>
+                ) : m.href ? (
+                  <a href={m.href} onFocus={() => setActive(i)} onClick={onClose}>
+                    <span className="mono">{number(i)}</span>
+                    <Roll text={m.label} />
+                  </a>
                 ) : (
                   <Soon className="off">
                     <span className="mono">{number(i)}</span>

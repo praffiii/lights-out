@@ -278,20 +278,32 @@ export function Home() {
           Read next
         </h2>
         <div className="pair">
-          {READ_NEXT.map((r) => (
-            <div key={r.title} className="next-item is-soon">
-              <div className="photo">
-                <img src={r.photo.src} alt={r.alt} loading="lazy" />
+          {READ_NEXT.map((r) => {
+            const body = (
+              <>
+                <div className="photo">
+                  <img src={r.photo.src} alt={r.alt} loading="lazy" />
+                </div>
+                <h3>
+                  {r.title}
+                  {r.to ? <span className="arr"> →</span> : <span className="soon mono">Soon</span>}
+                </h3>
+                <p className="mono muted">
+                  {r.kind} · {r.photo.credit}
+                </p>
+              </>
+            )
+
+            return r.to ? (
+              <Go key={r.title} to={r.to} className="next-item">
+                {body}
+              </Go>
+            ) : (
+              <div key={r.title} className="next-item is-soon">
+                {body}
               </div>
-              <h3>
-                {r.title}
-                <span className="soon mono">Soon</span>
-              </h3>
-              <p className="mono muted">
-                {r.kind} · {r.photo.credit}
-              </p>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </section>
     </div>

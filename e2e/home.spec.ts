@@ -285,3 +285,25 @@ test('the menu fits the theme switch on screen with five chapters linked', async
   await expect(page.getByRole('group', { name: 'Theme' })).toBeInViewport({ ratio: 1 })
   expect(errors).toEqual([])
 })
+
+test('the pit-stop read leads to chapter 03 and the 1973 story still waits', async ({ page, errors }) => {
+  await page.goto('/')
+  await expect(page.locator('.loader')).toHaveCount(0, { timeout: LOADER_MS })
+
+  await expect(page.locator('.next a.next-item')).toHaveAttribute('href', '/chapters/tyres-and-strategy')
+  await expect(page.locator('.next .next-item.is-soon h3')).toHaveText('Swedish Grand Prix, 1973.Soon')
+  expect(errors).toEqual([])
+})
+
+test('the menu sends How F1 works to the chapter list and The car to chapter 05', async ({ page, errors }) => {
+  await page.goto('/')
+  await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
+  await page.getByRole('button', { name: 'Menu' }).click()
+
+  await expect(page.locator('.menu nav .line > a', { hasText: 'The car' })).toHaveAttribute('href', '/chapters/inside-the-car')
+  await page.locator('.menu nav .line > a', { hasText: 'How F1 works' }).click()
+
+  await expect(page.locator('#start')).toBeInViewport()
+  await expect(page.locator('.menu')).toBeHidden()
+  expect(errors).toEqual([])
+})
