@@ -155,9 +155,9 @@ From here on the pages are planned, not built. Read every "rises", "types on" an
 
 | Page | Motion |
 |---|---|
-| Glossary | Letter index: the active letter fills ink. Terms rise as you reach them. A link to a term on another page lands on it and its row flashes purple for 0.6 s. |
+| Glossary | The headline sweeps in; the intro, search row and dark band fade up once. The list does not move. A link to a word lands on its row, which stays purple while the address points at it (CSS `:target`, no timer). |
 | 404 | "Veered off track." rises. A small 3D runoff render wipes in. "Back to the track →" runs the page change. |
-| Credits | Rows rise. Each photo credit shows its thumbnail on hover (it follows the cursor) and nothing on touch. |
+| Credits | The headlines sweep; the figures, typeface rows and small print fade up once. The photo table does not move; thumbnails sit in the rows. |
 
 ## What the spike proved
 

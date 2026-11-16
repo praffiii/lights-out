@@ -88,7 +88,7 @@ export function Footer() {
             {MENU.map((entry, i) => (
               <li key={entry.label}>
                 <span className="mono muted">{pad(i + 1)}</span>
-                {entry.to ? <Go to={entry.to}>{entry.label}</Go> : <Soon>{entry.label}</Soon>}
+                {entry.to ? <Go to={entry.to}>{entry.label}</Go> : entry.href ? <a href={entry.href}>{entry.label}</a> : <Soon>{entry.label}</Soon>}
               </li>
             ))}
           </ol>
@@ -96,9 +96,17 @@ export function Footer() {
         <div className="site">
           <p className="mono muted">This site</p>
           <ul>
-            {FOOTER_LINKS.map((label) => (
+            {FOOTER_LINKS.map(({ label, to, href }) => (
               <li key={label}>
-                <Soon>{label}</Soon>
+                {to ? (
+                  <Go to={to}>{label}</Go>
+                ) : href ? (
+                  <a href={href} rel="noreferrer">
+                    {label}
+                  </a>
+                ) : (
+                  <Soon>{label}</Soon>
+                )}
               </li>
             ))}
             <li>
@@ -112,7 +120,7 @@ export function Footer() {
       </p>
       <div className="row mono muted">
         <p>Lights Out is an unofficial fan project. Not affiliated with Formula 1, FOM or any team.</p>
-        <p>Data Jolpica F1 · NASA SRTM · Photos Wikimedia Commons</p>
+        <p>Data Jolpica F1 · OpenF1 · NASA SRTM · OpenStreetMap · Photos Wikimedia Commons</p>
       </div>
     </footer>
   )

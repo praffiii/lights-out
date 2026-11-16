@@ -1,32 +1,32 @@
 import type { To } from '#/shell/context.ts'
 
-export type Photo = { src: string; place: string; credit: string; srcSet?: string }
+export type Photo = { src: string; place: string; credit: string; srcSet?: string; source?: string }
 
 export const PHOTOS = {
-  heroLight: { src: '/img/hero-light.jpg', place: 'Lewis Hamilton · Ferrari SF-25 · Suzuka, 2025', credit: 'Photo Liauzh · CC BY-SA 4.0' },
-  heroDark: { src: '/img/hero-dark.jpg', place: 'McLaren MCL39 · Las Vegas, 2025', credit: 'Photo DHSgov · Public domain' },
-  ch01: { src: '/img/ch01.jpg', place: 'The grid · Shanghai, 2024', credit: 'Photo Liauzh · CC BY-SA 4.0' },
-  ch02: { src: '/img/ch02.jpg', srcSet: '/img/ch02.jpg 1400w, /img/ch02-3543.jpg 3543w', place: 'Main straight · Baku, 2026', credit: 'Photo Press Service of the President of Azerbaijan · CC BY 4.0' },
-  ch02Straight: { src: '/img/ch02-straight.jpg', place: 'The straight · Sepang, 2017', credit: 'Photo Morio · CC BY-SA 4.0' },
-  ch02Turn1: { src: '/img/ch02-turn1.jpg', place: 'Turn 1 · Sepang, 2017', credit: 'Photo Morio · CC BY-SA 4.0' },
-  ch02Exit: { src: '/img/ch02-exit.jpg', place: 'The exit · Sepang, 2017', credit: 'Photo Morio · CC BY-SA 4.0' },
-  ch02Tow: { src: '/img/ch02-tow.jpg', srcSet: '/img/ch02-tow.jpg 2000w, /img/ch02-tow-3388.jpg 3388w', place: 'The tow · Spa-Francorchamps, 2026', credit: 'Photo Der Alf · CC BY 4.0' },
-  ch03: { src: '/img/ch03.jpg', place: 'Pit exit · Suzuka, 2024', credit: 'Photo Cineyas · CC BY-SA 4.0' },
-  ch03Medium: { src: '/img/ch03-medium.jpg', place: 'Medium slick · 2026', credit: 'Photo TaurusEmerald · CC BY-SA 4.0' },
-  ch03Sc: { src: '/img/ch03-sc.jpg', place: 'Safety car · Suzuka, 2026', credit: 'Photo Ysys3455 · CC0' },
-  ch04: { src: '/img/ch04.jpg', place: 'Safety car board · Zandvoort, 2024', credit: 'Photo Steffen Prößdorf · CC BY-SA 4.0' },
-  ch04Marshal: { src: '/img/ch04-marshal.jpg', place: 'Track marshal · Zandvoort, 2024', credit: 'Photo Steffen Prößdorf · CC BY-SA 4.0' },
-  ch04Sweep: { src: '/img/ch04-sweep.jpg', place: 'Marshals clear the track · Melbourne, 2026', credit: 'Photo Yu Chu Chin · CC BY-SA 4.0' },
-  ch04Fire: { src: '/img/ch04-fire.jpg', place: 'A grass fire stops qualifying · Suzuka, 2025', credit: 'Photo Liauzh · CC BY-SA 4.0' },
-  ch04Board: { src: '/img/ch04-board.jpg', place: 'Yellow flag and SC board · Indianapolis, 2005', credit: 'Photo Dan Smith · CC BY-SA 2.0' },
-  ch05: { src: '/img/ch05.jpg', place: 'Oscar Piastri · McLaren MCL40 · Suzuka, 2026', credit: 'Photo Martin Lee · CC BY-SA 4.0' },
-  ch05History1950: { src: '/img/ch05-1950.jpg', place: 'Zandvoort, 1950', credit: 'Photo Nationaal Archief · CC0' },
-  ch05History1978: { src: '/img/ch05-1978.jpg', place: 'Zandvoort, 1978 · Lotus 79', credit: 'Mario Andretti leads Ronnie Peterson · Photo Koen Suyk / Anefo, Nationaal Archief · CC0' },
-  ch05History2026: { src: '/img/ch05-2026.jpg', place: 'Suzuka, 2026 · Mercedes W17', credit: 'Kimi Antonelli · Photo Martin Lee · CC BY-SA 4.0' },
-  tyres: { src: '/img/tyres.jpg', place: 'Pirelli tyres, slicks to wets', credit: 'Photo Hullian111 · CC BY-SA 4.0' },
-  williams: { src: '/img/williams.jpg', place: 'Williams FW48 · Shanghai, 2026', credit: 'Photo Liauzh · CC BY 4.0' },
-  brm: { src: '/img/y1973.jpg', place: 'BRM mechanics · Anderstorp, 1973', credit: 'Photo Markku Lepola · CC BY 4.0' },
-  startLights: { src: '/img/start-lights.jpg', place: 'Start lights · Melbourne, 2026 · cropped', credit: 'Photo Yu Chu Chin · CC BY-SA 4.0' },
+  heroLight: { src: '/img/hero-light.jpg', place: 'Lewis Hamilton · Ferrari SF-25 · Suzuka, 2025', credit: 'Photo Liauzh · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:2025_Japan_GP_-_Ferrari_-_Lewis_Hamilton_-_FP1.jpg' },
+  heroDark: { src: '/img/hero-dark.jpg', place: 'McLaren MCL39 · Las Vegas, 2025', credit: 'Photo DHSgov · Public domain', source: 'https://commons.wikimedia.org/wiki/File:Las_Vegas_Grand_Prix_(54941206297)_(cropped).jpg' },
+  ch01: { src: '/img/ch01.jpg', place: 'The grid · Shanghai, 2024', credit: 'Photo Liauzh · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Sprint_Grid_Top_3_-_Chinese_GP_2024.jpg' },
+  ch02: { src: '/img/ch02.jpg', srcSet: '/img/ch02.jpg 1400w, /img/ch02-3543.jpg 3543w', place: 'Main straight · Baku, 2026', credit: 'Photo Press Service of the President of Azerbaijan · CC BY 4.0', source: 'https://commons.wikimedia.org/wiki/File:Formula_1_2026_Azerbaijan_Grand_Prix_1.jpg' },
+  ch02Straight: { src: '/img/ch02-straight.jpg', place: 'The straight · Sepang, 2017', credit: 'Photo Morio · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Max_Verstappen_overtaking_Lewis_Hamilton_2017_Malaysia_1.jpg' },
+  ch02Turn1: { src: '/img/ch02-turn1.jpg', place: 'Turn 1 · Sepang, 2017', credit: 'Photo Morio · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Max_Verstappen_overtaking_Lewis_Hamilton_2017_Malaysia_3.jpg' },
+  ch02Exit: { src: '/img/ch02-exit.jpg', place: 'The exit · Sepang, 2017', credit: 'Photo Morio · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Max_Verstappen_overtaking_Lewis_Hamilton_2017_Malaysia_2.jpg' },
+  ch02Tow: { src: '/img/ch02-tow.jpg', srcSet: '/img/ch02-tow.jpg 2000w, /img/ch02-tow-3388.jpg 3388w', place: 'The tow · Spa-Francorchamps, 2026', credit: 'Photo Der Alf · CC BY 4.0', source: 'https://commons.wikimedia.org/wiki/File:F1_2026,_TGR_Haas_F1_Team,_Haas_VF-26,_Oliver_Bearman,_Esteban_Ocon,_Spa_Francorchamps_(55425688103).jpg' },
+  ch03: { src: '/img/ch03.jpg', place: 'Pit exit · Suzuka, 2024', credit: 'Photo Cineyas · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Max_Verstappen_in_the_RB20.jpg' },
+  ch03Medium: { src: '/img/ch03-medium.jpg', place: 'Medium slick · 2026', credit: 'Photo TaurusEmerald · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Pirelli_P_Zero_Formula_1_Medium_Slick_Tyre_2026.jpg' },
+  ch03Sc: { src: '/img/ch03-sc.jpg', place: 'Safety car · Suzuka, 2026', credit: 'Photo Ysys3455 · CC0', source: 'https://commons.wikimedia.org/wiki/File:F1%E3%82%BB%E3%83%BC%E3%83%95%E3%83%86%E3%82%A3%E3%82%AB%E3%83%BC_%E9%88%B4%E9%B9%BF2026.jpg' },
+  ch04: { src: '/img/ch04.jpg', place: 'Safety car board · Zandvoort, 2024', credit: 'Photo Steffen Prößdorf · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:2024-08-25_Motorsport,_Gro%C3%9Fer_Preis_der_Niederlande_2024,_Porsche_Mobil_1_Supercup_STP_3666_by_Stepro.jpg' },
+  ch04Marshal: { src: '/img/ch04-marshal.jpg', place: 'Track marshal · Zandvoort, 2024', credit: 'Photo Steffen Prößdorf · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:2024-08-24_Motorsport,_Formel_1,_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3286_by_Stepro.jpg' },
+  ch04Sweep: { src: '/img/ch04-sweep.jpg', place: 'Marshals clear the track · Melbourne, 2026', credit: 'Photo Yu Chu Chin · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Turn_11_at_the_2026_Australian_Grand_Prix_(028A8507)_(cropped).jpg' },
+  ch04Fire: { src: '/img/ch04-fire.jpg', place: 'A grass fire stops qualifying · Suzuka, 2025', credit: 'Photo Liauzh · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:2025_Japan_GP_-_Grass_Fire_-_Q2.jpg' },
+  ch04Board: { src: '/img/ch04-board.jpg', place: 'Yellow flag and SC board · Indianapolis, 2005', credit: 'Photo Dan Smith · CC BY-SA 2.0', source: 'https://commons.wikimedia.org/wiki/File:F1_yellow_flag_and_SC_sign.jpg' },
+  ch05: { src: '/img/ch05.jpg', place: 'Oscar Piastri · McLaren MCL40 · Suzuka, 2026', credit: 'Photo Martin Lee · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Mclaren_MCL40_-_Oscar_Piastri_enters_the_Nissin_Brake_Hairpin_at_Suzuka_during_the_2026_Japanese_GP_(55195174246).jpg' },
+  ch05History1950: { src: '/img/ch05-1950.jpg', place: 'Zandvoort, 1950', credit: 'Photo Nationaal Archief · CC0', source: 'https://commons.wikimedia.org/wiki/File:START,_autoraces,_Bestanddeelnr_904-0841.jpg' },
+  ch05History1978: { src: '/img/ch05-1978.jpg', place: 'Zandvoort, 1978 · Lotus 79', credit: 'Mario Andretti leads Ronnie Peterson · Photo Koen Suyk / Anefo, Nationaal Archief · CC0', source: 'https://commons.wikimedia.org/wiki/File:Grand_Prix_Zandvoort_Mario_Andretti_op_kop_met_daar_achter_Ronnie_Petterson,_Bestanddeelnr_929-8743.jpg' },
+  ch05History2026: { src: '/img/ch05-2026.jpg', place: 'Suzuka, 2026 · Mercedes W17', credit: 'Kimi Antonelli · Photo Martin Lee · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Mercedes_W17_-_Kimi_Antonelli_approaches_Spoon_Curve_at_Suzuka_during_the_2026_Japanese_GP_(55194289192).jpg' },
+  tyres: { src: '/img/tyres.jpg', place: 'Pirelli tyres, slicks to wets', credit: 'Photo Hullian111 · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Pirelli_Tyre_Sets_at_Formula_1_Exhibition,_London_02.jpg' },
+  williams: { src: '/img/williams.jpg', place: 'Williams FW48 · Shanghai, 2026', credit: 'Photo Liauzh · CC BY 4.0', source: 'https://commons.wikimedia.org/wiki/File:2026_Chinese_GP_-_Williams_-_Alex_Albon_-_Qualifying.jpg' },
+  brm: { src: '/img/y1973.jpg', place: 'BRM mechanics · Anderstorp, 1973', credit: 'Photo Markku Lepola · CC BY 4.0', source: 'https://commons.wikimedia.org/wiki/File:Swedish_Grand_Prix_1973_(JOKAMAL3B08-13).tif' },
+  startLights: { src: '/img/start-lights.jpg', place: 'Start lights · Melbourne, 2026 · cropped', credit: 'Photo Yu Chu Chin · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Track_Walk_at_the_2026_Australian_Grand_Prix_(028A8882).jpg' },
 } satisfies Record<string, Photo>
 
 export type ChapterPath = Extract<To, `/chapters/${string}`>
@@ -67,7 +67,7 @@ export const CAR_STATS = [
   { k: 'Aerodynamics', v: 'Active, two modes', count: null },
 ] as const
 
-export const READ_NEXT = [
-  { title: 'Why one pit stop can win a race.', kind: 'Strategy', photo: PHOTOS.tyres, alt: 'Pirelli tyres on display, from slicks to wets.' },
-  { title: 'Swedish Grand Prix, 1973.', kind: 'History', photo: PHOTOS.brm, alt: 'Mechanics at work on the number 20 BRM at the 1973 Swedish Grand Prix.' },
-] as const
+export const READ_NEXT: ReadonlyArray<{ title: string; kind: string; photo: Photo; alt: string; to: ChapterPath | null }> = [
+  { title: 'Why one pit stop can win a race.', kind: 'Strategy', photo: PHOTOS.tyres, alt: 'Pirelli tyres on display, from slicks to wets.', to: '/chapters/tyres-and-strategy' },
+  { title: 'Swedish Grand Prix, 1973.', kind: 'History', photo: PHOTOS.brm, alt: 'Mechanics at work on the number 20 BRM at the 1973 Swedish Grand Prix.', to: null },
+]

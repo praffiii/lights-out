@@ -210,6 +210,7 @@ Everything is square-cornered. Only things that roll or light up are round: whee
 
 - **Loader:** five start lights fill with real load progress, then lights out. 2.6s maximum.
 - **The people:** a timing-tower index list with hover previews.
-- **Glossary:** team-radio messages ("Box, box").
+- **Glossary:** one alphabetical list of every word the chapters define, read from the chapters' own word list, with search, an A–Z row and a link per word (`/glossary#undercut` lands on a purple row). No team-radio audio.
+- **Credits:** every photo with its photographer, licence and Wikimedia Commons page, counted from the photo lists; then the two typefaces and seven data sources. The first eight photos show, the rest open in place.
 - **Racecraft:** top-down telemetry replays the visitor scrubs.
 - **404:** "DNF. This page did not finish."

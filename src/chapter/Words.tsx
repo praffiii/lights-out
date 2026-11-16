@@ -1,7 +1,5 @@
 import { useState } from 'react'
 
-import { Soon } from '#/shell/Go.tsx'
-
 import { WORDS, type WordKey } from './words.ts'
 
 export function Words({ keys }: { keys: ReadonlyArray<WordKey> }) {
@@ -13,7 +11,9 @@ export function Words({ keys }: { keys: ReadonlyArray<WordKey> }) {
         <h2 id="words" className="mono">
           Words from this chapter
         </h2>
-        <Soon className="mono">Full glossary</Soon>
+        <a className="mono" href={open ? `/glossary#${open}` : '/glossary'}>
+          Full glossary →
+        </a>
       </div>
       <ul className="chips">
         {keys.map((k) => (

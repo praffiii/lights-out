@@ -10,7 +10,7 @@ export function NextRace({ photo }: { photo: Photo }) {
   return (
     <section className="next next-weekend" aria-labelledby="next">
       <div className="shot">
-        <img src={photo.src} alt="" loading="lazy" />
+        <img src={photo.src} srcSet={photo.srcSet} sizes={photo.srcSet ? '100vw' : undefined} alt="" loading="lazy" />
       </div>
       <div className="caption">
         <p className="mono">{race ? `Next · Round ${race.round} · ${race.when}` : 'Next'}</p>

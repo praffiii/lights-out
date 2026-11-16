@@ -79,15 +79,21 @@ it('carries the start, every chapter, the credit and the disclaimer without seas
   expect(text(container, '.start figcaption')).toContain('Photo Yu Chu Chin · CC BY-SA 4.0')
   expect([...container.querySelectorAll('.footer .toc li')].map((li) => li.textContent)).toEqual([
     '01Home',
-    '02How F1 worksSoon',
+    '02How F1 works',
     '03This season',
-    '04The carSoon',
+    '04The car',
     '05The engineSoon',
     '06The tracksSoon',
     '07The peopleSoon',
-    '08GlossarySoon',
+    '08Glossary',
   ])
   expect(container.querySelector('.footer .toc a')?.getAttribute('href')).toBe('/')
-  expect(container.querySelector('.site a')?.getAttribute('href')).toBe('#main')
+  expect([...container.querySelectorAll('.footer .toc a')].map((a) => a.getAttribute('href'))).toEqual(['/', '/#start', '/season', '/chapters/inside-the-car', '/glossary'])
+  expect([...container.querySelectorAll('.site li')].map((li) => [li.textContent, li.querySelector('a')?.getAttribute('href') ?? null, li.querySelector('a')?.getAttribute('rel') ?? null])).toEqual([
+    ['Credits', '/credits', null],
+    ['Source', 'https://github.com/praffiii/lights-out', 'noreferrer'],
+    ['Back to top ↑', '#main', null],
+  ])
+  expect(container.textContent).toContain('Data Jolpica F1 · OpenF1 · NASA SRTM · OpenStreetMap · Photos Wikimedia Commons')
   expect(container.textContent).toContain('Lights Out is an unofficial fan project. Not affiliated with Formula 1, FOM or any team.')
 })
