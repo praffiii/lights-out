@@ -29,4 +29,6 @@ it('counts every photo once, with or without a confirmed page', () => {
 it('names the driver on every portrait row', () => {
   expect(CREDITS.find((c) => c.src === '/img/drivers/LEC.webp')?.place).toBe('Charles Leclerc · Cannes, 2026')
   expect(CREDITS.find((c) => c.src === '/img/ch02.jpg')?.usedOn).toContain('Menu')
+  expect(CREDITS.find((c) => c.src === '/img/cars/nor.webp')?.usedOn).toBe('Home, This season, Chapter 03')
+  expect(CREDITS.find((c) => c.src === '/img/cars/pia.webp')?.usedOn).toBe('Home, This season')
 })

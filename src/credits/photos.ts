@@ -50,13 +50,15 @@ const entry = (photo: { src: string; place: string; credit: string; source?: str
   return { src: photo.src, place: photo.place, ...parts, source: photo.source ?? null, usedOn }
 }
 
+const UNDERCUT = new Set(['NOR', 'ANT'])
+
 const drivers = new Map<string, string>(CARS.map((car) => [car.code, car.driver]))
 
 const every: ReadonlyArray<Credit> = [
   ...Object.entries(PHOTOS).map(([key, photo]) => entry(photo, used.get(key) ?? '')),
   ...Object.values(CALENDAR).map(({ photo }) => entry({ ...photo, src: photo.small }, 'This season, Race weekend')),
   ...Object.entries(PORTRAITS).flatMap(([code, photo]) => (photo ? [entry({ ...photo, place: [drivers.get(code), photo.place].filter(Boolean).join(' · ') }, 'This season, Race weekend')] : [])),
-  ...CARS.map((car) => entry({ src: car.src, place: `${car.team} ${car.car} · Shanghai, 2026`, credit: car.credit, source: car.commons }, 'Home')),
+  ...CARS.map((car) => entry({ src: car.src, place: `${car.team} ${car.car} · Shanghai, 2026`, credit: car.credit, source: car.commons }, UNDERCUT.has(car.code) ? 'Home, This season, Chapter 03' : 'Home, This season')),
 ]
 
 const merged = new Map<string, Credit>()
