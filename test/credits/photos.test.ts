@@ -31,4 +31,5 @@ it('names the driver on every portrait row', () => {
   expect(CREDITS.find((c) => c.src === '/img/ch02.jpg')?.usedOn).toContain('Menu')
   expect(CREDITS.find((c) => c.src === '/img/cars/nor.webp')?.usedOn).toBe('Home, This season, Chapter 03')
   expect(CREDITS.find((c) => c.src === '/img/cars/pia.webp')?.usedOn).toBe('Home, This season')
+  expect(CREDITS.find((c) => c.src === '/img/cars/gas.webp')?.usedOn).toBe('Home, This season, Race weekend')
 })

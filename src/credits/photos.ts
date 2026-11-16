@@ -58,7 +58,7 @@ const every: ReadonlyArray<Credit> = [
   ...Object.entries(PHOTOS).map(([key, photo]) => entry(photo, used.get(key) ?? '')),
   ...Object.values(CALENDAR).map(({ photo }) => entry({ ...photo, src: photo.small }, 'This season, Race weekend')),
   ...Object.entries(PORTRAITS).flatMap(([code, photo]) => (photo ? [entry({ ...photo, place: [drivers.get(code), photo.place].filter(Boolean).join(' · ') }, 'This season, Race weekend')] : [])),
-  ...CARS.map((car) => entry({ src: car.src, place: `${car.team} ${car.car} · Shanghai, 2026`, credit: car.credit, source: car.commons }, UNDERCUT.has(car.code) ? 'Home, This season, Chapter 03' : 'Home, This season')),
+  ...CARS.map((car) => entry({ src: car.src, place: `${car.team} ${car.car} · Shanghai, 2026`, credit: car.credit, source: car.commons }, ['Home', 'This season', ...(UNDERCUT.has(car.code) ? ['Chapter 03'] : []), ...(PORTRAITS[car.code] ? [] : ['Race weekend'])].join(', '))),
 ]
 
 const merged = new Map<string, Credit>()
