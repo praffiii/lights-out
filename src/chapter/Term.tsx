@@ -4,10 +4,14 @@ import { HOVER } from '#/motion/motion.ts'
 
 import { WORDS, type WordKey } from './words.ts'
 
-export function Term({ k, children }: { k: WordKey; children: React.ReactNode }) {
+export function Term({ k, children, shown }: { k: WordKey; children: React.ReactNode; shown?: boolean }) {
   const [open, setOpen] = useState(false)
   const id = useId()
   const root = useRef<HTMLSpanElement>(null)
+
+  useEffect(() => {
+    if (shown && matchMedia('(min-width: 1200px)').matches) setOpen(true)
+  }, [shown])
 
   useEffect(() => {
     if (!open) return

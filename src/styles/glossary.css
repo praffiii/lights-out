@@ -1,0 +1,64 @@
+.glossary-page .opening { padding-bottom: 48px; }
+.glossary-page .opening .intro { max-width: 352px; font-size: 16px; }
+
+.glossary-page .find { display: grid; grid-template-columns: minmax(0, 640px) minmax(0, 1fr); align-items: end; column-gap: 72px; padding: 0 var(--m) 96px; }
+.glossary-page .find label { display: grid; gap: 14px; }
+.glossary-page .find input { width: 100%; padding: 0 0 14px; border: 0; border-bottom: 2px solid var(--ink); border-radius: 0; background: none; color: var(--ink); font: 700 clamp(24px, 2.6vw, 38px)/1.1 Archivo, sans-serif; letter-spacing: -0.03em; outline: none; appearance: none; }
+.glossary-page .find input::placeholder { color: var(--muted); opacity: 0.6; }
+.glossary-page .find input:focus-visible { border-color: var(--purple); }
+.glossary-page .letters { display: flex; justify-content: space-between; gap: 6px; padding-bottom: 18px; }
+.glossary-page .letters > * { padding: 6px 2px; }
+.glossary-page .letters span { color: var(--line); }
+.glossary-page .letters a:hover { color: var(--purple); }
+
+.glossary-page .tap { padding: 64px var(--m) 220px; border-block: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.glossary-page .tap .head { display: grid; grid-template-columns: minmax(0, 1fr) 380px; column-gap: 48px; align-items: start; }
+.glossary-page .tap .label { color: var(--muted); }
+.glossary-page .tap .how { justify-self: end; color: var(--purple); }
+.glossary-page .tap h2 { margin: 23px 0 0 -3px; }
+.glossary-page .tap .body { margin-top: 31px; font-size: 16px; }
+.glossary-page .tap .say { max-width: 1160px; margin: 96px 0 0 -2px; font-size: clamp(30px, 3.9vw, 56px); font-weight: 700; line-height: 1.08; letter-spacing: -0.035em; }
+.glossary-page .tap .term button { font: inherit; text-decoration-thickness: 3px; text-underline-offset: 8px; }
+.glossary-page .tap .term .def { left: 0; right: auto; top: calc(100% + 14px); width: 360px; padding: 18px 20px 20px; border-top: 3px solid var(--purple); font-size: 16px; }
+
+.glossary-page .list { padding: 110px var(--m) 0; }
+.glossary-page .list .cols, .glossary-page .list li { display: grid; grid-template-columns: 120px minmax(0, 472fr) minmax(0, 560fr) minmax(0, 228fr); column-gap: 24px; }
+.glossary-page .list .cols { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.glossary-page .list .cols span:last-child { justify-self: end; }
+.glossary-page .list ul { list-style: none; }
+.glossary-page .list li { align-items: start; padding: 30px 0 28px; border-bottom: 1px solid var(--line); scroll-margin-top: 120px; }
+.glossary-page .list .letter { margin: -9px 0 -12px -3px; font-size: 64px; font-weight: 900; line-height: 1; letter-spacing: -0.04em; }
+.glossary-page .list h3 { font-size: clamp(22px, 2.2vw, 32px); font-weight: 800; line-height: 1.1; letter-spacing: -0.035em; }
+.glossary-page .list li p { max-width: 520px; padding-top: 4px; font-size: 16px; color: var(--muted); }
+.glossary-page .list .go { justify-self: end; padding-top: 10px; white-space: nowrap; }
+.glossary-page .list .go:hover { color: var(--purple); }
+.glossary-page .list li:target { margin: -1px -12px 0; padding-inline: 12px; border-color: var(--purple); background: var(--purple); color: #111214; }
+.glossary-page .list li:target p, .glossary-page .list li:target .go:hover { color: inherit; }
+.glossary-page .list .none { padding-top: 30px; font-size: 20px; font-weight: 600; }
+.glossary-page .list .none:empty { display: none; }
+
+@media (max-width: 1199px) {
+  .glossary-page .find { grid-template-columns: minmax(0, 1fr); row-gap: 28px; padding-bottom: 64px; }
+  .glossary-page .letters { justify-content: flex-start; gap: 14px; overflow-x: auto; scrollbar-width: none; }
+  .glossary-page .tap { padding-bottom: 72px; }
+  .glossary-page .tap .head { grid-template-columns: minmax(0, 1fr); }
+  .glossary-page .tap .how { grid-row: 1; justify-self: start; display: none; }
+  .glossary-page .tap .say { margin-top: 56px; }
+  .glossary-page .tap .term .def { left: var(--m); right: var(--m); top: auto; width: auto; }
+  .glossary-page .list .cols, .glossary-page .list li { grid-template-columns: 72px minmax(0, 1fr) minmax(0, 1fr) auto; }
+}
+
+@media (max-width: 760px) {
+  .glossary-page .opening { padding-bottom: 32px; }
+  .glossary-page .opening h1 { font-size: clamp(36px, 11.4vw, 60px); }
+  .glossary-page .find { padding-bottom: 48px; }
+  .glossary-page .tap { padding: 40px var(--m) 48px; }
+  .glossary-page .tap .say { margin-top: 40px; }
+  .glossary-page .list { padding-top: 56px; }
+  .glossary-page .list .cols { display: none; }
+  .glossary-page .list ul { border-top: 1px solid var(--line); }
+  .glossary-page .list li { grid-template-columns: minmax(0, 1fr); row-gap: 8px; padding: 22px 0 20px; }
+  .glossary-page .list .letter { display: none; }
+  .glossary-page .list li p { padding-top: 0; }
+  .glossary-page .list .go { justify-self: start; padding-top: 6px; }
+}

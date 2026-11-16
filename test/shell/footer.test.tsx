@@ -85,10 +85,10 @@ it('carries the start, every chapter, the credit and the disclaimer without seas
     '05The engineSoon',
     '06The tracksSoon',
     '07The peopleSoon',
-    '08GlossarySoon',
+    '08Glossary',
   ])
   expect(container.querySelector('.footer .toc a')?.getAttribute('href')).toBe('/')
-  expect([...container.querySelectorAll('.footer .toc a')].map((a) => a.getAttribute('href'))).toEqual(['/', '/#start', '/season', '/chapters/inside-the-car'])
+  expect([...container.querySelectorAll('.footer .toc a')].map((a) => a.getAttribute('href'))).toEqual(['/', '/#start', '/season', '/chapters/inside-the-car', '/glossary'])
   expect([...container.querySelectorAll('.site li')].map((li) => [li.textContent, li.querySelector('a')?.getAttribute('href') ?? null, li.querySelector('a')?.getAttribute('rel') ?? null])).toEqual([
     ['CreditsSoon', null, null],
     ['Source', 'https://github.com/praffiii/lights-out', 'noreferrer'],

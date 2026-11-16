@@ -12,7 +12,7 @@ export const MENU: ReadonlyArray<MenuEntry> = [
   { label: 'The engine', to: null, photo: PHOTOS.brm },
   { label: 'The tracks', to: null, photo: PHOTOS.ch02 },
   { label: 'The people', to: null, photo: PHOTOS.ch05 },
-  { label: 'Glossary', to: null, photo: PHOTOS.ch04 },
+  { label: 'Glossary', to: '/glossary', photo: PHOTOS.ch04 },
 ]
 
 export const FOOTER_LINKS: ReadonlyArray<{ label: string; to?: To; href?: string }> = [{ label: 'Credits' }, { label: 'Source', href: 'https://github.com/praffiii/lights-out' }]
