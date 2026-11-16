@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CreditsRouteImport } from './routes/credits'
 import { Route as GlossaryRouteImport } from './routes/glossary'
 import { Route as SeasonRouteImport } from './routes/season'
 import { Route as WeekendRouteImport } from './routes/weekend'
@@ -25,6 +26,11 @@ import { Route as ApiPoleCircuitRouteImport } from './routes/api/pole.$circuit'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreditsRoute = CreditsRouteImport.update({
+  id: '/credits',
+  path: '/credits',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GlossaryRoute = GlossaryRouteImport.update({
@@ -86,6 +92,7 @@ const ApiPoleCircuitRoute = ApiPoleCircuitRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/credits': typeof CreditsRoute
   '/glossary': typeof GlossaryRoute
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/credits': typeof CreditsRoute
   '/glossary': typeof GlossaryRoute
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
@@ -115,6 +123,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/credits': typeof CreditsRoute
   '/glossary': typeof GlossaryRoute
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/credits'
     | '/glossary'
     | '/season'
     | '/weekend'
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/credits'
     | '/glossary'
     | '/season'
     | '/weekend'
@@ -159,6 +170,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/credits'
     | '/glossary'
     | '/season'
     | '/weekend'
@@ -174,6 +186,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CreditsRoute: typeof CreditsRoute
   GlossaryRoute: typeof GlossaryRoute
   SeasonRoute: typeof SeasonRoute
   WeekendRoute: typeof WeekendRoute
@@ -194,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/credits': {
+      id: '/credits'
+      path: '/credits'
+      fullPath: '/credits'
+      preLoaderRoute: typeof CreditsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/glossary': {
@@ -278,6 +298,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CreditsRoute: CreditsRoute,
   GlossaryRoute: GlossaryRoute,
   SeasonRoute: SeasonRoute,
   WeekendRoute: WeekendRoute,

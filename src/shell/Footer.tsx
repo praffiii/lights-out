@@ -120,7 +120,7 @@ export function Footer() {
       </p>
       <div className="row mono muted">
         <p>Lights Out is an unofficial fan project. Not affiliated with Formula 1, FOM or any team.</p>
-        <p>Data Jolpica F1 · NASA SRTM · Photos Wikimedia Commons</p>
+        <p>Data Jolpica F1 · OpenF1 · NASA SRTM · OpenStreetMap · Photos Wikimedia Commons</p>
       </div>
     </footer>
   )

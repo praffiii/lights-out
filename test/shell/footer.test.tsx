@@ -90,9 +90,10 @@ it('carries the start, every chapter, the credit and the disclaimer without seas
   expect(container.querySelector('.footer .toc a')?.getAttribute('href')).toBe('/')
   expect([...container.querySelectorAll('.footer .toc a')].map((a) => a.getAttribute('href'))).toEqual(['/', '/#start', '/season', '/chapters/inside-the-car', '/glossary'])
   expect([...container.querySelectorAll('.site li')].map((li) => [li.textContent, li.querySelector('a')?.getAttribute('href') ?? null, li.querySelector('a')?.getAttribute('rel') ?? null])).toEqual([
-    ['CreditsSoon', null, null],
+    ['Credits', '/credits', null],
     ['Source', 'https://github.com/praffiii/lights-out', 'noreferrer'],
     ['Back to top ↑', '#main', null],
   ])
+  expect(container.textContent).toContain('Data Jolpica F1 · OpenF1 · NASA SRTM · OpenStreetMap · Photos Wikimedia Commons')
   expect(container.textContent).toContain('Lights Out is an unofficial fan project. Not affiliated with Formula 1, FOM or any team.')
 })

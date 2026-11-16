@@ -15,4 +15,4 @@ export const MENU: ReadonlyArray<MenuEntry> = [
   { label: 'Glossary', to: '/glossary', photo: PHOTOS.ch04 },
 ]
 
-export const FOOTER_LINKS: ReadonlyArray<{ label: string; to?: To; href?: string }> = [{ label: 'Credits' }, { label: 'Source', href: 'https://github.com/praffiii/lights-out' }]
+export const FOOTER_LINKS: ReadonlyArray<{ label: string; to?: To; href?: string }> = [{ label: 'Credits', to: '/credits' }, { label: 'Source', href: 'https://github.com/praffiii/lights-out' }]

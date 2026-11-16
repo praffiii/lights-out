@@ -1,0 +1,79 @@
+.credits-page .opening { padding-bottom: 56px; }
+
+.credits-page .figures { display: grid; grid-template-columns: minmax(0, 1fr) 380px; column-gap: 48px; align-items: start; margin: 0 var(--m); padding: 36px 0 72px; border-top: 1px solid var(--line); }
+.credits-page .figures dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 24px; }
+.credits-page .figures dd { margin: 10px 0 0 -3px; font-size: clamp(56px, 6.4vw, 88px); font-weight: 900; line-height: 1; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.credits-page .figures div:last-child dd { color: var(--purple); }
+.credits-page .figures p { padding-top: 6px; font-size: 16px; }
+
+.credits-page .photos { padding: 0 var(--m) 110px; }
+.credits-page .photos .cols, .credits-page .photos li { display: grid; grid-template-columns: 168px minmax(0, 420fr) minmax(0, 300fr) 130px minmax(0, 210fr) 100px; column-gap: 28px; }
+.credits-page .photos .cols { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.credits-page .photos .cols span:last-child, .credits-page .photos .go { justify-self: end; }
+.credits-page .photos ul { list-style: none; }
+.credits-page .photos li { align-items: start; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.credits-page .photos .thumb { aspect-ratio: 3 / 2; overflow: hidden; background: var(--line); }
+.credits-page .photos .thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.credits-page .photos li > :not(.thumb) { padding-top: 12px; }
+.credits-page .photos .place { display: grid; gap: 8px; }
+.credits-page .photos .place b { font-size: 22px; font-weight: 700; line-height: 1.15; letter-spacing: -0.03em; }
+.credits-page .photos .by, .credits-page .photos .used { font-size: 16px; }
+.credits-page .photos .licence, .credits-page .photos .go { padding-top: 16px; white-space: nowrap; }
+.credits-page .photos .go:hover, .credits-page .print a:hover { color: var(--purple); }
+.credits-page .photos summary { display: inline-block; padding: 36px 0 0; font-size: 20px; font-weight: 600; letter-spacing: -0.02em; list-style: none; cursor: pointer; }
+.credits-page .photos summary::-webkit-details-marker { display: none; }
+.credits-page .photos summary:hover { color: var(--purple); }
+.credits-page .photos details[open] summary { display: none; }
+
+.credits-page .made { padding: 72px var(--m) 64px; border-block: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.credits-page .made .head, .credits-page .faces li, .credits-page .print { display: grid; grid-template-columns: minmax(0, 1fr) 380px; column-gap: 48px; }
+.credits-page .made .label, .credits-page .print .label { grid-column: 1 / -1; }
+.credits-page .made .label, .credits-page .made .mono { color: var(--muted); }
+.credits-page .made h2, .credits-page .print h2 { margin: 23px 0 0 -3px; }
+.credits-page .made .note { align-self: center; font-size: 16px; color: var(--muted); }
+.credits-page .faces { margin-top: 72px; list-style: none; }
+.credits-page .faces li { align-items: center; padding: 28px 0 34px; border-top: 1px solid var(--line); }
+.credits-page .faces b { margin-left: -6px; font-size: clamp(72px, 10.4vw, 152px); font-weight: 900; line-height: 1; letter-spacing: -0.045em; }
+.credits-page .faces b.mono { margin-left: 0; font-size: clamp(34px, 6.2vw, 92px); font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--ink); }
+.credits-page .faces p { display: grid; gap: 10px; font-size: 16px; color: var(--muted); }
+.credits-page .sources { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 44px 28px; padding-top: 40px; border-top: 1px solid var(--line); list-style: none; }
+.credits-page .sources li { display: grid; align-content: start; gap: 12px; }
+.credits-page .sources b { font-size: clamp(22px, 2.1vw, 30px); font-weight: 800; line-height: 1.1; letter-spacing: -0.035em; }
+.credits-page .sources p { font-size: 16px; color: var(--muted); }
+
+.credits-page .print { align-items: end; padding: 96px var(--m) 110px; }
+.credits-page .print .text { display: grid; gap: 28px; justify-items: start; font-size: 16px; }
+
+@media (max-width: 1199px) {
+  .credits-page .figures, .credits-page .made .head, .credits-page .faces li, .credits-page .print { grid-template-columns: minmax(0, 1fr); row-gap: 28px; }
+  .credits-page .figures p, .credits-page .made .note, .credits-page .print .text { max-width: 520px; }
+  .credits-page .photos .cols { display: none; }
+  .credits-page .photos ul:first-of-type { border-top: 1px solid var(--line); }
+  .credits-page .photos li { grid-template-columns: 168px minmax(0, 1fr) minmax(0, 1fr) auto; }
+  .credits-page .photos .thumb { grid-row: span 2; }
+  .credits-page .photos .licence { grid-column: 2; padding-top: 0; }
+  .credits-page .photos .used { grid-column: 3; }
+  .credits-page .photos li > .licence, .credits-page .photos li > .used { padding-top: 0; }
+  .credits-page .photos .go { grid-column: 4; grid-row: 1; }
+  .credits-page .sources { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  .credits-page .opening { padding-bottom: 32px; }
+  .credits-page .opening h1 { font-size: clamp(36px, 11.4vw, 60px); }
+  .credits-page .figures { padding: 28px 0 48px; }
+  .credits-page .figures dl { column-gap: 12px; }
+  .credits-page .figures dd { font-size: clamp(40px, 13vw, 56px); }
+  .credits-page .photos { padding-bottom: 64px; }
+  .credits-page .photos li { grid-template-columns: 104px minmax(0, 1fr); column-gap: 16px; row-gap: 6px; padding: 18px 0; }
+  .credits-page .photos .thumb { grid-row: span 5; }
+  .credits-page .photos li > :not(.thumb) { grid-column: 2; grid-row: auto; padding-top: 0; }
+  .credits-page .photos .place b { font-size: 18px; }
+  .credits-page .photos .go { justify-self: start; padding-top: 4px; }
+  .credits-page .photos summary { padding-top: 28px; font-size: 18px; }
+  .credits-page .made { padding: 48px var(--m); }
+  .credits-page .faces { margin-top: 44px; }
+  .credits-page .faces li { padding: 22px 0 26px; }
+  .credits-page .sources { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-top: 32px; }
+  .credits-page .print { padding: 56px var(--m) 64px; }
+}
