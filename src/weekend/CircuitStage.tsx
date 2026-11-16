@@ -25,7 +25,7 @@ const PHONE = '(max-width: 760px)'
 
 const CREDIT = 'Blender model · layout bacinger/f1-circuits (MIT) · elevation SRTM (NASA) · Map © OpenStreetMap contributors (ODbL)'
 
-const TELEMETRY = ' · Telemetry: OpenF1 (unofficial)'
+export const TELEMETRY = ' · Telemetry: OpenF1 (unofficial)'
 
 type Vars = CSSProperties & Record<`--${string}`, number | string>
 
@@ -52,9 +52,10 @@ type Props = {
   turns?: ReadonlyArray<{ turn: number; name?: string }>
   focus?: RefObject<Focus | null>
   pit?: ReadonlyArray<readonly [number, number, number]>
+  places?: ReadonlyArray<{ label: string; turn: number; up?: true }>
 }
 
-export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus, pit }: Props) {
+export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus, pit, places }: Props) {
   const box = useRef<HTMLDivElement>(null)
   const pins = useRef<HTMLDivElement>(null)
   const fill = useRef(1)
@@ -157,6 +158,13 @@ export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus,
                 <b className="mono">{String(pin.turn).padStart(2, '0')}</b>
                 {name ? <i className="mono">{name}</i> : null}
                 <em className="mono" data-apex />
+                {places
+                  ?.filter((p) => p.turn === pin.turn)
+                  .map((p) => (
+                    <span key={p.label} className="place" data-up={p.up ? '' : undefined}>
+                      <b className="mono">{p.label}</b>
+                    </span>
+                  ))}
               </span>
             )
           })}

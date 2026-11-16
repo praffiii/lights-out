@@ -4,7 +4,7 @@ import { Schema } from 'effect'
 import { isModelled } from '../../src/circuits/modelled.ts'
 import { circuitFor } from '../../src/circuits/registry.ts'
 import { SeasonSnapshotJson } from '../../src/season/snapshot-schema.ts'
-import { heroLabel, liveRow, placeAt, turnsWord } from '../../src/tracks/page-model.ts'
+import { heroLabel, liveRow, turnsWord } from '../../src/tracks/page-model.ts'
 import { TRACK_PAGES } from '../../src/tracks/pages.ts'
 
 const snapshot = Schema.decodeUnknownSync(SeasonSnapshotJson)(await Bun.file('test/fixtures/season-snapshot.json').text())
@@ -42,12 +42,12 @@ it('leaves out the champion while the title is open', () => {
   expect(liveRow('vegas', open, new Date('2026-11-19T12:00:00Z'))?.line).toBe('Round 21, this weekend.')
 })
 
-it('places a tag on a turn or between two', () => {
-  const pins = circuitFor('vegas')?.pins ?? []
-  const [t8, t12, t14] = [8, 12, 14].map((n) => pins.find((p) => p.turn === n))
+it('anchors every place tag to a turn the circuit has', () => {
+  for (const [id, page] of Object.entries(TRACK_PAGES)) {
+    const turns = new Set(circuitFor(id)?.pins.map((p) => p.turn))
 
-  expect(placeAt({ label: '', at: { turn: 8 } }, pins)).toEqual({ x: t8?.x ?? -1, y: t8?.y ?? -1 })
-  expect(placeAt({ label: '', at: { between: [12, 14] } }, pins)).toEqual({ x: ((t12?.x ?? 0) + (t14?.x ?? 0)) / 2, y: ((t12?.y ?? 0) + (t14?.y ?? 0)) / 2 })
+    for (const place of page?.places ?? []) expect(turns.has(place.turn)).toBe(true)
+  }
 })
 
 it('spells the turn count', () => {

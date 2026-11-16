@@ -4,7 +4,7 @@ import chapterCss from '#/styles/chapter.css?url'
 import tracksCss from '#/styles/tracks.css?url'
 import { TracksIndex } from '#/tracks/Index.tsx'
 
-export const Route = createFileRoute('/tracks')({
+export const Route = createFileRoute('/tracks/')({
   head: () => ({
     meta: [
       { title: 'The tracks · Lights Out' },

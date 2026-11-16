@@ -1,7 +1,7 @@
 import type { ModelledId } from '#/circuits/modelled.ts'
 import type { Photo } from '#/home/content.ts'
 
-export type Place = { label: string; at: { turn: number } | { between: readonly [number, number] }; up?: true }
+export type Place = { label: string; turn: number; up?: true }
 
 export type Corner = { tag: string; line: string; photo: Photo }
 
@@ -31,8 +31,8 @@ export const TRACK_PAGES: Partial<Record<ModelledId, TrackPage>> = {
     hero: { src: '/img/tracks/vegas-hero.jpg', place: 'Esteban Ocon, Haas VF-25 · Las Vegas, 2025', credit: DHS, source: commons('Las_Vegas_Grand_Prix_(54942077056).jpg') },
     bandTitle: ['Down the Strip.', 'Past the Sphere.'],
     places: [
-      { label: 'The Sphere · 112 m of LEDs', at: { turn: 8 }, up: true },
-      { label: 'The Strip · Las Vegas Boulevard', at: { between: [12, 14] } },
+      { label: 'The Sphere · 112 m of LEDs', turn: 8, up: true },
+      { label: 'The Strip · Las Vegas Boulevard', turn: 13 },
     ],
     cornersBody: 'on public roads closed for the sessions. Two corners worth knowing first.',
     corners: [
