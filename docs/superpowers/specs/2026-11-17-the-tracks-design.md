@@ -24,7 +24,7 @@ Anything below that does not come from the approved Figma frames, DESIGN.md, `do
 
 The mock's braking section ("Seven stops.", 337 km/h into Turn 14, 3.8 s, 66 % flat out) was measured by hand from OpenF1, on the fastest lap of the 2025 race.
 
-1. **The stored pole lap (my recommendation).**
+1. **The stored pole lap. Praffi picked this (2026-11-17).**
    - The hourly workflow already fetches the latest pole lap at every modelled circuit and stores it as `pole:v1:<circuit>`. That data includes brake, throttle and speed rows, and the site reads it from `/api/pole/<circuit>`.
    - The braking section computes from those rows in the browser. That means no new request, no new KV key and no new workflow step.
    - It updates itself: Friday night's 2026 pole lap replaces 2025's on its own, the same as the weekend band.
@@ -33,7 +33,6 @@ The mock's braking section ("Seven stops.", 337 km/h into Turn 14, 3.8 s, 66 % f
    - These are the mock's exact numbers.
    - They freeze at 2025, which breaks "data updates itself" (Praffi, 2026-11-10). Every page would also need a hand-run analysis.
 
-**Praffi to pick.** The rest of this spec is written for option 1. If Praffi picks option 2, only [Braking](#braking) and its tests change.
 
 ### How the index highlights this weekend's circuit
 
