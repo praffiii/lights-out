@@ -311,6 +311,9 @@ class Track:
     def heading(self, x, span=6.0):
         return (self.at(x + span) - self.at(x - span)).normalized()
 
+    def laps(self):
+        return {str(n): round(self.turn(n) / self.lap, 4) for n in range(1, len(TURNS) + 1)}
+
 
 def bar(track, x, name, mat, length=WIDTH + 0.9, depth=7.5, rise=0.25):
     p, h = track.at(x), flat(track.heading(x))
