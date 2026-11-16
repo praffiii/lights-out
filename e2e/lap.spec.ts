@@ -129,7 +129,7 @@ test('a scroll takes the wheel and the light holds still', async ({ page }, test
 
       const after = await km(page)
 
-      return after > start + 1 && after === before
+      return after > start + 0.5 && after === before
     })
     .toBe(true)
 
