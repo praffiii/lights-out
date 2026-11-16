@@ -82,6 +82,16 @@ for (const colorScheme of ['light', 'dark'] as const) {
   })
 }
 
+test('the braking numbers roll in once the pole lap arrives', async ({ page, errors }) => {
+  await stubPole(page, 'vegas')
+  await loaded(page, '/tracks/vegas')
+  await page.locator('.braking').scrollIntoViewIfNeeded()
+
+  await expect(page.locator('.braking .num').first()).toHaveAttribute('data-text', '327')
+  await expect(page.locator('.braking .num .sr').first()).toHaveText('327')
+  expect(errors).toEqual([])
+})
+
 test('with no pole lap there is no braking section and the band still draws', async ({ page, errors }) => {
   await stubPole(page, null)
   await loaded(page, '/tracks/vegas')

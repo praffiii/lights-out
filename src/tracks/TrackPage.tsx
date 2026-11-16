@@ -6,7 +6,7 @@ import { MODELLED, type ModelledId } from '#/circuits/modelled.ts'
 import { circuitFor, type CircuitInfo } from '#/circuits/registry.ts'
 import type { Photo } from '#/home/content.ts'
 import { useSecond } from '#/motion/client.ts'
-import { block, onEnter, roll, sweep, useGSAP } from '#/motion/motion.ts'
+import { onEnter, roll, sweep, useGSAP } from '#/motion/motion.ts'
 import { usePoleLap } from '#/pole/use-pole-lap.ts'
 import { seasonQueryOptions, useSeason } from '#/season/use-season.ts'
 import { capital } from '#/season/words.ts'
@@ -31,11 +31,9 @@ function hero(scope: HTMLElement) {
 }
 
 function motion(scope: HTMLElement) {
-  for (const el of all(scope, 'section:not(.top) .hl, .next h2')) sweep(el)
+  for (const el of all(scope, 'section:not(.top, .braking) .hl, .next h2')) sweep(el)
 
-  for (const el of all(scope, '.band .figures .num, .braking .num')) roll(el)
-
-  for (const el of all(scope, '.payoff')) block(el)
+  for (const el of all(scope, '.band .figures .num')) roll(el)
 }
 
 const captionOf = (place: string) => {

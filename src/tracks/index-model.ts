@@ -46,7 +46,7 @@ export function indexFacts(snapshot: SeasonSnapshot | undefined): IndexFacts {
 const litId = (snapshot: SeasonSnapshot | undefined, now: Date) => {
   const picked = snapshot ? pickRace(snapshot, now) : null
 
-  return picked && picked.kind !== 'finale' ? picked.race.circuit.circuitId : null
+  return picked && picked.kind !== 'finale' && picked.race.season === SEASON ? picked.race.circuit.circuitId : null
 }
 
 export function indexCells(snapshot: SeasonSnapshot | undefined, now: Date): ReadonlyArray<IndexCell> {

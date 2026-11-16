@@ -1,5 +1,8 @@
+import { useRef } from 'react'
+
 import { grandPrix } from '#/circuits/calendar.ts'
 import type { CircuitInfo } from '#/circuits/registry.ts'
+import { block, roll, ScrollTrigger, sweep, useGSAP } from '#/motion/motion.ts'
 import { clock } from '#/pole/replay.ts'
 import type { PoleLap } from '#/pole/schema.ts'
 import { capital, words } from '#/season/words.ts'
@@ -18,8 +21,27 @@ const statsOf = ({ biggest, zones, flatShare, flatSeconds }: Numbers): ReadonlyA
 ]
 
 export function Braking({ numbers, lap, info }: { numbers: Numbers; lap: PoleLap; info: CircuitInfo }) {
+  const root = useRef<HTMLElement>(null)
+
+  useGSAP(
+    () => {
+      const scope = root.current
+
+      if (!scope) return
+
+      for (const el of scope.querySelectorAll<HTMLElement>('.hl')) sweep(el)
+
+      for (const el of scope.querySelectorAll<HTMLElement>('.num')) roll(el)
+
+      for (const el of scope.querySelectorAll<HTMLElement>('.payoff')) block(el)
+
+      ScrollTrigger.refresh()
+    },
+    { scope: root },
+  )
+
   return (
-    <section className="braking" aria-labelledby="braking">
+    <section className="braking" aria-labelledby="braking" ref={root}>
       <div className="head">
         <p className="mono muted label">Braking</p>
         <h2 id="braking" className="display">

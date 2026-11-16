@@ -30,3 +30,10 @@ it('lights nothing with no snapshot or once the season is over', () => {
   expect(indexCells(undefined, at).some((c) => c.lit)).toBe(false)
   expect(indexCells(snapshot, new Date('2026-12-31T00:00:00Z')).some((c) => c.lit)).toBe(false)
 })
+
+it("lights nothing between seasons, even when next season's calendar is out", () => {
+  const nextCalendar = snapshot.calendar.map((race) => ({ ...race, season: 2027, sessions: race.sessions.map((s) => ({ ...s, startsAt: s.startsAt.replace('2026-', '2027-') })) }))
+  const between = { ...snapshot, nextCalendar }
+
+  expect(indexCells(between, new Date('2026-12-20T00:00:00Z')).some((c) => c.lit)).toBe(false)
+})
