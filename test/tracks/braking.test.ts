@@ -10,6 +10,7 @@ const read = async (id: string) => Schema.decodeUnknownSync(PoleLapJson)(await B
 
 const vegasLap = await read('vegas')
 const yasLap = await read('yas_marina')
+const losailLap = await read('losail')
 const vegasTurns = circuitFor('vegas')?.laps ?? []
 
 const lapOf = (rows: ReadonlyArray<PoleRow>, time: number): PoleLap => ({ sessionKey: 1, year: 2026, driver: 'Test Driver', wet: false, time, sectors: [1, 1, 1], rows })
@@ -35,6 +36,15 @@ it('finds the longest run without braking, Turn 12 to Turn 14', () => {
 
   expect(b?.longestRun).toMatchObject({ from: 12, to: 14 })
   expect(b?.longestRun.seconds).toBeCloseTo(23.6, 1)
+})
+
+it('finds seven stops on the 2025 Lusail pole lap, the biggest into Turn 6', () => {
+  const b = braking(losailLap, circuitFor('losail')?.laps ?? [])
+
+  expect(b?.zones.map((z) => z.turn)).toEqual([1, 2, 4, 6, 7, 10, 16])
+  expect(b?.biggest).toMatchObject({ turn: 6, entry: 250, min: 99, metres: 90 })
+  expect(b?.longestRun).toMatchObject({ from: 10, to: 16 })
+  expect(b?.flatSeconds.toFixed(1)).toBe('54.1')
 })
 
 it('names the Turn 1 stop that starts before the line', () => {
