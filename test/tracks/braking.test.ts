@@ -4,7 +4,7 @@ import { Schema } from 'effect'
 import { circuitFor } from '../../src/circuits/registry.ts'
 import type { PoleLap, PoleRow } from '../../src/pole/schema.ts'
 import { PoleLapJson } from '../../src/pole/schema.ts'
-import { braking } from '../../src/tracks/braking.ts'
+import { braking, payoff } from '../../src/tracks/braking.ts'
 
 const read = async (id: string) => Schema.decodeUnknownSync(PoleLapJson)(await Bun.file(`test/fixtures/pole/${id}.json`).text())
 
@@ -45,6 +45,13 @@ it('finds seven stops on the 2025 Lusail pole lap, the biggest into Turn 6', () 
   expect(b?.biggest).toMatchObject({ turn: 6, entry: 250, min: 99, metres: 90 })
   expect(b?.longestRun).toMatchObject({ from: 10, to: 16 })
   expect(b?.flatSeconds.toFixed(1)).toBe('54.1')
+})
+
+it('rounds the payoff from the flat-out time the stat shows, so 51.5 s reads 52', () => {
+  const b = braking(vegasLap, vegasTurns)
+
+  expect(b?.flatSeconds.toFixed(1)).toBe('51.5')
+  expect(b ? payoff(b) : '').toBe('20 seconds a lap on the brakes, 52 flat out.')
 })
 
 it('names the Turn 1 stop that starts before the line', () => {
