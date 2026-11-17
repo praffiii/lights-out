@@ -2,13 +2,13 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
 
 import { Next } from '#/chapter/Next.tsx'
-import { portraitFor } from '#/drivers/portraits.ts'
 import { useSecond } from '#/motion/client.ts'
 import { block, onEnter, roll, sweep, useGSAP } from '#/motion/motion.ts'
 import { seasonQueryOptions, useSeason } from '#/season/use-season.ts'
 import { waitFor } from '#/shell/Loader.tsx'
 
 import { indexCells, indexFacts, SEASON } from './index-model.ts'
+import { NEXT_PEOPLE } from './pages.ts'
 import { SizesBand } from './SizesBand.tsx'
 
 const all = (scope: HTMLElement, selector: string) => [...scope.querySelectorAll<HTMLElement>(selector)]
@@ -23,18 +23,6 @@ function motion(scope: HTMLElement) {
   for (const el of all(scope, '.sizes .hl, .next h2')) sweep(el)
 
   for (const el of all(scope, '.sizes .stage')) block(el)
-}
-
-const antonelli = portraitFor('ANT')
-
-if (!antonelli) throw new Error('the Antonelli portrait is missing')
-
-export const NEXT_PEOPLE = {
-  label: 'Next · The people',
-  title: 'Meet the grid.',
-  line: 'Read',
-  photo: { ...antonelli, place: 'Kimi Antonelli · Melbourne Walk, 2026' },
-  to: null,
 }
 
 export function TracksIndex() {

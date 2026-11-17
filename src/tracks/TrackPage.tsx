@@ -16,9 +16,8 @@ import { CircuitStage, TELEMETRY } from '#/weekend/CircuitStage.tsx'
 
 import { Braking } from './Braking.tsx'
 import { braking } from './braking.ts'
-import { NEXT_PEOPLE } from './Index.tsx'
 import { heroLabel, liveRow, turnsWord } from './page-model.ts'
-import { TRACK_PAGES, type TrackPage as Page } from './pages.ts'
+import { NEXT_PEOPLE, TRACK_PAGES, type TrackPage as Page } from './pages.ts'
 
 const FOOTNOTE = 'Layout: bacinger/f1-circuits (MIT) · elevation: SRTM 30 m (NASA), exaggerated 1.5x · Map © OpenStreetMap contributors (ODbL) · turn numbers: F1 circuit map'
 

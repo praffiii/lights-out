@@ -1,4 +1,5 @@
 import type { ModelledId } from '#/circuits/modelled.ts'
+import { portraitFor } from '#/drivers/portraits.ts'
 import type { Photo } from '#/home/content.ts'
 
 export type Place = { label: string; turn: number; up?: true }
@@ -18,6 +19,18 @@ export type TrackPage = {
   historyTitle: readonly [string, string]
   history: ReadonlyArray<HistoryRow>
   historyPhoto: Photo
+}
+
+const antonelli = portraitFor('ANT')
+
+if (!antonelli) throw new Error('the Antonelli portrait is missing')
+
+export const NEXT_PEOPLE = {
+  label: 'Next · The people',
+  title: 'Meet the grid.',
+  line: 'Read',
+  photo: { ...antonelli, place: 'Kimi Antonelli · Melbourne Walk, 2026' },
+  to: null,
 }
 
 const commons = (file: string) => `https://commons.wikimedia.org/wiki/File:${file}`
