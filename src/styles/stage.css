@@ -27,6 +27,10 @@
 .circuit .turn[data-hit] b { background: #fff; color: #06080e; box-shadow: 0 0 18px rgb(255 255 255 / 0.6); }
 .circuit .turn[data-hit] em { display: block; }
 .circuit .turn[data-hit] i { display: none; }
+.circuit .turn .place { position: absolute; left: 50%; top: 100%; visibility: visible; translate: -50% 14px; white-space: nowrap; }
+.circuit .turn .place[data-up] { top: auto; bottom: 0; translate: -50% -110px; }
+.circuit .turn .place[data-up]::after { content: ''; position: absolute; left: 50%; top: 100%; width: 1px; height: 110px; background: #f4f3ef; }
+.circuit .turn .place b { display: block; padding: 6px 10px 5px; border-radius: 0; background: #f4f3ef; box-shadow: none; backdrop-filter: none; color: #06080e; font-size: 11px; letter-spacing: 0.08em; }
 .circuit .replay { position: absolute; left: var(--m); bottom: 64px; z-index: 3; pointer-events: none; }
 .circuit .replay p { margin: 0; }
 .circuit .replay .who { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; }
@@ -79,6 +83,9 @@
   .circuit .turn::before { height: 10px; }
   .circuit .turn::after { width: 10px; height: 4px; }
   .circuit .turn b { padding: 2px 3px 1px; font-size: 7px; }
+  .circuit .turn .place b { padding: 4px 6px 3px; font-size: 8px; }
+  .circuit .turn .place[data-up] { translate: -50% -64px; }
+  .circuit .turn .place[data-up]::after { height: 64px; }
   .circuit .replay { right: var(--m); bottom: 20px; }
   .circuit .replay .row { flex-direction: column; align-items: stretch; gap: 10px; }
   .circuit .replay .lapclock { font-size: 44px; }

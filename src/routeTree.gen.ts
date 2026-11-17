@@ -21,6 +21,8 @@ import { Route as ChaptersOvertakingRouteImport } from './routes/chapters.overta
 import { Route as ChaptersRaceWeekendRouteImport } from './routes/chapters.race-weekend'
 import { Route as ChaptersTyresAndStrategyRouteImport } from './routes/chapters.tyres-and-strategy'
 import { Route as LapCircuitRouteImport } from './routes/lap.$circuit'
+import { Route as TracksIndexRouteImport } from './routes/tracks.index'
+import { Route as TracksCircuitRouteImport } from './routes/tracks.$circuit'
 import { Route as ApiPoleCircuitRouteImport } from './routes/api/pole.$circuit'
 
 const IndexRoute = IndexRouteImport.update({
@@ -84,6 +86,16 @@ const LapCircuitRoute = LapCircuitRouteImport.update({
   path: '/lap/$circuit',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TracksIndexRoute = TracksIndexRouteImport.update({
+  id: '/tracks/',
+  path: '/tracks/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TracksCircuitRoute = TracksCircuitRouteImport.update({
+  id: '/tracks/$circuit',
+  path: '/tracks/$circuit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPoleCircuitRoute = ApiPoleCircuitRouteImport.update({
   id: '/api/pole/$circuit',
   path: '/api/pole/$circuit',
@@ -103,6 +115,8 @@ export interface FileRoutesByFullPath {
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
   '/chapters/tyres-and-strategy': typeof ChaptersTyresAndStrategyRoute
   '/lap/$circuit': typeof LapCircuitRoute
+  '/tracks/$circuit': typeof TracksCircuitRoute
+  '/tracks/': typeof TracksIndexRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
 }
 export interface FileRoutesByTo {
@@ -118,6 +132,8 @@ export interface FileRoutesByTo {
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
   '/chapters/tyres-and-strategy': typeof ChaptersTyresAndStrategyRoute
   '/lap/$circuit': typeof LapCircuitRoute
+  '/tracks/$circuit': typeof TracksCircuitRoute
+  '/tracks': typeof TracksIndexRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
 }
 export interface FileRoutesById {
@@ -134,6 +150,8 @@ export interface FileRoutesById {
   '/chapters/race-weekend': typeof ChaptersRaceWeekendRoute
   '/chapters/tyres-and-strategy': typeof ChaptersTyresAndStrategyRoute
   '/lap/$circuit': typeof LapCircuitRoute
+  '/tracks/$circuit': typeof TracksCircuitRoute
+  '/tracks/': typeof TracksIndexRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
 }
 export interface FileRouteTypes {
@@ -151,6 +169,8 @@ export interface FileRouteTypes {
     | '/chapters/race-weekend'
     | '/chapters/tyres-and-strategy'
     | '/lap/$circuit'
+    | '/tracks/$circuit'
+    | '/tracks/'
     | '/api/pole/$circuit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -166,6 +186,8 @@ export interface FileRouteTypes {
     | '/chapters/race-weekend'
     | '/chapters/tyres-and-strategy'
     | '/lap/$circuit'
+    | '/tracks/$circuit'
+    | '/tracks'
     | '/api/pole/$circuit'
   id:
     | '__root__'
@@ -181,6 +203,8 @@ export interface FileRouteTypes {
     | '/chapters/race-weekend'
     | '/chapters/tyres-and-strategy'
     | '/lap/$circuit'
+    | '/tracks/$circuit'
+    | '/tracks/'
     | '/api/pole/$circuit'
   fileRoutesById: FileRoutesById
 }
@@ -197,6 +221,8 @@ export interface RootRouteChildren {
   ChaptersRaceWeekendRoute: typeof ChaptersRaceWeekendRoute
   ChaptersTyresAndStrategyRoute: typeof ChaptersTyresAndStrategyRoute
   LapCircuitRoute: typeof LapCircuitRoute
+  TracksCircuitRoute: typeof TracksCircuitRoute
+  TracksIndexRoute: typeof TracksIndexRoute
   ApiPoleCircuitRoute: typeof ApiPoleCircuitRoute
 }
 
@@ -286,6 +312,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LapCircuitRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tracks/': {
+      id: '/tracks/'
+      path: '/tracks'
+      fullPath: '/tracks/'
+      preLoaderRoute: typeof TracksIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tracks/$circuit': {
+      id: '/tracks/$circuit'
+      path: '/tracks/$circuit'
+      fullPath: '/tracks/$circuit'
+      preLoaderRoute: typeof TracksCircuitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/pole/$circuit': {
       id: '/api/pole/$circuit'
       path: '/api/pole/$circuit'
@@ -309,6 +349,8 @@ const rootRouteChildren: RootRouteChildren = {
   ChaptersRaceWeekendRoute: ChaptersRaceWeekendRoute,
   ChaptersTyresAndStrategyRoute: ChaptersTyresAndStrategyRoute,
   LapCircuitRoute: LapCircuitRoute,
+  TracksCircuitRoute: TracksCircuitRoute,
+  TracksIndexRoute: TracksIndexRoute,
   ApiPoleCircuitRoute: ApiPoleCircuitRoute,
 }
 export const routeTree = rootRouteImport

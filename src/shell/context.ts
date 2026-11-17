@@ -2,7 +2,7 @@ import { createContext, useContext } from 'react'
 
 import type { FileRoutesByTo } from '#/routeTree.gen'
 
-export type To = Exclude<keyof FileRoutesByTo, `/api/${string}` | `/lap/${string}`> | `/lap/${string}`
+export type To = Exclude<keyof FileRoutesByTo, `/api/${string}` | `/lap/${string}` | `/tracks/${string}`> | `/lap/${string}` | `/tracks/${string}`
 
 export type Dive = { rect: { top: number; right: number; bottom: number; left: number }; image: { left: number; top: number; width: number; height: number }; poster: string }
 

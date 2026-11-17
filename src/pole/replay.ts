@@ -6,7 +6,7 @@ const HOLD = 1.6
 const MAX_STEP = 0.1
 const APEX_REACH = 0.02
 
-const wrap = (u: number) => u - Math.floor(u)
+export const wrap = (u: number) => u - Math.floor(u)
 
 const wrapDiff = (d: number) => d - Math.round(d)
 

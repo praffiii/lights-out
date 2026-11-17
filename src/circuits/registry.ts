@@ -19,6 +19,8 @@ export type Crop = readonly [x0: number, y0: number, x1: number, y1: number]
 
 export type Pin = { turn: number; x: number; y: number }
 
+export type TurnLap = { turn: number; u: number }
+
 export type CircuitFacts = {
   firstGp: number
   lengthKm: string
@@ -38,20 +40,34 @@ export type CircuitInfo = {
   corner?: { turn: number; name: string }
   facts: CircuitFacts
   pins: ReadonlyArray<Pin>
+  laps: ReadonlyArray<TurnLap>
   line: ReadonlyArray<LinePoint>
   crop: Crop
   cuts: readonly [number, number]
 }
 
-const pinsOf = (json: Record<string, ReadonlyArray<number> | null>): ReadonlyArray<Pin> =>
+type PinsJson = Readonly<Record<string, ReadonlyArray<number> | Readonly<Record<string, number>> | null>>
+
+const isPoint = (at: PinsJson[string]): at is ReadonlyArray<number> => Array.isArray(at)
+
+const pinsOf = (json: PinsJson): ReadonlyArray<Pin> =>
   Object.entries(json)
     .flatMap(([name, at]) => {
       const turn = Number(name.replace('turn-', ''))
-      const [x, y] = at ?? []
+      const [x, y] = name.startsWith('turn-') && isPoint(at) ? at : []
 
-      return name.startsWith('turn-') && x !== undefined && y !== undefined ? [{ turn, x, y }] : []
+      return x !== undefined && y !== undefined ? [{ turn, x, y }] : []
     })
     .sort((a, b) => a.turn - b.turn)
+
+const lapsOf = (json: { laps: Record<string, number> }, pins: ReadonlyArray<Pin>): ReadonlyArray<TurnLap> =>
+  pins.map(({ turn }) => {
+    const u = json.laps[String(turn)]
+
+    if (u === undefined) throw new Error(`pins json has no lap for turn ${turn}`)
+
+    return { turn, u }
+  })
 
 const cropOf = ({ crop: [x0, y0, x1, y1] }: { crop: ReadonlyArray<number> }): Crop => {
   if (x0 === undefined || y0 === undefined || x1 === undefined || y1 === undefined) throw new Error('pins json has no crop')
@@ -70,6 +86,7 @@ const CIRCUITS = {
     corner: { turn: 1, name: 'S do Senna' },
     facts: factsOf(CALENDAR.interlagos, { distanceKm: '305.879', turns: 15, direction: 'anticlockwise' }),
     pins: pinsOf(br1940),
+    laps: lapsOf(br1940, pinsOf(br1940)),
     line: br1940Line,
     crop: cropOf(br1940),
     cuts: [0.282, 0.73],
@@ -80,6 +97,7 @@ const CIRCUITS = {
     corner: { turn: 7, name: 'Sphere chicane' },
     facts: factsOf(CALENDAR.vegas, { distanceKm: '309.958', turns: 17, direction: 'anticlockwise' }),
     pins: pinsOf(us2023),
+    laps: lapsOf(us2023, pinsOf(us2023)),
     line: us2023Line,
     crop: cropOf(us2023),
     cuts: [0.243, 0.518],
@@ -89,6 +107,7 @@ const CIRCUITS = {
     openf1: 'Lusail',
     facts: factsOf(CALENDAR.losail, { distanceKm: '308.611', turns: 16, direction: 'clockwise' }),
     pins: pinsOf(qa2004),
+    laps: lapsOf(qa2004, pinsOf(qa2004)),
     line: qa2004Line,
     crop: cropOf(qa2004),
     cuts: [0.343, 0.635],
@@ -98,6 +117,7 @@ const CIRCUITS = {
     openf1: 'Yas Marina Circuit',
     facts: factsOf(CALENDAR.yas_marina, { distanceKm: '306.188', turns: 16, direction: 'anticlockwise' }),
     pins: pinsOf(ae2009),
+    laps: lapsOf(ae2009, pinsOf(ae2009)),
     line: ae2009Line,
     crop: cropOf(ae2009),
     cuts: [0.211, 0.657],
@@ -107,6 +127,7 @@ const CIRCUITS = {
     openf1: 'Melbourne',
     facts: factsOf(CALENDAR.albert_park, { distanceKm: '306.124', turns: 14, direction: 'clockwise' }),
     pins: pinsOf(au1953),
+    laps: lapsOf(au1953, pinsOf(au1953)),
     line: au1953Line,
     crop: cropOf(au1953),
     cuts: [0.328, 0.6],
@@ -116,6 +137,7 @@ const CIRCUITS = {
     openf1: 'Miami',
     facts: factsOf(CALENDAR.miami, { distanceKm: '308.326', turns: 19, direction: 'anticlockwise' }),
     pins: pinsOf(us2022),
+    laps: lapsOf(us2022, pinsOf(us2022)),
     line: us2022Line,
     crop: cropOf(us2022),
     cuts: [0.309, 0.648],

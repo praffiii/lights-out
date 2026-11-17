@@ -41,3 +41,19 @@ it('models Miami from the us-2022 build', () => {
   expect(miami?.facts.turns).toBe(19)
   expect(miami?.pins).toHaveLength(19)
 })
+
+it('places every turn on the lap', () => {
+  for (const info of allCircuits()) {
+    expect(info.laps.map((t) => t.turn)).toEqual(info.pins.map((p) => p.turn))
+
+    for (const { u } of info.laps) expect(u >= 0 && u < 1).toBe(true)
+  }
+})
+
+it('runs the turns in lap order from the start line, wrapping at most once', () => {
+  for (const info of allCircuits()) {
+    const drops = info.laps.filter((t, i) => i > 0 && t.u < (info.laps[i - 1]?.u ?? 0)).length
+
+    expect(drops).toBeLessThanOrEqual(1)
+  }
+})

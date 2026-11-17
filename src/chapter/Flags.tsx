@@ -180,7 +180,7 @@ export function Flags() {
         </figure>
       </section>
       <Words keys={FLAGS_WORDS} />
-      <Next n="05" min={8} title="Inside the car." line="What every part of a 2026 car does" photo={PHOTOS.ch05} to="/chapters/inside-the-car" />
+      <Next label="Next · Chapter 05 · 8 min" title="Inside the car." line="What every part of a 2026 car does" photo={PHOTOS.ch05} to="/chapters/inside-the-car" />
     </div>
   )
 }

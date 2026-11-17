@@ -17,6 +17,8 @@ mock.module('../../src/circuits/Circuit.tsx', () => ({
 
 const { act, cleanup, fireEvent, render, waitFor } = await import('@testing-library/react')
 const { CircuitBand } = await import('../../src/weekend/CircuitBand.tsx')
+const { CircuitStage } = await import('../../src/weekend/CircuitStage.tsx')
+const { circuitFor } = await import('../../src/circuits/registry.ts')
 
 const snapshot = Schema.decodeUnknownSync(SeasonSnapshotJson)(await Bun.file('test/fixtures/season-snapshot.json').text())
 
@@ -149,4 +151,21 @@ it('credits OpenF1 only when a lap is shown', async () => {
   expect(none.container.querySelector('.replay')).toBeNull()
   expect(none.container.querySelector('.credit')?.textContent).toBe(CREDIT)
   none.restore()
+})
+
+it('rides each place tag on its turn pin so it moves with the model', () => {
+  const info = circuitFor('vegas')
+
+  if (!info) throw new Error('Las Vegas is modelled')
+
+  const { container } = render(<CircuitStage info={info} near={false} lap={null} onNear={() => {}} places={[{ label: 'The Sphere', turn: 8, up: true }, { label: 'The Strip', turn: 13 }]} />, {
+    wrapper: ({ children }) => <ShellContext.Provider value={shell}>{children}</ShellContext.Provider>,
+  })
+
+  const tags = [...container.querySelectorAll('.pins .place')]
+
+  expect(tags.map((tag) => [tag.closest('[data-pin]')?.getAttribute('data-pin'), tag.textContent, tag.hasAttribute('data-up')])).toEqual([
+    ['turn-8', 'The Sphere', true],
+    ['turn-13', 'The Strip', false],
+  ])
 })

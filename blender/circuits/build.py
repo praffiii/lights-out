@@ -175,6 +175,7 @@ def main():
 
     pins = project(scene, cam, turns)
     pins["crop"] = crop(scene, cam, pts)
+    pins["laps"] = track.laps()
     os.makedirs(PINS, exist_ok=True)
     json.dump(pins, open(os.path.join(PINS, f"{CID}.json"), "w"), indent=1)
     os.makedirs(LINES, exist_ok=True)

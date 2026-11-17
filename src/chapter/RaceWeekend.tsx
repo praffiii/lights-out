@@ -104,7 +104,7 @@ export function RaceWeekend() {
       {live?.circuit ? <PoleBand info={live.circuit} /> : null}
       <Ladder line={live?.ladder ?? null} />
       <Words keys={RACE_WEEKEND_WORDS} />
-      <Next n="02" min={5} title="How overtaking works." line="Why a pass starts a lap early" photo={next} to="/chapters/overtaking" />
+      <Next label="Next · Chapter 02 · 5 min" title="How overtaking works." line="Why a pass starts a lap early" photo={next} to="/chapters/overtaking" />
     </div>
   )
 }
