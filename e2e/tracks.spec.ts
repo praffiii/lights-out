@@ -94,8 +94,7 @@ for (const colorScheme of ['light', 'dark'] as const) {
     await expect(page).toHaveTitle('Lusail · The tracks · Lights Out')
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Lusail.')
     await expect(page.getByText('The tracks · Round 22 · Qatar')).toBeVisible()
-    await expect(page.locator('.place', { hasText: 'Main straight · 1,068 m' })).toHaveCount(1)
-    await expect(page.locator('.place', { hasText: 'Fast rights · T12–14, no braking' })).toHaveCount(1)
+    await expect(page.locator('.place')).toHaveText(['Fast rights · T12–14, no braking'])
     await expect(page.getByText('Sixteen turns.')).toBeVisible()
     await page.locator('.braking').scrollIntoViewIfNeeded()
     await expect(page.getByText('Seven stops.')).toBeVisible()
@@ -108,25 +107,31 @@ for (const colorScheme of ['light', 'dark'] as const) {
   })
 }
 
-test('the Lusail place tags sit inside the band', async ({ page, errors }) => {
-  await loaded(page, '/tracks/losail')
-  await trackStage(page).scrollIntoViewIfNeeded()
-  await expect(trackStage(page)).toHaveAttribute('data-gl', '', { timeout: 20_000 })
+for (const id of ['vegas', 'losail']) {
+  test(`the ${id} place tags sit inside the band, clear of the replay`, async ({ page, errors }) => {
+    await stubPole(page, id)
+    await loaded(page, `/tracks/${id}`)
+    await trackStage(page).scrollIntoViewIfNeeded()
+    await expect(trackStage(page)).toHaveAttribute('data-gl', '', { timeout: 20_000 })
+    await expect(page.locator('.circuit .replay')).toBeVisible()
 
-  const outside = await page.evaluate(() => {
-    const stage = document.querySelector('.track-page .band .stage')?.getBoundingClientRect()
+    const misplaced = await page.evaluate(() => {
+      const stage = document.querySelector('.track-page .band .stage')?.getBoundingClientRect()
+      const replay = [...document.querySelectorAll('.circuit .replay > *')].map((el) => el.getBoundingClientRect())
 
-    return [...document.querySelectorAll('.place b')].flatMap((tag) => {
-      const box = tag.getBoundingClientRect()
+      return [...document.querySelectorAll('.place b')].flatMap((tag) => {
+        const box = tag.getBoundingClientRect()
+        const inside = stage && box.left >= stage.left && box.right <= stage.right && box.top >= stage.top
+        const clear = replay.every((r) => box.right + 12 <= r.left || box.left - 12 >= r.right || box.bottom + 12 <= r.top || box.top - 12 >= r.bottom)
 
-      return stage && box.left >= stage.left && box.right <= stage.right && box.top >= stage.top ? [] : [tag.textContent]
+        return inside && clear ? [] : [tag.textContent]
+      })
     })
-  })
 
-  await expect(page.locator('.place b')).toHaveCount(2)
-  expect(outside).toEqual([])
-  expect(errors).toEqual([])
-})
+    expect(misplaced).toEqual([])
+    expect(errors).toEqual([])
+  })
+}
 
 test('the braking numbers roll in once the pole lap arrives', async ({ page, errors }) => {
   await stubPole(page, 'vegas')

@@ -45,10 +45,12 @@ The page holds one new entry, `TRACK_PAGES.losail` in `src/tracks/pages.ts`:
 | `intro` | "Built for motorbikes in the desert north of Doha, raced at night under floodlights." |
 | `hero` | place "The MotoGP start · Lusail, 2012", credit "Photo Box Repsol · CC BY 2.0", source `2012_Qatar_Grand_Prix_start.jpg` |
 | `bandTitle` | "One long straight." / "Then fast rights." |
-| `places` | "Fast rights · T12–14, no braking" on turn 13, `up`; "Main straight · 1,068 m" on turn 1 |
+| `places` | "Fast rights · T12–14, no braking" on turn 13, `up` |
 | `cornersBody` | "on a circuit built for MotoGP. Two corners worth knowing first." (the page puts "Clockwise," from the registry in front) |
 | `historyTitle` | "Built for bikes." / "Then came F1." |
 | `historyPhoto` | place "Casey Stoner, Ducati · Lusail, 2008", credit "Photo Cecep Gorbachev · CC BY 2.0", source `CaseyStoner-01.jpg` |
+
+**My call, after the live check:** the mock's second tag, "Main straight · 1,068 m" under Turn 1, is dropped. Turn 1 sits right above the pole-lap replay readout (which the mock did not show), so the tag touched it at every width. A raised tag at Turn 1 would land on the S1 label and the Turn 3 and 4 pins. The straight is still named in the headline and in the Turn 1 card. An e2e test now keeps every place tag at least 12 px clear of the readout, on both pages.
 
 **Corners**, in the mock's order:
 
@@ -123,7 +125,7 @@ New tests, written before the page entry:
 
 - **Unit,** `test/tracks/braking.test.ts`: the stored Lusail pole lap gives 7 stops. The biggest is into Turn 6, 250 → 99 km/h, and the longest run is Turn 10 to Turn 16.
 - **e2e,** `e2e/tracks.spec.ts`, in both themes on desktop and phone:
-  - `/tracks/losail` shows "Lusail.", the label `Round 22 · Qatar`, and both place tags, each inside the band.
+  - `/tracks/losail` shows "Lusail.", the label `Round 22 · Qatar`, and its place tag, inside the band and clear of the replay readout.
   - With the stubbed pole lap: "Seven stops.", "Into Turn 6", "250", and the explain line naming Turns 10 and 16.
   - No sideways scroll.
 - **e2e,** the "every photo is credited" test runs over both pages.

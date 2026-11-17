@@ -62,10 +62,7 @@ export const TRACK_PAGES: Partial<Record<ModelledId, TrackPage>> = {
     intro: 'Built for motorbikes in the desert north of Doha, raced at night under floodlights.',
     hero: { src: '/img/tracks/losail-hero.jpg', place: 'The MotoGP start · Lusail, 2012', credit: REPSOL, source: commons('2012_Qatar_Grand_Prix_start.jpg') },
     bandTitle: ['One long straight.', 'Then fast rights.'],
-    places: [
-      { label: 'Fast rights · T12–14, no braking', turn: 13, up: true },
-      { label: 'Main straight · 1,068 m', turn: 1 },
-    ],
+    places: [{ label: 'Fast rights · T12–14, no braking', turn: 13, up: true }],
     cornersBody: 'on a circuit built for MotoGP. Two corners worth knowing first.',
     corners: [
       {
