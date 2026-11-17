@@ -175,7 +175,7 @@ const vegas = circuitFor('vegas')
 if (!vegas) throw new Error('Las Vegas is modelled')
 
 const stage = (props: { places?: ReadonlyArray<{ label: string; turn: number; up?: true }>; onNear?: () => void }) =>
-  render(<CircuitStage info={vegas} near lap={null} {...props} />, {
+  render(<CircuitStage info={vegas} near={false} lap={null} {...props} />, {
     wrapper: ({ children }) => <ShellContext.Provider value={shell}>{children}</ShellContext.Provider>,
   })
 
@@ -204,7 +204,7 @@ it('watches nothing when no one asks to hear that the stage is near', () => {
 
   const { rerender } = stage({})
 
-  rerender(<CircuitStage info={vegas} near lap={null} />)
+  rerender(<CircuitStage info={vegas} near={false} lap={null} />)
 
   expect(built).toBe(0)
 })
