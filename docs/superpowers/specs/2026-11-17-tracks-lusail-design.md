@@ -117,13 +117,13 @@ The Repsol and Monster logos in the MotoGP photos are on the bikes and boards in
 Tests that change because a second page exists:
 
 - `test/tracks/index-model.test.ts`: the linked cells become `['vegas', 'losail']`.
-- `e2e/tracks.spec.ts`, the index test: the lit cell links to `/tracks/vegas`. It is located by the `.chip` class, since `.sizes a.cell` now matches two cells.
+- `e2e/tracks.spec.ts`, the index test: `.sizes a.cell` now matches two links, so it asserts both, `/tracks/vegas` then `/tracks/losail`.
 
 New tests, written before the page entry:
 
 - **Unit,** `test/tracks/braking.test.ts`: the stored Lusail pole lap gives 7 stops. The biggest is into Turn 6, 250 → 99 km/h, and the longest run is Turn 10 to Turn 16.
 - **e2e,** `e2e/tracks.spec.ts`, in both themes on desktop and phone:
-  - `/tracks/losail` shows "Lusail.", the label `Round 22 · Qatar`, and both place tags.
+  - `/tracks/losail` shows "Lusail.", the label `Round 22 · Qatar`, and both place tags, each inside the band.
   - With the stubbed pole lap: "Seven stops.", "Into Turn 6", "250", and the explain line naming Turns 10 and 16.
   - No sideways scroll.
 - **e2e,** the "every photo is credited" test runs over both pages.
