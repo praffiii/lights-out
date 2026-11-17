@@ -169,3 +169,42 @@ it('rides each place tag on its turn pin so it moves with the model', () => {
     ['turn-13', 'The Strip', false],
   ])
 })
+
+const vegas = circuitFor('vegas')
+
+if (!vegas) throw new Error('Las Vegas is modelled')
+
+const stage = (props: { places?: ReadonlyArray<{ label: string; turn: number; up?: true }>; onNear?: () => void }) =>
+  render(<CircuitStage info={vegas} near lap={null} {...props} />, {
+    wrapper: ({ children }) => <ShellContext.Provider value={shell}>{children}</ShellContext.Provider>,
+  })
+
+it('lets the place tags name the places, so the corner name stays off a track page', () => {
+  const corners = (container: HTMLElement) => [...container.querySelectorAll('.pins .turn i')].map((name) => name.textContent)
+
+  expect(corners(stage({ onNear: () => {} }).container)).toEqual(['Sphere chicane'])
+  cleanup()
+  expect(corners(stage({ places: [{ label: 'The Sphere', turn: 8, up: true }] }).container)).toEqual([])
+})
+
+it('watches nothing when no one asks to hear that the stage is near', () => {
+  let built = 0
+
+  class Counted {
+    constructor() {
+      built++
+    }
+
+    observe() {}
+
+    disconnect() {}
+  }
+
+  Object.defineProperty(globalThis, 'IntersectionObserver', { value: Counted, configurable: true, writable: true })
+
+  const { rerender } = stage({})
+
+  rerender(<CircuitStage info={vegas} near lap={null} />)
+
+  expect(built).toBe(0)
+})

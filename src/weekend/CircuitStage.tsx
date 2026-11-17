@@ -47,7 +47,7 @@ type Props = {
   info: CircuitInfo
   near: boolean
   lap: PoleLap | null
-  onNear: () => void
+  onNear?: () => void
   hud?: Hud
   turns?: ReadonlyArray<{ turn: number; name?: string }>
   focus?: RefObject<Focus | null>
@@ -74,7 +74,7 @@ export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus,
   useEffect(() => {
     const el = box.current
 
-    if (!el) return
+    if (!el || !onNear) return
 
     const observer = new IntersectionObserver((entries) => entries.some((entry) => entry.isIntersecting) && onNear(), { rootMargin: '200px' })
 
@@ -149,7 +149,7 @@ export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus,
           {info.pins.map((pin) => {
             const place: Vars = { '--px': pin.x, '--py': pin.y }
             const kept = only?.find((t) => t.turn === pin.turn)
-            const name = only ? kept?.name : info.corner?.turn === pin.turn ? info.corner.name : undefined
+            const name = only ? kept?.name : !places && info.corner?.turn === pin.turn ? info.corner.name : undefined
 
             if (only && !kept) return null
 

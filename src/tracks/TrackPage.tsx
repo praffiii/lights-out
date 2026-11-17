@@ -140,7 +140,7 @@ function Track({ id, info, page }: { id: ModelledId; info: CircuitInfo; page: Pa
           <Stat label="Race distance" value={facts.distanceKm} unit="km" />
         </dl>
         <div className="circuit">
-          <CircuitStage info={info} near lap={lap} onNear={() => {}} places={page.places} />
+          <CircuitStage info={info} near lap={lap} places={page.places} />
         </div>
         <p className="explain">{explain}</p>
       </section>
