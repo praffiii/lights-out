@@ -93,7 +93,7 @@ Each photo comes in two files, `public/img/tracks/losail-<name>.jpg` and `losail
 
 These match the Las Vegas sizes for the same slots.
 
-**My call:** the 2008 photo is never upscaled. Its source is 824 px wide, so both files keep the 760×570 crop, and the phone shows it at about 2×. The Las Vegas 1982 still set the same precedent.
+**My call:** the 2008 photo is never upscaled. Its source is 824 px wide, so both files keep the 760×570 crop, and the phone shows it at about 2×. This differs from the Las Vegas 1982 still, whose phone file was enlarged to 1170 px.
 
 ## Wiring
 

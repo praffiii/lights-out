@@ -98,6 +98,7 @@ for (const colorScheme of ['light', 'dark'] as const) {
     await expect(page.getByText('Sixteen turns.')).toBeVisible()
     await page.locator('.braking').scrollIntoViewIfNeeded()
     await expect(page.getByText('Seven stops.')).toBeVisible()
+    await expect(page.locator('.braking .stat dt').first()).toContainText('Into Turn 6')
     await expect(page.locator('.braking .stat').first()).toContainText('250')
     await expect(page.getByText(/Piastri's pole lap, 2025, 1:19\.387/)).toBeVisible()
     await expect(page.locator('.braking .wet')).toHaveCount(0)
@@ -107,8 +108,11 @@ for (const colorScheme of ['light', 'dark'] as const) {
   })
 }
 
-for (const id of ['vegas', 'losail']) {
-  test(`the ${id} place tags sit inside the band, clear of the replay`, async ({ page, errors }) => {
+for (const [id, name] of [
+  ['vegas', 'Las Vegas'],
+  ['losail', 'Lusail'],
+] as const) {
+  test(`the ${name} place tags sit inside the band, clear of the replay`, async ({ page, errors }) => {
     await stubPole(page, id)
     await loaded(page, `/tracks/${id}`)
     await trackStage(page).scrollIntoViewIfNeeded()
@@ -121,13 +125,14 @@ for (const id of ['vegas', 'losail']) {
 
       return [...document.querySelectorAll('.place b')].flatMap((tag) => {
         const box = tag.getBoundingClientRect()
-        const inside = stage && box.left >= stage.left && box.right <= stage.right && box.top >= stage.top
+        const inside = stage && box.left >= stage.left && box.right <= stage.right && box.top >= stage.top && box.bottom <= stage.bottom
         const clear = replay.every((r) => box.right + 12 <= r.left || box.left - 12 >= r.right || box.bottom + 12 <= r.top || box.top - 12 >= r.bottom)
 
         return inside && clear ? [] : [tag.textContent]
       })
     })
 
+    expect(await page.locator('.place b').count()).toBeGreaterThan(0)
     expect(misplaced).toEqual([])
     expect(errors).toEqual([])
   })

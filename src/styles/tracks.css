@@ -76,7 +76,6 @@
 .track-page .lap-band .head, .track-page .figures { position: relative; z-index: 4; pointer-events: none; }
 .track-page .lap-band .head { grid-column: 1; grid-row: 1; }
 .track-page .lap-band .label { color: var(--muted); }
-.track-page .lap-band h2 { margin: 10px 0 0 -4px; font-size: 56px; line-height: 0.95; letter-spacing: -0.04em; }
 .track-page .figures { grid-column: 1; grid-row: 2; display: grid; row-gap: 36px; margin-top: 64px; }
 .track-page .figures > div { padding-top: 16px; border-top: 1px solid var(--line); }
 .track-page .figures dd { margin-top: 10px; font-size: 56px; font-weight: 700; line-height: 1; letter-spacing: -0.04em; }
@@ -155,7 +154,7 @@
   .track-page .top .intro { margin-top: 12px; font-size: 16px; }
   .track-page .top .credit { position: static; order: 2; width: auto; max-width: none; padding: 12px var(--m) 0; }
   .track-page .lap-band { margin-top: 64px; padding-top: 40px; }
-  .track-page .lap-band h2, .track-page .head h2 { font-size: 36px; }
+  .track-page .head h2 { font-size: 36px; }
   .track-page .lap-band .explain { margin-top: 16px; font-size: 17px; }
   .track-page .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 24px; }
   .track-page .figures dd { font-size: 30px; }
