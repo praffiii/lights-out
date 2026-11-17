@@ -7,7 +7,7 @@ import { clock } from '#/pole/replay.ts'
 import type { PoleLap } from '#/pole/schema.ts'
 import { capital, words } from '#/season/words.ts'
 
-import type { Braking as Numbers } from './braking.ts'
+import { type Braking as Numbers, payoff } from './braking.ts'
 
 type Stat = { label: string; short: string; value: string; unit?: string; line: string }
 
@@ -71,7 +71,7 @@ export function Braking({ numbers, lap, info }: { numbers: Numbers; lap: PoleLap
       </dl>
       <p className="payoff">
         <span className="mono">So</span>
-        <span>{`${Math.round(numbers.brakingSeconds)} seconds a lap on the brakes, ${Math.round(numbers.flatSeconds)} flat out.`}</span>
+        <span>{payoff(numbers)}</span>
       </p>
       <p className="mono muted credit">{`Telemetry: OpenF1 · ${lap.year} ${grandPrix(info.gp)} qualifying, pole lap · brake on/off, about four samples a second`}</p>
     </section>

@@ -83,6 +83,8 @@ const zoneOf = (rows: ReadonlyArray<PoleRow>, run: Run, time: number, laps: Read
   }
 }
 
+export const payoff = (b: Braking) => `${Math.round(b.brakingSeconds)} seconds a lap on the brakes, ${Math.round(Number(b.flatSeconds.toFixed(1)))} flat out.`
+
 export const braking = (lap: PoleLap, laps: ReadonlyArray<TurnLap>): Braking | null => {
   const { rows, time } = lap
   const found = joined(rows, time)
