@@ -166,7 +166,10 @@ function Races({ races }: { races: NonNullable<Model['races']> }) {
           </tbody>
         </table>
       </section>
-      <p className="mono muted credit races-note">{races.footnote}</p>
+      <p className="mono muted credit races-note">
+        {races.footnote}
+        {races.key ? <span className="key">{` ${races.key}`}</span> : null}
+      </p>
     </>
   )
 }

@@ -4,7 +4,7 @@ import { Effect, Layer } from 'effect'
 import { buildPeople } from '../../src/people/build.ts'
 import type { People } from '../../src/people/schema.ts'
 import { JolpicaClient } from '../../src/season/jolpica-client.ts'
-import { drivers2026r20, missing, pageOf, peopleFake, qualifying2026r20, results2026r20, sprints2026r20 } from '../season/fake-jolpica.ts'
+import { drivers2026r20, missing, pageOf, peopleFake, results2026r20, sprints2026r20 } from '../season/fake-jolpica.ts'
 
 const build = (previous?: People, overrides: Partial<JolpicaClient['Service']> = {}) =>
   Effect.runPromise(buildPeople(2026, results2026r20.races, sprints2026r20.races, previous).pipe(Effect.provide(Layer.succeed(JolpicaClient, { ...peopleFake, ...overrides }))))
@@ -22,10 +22,10 @@ it('keeps every 2026 race row per driver', async () => {
   expect(people?.rounds).toHaveLength(20)
   expect(people?.rounds[14]).toEqual({ round: 15, raceName: 'Azerbaijan Grand Prix', locality: 'Baku', country: 'Azerbaijan' })
   expect(people?.results.ocon).toHaveLength(18)
-  expect(people?.results.ocon?.[14]).toEqual({ round: 15, grid: 13, position: 8, positionText: '8', points: 4, constructorId: 'haas' })
+  expect(people?.results.ocon?.[14]).toEqual({ round: 15, grid: 13, position: 8, positionText: '8', points: 4, constructorId: 'haas', qualified: 14 })
   expect(people?.sprintPoints.antonelli).toBe(31)
   expect(people?.born.ocon).toBe('1996-09-17')
-  expect(people?.qualifying).toHaveLength(qualifying2026r20.races.length)
+  expect(people?.results.russell?.[0]?.qualified).toBe(1)
 })
 
 it('merges a round that Jolpica splits across two pages', async () => {

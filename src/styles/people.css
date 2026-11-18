@@ -255,6 +255,9 @@
 .driver-page .races-note {
   padding: 24px var(--m) 0;
 }
+.driver-page .races-note .key {
+  display: none;
+}
 
 :is(.driver-page, .people-index) .next .caption {
   top: 280px;
@@ -459,6 +462,9 @@
   }
   .driver-page .races-note {
     padding-top: 16px;
+  }
+  .driver-page .races-note .key {
+    display: inline;
   }
   :is(.driver-page, .people-index) .next {
     display: flex;

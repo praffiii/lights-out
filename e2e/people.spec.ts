@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 
 import type { Page } from '@playwright/test'
 
+import { PEOPLE } from '../src/people/people.ts'
 import { expect, LOADER_MS, stubSeason, test } from './fixtures.ts'
 
 const loaded = async (page: Page, path: string) => {
@@ -34,14 +35,21 @@ for (const colorScheme of ['light', 'dark'] as const) {
   })
 }
 
-test('every race row on a phone is one line high', async ({ page, errors }, testInfo) => {
+test('no race cell is cut off on a phone', async ({ page, errors }, testInfo) => {
   test.skip(testInfo.project.name !== 'phone')
-  await loaded(page, '/people/ocon')
-  await expect(races(page)).toHaveCount(20)
+  test.setTimeout(120_000)
+  const cut: Array<string> = []
 
-  const heights = await races(page).evaluateAll((rows) => rows.map((row) => Math.round(row.getBoundingClientRect().height)))
+  for (const { driverId } of PEOPLE) {
+    await loaded(page, `/people/${driverId}`)
+    await expect(races(page)).toHaveCount(20)
 
-  expect(new Set(heights).size).toBe(1)
+    const cells = await page.locator('.races tbody td').evaluateAll((tds) => tds.filter((td) => td.checkVisibility() && td.scrollWidth > td.clientWidth).map((td) => td.textContent ?? ''))
+
+    cut.push(...cells.map((text) => `${driverId}: ${text}`))
+  }
+
+  expect(cut).toEqual([])
   expect(errors).toEqual([])
 })
 

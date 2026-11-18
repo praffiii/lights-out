@@ -30,7 +30,7 @@ export type DriverPage = {
   hero: { label: string; given: string; family: string; sub: string; photo: Photo }
   season: { label: string; headline: string; body: string; stats: ReadonlyArray<Line & { note: string }>; payoff: string; credit: string } | null
   career: { label: string; number: string; unit: string; headline: string; body: string; payoff: string; ladder: ReadonlyArray<Line>; credit: string } | null
-  races: { label: string; rows: ReadonlyArray<RaceRow>; footnote: string } | null
+  races: { label: string; rows: ReadonlyArray<RaceRow>; footnote: string; key: string | null } | null
   next: { label: string; name: string; to: `/people/${string}`; photo: Photo | undefined }
 }
 
@@ -41,6 +41,15 @@ const FINISH = new Map([
   ['W', 'Did not start'],
   ['F', 'Did not qualify'],
   ['E', 'Excluded'],
+])
+
+const SHORT = new Map([
+  ['Retired', 'Out'],
+  ['Disqualified', 'DSQ'],
+  ['Not classified', 'NC'],
+  ['Did not start', 'DNS'],
+  ['Did not qualify', 'DNQ'],
+  ['Excluded', 'EXC'],
 ])
 
 const classified = (row: PersonRow) => /^\d+$/.test(row.positionText)
@@ -91,7 +100,7 @@ export function career(people: People, driverId: string): Career | null {
     starts: past.starts + rows.length,
     wins: past.wins + wins.length,
     podiums: past.podiums + rows.filter((row) => classified(row) && row.position <= 3).length,
-    poles: past.poles + people.qualifying.filter((round) => round.rows.some((row) => row.driverId === driverId && row.position === 1)).length,
+    poles: past.poles + (people.results[driverId] ?? []).filter((row) => row.qualified === 1).length,
     points: past.points + rows.reduce((sum, row) => sum + row.points, 0) + (people.sprintPoints[driverId] ?? 0),
     seasons: seasons.length,
     teams,
@@ -140,11 +149,12 @@ const teammate = (people: People, driverId: string, constructorId: string) => {
 }
 
 const headToHead = (people: People, driverId: string, mateId: string) => {
-  const duels = people.qualifying.flatMap((round) => {
-    const me = round.rows.find((row) => row.driverId === driverId)
-    const mate = round.rows.find((row) => row.driverId === mateId)
+  const mates = people.results[mateId] ?? []
 
-    return me && mate && me.constructorId === mate.constructorId ? [me.position < mate.position] : []
+  const duels = (people.results[driverId] ?? []).flatMap((me) => {
+    const mate = mates.find((row) => row.round === me.round)
+
+    return me.qualified !== null && mate !== undefined && mate.qualified !== null && me.constructorId === mate.constructorId ? [me.qualified < mate.qualified] : []
   })
 
   const ahead = duels.filter(Boolean).length
@@ -170,13 +180,15 @@ const raceRows = (people: People, driverId: string): ReadonlyArray<RaceRow> => {
       ...base,
       start: row.grid === 0 ? 'Pit lane' : `P${row.grid}`,
       finish,
-      short: finish === 'Retired' ? 'Out' : finish,
+      short: SHORT.get(finish) ?? finish,
       points: String(row.points),
       best: row === best,
       dnr: false,
     }
   })
 }
+
+const shortKey = (rows: ReadonlyArray<RaceRow>) => [...new Set(rows.flatMap((row) => (row.short === row.finish ? [] : [`${row.short}: ${row.finish.toLowerCase()}.`])))].join(' ') || null
 
 export function driverPage(snapshot: SeasonSnapshot, driverId: string, now: Date): DriverPage | null {
   const entry = personFor(driverId)
@@ -197,6 +209,7 @@ export function driverPage(snapshot: SeasonSnapshot, driverId: string, now: Date
   const born = people.born[driverId]
   const age = born ? `, ${ageAt(born, now)}` : ''
   const c = career(people, driverId)
+  const raceList = raceRows(people, driverId)
 
   const since = !c
     ? ''
@@ -250,7 +263,7 @@ export function driverPage(snapshot: SeasonSnapshot, driverId: string, now: Date
       credit: `Figures: Jolpica F1 API, after round ${round}, ${lastRound?.locality ?? ''}`,
     },
     career: c ? careerSection(snapshot, decided && position === 1 ? { ...c, finals: [...c.finals, { season: people.season, position }] } : c, round) : null,
-    races: { label: `Race by race · ${people.season}`, rows: raceRows(people, driverId), footnote: `Results: Jolpica F1 API, after round ${round}. Sprints not shown.` },
+    races: { label: `Race by race · ${people.season}`, rows: raceList, footnote: `Results: Jolpica F1 API, after round ${round}. Sprints not shown.`, key: shortKey(raceList) },
     next: {
       label: `Next · P${next?.position ?? 1}`,
       name: nextPerson?.name ?? '',

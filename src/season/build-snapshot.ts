@@ -88,7 +88,8 @@ export const buildSnapshot = (now: Date, previous?: Pick<SeasonSnapshot, 'flags'
 
     const pages = driverStandings === null ? undefined : yield* seasonPages(jolpica, driverStandings.season)
     const past = pages && seasonHistory(pages.races, pages.sprints)
-    const grid = pages && driverStandings ? yield* people(driverStandings.season, pages, previous?.people) : previous?.people
+    const built = pages && driverStandings ? yield* people(driverStandings.season, pages, previous?.people) : previous?.people
+    const grid = built?.season === driverStandings?.season ? built : undefined
     const session = yield* latestSession(races, season, now)
     const flags = yield* flagTally(season, now, previous?.flags)
     const speed = yield* topSpeed(season, now, previous?.topSpeed)

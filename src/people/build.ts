@@ -2,10 +2,11 @@ import { Effect } from 'effect'
 
 import type { SeasonRace } from '../season/history.ts'
 import { JolpicaClient, type JolpicaError } from '../season/jolpica-client.ts'
-import type { DriverRaces, DriverStandings, ResultRow, SeasonQualifying } from '../season/jolpica-schema.ts'
+import type { DriverRaces, DriverStandings, ResultRow } from '../season/jolpica-schema.ts'
 
 type Table = NonNullable<typeof DriverStandings.Type>
 
+import { personFor } from './people.ts'
 import type { Past, People, PersonRow } from './schema.ts'
 
 export const PAST_BUDGET = 60
@@ -32,14 +33,6 @@ const all = <P extends { total: number }>(page: (offset: number) => Effect.Effec
 
     return pages
   })
-
-const byRound = (pages: ReadonlyArray<SeasonQualifying>) => {
-  const rounds = new Map<number, Array<SeasonQualifying['races'][number]['rows'][number]>>()
-
-  for (const race of pages.flatMap((page) => page.races)) rounds.set(race.round, [...(rounds.get(race.round) ?? []), ...race.rows])
-
-  return [...rounds].map(([round, rows]) => ({ round, rows }))
-}
 
 const pastOf = (
   driverId: string,
@@ -90,13 +83,14 @@ const mergeRounds = (races: ReadonlyArray<SeasonRace>) => {
   return [...rounds.values()].sort((a, b) => a.round - b.round)
 }
 
-const personRow = (round: number, row: ResultRow): PersonRow => ({
+const personRow = (round: number, row: ResultRow, qualified: number | null): PersonRow => ({
   round,
   grid: row.grid,
   position: row.position,
   positionText: row.positionText,
   points: row.points,
   constructorId: row.constructor.constructorId,
+  qualified,
 })
 
 export const buildPeople = (
@@ -108,10 +102,12 @@ export const buildPeople = (
   Effect.gen(function* () {
     const races = mergeRounds(pages)
     const jolpica = yield* JolpicaClient
-    const qualifying = byRound(yield* all((offset) => jolpica.seasonQualifying(season, offset)))
+    const sessions = yield* all((offset) => jolpica.seasonQualifying(season, offset))
+    const qualifying = new Map(sessions.flatMap((page) => page.races).flatMap(({ round, rows }) => rows.map((row) => [`${round} ${row.driverId}`, row.position] as const)))
     const through = season - 1
     const tables = new Map<number, Table>()
-    const past: Record<string, Past> = {}
+    const order = pointsOrder(races, sprints).filter((driverId) => personFor(driverId))
+    const past: Record<string, Past> = Object.fromEntries(order.flatMap((driverId) => (previous?.past[driverId] ? [[driverId, previous.past[driverId]]] : [])))
     let used = 0
 
     const counted = <A>(effect: Effect.Effect<A, JolpicaError>) => Effect.suspend(() => ((used += 1), effect))
@@ -134,16 +130,20 @@ export const buildPeople = (
         return pastOf(driverId, through, results, driverSprints, poles, tables)
       })
 
-    for (const driverId of pointsOrder(races, sprints)) {
-      const kept = previous?.past[driverId]
+    const fill = Effect.gen(function* () {
+      for (const driverId of order) {
+        if (past[driverId]?.through === through || used >= PAST_BUDGET) continue
 
-      if (kept?.through === through) past[driverId] = kept
-      else if (used < PAST_BUDGET) {
-        const built = yield* fetchPast(driverId).pipe(Effect.catch((error) => Effect.logWarning('driver career skipped', { driverId, path: error.path }).pipe(Effect.as(kept))))
+        const built = yield* fetchPast(driverId).pipe(Effect.catch((error) => Effect.logWarning('driver career skipped', { driverId, path: error.path }).pipe(Effect.as(undefined))))
 
         if (built) past[driverId] = built
-      } else if (kept) past[driverId] = kept
-    }
+      }
+    })
+
+    yield* fill.pipe(
+      Effect.timeout('90 seconds'),
+      Effect.catch((error) => Effect.logWarning('driver careers cut short', error)),
+    )
 
     const results: Record<string, Array<PersonRow>> = {}
     const sprintPoints: Record<string, number> = {}
@@ -151,7 +151,7 @@ export const buildPeople = (
 
     for (const race of races) {
       for (const row of race.rows) {
-        results[row.driver.driverId] = [...(results[row.driver.driverId] ?? []), personRow(race.round, row)]
+        results[row.driver.driverId] = [...(results[row.driver.driverId] ?? []), personRow(race.round, row, qualifying.get(`${race.round} ${row.driver.driverId}`) ?? null)]
 
         if (row.driver.dateOfBirth !== undefined) born[row.driver.driverId] = row.driver.dateOfBirth
       }
@@ -164,7 +164,6 @@ export const buildPeople = (
       rounds: races.map((race) => ({ round: race.round, raceName: race.raceName, locality: race.locality, country: race.country })),
       results,
       sprintPoints,
-      qualifying,
       born,
       past,
     }

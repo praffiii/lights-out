@@ -12,4 +12,6 @@ const lastResults: JolpicaClient['Service']['lastResults'] = () =>
 
 export const NOW = new Date('2026-11-18T12:00:00Z')
 
-export const snapshot = await Effect.runPromise(buildSnapshot(NOW).pipe(Effect.provide(Layer.merge(Layer.succeed(JolpicaClient, { ...peopleFake, lastResults }), fakeOpenF1()))))
+export const peopleLayer = (overrides: Partial<JolpicaClient['Service']> = {}) => Layer.merge(Layer.succeed(JolpicaClient, { ...peopleFake, lastResults, ...overrides }), fakeOpenF1())
+
+export const snapshot = await Effect.runPromise(buildSnapshot(NOW).pipe(Effect.provide(peopleLayer())))

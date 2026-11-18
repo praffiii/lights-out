@@ -108,3 +108,11 @@ it('shows the hero car photo in the Next band when the next driver has no portra
   expect(before).toBeDefined()
   expect(before && driverPage(snapshot, before.driverId, now)?.next.photo).toEqual(personFor('gasly')?.hero)
 })
+
+it('shortens every status for the phone and keys the short forms it uses', () => {
+  const piastri = driverPage(snapshot, 'piastri', now)?.races
+
+  expect(piastri?.rows.filter((row) => row.finish === 'Did not start').map((row) => row.short)).toEqual(['DNS', 'DNS'])
+  expect(piastri?.key).toBe('DNS: did not start. Out: retired.')
+  expect(driverPage(snapshot, 'ocon', now)?.races?.key).toBe('Out: retired.')
+})
