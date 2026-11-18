@@ -116,3 +116,11 @@ it('shortens every status for the phone and keys the short forms it uses', () =>
   expect(piastri?.key).toBe('DNS: did not start. Out: retired.')
   expect(driverPage(snapshot, 'ocon', now)?.races?.key).toBe('Out: retired.')
 })
+
+it("counts this season's final place in the career once the season is over", () => {
+  const standings = snapshot.driverStandings
+  const over: SeasonSnapshot = standings ? { ...snapshot, latest: null, driverStandings: { ...standings, round: 23 } } : snapshot
+
+  expect(driverPage(snapshot, 'bearman', now)?.career?.body).toBe('With Ferrari and Haas. Best season: 13th, in 2025.')
+  expect(driverPage(over, 'bearman', now)?.career?.body).toBe('With Ferrari and Haas. Best season: 13th, in 2025 and 2026.')
+})

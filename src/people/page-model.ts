@@ -262,7 +262,9 @@ export function driverPage(snapshot: SeasonSnapshot, driverId: string, now: Date
       payoff,
       credit: `Figures: Jolpica F1 API, after round ${round}, ${lastRound?.locality ?? ''}`,
     },
-    career: c ? careerSection(snapshot, decided && position === 1 ? { ...c, finals: [...c.finals, { season: people.season, position }] } : c, round) : null,
+    career: c
+      ? careerSection(snapshot, fight?.state === 'over' || (decided && position === 1) ? { ...c, finals: [...c.finals, { season: people.season, position: standing.position ?? null }] } : c, round)
+      : null,
     races: { label: `Race by race · ${people.season}`, rows: raceList, footnote: `Results: Jolpica F1 API, after round ${round}. Sprints not shown.`, key: shortKey(raceList) },
     next: {
       label: `Next · P${next?.position ?? 1}`,
