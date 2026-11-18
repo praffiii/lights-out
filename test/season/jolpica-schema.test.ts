@@ -9,6 +9,7 @@ import {
   RacesResponse,
   SprintResponse,
 } from '../../src/season/jolpica-schema.ts'
+import { driverFixture, qualifying2026r20, results2026r20 } from './fake-jolpica.ts'
 
 const fixture = (name: string) => Bun.file(`test/fixtures/jolpica/${name}.json`).json()
 
@@ -91,4 +92,28 @@ it('keeps a driver with no nationality yet', async () => {
   const drivers = Schema.decodeUnknownSync(DriverStandingsResponse)(await fixture('driverstandings-2026'))
 
   expect(drivers?.rows.find((row) => row.driver.driverId === 'rafael_camara')?.driver.nationality).toBeNull()
+})
+
+it('season results carry the race name, locality, country and dates of birth', () => {
+  const r15 = results2026r20.races.find((race) => race.round === 15)
+
+  expect(r15?.raceName).toBe('Azerbaijan Grand Prix')
+  expect(r15?.locality).toBe('Baku')
+  expect(r15?.country).toBe('Azerbaijan')
+  expect(r15?.rows.find((row) => row.driver.driverId === 'ocon')?.driver.dateOfBirth).toBe('1996-09-17')
+})
+
+it('season qualifying keeps driver, team and position per round', () => {
+  expect(qualifying2026r20.races[0]?.rows).toContainEqual({ driverId: 'ocon', constructorId: 'haas', position: 13 })
+})
+
+it('driver results list every entry with its season, round and country', () => {
+  const ocon = driverFixture('ocon')
+
+  expect(ocon?.results.races.length).toBe(198)
+  expect(ocon?.results.races[0]).toMatchObject({ season: 2016, round: 13, country: 'Belgium' })
+})
+
+it('driver poles list one season per pole, skipping the rows Jolpica adds that are not P1', () => {
+  expect(driverFixture('antonelli')?.poles.seasons).toEqual([2026, 2026, 2026, 2026, 2026, 2026, 2026])
 })

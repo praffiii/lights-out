@@ -3,10 +3,14 @@ import { HttpClient, HttpClientError, HttpClientRequest } from 'effect/http'
 
 import {
   ConstructorStandingsResponse,
+  DriverPolesResponse,
+  DriverResultsResponse,
+  DriverSprintsResponse,
   DriverStandingsResponse,
   QualifyingResponse,
   RaceResultsResponse,
   RacesResponse,
+  SeasonQualifyingResponse,
   SeasonResultsResponse,
   SeasonSprintsResponse,
   SprintResponse,
@@ -22,6 +26,8 @@ type Season = number | 'current'
 type Endpoint<S extends Schema.Decoder<unknown>> = (season: Season) => Effect.Effect<S['Type'], JolpicaError>
 
 type Paged<S extends Schema.Decoder<unknown>> = (season: number, offset: number) => Effect.Effect<S['Type'], JolpicaError>
+
+type DriverPaged<S extends Schema.Decoder<unknown>> = (driverId: string, offset: number) => Effect.Effect<S['Type'], JolpicaError>
 
 const BASE_URL = 'https://api.jolpi.ca/ergast/f1'
 
@@ -40,6 +46,10 @@ export class JolpicaClient extends Context.Service<
     readonly constructorStandings: Endpoint<typeof ConstructorStandingsResponse>
     readonly seasonResults: Paged<typeof SeasonResultsResponse>
     readonly seasonSprints: Paged<typeof SeasonSprintsResponse>
+    readonly seasonQualifying: Paged<typeof SeasonQualifyingResponse>
+    readonly driverResults: DriverPaged<typeof DriverResultsResponse>
+    readonly driverSprints: DriverPaged<typeof DriverSprintsResponse>
+    readonly driverPoles: DriverPaged<typeof DriverPolesResponse>
   }
 >()('JolpicaClient') {
   static readonly layer = Layer.effect(
@@ -70,6 +80,11 @@ export class JolpicaClient extends Context.Service<
         (season, offset) =>
           get(schema, `/${season}/${resource}/?limit=100&offset=${offset}`)
 
+      const byDriver =
+        <S extends Schema.Decoder<unknown>>(schema: S, resource: string): DriverPaged<S> =>
+        (driverId, offset) =>
+          get(schema, `/drivers/${driverId}/${resource}/?limit=100&offset=${offset}`)
+
       return {
         races: endpoint(RacesResponse, 'races'),
         lastResults: endpoint(RaceResultsResponse, 'last/results'),
@@ -79,6 +94,10 @@ export class JolpicaClient extends Context.Service<
         constructorStandings: endpoint(ConstructorStandingsResponse, 'constructorstandings'),
         seasonResults: paged(SeasonResultsResponse, 'results'),
         seasonSprints: paged(SeasonSprintsResponse, 'sprint'),
+        seasonQualifying: paged(SeasonQualifyingResponse, 'qualifying'),
+        driverResults: byDriver(DriverResultsResponse, 'results'),
+        driverSprints: byDriver(DriverSprintsResponse, 'sprint'),
+        driverPoles: byDriver(DriverPolesResponse, 'qualifying/1'),
       }
     }),
   )
