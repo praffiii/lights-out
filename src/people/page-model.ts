@@ -187,6 +187,8 @@ export function driverPage(snapshot: SeasonSnapshot, driverId: string, now: Date
   if (!entry || !standings || !people || !standing) return null
 
   const ref = standing.driver
+  const name = person(ref).name
+  const given = name.endsWith(` ${ref.familyName}`) ? name.slice(0, -ref.familyName.length - 1) : ref.givenName
   const rows = people.results[driverId] ?? []
   const constructorId = rows.at(-1)?.constructorId ?? standing.constructors.at(-1)?.constructorId ?? ''
   const teamLabel = teamName({ constructorId, name: constructorName(snapshot, constructorId) })
@@ -233,7 +235,7 @@ export function driverPage(snapshot: SeasonSnapshot, driverId: string, now: Date
   const portrait = next?.driver.code ? portraitFor(next.driver.code) : undefined
 
   return {
-    hero: { label: `The people · ${teamLabel} · No. ${ref.number ?? ''}`, given: ref.givenName, family: ref.familyName, sub: `${ref.nationality ?? ''}${age}.${since}`, photo: entry.hero },
+    hero: { label: `The people · ${teamLabel} · No. ${ref.number ?? ''}`, given, family: ref.familyName, sub: `${ref.nationality ?? ''}${age}.${since}`, photo: entry.hero },
     season: {
       label: `${people.season} · After round ${round}`,
       headline,
@@ -247,7 +249,7 @@ export function driverPage(snapshot: SeasonSnapshot, driverId: string, now: Date
       payoff,
       credit: `Figures: Jolpica F1 API, after round ${round}, ${lastRound?.locality ?? ''}`,
     },
-    career: c ? careerSection(snapshot, c, round) : null,
+    career: c ? careerSection(snapshot, decided && position === 1 ? { ...c, finals: [...c.finals, { season: people.season, position }] } : c, round) : null,
     races: { label: `Race by race · ${people.season}`, rows: raceRows(people, driverId), footnote: `Results: Jolpica F1 API, after round ${round}. Sprints not shown.` },
     next: {
       label: `Next · P${next?.position ?? 1}`,

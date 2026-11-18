@@ -57,10 +57,11 @@ it('reads every round, the best one purple and the missed ones as did not race',
 it('writes a champion with several wins', () => {
   const page = driverPage(snapshot, 'antonelli', now)
 
-  expect(page?.hero.sub).toBe('Italian, 20. In Formula 1 since 2025, with Mercedes.')
+  expect(page?.hero).toMatchObject({ given: 'Kimi', family: 'Antonelli', sub: 'Italian, 20. In Formula 1 since 2025, with Mercedes.' })
   expect(page?.season?.headline).toBe('Champion in 2026.')
   expect(page?.season?.payoff).toBe('9 wins in 2026, the first in Shanghai.')
-  expect(page?.career).toMatchObject({ number: '44', headline: '9 wins. The first: China, 2026.', body: 'With Mercedes. Best season: 7th, in 2025.', payoff: 'Two seasons, one team.' })
+  expect(page?.career).toMatchObject({ number: '44', headline: '9 wins. The first: China, 2026.', body: 'With Mercedes. World champion in 2026.', payoff: 'Two seasons, one team.' })
+  expect(page?.career?.ladder.at(-1)).toEqual({ label: 'Titles', value: '1' })
 })
 
 it('names the next driver one place down and wraps the last to the leader', () => {
