@@ -163,6 +163,42 @@ for (const [id, name] of [
   })
 }
 
+for (const [id, name] of [
+  ['vegas', 'Las Vegas'],
+  ['losail', 'Lusail'],
+  ['yas_marina', 'Yas Marina'],
+] as const) {
+  for (const width of [1200, 1280]) {
+    test(`the ${name} place tags stay clear of the band headline on a ${width} px screen`, async ({ page, isMobile }) => {
+      test.skip(isMobile, 'on a phone the headline sits above the stage')
+      await page.setViewportSize({ width, height: 830 })
+      await stubPole(page, id)
+      await loaded(page, `/tracks/${id}`)
+      await trackStage(page).scrollIntoViewIfNeeded()
+      await expect(trackStage(page)).toHaveAttribute('data-gl', '', { timeout: 20_000 })
+      await expect.poll(() => page.evaluate(() => parseFloat(getComputedStyle(document.getElementById('lap') ?? document.body).getPropertyValue('--wdth')))).toBeLessThan(100.1)
+
+      const clashing = await page.evaluate(() => {
+        const range = document.createRange()
+        const headline = document.getElementById('lap')
+
+        if (headline) range.selectNodeContents(headline)
+        const words = [...range.getClientRects()]
+
+        return [...document.querySelectorAll('.place b')].flatMap((tag) => {
+          const box = tag.getBoundingClientRect()
+          const clear = words.every((w) => box.right + 12 <= w.left || box.left - 12 >= w.right || box.bottom + 12 <= w.top || box.top - 12 >= w.bottom)
+
+          return clear ? [] : [tag.textContent]
+        })
+      })
+
+      expect(await page.locator('.place b').count()).toBeGreaterThan(0)
+      expect(clashing).toEqual([])
+    })
+  }
+}
+
 test('the braking numbers roll in once the pole lap arrives', async ({ page, errors }) => {
   await stubPole(page, 'vegas')
   await loaded(page, '/tracks/vegas')
