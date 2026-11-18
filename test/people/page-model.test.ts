@@ -1,6 +1,7 @@
 import { expect, it } from 'bun:test'
 
 import { driverPage } from '../../src/people/page-model.ts'
+import { PEOPLE, personFor } from '../../src/people/people.ts'
 import type { SeasonSnapshot } from '../../src/season/snapshot-schema.ts'
 import { NOW as now, snapshot } from './fixture.ts'
 
@@ -94,4 +95,15 @@ it('writes a rookie and a winless driver', () => {
 
 it('returns null for a driver without a page', () => {
   expect(driverPage(snapshot, 'tsunoda', now)).toBeNull()
+})
+
+it('names the driver on the Next portrait', () => {
+  expect(driverPage(snapshot, 'ocon', now)?.next.photo?.place).toBe('Fernando Alonso · Shanghai, 2026')
+})
+
+it('shows the hero car photo in the Next band when the next driver has no portrait', () => {
+  const before = PEOPLE.find((person) => driverPage(snapshot, person.driverId, now)?.next.to === '/people/gasly')
+
+  expect(before).toBeDefined()
+  expect(before && driverPage(snapshot, before.driverId, now)?.next.photo).toEqual(personFor('gasly')?.hero)
 })

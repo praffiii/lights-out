@@ -2,7 +2,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef } from 'react'
 
 import { Next } from '#/chapter/Next.tsx'
-import type { Photo } from '#/home/content.ts'
 import { onEnter, roll, sweep, useGSAP } from '#/motion/motion.ts'
 import { seasonQueryOptions, useSeason } from '#/season/use-season.ts'
 import { Go } from '#/shell/Go.tsx'
@@ -26,18 +25,16 @@ function motion(scope: HTMLElement) {
 
 function Hero({ hero }: { hero: Model['hero'] }) {
   const { photo } = hero
-  const [name = '', where = ''] = photo?.place.split(' · ') ?? []
+  const [name = '', where = ''] = photo.place.split(' · ')
 
   return (
     <section className="top" aria-labelledby="h1">
-      {photo ? (
-        <div className="shot">
-          <picture>
-            <source media="(max-width: 760px)" srcSet={photo.src.replace(/\.jpg$/, '-phone.jpg')} />
-            <img src={photo.src} alt={photo.place} fetchPriority="high" />
-          </picture>
-        </div>
-      ) : null}
+      <div className="shot">
+        <picture>
+          <source media="(max-width: 760px)" srcSet={photo.src.replace(/\.jpg$/, '-phone.jpg')} />
+          <img src={photo.src} alt={photo.place} fetchPriority="high" />
+        </picture>
+      </div>
       <div className="title">
         <p className="mono muted label">{hero.label}</p>
         <h1 id="h1" className="display">
@@ -45,18 +42,14 @@ function Hero({ hero }: { hero: Model['hero'] }) {
         </h1>
         <p className="intro">{hero.sub}</p>
       </div>
-      {photo ? (
-        <>
-          <div className="caption">
-            <p className="mono">{where.replace(', ', ' · ')}</p>
-            <p className="name">{name}</p>
-          </div>
-          <p className="mono credit">
-            <span className="place">{`${photo.place} · `}</span>
-            {photo.credit}
-          </p>
-        </>
-      ) : null}
+      <div className="caption">
+        <p className="mono">{where.replace(', ', ' · ')}</p>
+        <p className="name">{name}</p>
+      </div>
+      <p className="mono credit">
+        <span className="place">{`${photo.place} · `}</span>
+        {photo.credit}
+      </p>
     </section>
   )
 }
@@ -178,8 +171,6 @@ function Races({ races }: { races: NonNullable<Model['races']> }) {
   )
 }
 
-const nextPhoto = (next: Model['next']): Photo | undefined => next.portrait && { ...next.portrait, place: `${next.name} · ${next.portrait.place}` }
-
 function Driver({ driverId }: { driverId: string }) {
   const client = useQueryClient()
   const { data } = useSeason()
@@ -207,15 +198,13 @@ function Driver({ driverId }: { driverId: string }) {
 
   if (!page) return <Missing />
 
-  const photo = nextPhoto(page.next)
-
   return (
     <div className="chapter-page tracks-page track-page driver-page" ref={root}>
       <Hero hero={page.hero} />
       {page.season ? <Season season={page.season} /> : null}
       {page.career ? <Career career={page.career} /> : null}
       {page.races ? <Races races={page.races} /> : null}
-      {photo ? <Next label={page.next.label} title={`${page.next.name}.`} line="Read " photo={photo} to={page.next.to} /> : null}
+      {page.next.photo ? <Next label={page.next.label} title={`${page.next.name}.`} line="Read " photo={page.next.photo} to={page.next.to} /> : null}
     </div>
   )
 }

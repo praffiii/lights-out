@@ -27,11 +27,11 @@ export type RaceRow = { round: string; grandPrix: string; city: string; start: s
 type Line = { label: string; value: string }
 
 export type DriverPage = {
-  hero: { label: string; given: string; family: string; sub: string; photo: Photo | undefined }
+  hero: { label: string; given: string; family: string; sub: string; photo: Photo }
   season: { label: string; headline: string; body: string; stats: ReadonlyArray<Line & { note: string }>; payoff: string; credit: string } | null
   career: { label: string; number: string; unit: string; headline: string; body: string; payoff: string; ladder: ReadonlyArray<Line>; credit: string } | null
   races: { label: string; rows: ReadonlyArray<RaceRow>; footnote: string } | null
-  next: { label: string; name: string; to: `/people/${string}`; portrait: Photo | undefined }
+  next: { label: string; name: string; to: `/people/${string}`; photo: Photo | undefined }
 }
 
 const FINISH = new Map([
@@ -230,6 +230,7 @@ export function driverPage(snapshot: SeasonSnapshot, driverId: string, now: Date
   const here = order.findIndex((row) => row.driver.driverId === driverId)
   const next = order[(here + 1) % order.length] ?? order[0]
   const nextPerson = next ? person(next.driver) : undefined
+  const portrait = next?.driver.code ? portraitFor(next.driver.code) : undefined
 
   return {
     hero: { label: `The people · ${teamLabel} · No. ${ref.number ?? ''}`, given: ref.givenName, family: ref.familyName, sub: `${ref.nationality ?? ''}${age}.${since}`, photo: entry.hero },
@@ -252,7 +253,7 @@ export function driverPage(snapshot: SeasonSnapshot, driverId: string, now: Date
       label: `Next · P${next?.position ?? 1}`,
       name: nextPerson?.name ?? '',
       to: `/people/${next?.driver.driverId ?? ''}`,
-      portrait: next?.driver.code ? portraitFor(next.driver.code) : undefined,
+      photo: portrait && nextPerson ? { ...portrait, place: `${nextPerson.name} · ${portrait.place}` } : next && personFor(next.driver.driverId)?.hero,
     },
   }
 }
