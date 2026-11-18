@@ -4,6 +4,7 @@ import { person, team, titleFight } from '#/season/page-model.ts'
 import type { SeasonSnapshot } from '#/season/snapshot-schema.ts'
 import { capital, ordinal, ordinalWord, words } from '#/season/words.ts'
 
+import { BAND } from './legends.ts'
 import { personFor } from './people.ts'
 import type { Past, People, PersonRow, Round, Team } from './schema.ts'
 
@@ -252,6 +253,103 @@ export function driverPage(snapshot: SeasonSnapshot, driverId: string, now: Date
       name: nextPerson?.name ?? '',
       to: `/people/${next?.driver.driverId ?? ''}`,
       portrait: next?.driver.code ? portraitFor(next.driver.code) : undefined,
+    },
+  }
+}
+
+export type TowerRow = {
+  position: string
+  number: string
+  name: string
+  team: string
+  nationality: string
+  points: string
+  to: string | null
+  champion: boolean
+  thumb: Photo | null
+}
+
+export type PeopleIndex = {
+  hero: { label: string; count: number; body: string; facts: ReadonlyArray<Line & { note: string }> }
+  band: { visible: boolean }
+  tower: { label: string; meta: string; rows: ReadonlyArray<TowerRow>; footnote: string | null }
+}
+
+const roundsText = (rounds: ReadonlyArray<number>) => {
+  const first = rounds[0]
+  const last = rounds.at(-1)
+  const run = first !== undefined && last !== undefined && last - first === rounds.length - 1
+
+  return rounds.length === 1 ? `round ${first}` : run ? `rounds ${first} to ${last}` : `rounds ${list(rounds)}`
+}
+
+export function peopleIndex(snapshot: SeasonSnapshot, now: Date): PeopleIndex | null {
+  const standings = snapshot.driverStandings
+
+  if (!standings) return null
+
+  const people = snapshot.people
+  const fight = titleFight(snapshot)
+  const decided = fight?.state === 'decided' || fight?.state === 'over'
+  const currentTeam = (driverId: string, fallback: string) => (people?.results[driverId] ?? []).at(-1)?.constructorId ?? fallback
+  const nameOf = (constructorId: string) => teamName({ constructorId, name: constructorName(snapshot, constructorId) })
+  const grid = standings.rows.filter((row) => personFor(row.driver.driverId))
+  const teams = new Set(grid.map((row) => currentTeam(row.driver.driverId, row.constructors.at(-1)?.constructorId ?? '')))
+  const locality = people?.rounds.at(-1)?.locality ?? ''
+
+  const aged = (driverId: string) => {
+    const born = people?.born[driverId]
+
+    return born ? `Aged ${ageAt(born, now)}` : ''
+  }
+
+  const byAge = grid.flatMap((row) => {
+    const born = people?.born[row.driver.driverId]
+
+    return born ? [{ row, born }] : []
+  })
+
+  const sorted = [...byAge].sort((a, b) => b.born.localeCompare(a.born))
+  const youngest = sorted[0]
+  const oldest = sorted.at(-1)
+  const leader = standings.rows[0]
+  const fact = (label: string, entry: (typeof standings.rows)[number] | undefined) => (entry ? [{ label, value: entry.driver.familyName, note: aged(entry.driver.driverId) }] : [])
+  const standIns = standings.rows.filter((row) => !personFor(row.driver.driverId))
+
+  const footnote = standIns.map((row) => {
+    const rows = people?.results[row.driver.driverId] ?? []
+
+    return `${person(row.driver).name} (${nameOf(currentTeam(row.driver.driverId, row.constructors.at(-1)?.constructorId ?? ''))}, ${roundsText(rows.map((r) => r.round))})`
+  })
+
+  return {
+    hero: {
+      label: `The people · ${standings.season} season`,
+      count: grid.length,
+      body: `${capital(words(teams.size))} teams, two cars each. Who drives for whom, how they stand after ${locality}, and the champions they are chasing.`,
+      facts: [...fact(decided ? 'Champion' : 'Leader', leader), ...fact('Youngest', youngest?.row), ...fact('Oldest', oldest?.row)],
+    },
+    band: { visible: standings.season === BAND.season },
+    tower: {
+      label: `The grid · after round ${standings.round}`,
+      meta: `${grid.length} drivers · ${teams.size} teams · points after ${locality}`,
+      rows: standings.rows.map((row, i) => {
+        const entry = personFor(row.driver.driverId)
+        const position = row.position ?? i + 1
+
+        return {
+          position: String(position).padStart(2, '0'),
+          number: String(row.driver.number ?? ''),
+          name: person(row.driver).name,
+          team: nameOf(currentTeam(row.driver.driverId, row.constructors.at(-1)?.constructorId ?? '')),
+          nationality: row.driver.nationality ?? '',
+          points: String(row.points),
+          to: entry ? `/people/${entry.driverId}` : null,
+          champion: decided && position === 1,
+          thumb: entry?.hero ?? null,
+        }
+      }),
+      footnote: footnote.length > 0 ? `Also raced in ${standings.season}: ${list(footnote)}.` : null,
     },
   }
 }
