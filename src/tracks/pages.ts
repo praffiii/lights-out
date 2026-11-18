@@ -97,4 +97,51 @@ export const TRACK_PAGES: Partial<Record<ModelledId, TrackPage>> = {
     ],
     historyPhoto: { src: '/img/tracks/losail-2008.jpg', place: 'Casey Stoner, Ducati · Lusail, 2008', credit: 'Photo Cecep Gorbachev · CC BY 2.0', source: commons('CaseyStoner-01.jpg') },
   },
+  yas_marina: {
+    country: 'United Arab Emirates',
+    intro: 'Beside a marina on Yas Island, raced from sunset into the night.',
+    hero: {
+      src: '/img/tracks/yas_marina-hero.jpg',
+      place: 'Racing under the floodlights · Yas Marina, 2010',
+      credit: 'Photo JiteshJagadish · CC BY 2.0',
+      source: commons('Yas_Marina_circuit_by_night.jpg'),
+    },
+    bandTitle: ['Two straights.', 'Then the marina.'],
+    places: [{ label: 'Under the W hotel · T13–14', turn: 13, up: true }],
+    cornersBody: 'beside a marina and under a hotel. Two corners worth knowing first.',
+    corners: [
+      {
+        tag: 'T5 · The hairpin',
+        line: 'Three old corners became one wider hairpin in 2021. It opens onto the back straight.',
+        photo: {
+          src: '/img/tracks/yas_marina-t5.jpg',
+          place: 'Kimi Räikkönen, Lotus, the winner · Yas Marina, 2012',
+          credit: 'Photo Play Among Friends Paf · CC BY 2.0',
+          source: commons('2012_Abu_Dhabi_GP_Winner.jpg'),
+        },
+      },
+      {
+        tag: 'T13–14 · Under the hotel',
+        line: 'The track runs under the W Abu Dhabi hotel, which straddles it beside the marina.',
+        photo: {
+          src: '/img/tracks/yas_marina-hotel.jpg',
+          place: 'Fireworks over the hotel after the race · Yas Marina, 2015',
+          credit: 'Photo Willo2173 · CC BY 2.0',
+          source: commons('Firework_Abu_Dhabi_Grand_Prix_2015.jpg'),
+        },
+      },
+    ],
+    historyTitle: ['Where titles', 'are decided.'],
+    history: [
+      { year: 2009, line: "F1's first day–night race. It starts at 17:00 and the sun sets at 17:43. Vettel wins." },
+      { year: 2021, line: 'Verstappen passes Hamilton on the last lap, after a disputed safety-car restart, and is champion.' },
+      { year: 2025, line: 'Norris is champion by two points. Verstappen wins the race.' },
+    ],
+    historyPhoto: {
+      src: '/img/tracks/yas_marina-2009.jpg',
+      place: 'Jenson Button, Brawn, the 2009 champion · Yas Marina, 2009',
+      credit: 'Photo Yuriy Lapitskiy · CC BY-SA 3.0',
+      source: commons('Jenson_Button_(Brawn_BGP_001)_on_Sunday_at_2009_Abu_Dhabi_Grand_Prix.jpg'),
+    },
+  },
 }

@@ -13,6 +13,7 @@ export default defineConfig({
         { path: '/tracks' },
         { path: '/tracks/vegas' },
         { path: '/tracks/losail' },
+        { path: '/tracks/yas_marina' },
         ...['interlagos', 'vegas', 'losail', 'yas_marina', 'albert_park'].map((id) => ({ path: `/lap/${id}` })),
       ],
       prerender: {

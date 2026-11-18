@@ -89,6 +89,15 @@ it('reads a dry lap too', () => {
   expect(Math.round((b?.flatShare ?? 0) * 100)).toBe(66)
 })
 
+it('finds six stops on the 2025 Yas Marina pole lap, the biggest into Turn 6', () => {
+  const b = braking(yasLap, circuitFor('yas_marina')?.laps ?? [])
+
+  expect(b?.zones.map((z) => z.turn)).toEqual([1, 5, 6, 9, 12, 16])
+  expect(b?.biggest).toMatchObject({ turn: 6, entry: 316, min: 68, metres: 130 })
+  expect(b?.longestRun).toMatchObject({ from: 6, to: 9 })
+  expect(b?.flatSeconds.toFixed(1)).toBe('54.2')
+})
+
 it('returns null for a lap with no braking', () => {
   const rows: ReadonlyArray<PoleRow> = [
     [0, 0, 300, 8, 100, 0],

@@ -18,7 +18,7 @@ it('lists 23 cells in calendar order with short names', () => {
   expect(cells.length).toBe(23)
   expect(cells[4]).toMatchObject({ round: 5, label: 'Montréal' })
   expect(cells.find((c) => c.id === 'vegas')).toMatchObject({ round: 21, to: '/tracks/vegas' })
-  expect(cells.filter((c) => c.to !== null).map((c) => c.id)).toEqual(['vegas', 'losail'])
+  expect(cells.filter((c) => c.to !== null).map((c) => c.id)).toEqual(['vegas', 'losail', 'yas_marina'])
 })
 
 it("lights the menu's race and nothing else", () => {
