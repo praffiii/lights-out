@@ -124,3 +124,14 @@ it("counts this season's final place in the career once the season is over", () 
   expect(driverPage(snapshot, 'bearman', now)?.career?.body).toBe('With Ferrari and Haas. Best season: 13th, in 2025.')
   expect(driverPage(over, 'bearman', now)?.career?.body).toBe('With Ferrari and Haas. Best season: 13th, in 2025 and 2026.')
 })
+
+it('waits for the final standings before counting the final place', () => {
+  const standings = snapshot.driverStandings
+  const latest = snapshot.latest
+  const race = latest?.race.race
+
+  const lagging: SeasonSnapshot =
+    standings && latest && race ? { ...snapshot, latest: { ...latest, race: { ...latest.race, race: { ...race, round: 23 } } }, driverStandings: { ...standings, round: 22 } } : snapshot
+
+  expect(driverPage(lagging, 'bearman', now)?.career?.body).toBe('With Ferrari and Haas. Best season: 13th, in 2025.')
+})

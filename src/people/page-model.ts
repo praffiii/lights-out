@@ -222,6 +222,7 @@ export function driverPage(snapshot: SeasonSnapshot, driverId: string, now: Date
   const fight = titleFight(snapshot)
   const decided = fight?.state === 'decided' || fight?.state === 'over'
   const position = standing.position ?? 0
+  const seasonOver = standings.season === snapshot.season && !snapshot.calendar.some((race) => race.round > standings.round)
   const startsNow = rows.filter(started).length
   const winsNow = rows.filter((row) => classified(row) && row.position === 1)
   const best = bestRow(rows)
@@ -262,9 +263,7 @@ export function driverPage(snapshot: SeasonSnapshot, driverId: string, now: Date
       payoff,
       credit: `Figures: Jolpica F1 API, after round ${round}, ${lastRound?.locality ?? ''}`,
     },
-    career: c
-      ? careerSection(snapshot, fight?.state === 'over' || (decided && position === 1) ? { ...c, finals: [...c.finals, { season: people.season, position: standing.position ?? null }] } : c, round)
-      : null,
+    career: c ? careerSection(snapshot, seasonOver || (decided && position === 1) ? { ...c, finals: [...c.finals, { season: people.season, position: standing.position ?? null }] } : c, round) : null,
     races: { label: `Race by race · ${people.season}`, rows: raceList, footnote: `Results: Jolpica F1 API, after round ${round}. Sprints not shown.`, key: shortKey(raceList) },
     next: {
       label: `Next · P${next?.position ?? 1}`,
