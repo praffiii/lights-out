@@ -78,6 +78,18 @@ const pointsOrder = (races: ReadonlyArray<SeasonRace>, sprints: ReadonlyArray<Se
   return [...points].sort((a, b) => b[1] - a[1]).map(([driverId]) => driverId)
 }
 
+const mergeRounds = (races: ReadonlyArray<SeasonRace>) => {
+  const rounds = new Map<number, SeasonRace>()
+
+  for (const race of races) {
+    const seen = rounds.get(race.round)
+
+    rounds.set(race.round, seen ? { ...seen, rows: [...seen.rows, ...race.rows] } : race)
+  }
+
+  return [...rounds.values()].sort((a, b) => a.round - b.round)
+}
+
 const personRow = (round: number, row: ResultRow): PersonRow => ({
   round,
   grid: row.grid,
@@ -89,11 +101,12 @@ const personRow = (round: number, row: ResultRow): PersonRow => ({
 
 export const buildPeople = (
   season: number,
-  races: ReadonlyArray<SeasonRace>,
+  pages: ReadonlyArray<SeasonRace>,
   sprints: ReadonlyArray<SeasonRace>,
   previous: People | undefined,
 ): Effect.Effect<People | undefined, never, JolpicaClient> =>
   Effect.gen(function* () {
+    const races = mergeRounds(pages)
     const jolpica = yield* JolpicaClient
     const qualifying = byRound(yield* all((offset) => jolpica.seasonQualifying(season, offset)))
     const through = season - 1

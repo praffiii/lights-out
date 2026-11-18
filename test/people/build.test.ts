@@ -4,7 +4,7 @@ import { Effect, Layer } from 'effect'
 import { buildPeople } from '../../src/people/build.ts'
 import type { People } from '../../src/people/schema.ts'
 import { JolpicaClient } from '../../src/season/jolpica-client.ts'
-import { drivers2026r20, missing, peopleFake, qualifying2026r20, results2026r20, sprints2026r20 } from '../season/fake-jolpica.ts'
+import { drivers2026r20, missing, pageOf, peopleFake, qualifying2026r20, results2026r20, sprints2026r20 } from '../season/fake-jolpica.ts'
 
 const build = (previous?: People, overrides: Partial<JolpicaClient['Service']> = {}) =>
   Effect.runPromise(buildPeople(2026, results2026r20.races, sprints2026r20.races, previous).pipe(Effect.provide(Layer.succeed(JolpicaClient, { ...peopleFake, ...overrides }))))
@@ -26,6 +26,15 @@ it('keeps every 2026 race row per driver', async () => {
   expect(people?.sprintPoints.antonelli).toBe(31)
   expect(people?.born.ocon).toBe('1996-09-17')
   expect(people?.qualifying).toHaveLength(qualifying2026r20.races.length)
+})
+
+it('merges a round that Jolpica splits across two pages', async () => {
+  const paged = [0, 100, 200, 300, 400].flatMap((offset) => pageOf(results2026r20, offset).races)
+  const people = await Effect.runPromise(buildPeople(2026, paged, sprints2026r20.races, undefined).pipe(Effect.provide(Layer.succeed(JolpicaClient, peopleFake))))
+
+  expect(paged.length).toBeGreaterThan(20)
+  expect(people?.rounds.map((round) => round.round)).toEqual(Array.from({ length: 20 }, (_, i) => i + 1))
+  expect(people?.results.ocon).toHaveLength(18)
 })
 
 it('builds a past career through the season before', async () => {
