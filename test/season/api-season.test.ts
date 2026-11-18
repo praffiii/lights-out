@@ -2,7 +2,7 @@ import { expect, it } from 'bun:test'
 import { Effect, Schema } from 'effect'
 
 import { handleSeasonRequest } from '../../src/season/handle-season-request.ts'
-import { SeasonSnapshot } from '../../src/season/snapshot-schema.ts'
+import { SeasonSnapshot, SeasonSnapshotJson } from '../../src/season/snapshot-schema.ts'
 import { SnapshotStore } from '../../src/season/store.ts'
 import { fakeKV } from './fake-kv.ts'
 import { snapshotAt } from './snapshot.ts'
@@ -30,4 +30,12 @@ it('api returns the snapshot with cache headers', async () => {
   expect(response.headers.get('content-type')).toContain('application/json')
   expect(response.headers.get('cache-control')).toContain('max-age=60')
   expect(Schema.decodeUnknownSync(SeasonSnapshot)(await response.json()).season).toBe(2026)
+})
+
+it('still decodes a stored snapshot from before people existed', async () => {
+  const { people: _, ...older } = await Bun.file('test/fixtures/season-snapshot.json').json()
+  const stored = Schema.decodeUnknownSync(SeasonSnapshotJson)(JSON.stringify(older))
+
+  expect(stored.people).toBeUndefined()
+  expect(stored.driverStandings?.rows[0]?.driver.dateOfBirth).toBeUndefined()
 })

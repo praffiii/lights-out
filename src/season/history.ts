@@ -1,9 +1,11 @@
-import type { DriverRef, ResultRow } from './jolpica-schema.ts'
+import type { DriverRef, ResultRow, SeasonResults } from './jolpica-schema.ts'
 import type { History, Leader, TeamPoints } from './snapshot-schema.ts'
 
-export type SeasonRace = { round: number; rows: ReadonlyArray<ResultRow> }
+export type SeasonRace = SeasonResults['races'][number]
 
-const byRound = (races: ReadonlyArray<SeasonRace>) => {
+type RoundRows = { round: number; rows: ReadonlyArray<ResultRow> }
+
+const byRound = (races: ReadonlyArray<RoundRows>) => {
   const rounds = new Map<number, Array<ResultRow>>()
 
   for (const race of races) rounds.set(race.round, [...(rounds.get(race.round) ?? []), ...race.rows])
@@ -25,7 +27,7 @@ const countback = (a: Tally, b: Tally) => {
   return 0
 }
 
-export function seasonHistory(races: ReadonlyArray<SeasonRace>, sprints: ReadonlyArray<SeasonRace>): History {
+export function seasonHistory(races: ReadonlyArray<RoundRows>, sprints: ReadonlyArray<RoundRows>): History {
   const raceRows = byRound(races)
   const sprintRows = byRound(sprints)
   const tally = new Map<string, Tally>()

@@ -1,6 +1,7 @@
 import { Schema } from 'effect'
 
 import { FlagTally } from '../flags/schema.ts'
+import { People } from '../people/schema.ts'
 import { TopSpeed } from '../speed/schema.ts'
 
 import { ConstructorStandings, DriverRef, DriverStandings, QualifyingResults, Race, RaceResults, Session, SessionName } from './jolpica-schema.ts'
@@ -69,6 +70,7 @@ export const SeasonSnapshot = Schema.Struct({
   latestSession: Schema.optionalKey(LatestSession),
   flags: Schema.optionalKey(FlagTally),
   topSpeed: Schema.optionalKey(TopSpeed),
+  people: Schema.optionalKey(People),
 })
 
 export type SeasonSnapshot = typeof SeasonSnapshot.Type

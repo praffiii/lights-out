@@ -2,6 +2,8 @@ import { CALENDAR } from '#/circuits/calendar.ts'
 import { PORTRAITS } from '#/drivers/portraits.ts'
 import { CARS } from '#/home/cars.ts'
 import { PHOTOS } from '#/home/content.ts'
+import { LEGENDS } from '#/people/legends.ts'
+import { PEOPLE } from '#/people/people.ts'
 import { NEXT_PEOPLE, TRACK_PAGES } from '#/tracks/pages.ts'
 
 export type Credit = { src: string; place: string; by: string; licence: string; source: string | null; usedOn: string }
@@ -58,10 +60,14 @@ const drivers = new Map<string, string>(CARS.map((car) => [car.code, car.driver]
 const every: ReadonlyArray<Credit> = [
   ...Object.entries(PHOTOS).map(([key, photo]) => entry(photo, used.get(key) ?? '')),
   ...Object.values(CALENDAR).map(({ photo }) => entry({ ...photo, src: photo.small }, 'This season, Race weekend')),
-  ...Object.entries(PORTRAITS).flatMap(([code, photo]) => (photo ? [entry({ ...photo, place: [drivers.get(code), photo.place].filter(Boolean).join(' · ') }, 'This season, Race weekend')] : [])),
+  ...Object.entries(PORTRAITS).flatMap(([code, photo]) =>
+    photo ? [entry({ ...photo, place: [drivers.get(code), photo.place].filter(Boolean).join(' · ') }, 'This season, Race weekend, The people')] : [],
+  ),
   ...Object.values(TRACK_PAGES).flatMap((page) => (page ? [page.hero, ...page.corners.map((c) => c.photo), page.historyPhoto].map((photo) => entry(photo, 'The tracks')) : [])),
   entry(NEXT_PEOPLE.photo, 'The tracks'),
   ...CARS.map((car) => entry({ src: car.src, place: `${car.team} ${car.car} · Shanghai, 2026`, credit: car.credit, source: car.commons }, ['Home', 'This season', ...(UNDERCUT.has(car.code) ? ['Chapter 03'] : []), ...(PORTRAITS[car.code] ? [] : ['Race weekend'])].join(', '))),
+  ...PEOPLE.map(({ hero }) => entry(hero, 'The people')),
+  entry(LEGENDS.photo, 'The people'),
 ]
 
 const merged = new Map<string, Credit>()
