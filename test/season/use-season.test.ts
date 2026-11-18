@@ -1,7 +1,11 @@
 import { afterEach, expect, it, mock, spyOn } from 'bun:test'
+import { Schema } from 'effect'
 
+import { SeasonSnapshot } from '../../src/season/snapshot-schema.ts'
 import { fetchSeason, retrySeason, SeasonWarmingError, seasonQueryOptions } from '../../src/season/use-season.ts'
 import { snapshotAt } from './snapshot.ts'
+
+const served = async (at: string) => Schema.encodeSync(SeasonSnapshot)(await snapshotAt(at))
 
 const stubFetch = (response: Response) => spyOn(globalThis, 'fetch').mockResolvedValue(response)
 
@@ -10,7 +14,7 @@ afterEach(() => {
 })
 
 it('decodes a 200 snapshot', async () => {
-  stubFetch(Response.json(await snapshotAt('2026-11-08T00:00:00.000Z')))
+  stubFetch(Response.json(await served('2026-11-08T00:00:00.000Z')))
 
   const snapshot = await fetchSeason()
 
@@ -36,7 +40,7 @@ it('releases the response body when it gives up on a 503', async () => {
 })
 
 it('rejects a snapshot missing season', async () => {
-  const { season: _season, ...rest } = await snapshotAt('2026-11-08T00:00:00.000Z')
+  const { season: _season, ...rest } = await served('2026-11-08T00:00:00.000Z')
 
   stubFetch(Response.json(rest))
 
@@ -59,7 +63,7 @@ it('a SeasonWarmingError is not retried', () => {
 })
 
 it('fetchSeason passes an AbortSignal to fetch', async () => {
-  const fetch = stubFetch(Response.json(await snapshotAt('2026-11-08T00:00:00.000Z')))
+  const fetch = stubFetch(Response.json(await served('2026-11-08T00:00:00.000Z')))
 
   await fetchSeason()
 
