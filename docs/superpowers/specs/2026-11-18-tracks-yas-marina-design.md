@@ -82,14 +82,14 @@ Each photo comes in two files, `public/img/tracks/yas_marina-<name>.jpg` and `ya
 
 | Name | Desktop | Phone | Source |
 |---|---|---|---|
-| `hero` | 2880×1520 | 1170×780 | 3599×2399, full size, via the browser |
+| `hero` | 2400×1520 | 1170×780 | 3599×2399, full size, via the browser |
 | `t5` | 1632×1120 | 1170×804 | 3840 px preview of a 4256 px original |
 | `hotel` | 960×660 | 1170×804 | 3840 px preview of a 5184 px original |
 | `2009` | 864×648 | 1170×876 | 3840 px preview of a 5616 px original |
 
-These match the Las Vegas sizes for the same slots. Nothing is enlarged. The four desktop files total about 770 KB.
+These match the Las Vegas sizes for the same slots, except the desktop hero. Nothing is enlarged. The four desktop files total about 720 KB.
 
-**My call:** the desktop hero is the bottom-left 2880×1520 of the original, with no resize. A full-width crop put the four cars behind the title block. This crop keeps them to the right of it. The floodlight tops are cut on desktop. The phone crop is the full frame and keeps them.
+**My call:** the desktop hero is the bottom-left 2400×1520 of the original, with no resize. The hero is drawn with `object-fit: cover`, centred, under a 740 px title block anchored bottom-left. A full-width crop put the four cars behind the title block. A 2880×1520 crop cleared them only from about 1400 px up: at 1280 px half the lead car sat behind the title (found in the final review). At 2400×1520 the image is never cropped sideways from 1200 px up, so the lead car stays right of the title from 1000 to 1920 px. The cost is 1.67× pixel density at 1440 px instead of 2×. The floodlight tops are cut on desktop. The phone crop is the full frame and keeps them.
 
 **My call:** the hotel photo drops its top 160 px before cropping, to remove a white speck in the sky.
 
