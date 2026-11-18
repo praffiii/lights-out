@@ -30,8 +30,8 @@ export const NEXT_PEOPLE = {
   title: 'Meet the grid.',
   line: 'Read',
   photo: { ...antonelli, place: 'Kimi Antonelli · Melbourne Walk, 2026' },
-  to: null,
-}
+  to: '/people',
+} as const
 
 const commons = (file: string) => `https://commons.wikimedia.org/wiki/File:${file}`
 

@@ -2,6 +2,7 @@ import { CALENDAR } from '#/circuits/calendar.ts'
 import { PORTRAITS } from '#/drivers/portraits.ts'
 import { CARS } from '#/home/cars.ts'
 import { PHOTOS } from '#/home/content.ts'
+import { LEGENDS } from '#/people/legends.ts'
 import { PEOPLE } from '#/people/people.ts'
 import { NEXT_PEOPLE, TRACK_PAGES } from '#/tracks/pages.ts'
 
@@ -66,6 +67,7 @@ const every: ReadonlyArray<Credit> = [
   entry(NEXT_PEOPLE.photo, 'The tracks'),
   ...CARS.map((car) => entry({ src: car.src, place: `${car.team} ${car.car} · Shanghai, 2026`, credit: car.credit, source: car.commons }, ['Home', 'This season', ...(UNDERCUT.has(car.code) ? ['Chapter 03'] : []), ...(PORTRAITS[car.code] ? [] : ['Race weekend'])].join(', '))),
   ...PEOPLE.map(({ hero }) => entry(hero, 'The people')),
+  entry(LEGENDS.photo, 'The people'),
 ]
 
 const merged = new Map<string, Credit>()

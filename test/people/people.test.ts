@@ -28,3 +28,15 @@ it('lists every hero in the credits as used on The people', () => {
 it('marks the portraits the Next band shows as used on The people', () => {
   expect(CREDITS.find((c) => c.src === '/img/drivers/ALO.webp')?.usedOn.split(', ')).toContain('The people')
 })
+
+it('credits the Senna photo of the legends on The people', async () => {
+  const senna = CREDITS.find((c) => c.src === '/img/people/senna-1991.jpg')
+
+  expect(senna).toMatchObject({
+    by: 'George Voudouris',
+    licence: 'CC BY-SA 4.0',
+    usedOn: 'The people',
+    source: 'https://commons.wikimedia.org/wiki/File:Ayrton_Senna_during_the_race_in_Spa-Francorchamps_on_25_August_1991.jpg',
+  })
+  expect(await Bun.file('public/img/people/senna-1991.jpg').exists()).toBe(true)
+})

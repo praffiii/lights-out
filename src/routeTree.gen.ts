@@ -21,6 +21,7 @@ import { Route as ChaptersOvertakingRouteImport } from './routes/chapters.overta
 import { Route as ChaptersRaceWeekendRouteImport } from './routes/chapters.race-weekend'
 import { Route as ChaptersTyresAndStrategyRouteImport } from './routes/chapters.tyres-and-strategy'
 import { Route as LapCircuitRouteImport } from './routes/lap.$circuit'
+import { Route as PeopleIndexRouteImport } from './routes/people.index'
 import { Route as PeopleDriverRouteImport } from './routes/people.$driver'
 import { Route as TracksIndexRouteImport } from './routes/tracks.index'
 import { Route as TracksCircuitRouteImport } from './routes/tracks.$circuit'
@@ -87,6 +88,11 @@ const LapCircuitRoute = LapCircuitRouteImport.update({
   path: '/lap/$circuit',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PeopleIndexRoute = PeopleIndexRouteImport.update({
+  id: '/people/',
+  path: '/people/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PeopleDriverRoute = PeopleDriverRouteImport.update({
   id: '/people/$driver',
   path: '/people/$driver',
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/lap/$circuit': typeof LapCircuitRoute
   '/people/$driver': typeof PeopleDriverRoute
   '/tracks/$circuit': typeof TracksCircuitRoute
+  '/people/': typeof PeopleIndexRoute
   '/tracks/': typeof TracksIndexRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
 }
@@ -141,6 +148,7 @@ export interface FileRoutesByTo {
   '/lap/$circuit': typeof LapCircuitRoute
   '/people/$driver': typeof PeopleDriverRoute
   '/tracks/$circuit': typeof TracksCircuitRoute
+  '/people': typeof PeopleIndexRoute
   '/tracks': typeof TracksIndexRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
 }
@@ -160,6 +168,7 @@ export interface FileRoutesById {
   '/lap/$circuit': typeof LapCircuitRoute
   '/people/$driver': typeof PeopleDriverRoute
   '/tracks/$circuit': typeof TracksCircuitRoute
+  '/people/': typeof PeopleIndexRoute
   '/tracks/': typeof TracksIndexRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
 }
@@ -180,6 +189,7 @@ export interface FileRouteTypes {
     | '/lap/$circuit'
     | '/people/$driver'
     | '/tracks/$circuit'
+    | '/people/'
     | '/tracks/'
     | '/api/pole/$circuit'
   fileRoutesByTo: FileRoutesByTo
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/lap/$circuit'
     | '/people/$driver'
     | '/tracks/$circuit'
+    | '/people'
     | '/tracks'
     | '/api/pole/$circuit'
   id:
@@ -216,6 +227,7 @@ export interface FileRouteTypes {
     | '/lap/$circuit'
     | '/people/$driver'
     | '/tracks/$circuit'
+    | '/people/'
     | '/tracks/'
     | '/api/pole/$circuit'
   fileRoutesById: FileRoutesById
@@ -235,6 +247,7 @@ export interface RootRouteChildren {
   LapCircuitRoute: typeof LapCircuitRoute
   PeopleDriverRoute: typeof PeopleDriverRoute
   TracksCircuitRoute: typeof TracksCircuitRoute
+  PeopleIndexRoute: typeof PeopleIndexRoute
   TracksIndexRoute: typeof TracksIndexRoute
   ApiPoleCircuitRoute: typeof ApiPoleCircuitRoute
 }
@@ -325,6 +338,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LapCircuitRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/people/': {
+      id: '/people/'
+      path: '/people'
+      fullPath: '/people/'
+      preLoaderRoute: typeof PeopleIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/people/$driver': {
       id: '/people/$driver'
       path: '/people/$driver'
@@ -371,6 +391,7 @@ const rootRouteChildren: RootRouteChildren = {
   LapCircuitRoute: LapCircuitRoute,
   PeopleDriverRoute: PeopleDriverRoute,
   TracksCircuitRoute: TracksCircuitRoute,
+  PeopleIndexRoute: PeopleIndexRoute,
   TracksIndexRoute: TracksIndexRoute,
   ApiPoleCircuitRoute: ApiPoleCircuitRoute,
 }

@@ -16,6 +16,7 @@ export default defineConfig({
         { path: '/tracks/vegas' },
         { path: '/tracks/losail' },
         { path: '/tracks/yas_marina' },
+        { path: '/people' },
         ...PEOPLE.map((person) => ({ path: `/people/${person.driverId}` })),
         ...['interlagos', 'vegas', 'losail', 'yas_marina', 'albert_park'].map((id) => ({ path: `/lap/${id}` })),
       ],

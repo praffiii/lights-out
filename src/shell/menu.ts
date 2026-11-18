@@ -11,7 +11,7 @@ export const MENU: ReadonlyArray<MenuEntry> = [
   { label: 'The car', to: '/chapters/inside-the-car', photo: PHOTOS.williams },
   { label: 'The engine', to: null, photo: PHOTOS.brm },
   { label: 'The tracks', to: '/tracks', photo: PHOTOS.ch02 },
-  { label: 'The people', to: null, photo: PHOTOS.ch05 },
+  { label: 'The people', to: '/people', photo: PHOTOS.ch05 },
   { label: 'Glossary', to: '/glossary', photo: PHOTOS.ch04 },
 ]
 

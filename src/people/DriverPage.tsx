@@ -213,8 +213,8 @@ function Missing() {
   return (
     <section className="people-missing">
       <h1 className="mono">No page for this driver yet</h1>
-      <Go to="/season" className="mono">
-        This season
+      <Go to="/people" className="mono">
+        All the people
       </Go>
     </section>
   )

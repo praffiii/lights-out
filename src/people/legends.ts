@@ -1,8 +1,9 @@
 import { portraitFor } from '#/drivers/portraits.ts'
 
 const antonelli = portraitFor('ANT')
+const verstappen = portraitFor('VER')
 
-if (!antonelli) throw new Error('the Antonelli portrait is missing')
+if (!antonelli || !verstappen) throw new Error('the Antonelli or Verstappen portrait is missing')
 
 export const BAND = {
   season: 2026,
@@ -30,6 +31,12 @@ export const LEGENDS = {
     { titles: 4, line: 'Max Verstappen. Four in a row with Red Bull, 2021 to 2024. Still racing.' },
   ],
   note: 'Three titles, and the number 12 that Antonelli races in his honour.',
+  photo: {
+    src: '/img/people/senna-1991.jpg',
+    place: 'Ayrton Senna, McLaren MP4/6 · Spa-Francorchamps, 1991',
+    credit: 'Photo George Voudouris · CC BY-SA 4.0',
+    source: 'https://commons.wikimedia.org/wiki/File:Ayrton_Senna_during_the_race_in_Spa-Francorchamps_on_25_August_1991.jpg',
+  },
 } as const
 
 export const NEXT_SEASON = {
@@ -37,4 +44,5 @@ export const NEXT_SEASON = {
   title: 'The fight for second.',
   line: 'Read',
   to: '/season',
+  photo: { ...verstappen, place: 'Max Verstappen · Melbourne, 2026' },
 } as const
