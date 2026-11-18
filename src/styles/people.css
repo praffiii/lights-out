@@ -1,0 +1,474 @@
+.driver-page,
+.driver-page .races {
+  --dim: color-mix(in srgb, var(--muted) 55%, var(--bg));
+}
+.driver-page h2.display {
+  white-space: normal;
+}
+
+.driver-page .top h1 {
+  margin: 10px 0 0 -6px;
+  font-size: 120px;
+  line-height: 0.88;
+}
+.driver-page .top h1 .hl {
+  display: block;
+}
+.driver-page .top .intro {
+  margin-top: 30px;
+}
+.driver-page .top .caption {
+  display: none;
+}
+
+.driver-page .season-numbers {
+  display: grid;
+  grid-template-columns: minmax(0, 464px) minmax(0, 1fr);
+  column-gap: 48px;
+  align-items: start;
+  padding: 92px var(--m) 0;
+}
+.driver-page .season-numbers .head {
+  grid-row: 1 / span 3;
+}
+.driver-page .season-numbers h2 {
+  max-width: 360px;
+  margin: 10px 0 0 -4px;
+  font-size: 72px;
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+}
+.driver-page .season-numbers .body {
+  max-width: 420px;
+  margin-top: 48px;
+  font-size: 18px;
+  color: var(--muted);
+}
+.driver-page .stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 40px;
+}
+.driver-page .stats > div {
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.driver-page .stats .num {
+  display: block;
+  margin: 10px 0 0 -4px;
+  font-size: 104px;
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+}
+.driver-page .stats .note {
+  display: block;
+  margin-top: 12px;
+  font-size: 16px;
+  color: var(--muted);
+}
+.driver-page .season-numbers .credit {
+  margin-top: 16px;
+}
+
+.driver-page .career {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 512px);
+  column-gap: 48px;
+  align-items: start;
+  padding: 180px var(--m) 0;
+}
+.driver-page .career .label {
+  grid-column: 1 / -1;
+}
+.driver-page .career .count {
+  display: grid;
+}
+.driver-page .career .starts {
+  margin-left: -0.05em;
+  font-size: clamp(200px, 30vw, 440px);
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+}
+.driver-page .career .unit {
+  margin-top: 8px;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.driver-page .career .story {
+  padding-top: 12px;
+}
+.driver-page .career h2 {
+  max-width: 420px;
+  margin-left: -4px;
+  font-size: 72px;
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+}
+.driver-page .career .body {
+  max-width: 460px;
+  margin-top: 32px;
+  font-size: 18px;
+  color: var(--muted);
+}
+.driver-page .career .payoff-line {
+  margin-top: 32px;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--purple);
+}
+.driver-page .record {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  column-gap: 21px;
+  margin-top: 96px;
+}
+.driver-page .record > div {
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.driver-page .record > div:first-child {
+  padding-top: 16px;
+  border-top: 3px solid var(--purple);
+  color: var(--purple);
+}
+.driver-page .record dt {
+  color: var(--muted);
+}
+.driver-page .record > div:first-child dt {
+  color: inherit;
+}
+.driver-page .record dd {
+  margin-top: 8px;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+.driver-page .career > .credit {
+  grid-column: 1 / -1;
+  margin-top: 24px;
+}
+
+.driver-page .races {
+  margin-top: 160px;
+  padding: 64px 0 48px;
+  background: var(--bg);
+  color: var(--ink);
+}
+.driver-page .races .head {
+  padding: 0 var(--m);
+}
+.driver-page .races h2 {
+  margin: 10px 0 0 -4px;
+  font-size: 56px;
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+}
+.driver-page .races .body {
+  max-width: 296px;
+  margin-top: 48px;
+  font-size: 16px;
+  color: var(--muted);
+}
+.driver-page .races table {
+  width: 100%;
+  margin-top: 72px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.driver-page .races th {
+  padding-bottom: 10px;
+  font-weight: 400;
+  text-align: left;
+  text-transform: none;
+}
+.driver-page .races th:first-child {
+  width: calc(var(--m) + 72px);
+}
+.driver-page .races th.city {
+  width: 18%;
+}
+.driver-page .races th:nth-child(4) {
+  width: 12.5%;
+}
+.driver-page .races th:nth-child(5) {
+  width: 17.5%;
+}
+.driver-page .races th.pts {
+  width: calc(var(--m) + 100px);
+}
+.driver-page .races :is(th, td):first-child {
+  padding-left: var(--m);
+}
+.driver-page .races :is(th, td):last-child {
+  padding-right: var(--m);
+  text-align: right;
+}
+.driver-page .races tbody tr {
+  height: 48px;
+  background: linear-gradient(var(--line), var(--line)) var(--m) 0 / calc(100% - 2 * var(--m)) 1px no-repeat;
+}
+.driver-page .races td {
+  overflow: hidden;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.driver-page .races td.mono {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+  text-transform: none;
+}
+.driver-page .races td.start,
+.driver-page .races td.pts.is-zero {
+  color: var(--muted);
+}
+.driver-page .races td.pts.is-zero {
+  color: var(--dim);
+}
+.driver-page .races :is(th, td) .short {
+  display: none;
+}
+.driver-page .races tr.is-best {
+  background: var(--purple);
+}
+.driver-page .races tr.is-best td {
+  color: #fff;
+}
+.driver-page .races tr.is-dnr td {
+  color: var(--dim);
+}
+.driver-page .races td.dnr {
+  font-weight: 500;
+  text-align: left;
+  text-transform: uppercase;
+}
+.driver-page .races-note {
+  padding: 24px var(--m) 0;
+}
+
+.driver-page .next .caption {
+  top: 280px;
+}
+.driver-page .next h2 {
+  font-size: 96px;
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+}
+
+.people-empty {
+  padding: 200px var(--m);
+  font-size: 20px;
+  color: var(--muted);
+}
+.people-missing {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 20px;
+  min-height: 70svh;
+  padding: 24px;
+  text-align: center;
+}
+.people-missing h1 {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+.people-missing a {
+  font-size: 11px;
+  color: var(--purple);
+  letter-spacing: 0.12em;
+}
+
+@media (max-width: 1199px) {
+  .driver-page .top h1 {
+    font-size: 96px;
+  }
+  .driver-page .season-numbers,
+  .driver-page .career {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .driver-page .season-numbers .head {
+    grid-row: auto;
+    margin-bottom: 48px;
+  }
+  .driver-page .career .story {
+    padding-top: 40px;
+  }
+  .driver-page .races th.city {
+    width: 16%;
+  }
+}
+
+@media (max-width: 760px) {
+  .driver-page .top h1 {
+    margin: 10px 0 0 -3px;
+    font-size: clamp(44px, 16vw, 64px);
+  }
+  .driver-page .top .intro {
+    margin-top: 12px;
+  }
+  .driver-page .top .caption {
+    display: block;
+    order: 2;
+    position: relative;
+    z-index: 1;
+    margin: -36px var(--m) 0;
+    padding: 18px 20px 20px;
+    border-top: 3px solid var(--purple);
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .driver-page .top .caption .mono {
+    color: var(--inv);
+  }
+  .driver-page .top .caption .name {
+    margin-top: 6px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .driver-page .top .credit {
+    order: 3;
+  }
+  .driver-page .top .credit .place {
+    display: none;
+  }
+  .driver-page .season-numbers {
+    padding-top: 72px;
+  }
+  .driver-page .season-numbers .head {
+    margin-bottom: 32px;
+  }
+  .driver-page .season-numbers h2,
+  .driver-page .career h2,
+  .driver-page .races h2 {
+    font-size: 36px;
+  }
+  .driver-page .season-numbers .body {
+    margin-top: 16px;
+    font-size: 16px;
+  }
+  .driver-page .stats {
+    gap: 28px 16px;
+  }
+  .driver-page .stats .num {
+    margin-left: -2px;
+    font-size: 52px;
+  }
+  .driver-page .stats .note {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  .driver-page .career {
+    padding-top: 96px;
+  }
+  .driver-page .career .starts {
+    margin-top: 4px;
+    font-size: 176px;
+  }
+  .driver-page .career .unit {
+    margin-top: 0;
+    font-size: 20px;
+  }
+  .driver-page .career .story {
+    padding-top: 28px;
+  }
+  .driver-page .career .body {
+    margin-top: 16px;
+    font-size: 16px;
+  }
+  .driver-page .career .payoff-line {
+    margin-top: 20px;
+    font-size: 20px;
+  }
+  .driver-page .record {
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 28px;
+  }
+  .driver-page .record > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+  }
+  .driver-page .record > div:first-child {
+    padding-top: 8px;
+  }
+  .driver-page .record dd {
+    margin-top: 0;
+    font-size: 24px;
+  }
+  .driver-page .career > .credit {
+    margin-top: 12px;
+  }
+  .driver-page .races {
+    margin-top: 64px;
+    padding: 72px 0 32px;
+  }
+  .driver-page .races .body {
+    margin-top: 12px;
+  }
+  .driver-page .races table {
+    margin-top: 40px;
+  }
+  .driver-page .races th {
+    font-size: 10px;
+  }
+  .driver-page .races th:first-child {
+    width: calc(var(--m) + 28px);
+  }
+  .driver-page .races .city {
+    display: none;
+  }
+  .driver-page .races th:nth-child(4) {
+    width: 56px;
+  }
+  .driver-page .races th:nth-child(5) {
+    width: 64px;
+  }
+  .driver-page .races th.pts {
+    width: calc(var(--m) + 28px);
+  }
+  .driver-page .races tbody tr {
+    height: 40px;
+  }
+  .driver-page .races td {
+    font-size: 15px;
+  }
+  .driver-page .races td.mono {
+    font-size: 10px;
+  }
+  .driver-page .races :is(th, td) .full {
+    display: none;
+  }
+  .driver-page .races :is(th, td) .short {
+    display: inline;
+  }
+  .driver-page .races td.dnr {
+    text-align: right;
+  }
+  .driver-page .races-note {
+    padding-top: 16px;
+  }
+  .driver-page .next {
+    display: flex;
+    flex-direction: column;
+  }
+  .driver-page .next .caption {
+    order: -1;
+    padding-top: 0;
+  }
+  .driver-page .next h2 {
+    font-size: 48px;
+  }
+}

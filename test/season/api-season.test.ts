@@ -33,7 +33,8 @@ it('api returns the snapshot with cache headers', async () => {
 })
 
 it('still decodes a stored snapshot from before people existed', async () => {
-  const stored = Schema.decodeUnknownSync(SeasonSnapshotJson)(await Bun.file('test/fixtures/season-snapshot.json').text())
+  const { people: _, ...older } = await Bun.file('test/fixtures/season-snapshot.json').json()
+  const stored = Schema.decodeUnknownSync(SeasonSnapshotJson)(JSON.stringify(older))
 
   expect(stored.people).toBeUndefined()
   expect(stored.driverStandings?.rows[0]?.driver.dateOfBirth).toBeUndefined()

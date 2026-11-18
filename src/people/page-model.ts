@@ -31,7 +31,7 @@ export type DriverPage = {
   season: { label: string; headline: string; body: string; stats: ReadonlyArray<Line & { note: string }>; payoff: string; credit: string } | null
   career: { label: string; number: string; unit: string; headline: string; body: string; payoff: string; ladder: ReadonlyArray<Line>; credit: string } | null
   races: { label: string; rows: ReadonlyArray<RaceRow>; footnote: string } | null
-  next: { label: string; name: string; to: string; portrait: Photo | undefined }
+  next: { label: string; name: string; to: `/people/${string}`; portrait: Photo | undefined }
 }
 
 const FINISH = new Map([
@@ -264,7 +264,7 @@ export type TowerRow = {
   team: string
   nationality: string
   points: string
-  to: string | null
+  to: `/people/${string}` | null
   champion: boolean
   thumb: Photo | null
 }
