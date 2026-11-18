@@ -135,3 +135,23 @@ it('waits for the final standings before counting the final place', () => {
 
   expect(driverPage(lagging, 'bearman', now)?.career?.body).toBe('With Ferrari and Haas. Best season: 13th, in 2025.')
 })
+
+it('waits for the final standings before giving a narrow leader the title', () => {
+  const standings = snapshot.driverStandings
+  const latest = snapshot.latest
+  const race = latest?.race.race
+  const second = standings?.rows[1]
+  const rows = standings && second ? standings.rows.map((row, i) => (i === 0 ? { ...row, points: second.points + 1 } : row)) : []
+
+  const lagging: SeasonSnapshot =
+    standings && latest && race ? { ...snapshot, latest: { ...latest, race: { ...latest.race, race: { ...race, round: 23 } } }, driverStandings: { ...standings, round: 22, rows } } : snapshot
+
+  expect(driverPage(lagging, 'antonelli', now)?.career?.ladder.at(-1)).toEqual({ label: 'Best season', value: '7th' })
+})
+
+it("keeps last season's final place in the career once the calendar rolls over", () => {
+  const standings = snapshot.driverStandings
+  const rolled: SeasonSnapshot = standings ? { ...snapshot, season: snapshot.season + 1, latest: null, driverStandings: { ...standings, round: 23 } } : snapshot
+
+  expect(driverPage(rolled, 'bearman', now)?.career?.body).toBe('With Ferrari and Haas. Best season: 13th, in 2025 and 2026.')
+})
