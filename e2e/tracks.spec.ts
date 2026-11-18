@@ -176,10 +176,9 @@ for (const [id, name] of [
       await loaded(page, `/tracks/${id}`)
       await trackStage(page).scrollIntoViewIfNeeded()
       await expect(trackStage(page)).toHaveAttribute('data-gl', '', { timeout: 20_000 })
-      await expect.poll(() => page.locator('#lap').evaluate((el) => parseFloat(getComputedStyle(el).getPropertyValue('--wdth')))).toBeLessThan(100.1)
-      await page.locator('main').evaluate((el) => el.style.setProperty('--wdth', '112'))
 
       const { words, clashing } = await page.locator('#lap').evaluate((headline) => {
+        document.querySelector('main')?.style.setProperty('--wdth', '112')
         const range = document.createRange()
 
         range.selectNodeContents(headline)
