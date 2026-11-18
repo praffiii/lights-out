@@ -26,9 +26,10 @@ for (const colorScheme of ['light', 'dark'] as const) {
     await expect(page.locator('.sizes .chip').filter({ visible: true })).toHaveText(/^(20 · Interlagos · 4\.309 km|20 Interlagos)$/)
     await expect(page.locator('.sizes img.patch').filter({ visible: true })).toHaveAttribute('src', /-br-1940\.webp$/)
     const links = page.locator('.sizes a.cell').filter({ visible: true })
-    await expect(links).toHaveCount(2)
+    await expect(links).toHaveCount(3)
     await expect(links.nth(0)).toHaveAttribute('href', '/tracks/vegas')
     await expect(links.nth(1)).toHaveAttribute('href', '/tracks/losail')
+    await expect(links.nth(2)).toHaveAttribute('href', '/tracks/yas_marina')
     await expect(page.getByText('Pick a track with → to open it')).toBeVisible()
     await expect(page.locator('.sizes')).toHaveCSS('background-color', 'rgb(6, 8, 14)')
     expect(await noOverflow(page)).toBe(true)
@@ -108,9 +109,33 @@ for (const colorScheme of ['light', 'dark'] as const) {
   })
 }
 
+for (const colorScheme of ['light', 'dark'] as const) {
+  test(`the Yas Marina page reads the lap from the stored pole lap, ${colorScheme}`, async ({ page, errors }) => {
+    await page.emulateMedia({ colorScheme })
+    await stubPole(page, 'yas_marina')
+    await loaded(page, '/tracks/yas_marina')
+
+    await expect(page).toHaveTitle('Yas Marina · The tracks · Lights Out')
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Yas Marina.')
+    await expect(page.getByText('The tracks · Round 23 · United Arab Emirates')).toBeVisible()
+    await expect(page.locator('.place')).toHaveText(['Under the W hotel · T13–14'])
+    await expect(page.getByText('Sixteen turns.')).toBeVisible()
+    await page.locator('.braking').scrollIntoViewIfNeeded()
+    await expect(page.getByText('Six stops.')).toBeVisible()
+    await expect(page.locator('.braking .stat dt').first()).toContainText('Into Turn 6')
+    await expect(page.locator('.braking .stat').first()).toContainText('316')
+    await expect(page.getByText(/Verstappen's pole lap, 2025, 1:22\.207/)).toBeVisible()
+    await expect(page.locator('.braking .wet')).toHaveCount(0)
+    await expect(page.getByText(/from Turn 6 to Turn 9/)).toBeVisible()
+    expect(await noOverflow(page)).toBe(true)
+    expect(errors).toEqual([])
+  })
+}
+
 for (const [id, name] of [
   ['vegas', 'Las Vegas'],
   ['losail', 'Lusail'],
+  ['yas_marina', 'Yas Marina'],
 ] as const) {
   test(`the ${name} place tags sit inside the band, clear of the replay`, async ({ page, errors }) => {
     await stubPole(page, id)
@@ -188,6 +213,7 @@ test('an unknown track shows the missing section', async ({ page }) => {
 for (const [id, name] of [
   ['vegas', 'Las Vegas'],
   ['losail', 'Lusail'],
+  ['yas_marina', 'Yas Marina'],
 ] as const) {
   test(`every photo on the ${name} page is credited`, async ({ page }) => {
     await loaded(page, `/tracks/${id}`)
