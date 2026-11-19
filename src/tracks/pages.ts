@@ -1,8 +1,7 @@
 import type { ModelledId } from '#/circuits/modelled.ts'
 import { portraitFor } from '#/drivers/portraits.ts'
 import type { Photo } from '#/home/content.ts'
-
-export type Place = { label: string; turn: number; up?: true }
+import type { Place } from '#/weekend/CircuitStage.tsx'
 
 export type Corner = { tag: string; line: string; photo: Photo }
 

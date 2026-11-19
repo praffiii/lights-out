@@ -12,6 +12,7 @@ import { lapProfile } from './lap.ts'
 import { allCircuits } from './registry.ts'
 import { broadcast, isSector, screen } from './shaders.ts'
 import { fitCrop, fitSpin } from './fit.ts'
+import { hideLabels } from './labels.ts'
 
 const LAP_SECONDS = 14
 const TRAIL = 8
@@ -28,7 +29,6 @@ const LOOK = 0.012
 const YAW = 0.55
 const PITCH = 0.62
 const UP = new THREE.Vector3(0, 1, 0)
-const LABEL = /-label/
 
 export const modelUrl = (model: string) => `/circuits/${model}.glb`
 
@@ -49,7 +49,6 @@ export type Replay = {
   trace: RefObject<Float32Array | null>
   turns: RefObject<ReadonlyArray<{ turn: number; u: number }>>
   focus?: RefObject<Focus | null>
-  bare?: boolean
   pit?: { points: ReadonlyArray<readonly [number, number, number]>; trace: RefObject<Float32Array | null> }
 }
 
@@ -61,6 +60,7 @@ type Props = {
   onReady: () => void
   lap?: Lap
   replay?: Replay
+  bare?: boolean
 }
 
 const NO_LAP = () => {}
@@ -94,7 +94,7 @@ const infoFor = (model: string) => {
   return info
 }
 
-function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
+function Scene({ model, layout, fill, pins, onReady, lap, replay, bare }: Props) {
   const restart = lap?.restart ?? 0
   const running = lap?.running
   const tag = lap?.tag
@@ -128,7 +128,7 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
     stale.current = true
   }, [restart])
 
-  const { fills, markers, rest, light, turns } = useMemo(() => {
+  const { fills, markers, marks, rest, light, turns } = useMemo(() => {
     const info = infoFor(model)
     const track = new THREE.Box3()
 
@@ -146,9 +146,12 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
 
     const { fills } = broadcast(gltf.scene, map, Math.max(extent.x, extent.z))
     const markers: THREE.Object3D[] = []
+    const marks: THREE.Object3D[] = []
 
     gltf.scene.traverse((o) => {
       if (o.name.startsWith('turn-')) markers.push(o)
+
+      if (o.name.startsWith('mark-')) marks.push(o)
     })
 
     markers.sort((a, b) => turnOf(a) - turnOf(b))
@@ -193,7 +196,7 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
       info.line,
     ).map((u, i) => ({ turn: markers[i] ? turnOf(markers[i]) : 0, u }))
 
-    return { fills, markers, rest, light: { group, head, trail, geometry }, turns }
+    return { fills, markers, marks, rest, light: { group, head, trail, geometry }, turns }
   }, [gltf, map, model])
 
   useEffect(() => {
@@ -204,21 +207,7 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
     if (replay) replay.turns.current = turns
   }, [replay, turns])
 
-  useEffect(() => {
-    if (!replay?.bare) return
-
-    const hidden: THREE.Object3D[] = []
-
-    gltf.scene.traverse((o) => {
-      if (LABEL.test(o.name) && o.visible) hidden.push(o)
-    })
-
-    for (const o of hidden) o.visible = false
-
-    return () => {
-      for (const o of hidden) o.visible = true
-    }
-  }, [gltf, replay])
+  useEffect(() => (bare ? hideLabels(gltf.scene) : undefined), [gltf, bare])
 
   useEffect(
     () => () => {
@@ -431,6 +420,17 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
 
       if (framed) declutter(shown, phone)
 
+      for (const o of marks) {
+        const pin = pinEls.get(o.name)
+        const at = pin && screen(o, camera, size.width, size.height)
+
+        if (!pin) continue
+
+        pin.style.visibility = at ? '' : 'hidden'
+
+        if (at) pin.style.transform = `translate(${at[0]}px, ${at[1]}px)`
+      }
+
       advance(time * 1000)
 
       if (first) {
@@ -442,7 +442,7 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay }: Props) {
     gsap.ticker.add(tick)
 
     return () => gsap.ticker.remove(tick)
-  }, [fills, markers, rest, light, camera, size, layout, advance, gl, scene, fill, running, pins, tag, lapped, replay])
+  }, [fills, markers, marks, rest, light, camera, size, layout, advance, gl, scene, fill, running, pins, tag, lapped, replay])
 
   return (
     <>

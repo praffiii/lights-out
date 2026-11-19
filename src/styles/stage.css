@@ -30,7 +30,13 @@
 .circuit .turn .place { position: absolute; left: 50%; top: 100%; visibility: visible; translate: -50% 14px; white-space: nowrap; }
 .circuit .turn .place[data-up] { top: auto; bottom: 0; translate: -50% -110px; }
 .circuit .turn .place[data-up]::after { content: ''; position: absolute; left: 50%; top: 100%; width: 1px; height: 110px; background: #f4f3ef; }
-.circuit .turn .place b { display: block; padding: 6px 10px 5px; border-radius: 0; background: #f4f3ef; box-shadow: none; backdrop-filter: none; color: #06080e; font-size: 11px; letter-spacing: 0.08em; }
+.circuit .turn .place b,
+.circuit .mark .place b { display: block; padding: 6px 10px 5px; border-radius: 0; background: #f4f3ef; box-shadow: none; backdrop-filter: none; color: #06080e; font-size: 11px; letter-spacing: 0.08em; }
+.circuit .mark::before { content: ''; position: absolute; translate: -50% -50%; width: 10px; height: 10px; border-radius: 50%; background: #f4f3ef; box-shadow: 0 0 0 2px #06080e; }
+.circuit .mark:has([data-accent])::before { background: var(--purple); }
+.circuit .mark .place { position: absolute; translate: -10px var(--drop, 14px); white-space: nowrap; }
+.circuit .mark .place::before { content: ''; position: absolute; left: 10px; bottom: 100%; width: 1px; height: calc(var(--drop, 14px) - 5px); background: #f4f3ef; }
+.circuit .mark .place[data-accent] b { background: var(--purple); color: #f4f3ef; }
 .circuit .replay { position: absolute; left: var(--m); bottom: 64px; z-index: 3; pointer-events: none; }
 .circuit .replay p { margin: 0; }
 .circuit .replay .who { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; }
@@ -83,7 +89,11 @@
   .circuit .turn::before { height: 10px; }
   .circuit .turn::after { width: 10px; height: 4px; }
   .circuit .turn b { padding: 2px 3px 1px; font-size: 7px; }
-  .circuit .turn .place b { padding: 4px 6px 3px; font-size: 8px; }
+  .circuit .turn .place b,
+  .circuit .mark .place b { padding: 4px 6px 3px; font-size: 8px; }
+  .circuit .mark::before { width: 8px; height: 8px; }
+  .circuit .mark .place { translate: -6px var(--drop, 14px); }
+  .circuit .mark .place::before { left: 6px; height: calc(var(--drop, 14px) - 4px); }
   .circuit .turn .place[data-up] { translate: -50% -64px; }
   .circuit .turn .place[data-up]::after { height: 64px; }
   .circuit .replay { right: var(--m); bottom: 20px; }

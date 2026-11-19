@@ -6,6 +6,7 @@ import { afterAll, afterEach, expect, it, mock, spyOn } from 'bun:test'
 import { Schema } from 'effect'
 
 import { SeasonSnapshotJson } from '../../src/season/snapshot-schema.ts'
+import type { Place } from '../../src/weekend/CircuitStage.tsx'
 import { ShellContext } from '../../src/shell/context.ts'
 import { weekendPage } from '../../src/weekend/page-model.ts'
 
@@ -207,4 +208,44 @@ it('watches nothing when no one asks to hear that the stage is near', () => {
   rerender(<CircuitStage info={vegas} near={false} lap={null} />)
 
   expect(built).toBe(0)
+})
+
+const monza = circuitFor('monza')
+
+if (!monza) throw new Error('Monza is modelled')
+
+const monzaStage = (props: { places?: ReadonlyArray<Place>; bare?: true }) =>
+  render(<CircuitStage info={monza} near={false} lap={null} {...props} />, {
+    wrapper: ({ children }) => <ShellContext.Provider value={shell}>{children}</ShellContext.Provider>,
+  })
+
+it('rides each mark tag on its mark pin, the purple one marked accent', () => {
+  const { container } = monzaStage({
+    places: [
+      { label: 'Pole', mark: 'pole' },
+      { label: 'Grid 19 · his start', mark: 'grid-19', accent: true },
+    ],
+  })
+  const tags = [...container.querySelectorAll('.pins .mark .place')]
+  const at = [...container.querySelectorAll<HTMLElement>('.pins .mark')].map((el) => [el.dataset.pin, Number(el.style.getPropertyValue('--px')), Number(el.style.getPropertyValue('--py'))])
+
+  expect(tags.map((tag) => [tag.closest('[data-pin]')?.getAttribute('data-pin'), tag.textContent, tag.hasAttribute('data-accent')])).toEqual([
+    ['mark-pole', 'Pole', false],
+    ['mark-grid-19', 'Grid 19 · his start', true],
+  ])
+  expect(at.sort()).toEqual((monza.marks ?? []).map((m) => [`mark-${m.name}`, m.x, m.y]).sort())
+  expect(container.querySelectorAll('.pins .turn')).toHaveLength(11)
+})
+
+it('draws no mark that no place names', () => {
+  expect(monzaStage({}).container.querySelectorAll('.pins .mark')).toHaveLength(0)
+})
+
+it('a bare stage shows the poster without sector labels', () => {
+  const bare = monzaStage({ bare: true }).container.querySelector('img.poster')
+
+  expect(bare?.getAttribute('src')).toBe('/circuits/it-1922-bare.webp')
+  expect(bare?.getAttribute('srcset')).toContain('/circuits/it-1922-bare-1440.webp 1440w')
+  cleanup()
+  expect(monzaStage({}).container.querySelector('img.poster')?.getAttribute('src')).toBe('/circuits/it-1922.webp')
 })

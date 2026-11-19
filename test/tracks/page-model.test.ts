@@ -46,7 +46,7 @@ it('anchors every place tag to a turn the circuit has', () => {
   for (const [id, page] of Object.entries(TRACK_PAGES)) {
     const turns = new Set(circuitFor(id)?.pins.map((p) => p.turn))
 
-    for (const place of page?.places ?? []) expect(turns.has(place.turn)).toBe(true)
+    for (const place of page?.places ?? []) expect(place.turn !== undefined && turns.has(place.turn)).toBe(true)
   }
 })
 
