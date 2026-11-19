@@ -72,10 +72,10 @@ export function RunHud({ run, stage, replay, ready }: Props) {
     <div className="run-hud" ref={hud} aria-hidden>
       <div className="car">
         {Array.from({ length: TRAIL }, (_, i) => (
-          <i key={i} className={i === 0 ? 'head' : undefined} style={fade(i)} />
+          <i key={i} className={i === 0 ? 'tip' : undefined} style={fade(i)} />
         ))}
       </div>
-      <span className="mono chip">{chipText(run, still)}</span>
+      <span className="mono chip">{chipText(run, 0)}</span>
     </div>
   )
 }
