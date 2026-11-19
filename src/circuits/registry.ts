@@ -6,6 +6,8 @@ import au1953Line from './lines/au-1953.json'
 import au1953 from './pins/au-1953.json'
 import br1940Line from './lines/br-1940.json'
 import br1940 from './pins/br-1940.json'
+import it1922Line from './lines/it-1922.json'
+import it1922 from './pins/it-1922.json'
 import qa2004Line from './lines/qa-2004.json'
 import qa2004 from './pins/qa-2004.json'
 import us2022Line from './lines/us-2022.json'
@@ -18,6 +20,8 @@ export type LinePoint = { u: number; x: number; y: number; z: number }
 export type Crop = readonly [x0: number, y0: number, x1: number, y1: number]
 
 export type Pin = { turn: number; x: number; y: number }
+
+export type Mark = { name: string; x: number; y: number }
 
 export type TurnLap = { turn: number; u: number }
 
@@ -44,6 +48,7 @@ export type CircuitInfo = {
   line: ReadonlyArray<LinePoint>
   crop: Crop
   cuts: readonly [number, number]
+  marks?: ReadonlyArray<Mark>
 }
 
 type PinsJson = Readonly<Record<string, ReadonlyArray<number> | Readonly<Record<string, number>> | null>>
@@ -59,6 +64,13 @@ const pinsOf = (json: PinsJson): ReadonlyArray<Pin> =>
       return x !== undefined && y !== undefined ? [{ turn, x, y }] : []
     })
     .sort((a, b) => a.turn - b.turn)
+
+const marksOf = (json: PinsJson): ReadonlyArray<Mark> =>
+  Object.entries(json).flatMap(([name, at]) => {
+    const [x, y] = name.startsWith('mark-') && isPoint(at) ? at : []
+
+    return x !== undefined && y !== undefined ? [{ name: name.slice('mark-'.length), x, y }] : []
+  })
 
 const lapsOf = (json: { laps: Record<string, number> }, pins: ReadonlyArray<Pin>): ReadonlyArray<TurnLap> =>
   pins.map(({ turn }) => {
@@ -141,6 +153,17 @@ const CIRCUITS = {
     line: us2022Line,
     crop: cropOf(us2022),
     cuts: [0.309, 0.648],
+  },
+  monza: {
+    ...fromCalendar(CALENDAR.monza),
+    openf1: 'Monza',
+    facts: factsOf(CALENDAR.monza, { distanceKm: '306.720', turns: 11, direction: 'clockwise' }),
+    pins: pinsOf(it1922),
+    laps: lapsOf(it1922, pinsOf(it1922)),
+    line: it1922Line,
+    crop: cropOf(it1922),
+    cuts: [0.3303, 0.6425],
+    marks: marksOf(it1922),
   },
 } satisfies Record<ModelledId, Omit<CircuitInfo, 'id'>>
 

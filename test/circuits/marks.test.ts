@@ -6,10 +6,8 @@ const KB = 1024
 
 const near = (at: ReadonlyArray<number> | undefined, x: number, y: number) => at !== undefined && Math.abs((at[0] ?? 9) - x) < 0.003 && Math.abs((at[1] ?? 9) - y) < 0.003
 
-const marks: Readonly<Record<string, ReadonlyArray<number> | undefined>> = { pole: pins['mark-pole'], 'grid-19': pins['mark-grid-19'] }
-
 it('pins the Monza marks where the 2026 grid stood', () => {
-  expect([near(marks.pole, 0.4231, 0.5719), near(marks['grid-19'], 0.3913, 0.5907)]).toEqual([true, true])
+  expect([near(pins['mark-pole'], 0.4231, 0.5719), near(pins['mark-grid-19'], 0.3913, 0.5907)]).toEqual([true, true])
 })
 
 it('ships the marks as model nodes', async () => {

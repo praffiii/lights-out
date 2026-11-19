@@ -42,6 +42,18 @@ it("stores Miami's 2026 pole lap now Miami is modelled", async () => {
   expect(lap?.time).toBe(87.798)
 })
 
+it("stores Monza's 2026 pole lap now Monza is modelled", async () => {
+  const { kv } = fakeKV()
+
+  await run(kv)
+
+  const lap = await stored(kv, 'monza')
+
+  expect(lap?.sessionKey).toBe(11357)
+  expect(lap?.driver).toBe('Pierre Gasly')
+  expect(lap?.time).toBe(81.786)
+})
+
 it("falls back to last year's pole before this year's qualifying", async () => {
   const { kv } = fakeKV()
 
@@ -125,7 +137,12 @@ it('one circuit failing keeps the others', async () => {
   const outcomes = await run(kv, { location: (key, driver, from, to) => (key === 9854 ? broken : fakeOpenF1Service.location(key, driver, from, to)) })
 
   expect(outcomes.find((o) => o.id === 'vegas')?.outcome).toBe('kept')
-  expect(outcomes.filter((o) => o.outcome === 'written').map((o) => o.id).sort()).toEqual(['albert_park', 'interlagos', 'losail', 'miami', 'yas_marina'])
+  expect(
+    outcomes
+      .filter((o) => o.outcome === 'written')
+      .map((o) => o.id)
+      .sort(),
+  ).toEqual(['albert_park', 'interlagos', 'losail', 'miami', 'monza', 'yas_marina'])
 })
 
 it('stays under 15 KB per circuit', async () => {
@@ -133,6 +150,6 @@ it('stays under 15 KB per circuit', async () => {
 
   await run(kv)
 
-  expect(entries.size).toBe(6)
+  expect(entries.size).toBe(7)
   expect([...entries.values()].every((json) => json.length <= 15_000)).toBe(true)
 })
