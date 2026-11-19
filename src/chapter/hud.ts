@@ -5,7 +5,7 @@ export const place = (el: Element | null | undefined, x: number, y: number) => {
   if (el instanceof HTMLElement || el instanceof SVGElement) el.style.translate = `${x.toFixed(1)}px ${y.toFixed(1)}px`
 }
 
-export function runWhileSeen(el: Element, replay: Replay, draw: () => void) {
+export function runWhileSeen(el: Element, replay: Replay, draw: (time: number, deltaMs: number) => void) {
   let seen = false
   let entered = false
   let ticking = false

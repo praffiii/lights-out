@@ -56,9 +56,10 @@ type Props = {
   pit?: ReadonlyArray<readonly [number, number, number]>
   places?: ReadonlyArray<Place>
   bare?: true
+  controls?: true
 }
 
-export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus, pit, places, bare }: Props) {
+export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus, pit, places, bare, controls }: Props) {
   const box = useRef<HTMLDivElement>(null)
   const pins = useRef<HTMLDivElement>(null)
   const fill = useRef(1)
@@ -188,7 +189,7 @@ export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus,
         </div>
         {hud ? hud({ stage: box, replay, ready }) : lap ? <PoleHud lap={lap} gp={grandPrix(info.gp)} stage={box} pins={pins} replay={replay} onPick={pick} /> : null}
       </div>
-      {hud ? null : (
+      {hud && !controls ? null : (
         <>
           <div className="mono toggles">
             <button type="button" aria-pressed={turns} onClick={() => setTurns((on) => !on)}>

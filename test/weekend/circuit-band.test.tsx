@@ -3,6 +3,7 @@ import { GlobalRegistrator } from '@happy-dom/global-registrator'
 GlobalRegistrator.register()
 
 import { afterAll, afterEach, expect, it, mock, spyOn } from 'bun:test'
+import type { ComponentProps } from 'react'
 import { Schema } from 'effect'
 
 import { SeasonSnapshotJson } from '../../src/season/snapshot-schema.ts'
@@ -20,6 +21,8 @@ const { act, cleanup, fireEvent, render, waitFor } = await import('@testing-libr
 const { CircuitBand } = await import('../../src/weekend/CircuitBand.tsx')
 const { CircuitStage } = await import('../../src/weekend/CircuitStage.tsx')
 const { circuitFor } = await import('../../src/circuits/registry.ts')
+const { RunHud } = await import('../../src/people/RunHud.tsx')
+const { RUN } = await import('../../src/people/run.ts')
 
 const snapshot = Schema.decodeUnknownSync(SeasonSnapshotJson)(await Bun.file('test/fixtures/season-snapshot.json').text())
 
@@ -214,7 +217,7 @@ const monza = circuitFor('monza')
 
 if (!monza) throw new Error('Monza is modelled')
 
-const monzaStage = (props: { places?: ReadonlyArray<Place>; bare?: true }) =>
+const monzaStage = (props: { places?: ReadonlyArray<Place>; bare?: true; controls?: true; near?: boolean; hud?: ComponentProps<typeof CircuitStage>['hud'] }) =>
   render(<CircuitStage info={monza} near={false} lap={null} {...props} />, {
     wrapper: ({ children }) => <ShellContext.Provider value={shell}>{children}</ShellContext.Provider>,
   })
@@ -249,4 +252,31 @@ it('a bare stage shows the poster without sector labels', () => {
   expect(bare?.getAttribute('srcset')).toContain('/circuits/it-1922-bare-1440.webp 1440w')
   cleanup()
   expect(monzaStage({}).container.querySelector('img.poster')?.getAttribute('src')).toBe('/circuits/it-1922.webp')
+})
+
+it('a hud with controls keeps the toggles and the Explore link', () => {
+  const { getByRole, getByText } = monzaStage({ controls: true, hud: () => null })
+
+  expect(getByRole('button', { name: 'Turns' })).toBeTruthy()
+  expect(getByText('Explore the lap in 3D').closest('a')?.getAttribute('href')).toBe('/lap/monza')
+})
+
+it('a hud without controls still drops them, as the Interlagos replay needs', () => {
+  expect(monzaStage({ hud: () => null }).queryByRole('button', { name: 'Turns' })).toBeNull()
+})
+
+it('starts the run at Grid 19 and shows no car until the track is drawn', async () => {
+  nearby()
+
+  const quiet = spyOn(console, 'error').mockImplementation(() => {})
+  const { container } = monzaStage({ near: true, controls: true, hud: (ctx) => <RunHud run={RUN} {...ctx} /> })
+
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 50))
+  })
+
+  expect(container.querySelector('.run-hud .chip')?.textContent).toBe('ANT · P19')
+  expect(container.querySelector('.run-hud')?.hasAttribute('data-on')).toBe(false)
+  expect(container.querySelector('.stage')?.hasAttribute('data-failed')).toBe(true)
+  quiet.mockRestore()
 })

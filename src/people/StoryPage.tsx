@@ -9,6 +9,8 @@ import { CircuitStage } from '#/weekend/CircuitStage.tsx'
 
 import { Career, Hero, Races, Season, usePageMotion } from './DriverPage.tsx'
 import { storyPage } from './page-model.ts'
+import { RUN } from './run.ts'
+import { RunHud } from './RunHud.tsx'
 import { HERO, MILESTONES, MONZA, NEXT_LEGENDS, NUMBERS, RECORD, W17 } from './story.ts'
 
 const RECORD_SECTION = {
@@ -46,7 +48,7 @@ function Monza() {
           ))}
         </dl>
         <div className="circuit">
-          <CircuitStage info={info} near={near} onNear={onNear} lap={null} places={MONZA.tags} bare />
+          <CircuitStage info={info} near={near} onNear={onNear} lap={null} places={MONZA.tags} bare controls hud={(ctx) => <RunHud run={RUN} {...ctx} />} />
         </div>
         <p className="explain">{MONZA.explain}</p>
       </section>

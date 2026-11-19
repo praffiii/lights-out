@@ -57,7 +57,7 @@ export const MONZA = {
   tags: TAGS,
   explain: 'Sectors: the lap in three timed parts. Turns: the eleven numbered turns. He started 19th, about 150 m behind the car on pole.',
   footnote:
-    'Layout: bacinger/f1-circuits (MIT) · elevation: SRTM 30 m (NASA), exaggerated 1.5x · Map © OpenStreetMap contributors (ODbL) · turn numbers: F1 circuit map · sectors and grid: OpenF1, 2026 race',
+    'Layout: bacinger/f1-circuits (MIT) · elevation: SRTM 30 m (NASA), exaggerated 1.5x · Map © OpenStreetMap contributors (ODbL) · turn numbers: F1 circuit map · sectors, grid and his lap 1: OpenF1, 2026 race',
 } as const
 
 export const W17 = {

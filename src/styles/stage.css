@@ -106,3 +106,13 @@
   .circuit .readout [data-speed] { font-size: 16px; }
   .circuit .readout .pedals { width: 56px; }
 }
+
+.circuit .run-hud { position: absolute; inset: 0; z-index: 3; visibility: hidden; pointer-events: none; }
+.circuit .run-hud[data-on] { visibility: visible; }
+.circuit .run-hud .car { visibility: inherit; opacity: 1; }
+.circuit .run-hud .head { background: var(--purple); box-shadow: 0 0 0 2.5px #fff, 0 0 12px 2px rgb(255 255 255 / 0.35), 0 0 30px 8px rgb(164 59 255 / 0.6); }
+.circuit .run-hud .chip { position: absolute; left: 0; top: 0; padding: 6px 10px 5px; background: var(--purple); color: #f4f3ef; font-size: 11px; letter-spacing: 0.08em; white-space: nowrap; }
+
+@media (max-width: 760px) {
+  .circuit .run-hud .chip { padding: 4px 6px 3px; font-size: 8px; }
+}

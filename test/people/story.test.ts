@@ -2,7 +2,7 @@ import { expect, it } from 'bun:test'
 
 import { creditParts } from '../../src/credits/photos.ts'
 import { career, storyPage } from '../../src/people/page-model.ts'
-import { HERO, RECORD, STORY_PHOTOS } from '../../src/people/story.ts'
+import { HERO, MONZA, RECORD, STORY_PHOTOS } from '../../src/people/story.ts'
 import { NOW, snapshot } from './fixture.ts'
 
 const DAY = 86_400_000
@@ -93,4 +93,8 @@ it('is null without people data or without an Antonelli standings row', () => {
 
   expect([people === undefined, storyPage(bare, NOW)]).toEqual([false, null])
   expect(storyPage({ ...snapshot, driverStandings: { ...standings, rows } }, NOW)).toBeNull()
+})
+
+it('credits his lap 1 to OpenF1 in the Monza footnote', () => {
+  expect(MONZA.footnote.endsWith('sectors, grid and his lap 1: OpenF1, 2026 race')).toBe(true)
 })
