@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo, useRef } from 'react'
+import { type RefObject, useEffect, useMemo, useRef } from 'react'
 
 import { Next } from '#/chapter/Next.tsx'
 import { onEnter, roll, sweep, useGSAP } from '#/motion/motion.ts'
@@ -20,10 +20,25 @@ function hero(scope: HTMLElement) {
 function motion(scope: HTMLElement) {
   for (const el of all(scope, 'section:not(.top) h2 .hl, .next h2')) sweep(el)
 
-  for (const el of all(scope, '.stats .num, .career .starts')) roll(el)
+  for (const el of all(scope, '.stats .num, .career .starts, .figures .num')) roll(el)
 }
 
-function Hero({ hero }: { hero: Model['hero'] }) {
+export function usePageMotion(root: RefObject<HTMLDivElement | null>, ready: boolean) {
+  useGSAP(
+    (_, safe) => {
+      const scope = root.current
+
+      if (!scope || !safe) return
+
+      motion(scope)
+
+      return onEnter(safe(() => hero(scope)))
+    },
+    { scope: root, dependencies: [ready] },
+  )
+}
+
+export function Hero({ hero }: { hero: Model['hero'] }) {
   const { photo } = hero
   const [name = '', where = ''] = photo.place.split(' · ')
 
@@ -36,7 +51,7 @@ function Hero({ hero }: { hero: Model['hero'] }) {
         </picture>
       </div>
       <div className="title">
-        <p className="mono muted label">{hero.label}</p>
+        {hero.label ? <p className="mono muted label">{hero.label}</p> : null}
         <h1 id="h1" className="display">
           <span className="hl">{hero.given}</span> <span className="hl">{`${hero.family}.`}</span>
         </h1>
@@ -54,7 +69,7 @@ function Hero({ hero }: { hero: Model['hero'] }) {
   )
 }
 
-function Season({ season }: { season: NonNullable<Model['season']> }) {
+export function Season({ season }: { season: NonNullable<Model['season']> }) {
   return (
     <section className="season-numbers" aria-labelledby="season">
       <div className="head">
@@ -84,7 +99,7 @@ function Season({ season }: { season: NonNullable<Model['season']> }) {
   )
 }
 
-function Career({ career }: { career: NonNullable<Model['career']> }) {
+export function Career({ career }: { career: NonNullable<Model['career']> }) {
   return (
     <section className="career" aria-labelledby="career">
       <p className="mono muted label">{career.label}</p>
@@ -112,7 +127,7 @@ function Career({ career }: { career: NonNullable<Model['career']> }) {
   )
 }
 
-function Races({ races }: { races: NonNullable<Model['races']> }) {
+export function Races({ races }: { races: NonNullable<Model['races']> }) {
   const { theme } = useTheme()
 
   return (
@@ -184,18 +199,7 @@ function Driver({ driverId }: { driverId: string }) {
     waitFor(client.fetchQuery(seasonQueryOptions))
   }, [client])
 
-  useGSAP(
-    (_, safe) => {
-      const scope = root.current
-
-      if (!scope || !safe) return
-
-      motion(scope)
-
-      return onEnter(safe(() => hero(scope)))
-    },
-    { scope: root, dependencies: [page !== null] },
-  )
+  usePageMotion(root, page !== null)
 
   if (!data?.people) return <p className="people-empty">The season data is on its way. Try again in a minute.</p>
 

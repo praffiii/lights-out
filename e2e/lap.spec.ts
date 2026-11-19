@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test'
 
 import { expect, LOADER_MS, test } from './fixtures.ts'
 
-const IDS = { interlagos: 'Interlagos', vegas: 'Las Vegas', losail: 'Lusail', yas_marina: 'Yas Marina', albert_park: 'Albert Park', miami: 'Miami' } as const
+const IDS = { interlagos: 'Interlagos', vegas: 'Las Vegas', losail: 'Lusail', yas_marina: 'Yas Marina', albert_park: 'Albert Park', miami: 'Miami', monza: 'Monza' } as const
 
 const lifted = (page: Page) => expect(page.locator('.loader')).toHaveCount(0, { timeout: LOADER_MS })
 

@@ -1,6 +1,7 @@
 import { expect, it } from 'bun:test'
 
 import { COUNTS, creditParts, CREDITS } from '../../src/credits/photos.ts'
+import { STORY_PHOTOS } from '../../src/people/story.ts'
 import { NEXT_PEOPLE } from '../../src/tracks/pages.ts'
 
 it('reads the photographer and licence out of every credit line on the site', () => {
@@ -39,4 +40,8 @@ it('credits the photo the Next band on The tracks shows', () => {
   const row = CREDITS.find((c) => c.source === NEXT_PEOPLE.photo.source)
 
   expect(row?.usedOn.split(', ')).toContain('The tracks')
+})
+
+it('credits the three photos of the Antonelli story on The people', () => {
+  for (const photo of STORY_PHOTOS) expect(CREDITS.find((c) => c.src === photo.src)?.usedOn.split(', ')).toContain('The people')
 })

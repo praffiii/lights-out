@@ -10,6 +10,7 @@ type Input = {
   location: ReadonlyArray<LocationSample>
   line: ReadonlyArray<LinePoint>
   cuts: readonly [number, number]
+  standing?: true
 }
 
 type Point = { x: number; y: number }
@@ -145,7 +146,7 @@ const at = (ts: ReadonlyArray<number>, vs: ReadonlyArray<number>, t: number) => 
   return t1 === t0 ? v0 : v0 + ((v1 - v0) * (t - t0)) / (t1 - t0)
 }
 
-export const alignLap = ({ start, time, splits, car, location, line, cuts }: Input): { rows: PoleRow[]; miss: number } | null => {
+export const alignLap = ({ start, time, splits, car, location, line, cuts, standing }: Input): { rows: PoleRow[]; miss: number } | null => {
   if (car.length < MIN_SAMPLES || location.length < MIN_SAMPLES) return null
 
   const located = location.map((s) => ({ t: (Date.parse(s.date) - start) / 1000, x: s.x, y: s.y }))
@@ -172,7 +173,7 @@ export const alignLap = ({ start, time, splits, car, location, line, cuts }: Inp
   const u0 = at(ts, lifted, 0)
   const into = (cut: number) => cut + Math.ceil(u0 - cut)
   const times = [0, splits[0], splits[1], time]
-  const targets = [u0, into(cuts[0]), into(cuts[1]), u0 + 1]
+  const targets = [u0, into(cuts[0]), into(cuts[1]), standing ? Math.floor(u0) + 1 : u0 + 1]
   const anchors = times.map((t) => at(ts, lifted, t))
   const miss = Math.max(Math.abs((anchors[1] ?? 0) - (targets[1] ?? 0)), Math.abs((anchors[2] ?? 0) - (targets[2] ?? 0)))
 

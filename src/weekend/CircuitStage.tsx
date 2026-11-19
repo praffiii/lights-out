@@ -41,6 +41,8 @@ export function useNearLap(id: string) {
   return { near, onNear, lap }
 }
 
+export type Place = { label: string; up?: true; accent?: true } & ({ turn: number; mark?: undefined } | { mark: string; turn?: undefined })
+
 type Hud = (ctx: { stage: RefObject<HTMLDivElement | null>; replay: Replay; ready: boolean }) => ReactNode
 
 type Props = {
@@ -52,14 +54,16 @@ type Props = {
   turns?: ReadonlyArray<{ turn: number; name?: string }>
   focus?: RefObject<Focus | null>
   pit?: ReadonlyArray<readonly [number, number, number]>
-  places?: ReadonlyArray<{ label: string; turn: number; up?: true }>
+  places?: ReadonlyArray<Place>
+  bare?: true
+  controls?: true
 }
 
-export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus, pit, places }: Props) {
+export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus, pit, places, bare, controls }: Props) {
   const box = useRef<HTMLDivElement>(null)
   const pins = useRef<HTMLDivElement>(null)
   const fill = useRef(1)
-  const replay = useRef<Replay>({ running: { current: false }, trace: { current: null }, turns: { current: [] }, focus, bare: hud !== undefined, pit: pit ? { points: pit, trace: { current: null } } : undefined }).current
+  const replay = useRef<Replay>({ running: { current: false }, trace: { current: null }, turns: { current: [] }, focus, pit: pit ? { points: pit, trace: { current: null } } : undefined }).current
   const [ready, setReady] = useState(false)
   const [failed, setFailed] = useState(false)
   const [turns, setTurns] = useState(true)
@@ -69,7 +73,7 @@ export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus,
   const [ratio, setRatio] = useState<number | null>(null)
   const fit = fitSpin(info.crop, ratio ?? (phone ? TALL : WIDE))
   const vars: Vars = { '--w': fit.w, '--h': fit.h, '--x': fit.x, '--y': fit.y }
-  const poster = `/circuits/${info.model}`
+  const poster = `/circuits/${info.model}${bare ? '-bare' : ''}`
 
   useEffect(() => {
     const el = box.current
@@ -140,7 +144,7 @@ export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus,
           <div className="gl">
             <CircuitGuard onError={() => setFailed(true)}>
               <Suspense fallback={null}>
-                <Circuit model={info.model} layout="spin" fill={fill} pins={pins} replay={lap || hud ? replay : undefined} onReady={() => setReady(true)} />
+                <Circuit model={info.model} layout="spin" fill={fill} pins={pins} replay={lap || hud ? replay : undefined} bare={bare === true || hud !== undefined} onReady={() => setReady(true)} />
               </Suspense>
             </CircuitGuard>
           </div>
@@ -168,10 +172,24 @@ export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus,
               </span>
             )
           })}
+          {info.marks?.map((mark) => {
+            const named = places?.filter((p) => p.mark === mark.name) ?? []
+            const place: Vars = { '--px': mark.x, '--py': mark.y }
+
+            return named.length > 0 ? (
+              <span key={mark.name} className="mark" data-pin={`mark-${mark.name}`} style={place}>
+                {named.map((p) => (
+                  <span key={p.label} className="place" data-accent={p.accent ? '' : undefined}>
+                    <b className="mono">{p.label}</b>
+                  </span>
+                ))}
+              </span>
+            ) : null
+          })}
         </div>
         {hud ? hud({ stage: box, replay, ready }) : lap ? <PoleHud lap={lap} gp={grandPrix(info.gp)} stage={box} pins={pins} replay={replay} onPick={pick} /> : null}
       </div>
-      {hud ? null : (
+      {hud && !controls ? null : (
         <>
           <div className="mono toggles">
             <button type="button" aria-pressed={turns} onClick={() => setTurns((on) => !on)}>

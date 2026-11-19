@@ -1,8 +1,9 @@
 import { expect, it } from 'bun:test'
+import { Schema } from 'effect'
 
 import { circuitFor } from '../../src/circuits/registry.ts'
 import { alignLap } from '../../src/pole/align.ts'
-import type { PoleRow } from '../../src/pole/schema.ts'
+import { CarResponse, LocationResponse, OpenF1Lap, type PoleRow } from '../../src/pole/schema.ts'
 import { poleOf } from '../season/fake-openf1.ts'
 
 const FIVE = [
@@ -81,4 +82,26 @@ it('aligns a lap whose first location sample is 0.4 s after the lap start', () =
 
 it('rejects a lap whose positions belong to another circuit', () => {
   expect(alignLap(inputFor('vegas', 9854, 'interlagos'))).toBeNull()
+})
+
+const MONZA = Schema.decodeUnknownSync(Schema.Struct({ lap: OpenF1Lap, car: CarResponse, location: LocationResponse }))(await Bun.file('test/fixtures/openf1/monza-lap1-11361.json').json())
+
+const GRID_19 = 125.4 / 5793
+
+it('lines up a standing start from the grid slot to the line', () => {
+  const info = circuitFor('monza')
+  const { lap, car, location } = MONZA
+  const time = lap.lap_duration
+  const s1 = lap.duration_sector_1
+  const s2 = lap.duration_sector_2
+
+  if (!info || !lap.date_start || time === null || s1 === null || s2 === null) throw new Error('Monza lap 1 is recorded')
+
+  const rows = alignLap({ start: Date.parse(lap.date_start), time, splits: [s1, s1 + s2], car, location, line: info.line, cuts: info.cuts, standing: true })?.rows ?? []
+
+  expect(rows[0]?.[0]).toBe(0)
+  expect(Math.abs((rows[0]?.[1] ?? 0) - GRID_19)).toBeLessThan(0.004)
+  expect(rows.at(-1)?.[0]).toBe(time)
+  expect(rows.at(-1)?.[1]).toBe(1)
+  expect(rows.every((row, i) => i === 0 || row[1] >= (rows[i - 1]?.[1] ?? 0))).toBe(true)
 })

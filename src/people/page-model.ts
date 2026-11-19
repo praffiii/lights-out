@@ -6,6 +6,7 @@ import { capital, ordinal, ordinalWord, words } from '#/season/words.ts'
 
 import { BAND } from './legends.ts'
 import { personFor } from './people.ts'
+import { NUMBERS } from './story.ts'
 import type { Past, People, PersonRow, Round, Team } from './schema.ts'
 
 export type Career = {
@@ -272,6 +273,39 @@ export function driverPage(snapshot: SeasonSnapshot, driverId: string, now: Date
       to: `/people/${next?.driver.driverId ?? ''}`,
       photo: portrait && nextPerson ? { ...portrait, place: `${nextPerson.name} · ${portrait.place}` } : next && personFor(next.driver.driverId)?.hero,
     },
+  }
+}
+
+export type StoryPage = {
+  label: string
+  numbers: { label: string; body: string; stats: ReadonlyArray<Line & { note: string }>; credit: string }
+  races: NonNullable<DriverPage['races']>
+}
+
+export function storyPage(snapshot: SeasonSnapshot, now: Date): StoryPage | null {
+  const page = driverPage(snapshot, 'antonelli', now)
+  const people = snapshot.people
+  const c = people && career(people, 'antonelli')
+
+  if (!page?.season || !page.races || !c) return null
+
+  const wins = (people.results.antonelli ?? []).filter((row) => classified(row) && row.position === 1).length
+  const in2026 = snapshot.driverStandings?.season === 2026
+
+  return {
+    label: page.hero.label,
+    numbers: {
+      label: `${NUMBERS.label} · ${c.starts} starts`,
+      body: in2026 ? `${NUMBERS.body} A year later he won ${words(wins)} Grands Prix.` : NUMBERS.body,
+      stats: [
+        { label: 'Wins', value: String(c.wins), note: in2026 ? `${capital(words(wins))} of them in 2026` : '' },
+        { label: 'Pole positions', value: String(c.poles), note: NUMBERS.poles },
+        { label: 'Podiums', value: String(c.podiums), note: `From ${c.starts} starts` },
+        { label: 'Car number', ...NUMBERS.number },
+      ],
+      credit: page.season.credit,
+    },
+    races: page.races,
   }
 }
 

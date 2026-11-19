@@ -1006,3 +1006,41 @@
     width: auto;
   }
 }
+
+.story-page .monza-band .body {
+  max-width: 296px;
+  margin-top: 32px;
+  font-size: 16px;
+  color: var(--muted);
+}
+.story-page .monza-band .figures > div:last-child dd {
+  color: var(--purple);
+}
+.story-page .mark[data-pin='mark-pole'] {
+  --drop: 143px;
+}
+.story-page .mark[data-pin='mark-grid-19'] {
+  --drop: 186px;
+}
+.story-page .w17 {
+  margin-top: 76px;
+}
+.story-page .milestones .years li:last-child .year {
+  color: var(--purple);
+}
+
+@media (max-width: 760px) {
+  .story-page .monza-band .body {
+    max-width: none;
+    margin-top: 20px;
+  }
+  .story-page .mark[data-pin='mark-pole'] {
+    --drop: 56px;
+  }
+  .story-page .mark[data-pin='mark-grid-19'] {
+    --drop: 82px;
+  }
+  .story-page .w17 {
+    margin-top: 56px;
+  }
+}

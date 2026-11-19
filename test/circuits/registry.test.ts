@@ -30,7 +30,7 @@ it('gives every circuit a phone crop inside the poster', () => {
 })
 
 it('names every circuit by its registry id', () => {
-  for (const id of ['interlagos', 'vegas', 'losail', 'yas_marina', 'albert_park', 'miami']) expect(circuitFor(id)?.id).toBe(id)
+  for (const id of ['interlagos', 'vegas', 'losail', 'yas_marina', 'albert_park', 'miami', 'monza']) expect(circuitFor(id)?.id).toBe(id)
 })
 
 it('models Miami from the us-2022 build', () => {
@@ -56,4 +56,20 @@ it('runs the turns in lap order from the start line, wrapping at most once', () 
 
     expect(drops).toBeLessThanOrEqual(1)
   }
+})
+
+it('models Monza from the it-1922 build, with its two grid marks', () => {
+  const monza = circuitFor('monza')
+
+  expect(monza?.model).toBe('it-1922')
+  expect(monza?.openf1).toBe('Monza')
+  expect(monza?.cuts).toEqual([0.3303, 0.6425])
+  expect(monza?.facts).toEqual({ turns: 11, direction: 'clockwise', distanceKm: '306.720', lengthKm: '5.793', laps: 53, firstGp: 1950 })
+  expect(monza?.pins).toHaveLength(11)
+  expect(monza?.marks?.map((m) => m.name).sort()).toEqual(['grid-19', 'pole'])
+  expect(monza?.marks?.every((m) => m.x > 0 && m.x < 1 && m.y > 0 && m.y < 1)).toBe(true)
+})
+
+it('gives marks only to the circuits that have them', () => {
+  expect(allCircuits().flatMap((info) => (info.marks ? [info.id] : []))).toEqual(['monza'])
 })
