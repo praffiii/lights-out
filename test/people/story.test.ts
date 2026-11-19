@@ -1,7 +1,9 @@
 import { expect, it } from 'bun:test'
 
 import { creditParts } from '../../src/credits/photos.ts'
+import { career, storyPage } from '../../src/people/page-model.ts'
 import { HERO, RECORD, STORY_PHOTOS } from '../../src/people/story.ts'
+import { NOW, snapshot } from './fixture.ts'
 
 const DAY = 86_400_000
 
@@ -39,4 +41,56 @@ it('the record copy agrees with itself', () => {
   ])
   expect<string>(RECORD.payoff).toBe(`${vettel.years - antonelli.years} years and ${vettel.days - antonelli.days} days younger.`)
   expect(RECORD.ages.map((a) => a.years * 366 + a.days)).toEqual(RECORD.ages.map((a) => a.years * 366 + a.days).sort((a, b) => a - b))
+})
+
+it('reads the story numbers from the snapshot', () => {
+  const page = storyPage(snapshot, NOW)
+
+  expect(page?.label).toBe('The people · Mercedes · No. 12')
+  expect(page?.numbers.label).toBe('In Formula 1 · 44 starts')
+  expect(page?.numbers.body).toBe('He arrived in 2025 at 18, the third-youngest driver in F1 history. A year later he won nine Grands Prix.')
+  expect(page?.numbers.stats.map(({ label, value, note }) => [label, value, note])).toEqual([
+    ['Wins', '9', 'Nine of them in 2026'],
+    ['Pole positions', '7', 'The first at 19, the youngest ever'],
+    ['Podiums', '19', 'From 44 starts'],
+    ['Car number', '12', 'Kept for his title defence'],
+  ])
+  expect(page?.numbers.credit).toBe('Figures: Jolpica F1 API, after round 20, São Paulo')
+  expect(page?.races.rows).toHaveLength(20)
+  expect(page?.races.rows.filter((row) => row.best).map((row) => row.grandPrix)).toEqual(['Chinese'])
+})
+
+it('agrees with the career on the template', () => {
+  const totals = snapshot.people && career(snapshot.people, 'antonelli')
+
+  expect(
+    storyPage(snapshot, NOW)
+      ?.numbers.stats.slice(0, 3)
+      .map((stat) => stat.value),
+  ).toEqual([String(totals?.wins), String(totals?.poles), String(totals?.podiums)])
+  expect(storyPage(snapshot, NOW)?.numbers.label).toBe(`In Formula 1 · ${totals?.starts} starts`)
+})
+
+it('drops the 2026 win count once the standings move to 2027', () => {
+  const standings = snapshot.driverStandings
+
+  if (!standings) throw new Error('the fixture has no standings')
+
+  const page = storyPage({ ...snapshot, driverStandings: { ...standings, season: 2027 } }, NOW)
+
+  expect(page?.numbers.body).toBe('He arrived in 2025 at 18, the third-youngest driver in F1 history.')
+  expect(page?.numbers.stats[0]?.note).toBe('')
+  expect(page?.numbers.stats.map((stat) => stat.value)).toEqual(['9', '7', '19', '12'])
+})
+
+it('is null without people data or without an Antonelli standings row', () => {
+  const standings = snapshot.driverStandings
+
+  if (!standings) throw new Error('the fixture has no standings')
+
+  const rows = standings.rows.filter((row) => row.driver.driverId !== 'antonelli')
+  const { people, ...bare } = snapshot
+
+  expect([people === undefined, storyPage(bare, NOW)]).toEqual([false, null])
+  expect(storyPage({ ...snapshot, driverStandings: { ...standings, rows } }, NOW)).toBeNull()
 })
