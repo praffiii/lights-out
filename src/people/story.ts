@@ -16,7 +16,7 @@ export const HERO = {
 
 export const NUMBERS = {
   label: 'In Formula 1',
-  title: ['Second', 'season,', 'first title.'],
+  title: 'Second season, first title.',
   body: 'He arrived in 2025 at 18, the third-youngest driver in F1 history.',
   poles: 'The first at 19, the youngest ever',
   number: { value: '12', note: 'Kept for his title defence' },
@@ -27,7 +27,7 @@ export const RECORD = {
   label: 'The record',
   number: '20',
   unit: 'years and 68 days old',
-  headline: ['Youngest', 'champion', 'ever.'],
+  headline: 'Youngest champion ever.',
   body: "He clinched the title in Mexico City on 1 November 2026. The record he broke was Sebastian Vettel's, from 2010.",
   payoff: '3 years and 66 days younger.',
   ages: [

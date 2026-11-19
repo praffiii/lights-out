@@ -30,6 +30,7 @@ for (const colorScheme of ['light', 'dark'] as const) {
     await expect(page.locator('.races tr.is-best')).toContainText('Azerbaijan')
     await expect(page.locator('.races tr.is-dnr')).toHaveCount(2)
     await expect(page.locator('.next a')).toHaveAttribute('href', '/people/alonso')
+    await expect(page.locator('.story-page')).toHaveCount(0)
     expect(await noOverflow(page)).toBe(true)
     expect(errors).toEqual([])
   })
@@ -87,14 +88,14 @@ test('a snapshot from before the people data shows the waiting line', async ({ p
   expect(errors).toEqual([])
 })
 
-for (const path of ['/people/ocon', '/people']) {
+for (const path of ['/people/ocon', '/people', '/people/antonelli']) {
   test(`every photo on ${path} is credited`, async ({ page, errors }) => {
     await loaded(page, path)
     await expect(page.locator('.next img')).toHaveCount(1)
 
     const missing = await page.evaluate(() =>
       [...document.querySelectorAll('main img')].flatMap((img) =>
-        /Public domain|CC/.test(img.closest('figure, section')?.querySelector('.credit')?.textContent ?? '') ? [] : [img.getAttribute('src')],
+        img.closest('.stage') || /Public domain|CC/.test(img.closest('figure, section')?.querySelector('.credit')?.textContent ?? '') ? [] : [img.getAttribute('src')],
       ),
     )
 
@@ -163,5 +164,95 @@ test('the index shows the waiting line on a 503', async ({ page, errors }) => {
   await loaded(page, '/people')
 
   await expect(page.getByText('The season data is on its way. Try again in a minute.')).toBeVisible()
+  expect(errors.filter((e) => !e.includes('503'))).toEqual([])
+})
+
+const monza = (page: Page) => page.locator('.monza-band .stage')
+
+for (const colorScheme of ['light', 'dark'] as const) {
+  test(`the Antonelli story tells the title, the record and Monza, ${colorScheme}`, async ({ page, errors }) => {
+    await page.emulateMedia({ colorScheme })
+    await stubSeason(page)
+    await loaded(page, '/people/antonelli')
+
+    await expect(page).toHaveTitle('Kimi Antonelli · The people · Lights Out')
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Kimi Antonelli.')
+    await expect(page.locator('main').getByRole('heading', { level: 2 })).toHaveText([
+      'Second season, first title.',
+      'Youngest champion ever.',
+      'Nineteenth to first.',
+      'From Bologna to Mexico City.',
+      'Race by race.',
+      'Where the 12 came from.',
+    ])
+    await expect(page.locator('.season-numbers')).toContainText('44 starts')
+    await expect(page.locator('.season-numbers')).toContainText('nine Grands Prix')
+    await expect(races(page)).toHaveCount(20)
+    await expect(page.locator('.races tr.is-best')).toHaveCount(1)
+    await expect(page.locator('.races tr.is-best')).toContainText('Chinese')
+    await expect(page.locator('.monza-band img.poster')).toHaveAttribute('src', /\/circuits\/it-1922-bare\.webp$/)
+    expect(await noOverflow(page)).toBe(true)
+    expect(errors).toEqual([])
+  })
+}
+
+for (const width of [1200, 1440, 0]) {
+  test(`the Monza tags sit inside the stage and clear of the chips and the headline${width ? ` at ${width} px` : ''}`, async ({ page, errors, isMobile }) => {
+    test.skip(isMobile !== (width === 0))
+
+    if (width) await page.setViewportSize({ width, height: 830 })
+
+    await stubSeason(page)
+    await loaded(page, '/people/antonelli')
+    await monza(page).scrollIntoViewIfNeeded()
+    await expect(monza(page)).toHaveAttribute('data-gl', '', { timeout: 20_000 })
+    await expect(page.locator('.monza-band .mark .place b')).toHaveCount(2)
+
+    const misplaced = await page.evaluate((desktop) => {
+      document.querySelector('main')?.style.setProperty('--wdth', '112')
+      const stage = document.querySelector('.monza-band .stage')?.getBoundingClientRect()
+      const shown = (el: Element) => getComputedStyle(el).visibility === 'visible' && el.getBoundingClientRect().width > 0
+      const chips = [...document.querySelectorAll('.monza-band .turn:not([data-crowd]) > b')].flatMap((el) => (shown(el) ? [el.getBoundingClientRect()] : []))
+      const range = document.createRange()
+      const headline = document.querySelector('#monza')
+
+      if (headline) range.selectNodeContents(headline)
+
+      const words = desktop ? [...range.getClientRects()] : []
+      const clear = (box: DOMRect, r: DOMRect) => box.right + 12 <= r.left || box.left - 12 >= r.right || box.bottom + 12 <= r.top || box.top - 12 >= r.bottom
+
+      return [...document.querySelectorAll('.monza-band .mark .place b')].filter(shown).flatMap((tag) => {
+        const box = tag.getBoundingClientRect()
+        const inside = stage && box.left >= stage.left && box.right <= stage.right && box.top >= stage.top && box.bottom <= stage.bottom
+
+        return inside && chips.every((r) => clear(box, r)) && words.every((r) => clear(box, r)) ? [] : [tag.textContent]
+      })
+    }, width > 0)
+
+    expect(misplaced).toEqual([])
+    expect(errors).toEqual([])
+  })
+}
+
+test('Read takes the story to the legends', async ({ page, errors }) => {
+  await stubSeason(page)
+  await loaded(page, '/people/antonelli')
+  await expect(page.locator('.season-numbers')).toBeVisible()
+  await page.locator('.next .read').click()
+
+  await expect(page).toHaveURL(/\/people#legends$/)
+  await expect(page.locator('#legends')).toBeInViewport()
+  expect(errors).toEqual([])
+})
+
+test('a 503 keeps the story and hides only the live numbers', async ({ page, errors }) => {
+  await stubSeason(page, { status: 503, body: JSON.stringify({ status: 'warming' }) })
+  await loaded(page, '/people/antonelli')
+
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Kimi Antonelli.')
+  await expect(page.getByText('Youngest champion ever.')).toBeVisible()
+  await expect(page.locator('.season-numbers')).toHaveCount(0)
+  await expect(page.locator('.races')).toHaveCount(0)
+  await expect(page.locator('.people-empty')).toHaveCount(0)
   expect(errors.filter((e) => !e.includes('503'))).toEqual([])
 })

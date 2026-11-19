@@ -18,6 +18,17 @@ function scrollTop(lenis: Lenis | undefined, immediate: boolean) {
   else window.scrollTo({ top: 0, behavior: immediate || REDUCED ? 'instant' : 'smooth' })
 }
 
+function land(lenis: Lenis | undefined, to: To) {
+  const id = to.split('#')[1]
+  const target = id ? document.getElementById(id) : null
+  const section = target?.closest('section') ?? target
+
+  if (!section) return
+
+  if (lenis) lenis.scrollTo(section, { immediate: true, force: true })
+  else section.scrollIntoView({ behavior: 'instant' })
+}
+
 const FULL = 'inset(0px 0px 0px 0px)'
 
 const inset = ({ top, right, bottom, left }: Dive['rect']) => `inset(${top}px ${innerWidth - right}px ${innerHeight - bottom}px ${left}px)`
@@ -132,6 +143,7 @@ export function Shell() {
       await router.navigate({ href: to })
       scrollTop(lenis, true)
       ScrollTrigger.refresh()
+      land(lenis, to)
       gsap.set(page, { autoAlpha: 1 })
       enter()
 
