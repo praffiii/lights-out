@@ -196,7 +196,7 @@ for (const colorScheme of ['light', 'dark'] as const) {
   })
 }
 
-for (const width of [1200, 1440, 0]) {
+for (const width of [768, 1024, 1200, 1440, 0]) {
   test(`the Monza tags sit inside the stage and clear of the chips and the headline${width ? ` at ${width} px` : ''}`, async ({ page, errors, isMobile }) => {
     test.skip(isMobile !== (width === 0))
 
