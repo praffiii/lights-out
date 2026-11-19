@@ -226,7 +226,8 @@ it('rides each mark tag on its mark pin, the purple one marked accent', () => {
       { label: 'Grid 19 · his start', mark: 'grid-19', accent: true },
     ],
   })
-  const tags = [...container.querySelectorAll('.pins .mark .place')]
+
+  const tags =[...container.querySelectorAll('.pins .mark .place')]
   const at = [...container.querySelectorAll<HTMLElement>('.pins .mark')].map((el) => [el.dataset.pin, Number(el.style.getPropertyValue('--px')), Number(el.style.getPropertyValue('--py'))])
 
   expect(tags.map((tag) => [tag.closest('[data-pin]')?.getAttribute('data-pin'), tag.textContent, tag.hasAttribute('data-accent')])).toEqual([
