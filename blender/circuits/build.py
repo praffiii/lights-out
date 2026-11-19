@@ -8,7 +8,7 @@ import bpy
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import broadcast as b
 import circuit
-from circuit import CID, HEIGHT, HERE, PINS, PUBLIC, SECTORS, SECTOR_CUTS, TURNS, WIDTH, Track, camera, empty, export, project, setup_render
+from circuit import CFG, CID, HEIGHT, HERE, PINS, PUBLIC, SECTORS, SECTOR_CUTS, TURNS, WIDTH, Track, camera, empty, export, project, setup_render
 from mathutils import Vector
 from bpy_extras.object_utils import world_to_camera_view
 
@@ -149,6 +149,7 @@ def main():
     hues = dict(SECTORS)
     circuit.bar(track, 0.0, "start", b.flat_emit("start", b.PAL["start"]), length=WIDTH + 3, depth=7, rise=0.5)
     turns = [empty(f"turn-{n}", b.on_ground(tree, b.outward(track, track.starts[i], b.TURN_OUT))) for n, i in enumerate(TURNS, start=1)]
+    marks = [empty(f"mark-{name}", track.at(s) + Vector((0, 0, HEIGHT))) for name, s in CFG.get("marks", {}).items()]
     anchors = [b.on_ground(tree, b.outward(track, k, b.SECTOR_OUT)) for k in mids]
 
     bg = setup_render(scene)
@@ -171,9 +172,18 @@ def main():
         scene.render.resolution_percentage = percent
         scene.render.filepath = os.path.join(PUBLIC, f"{CID}{suffix}.webp")
         bpy.ops.render.render(write_still=True)
+    labels = [o for o in bpy.data.objects if "-label" in o.name] if marks else []
+    for o in labels:
+        o.hide_render = True
+    for percent, suffix in ((100, "-bare"), (50, "-bare-1440")) if marks else ():
+        scene.render.resolution_percentage = percent
+        scene.render.filepath = os.path.join(PUBLIC, f"{CID}{suffix}.webp")
+        bpy.ops.render.render(write_still=True)
+    for o in labels:
+        o.hide_render = False
     scene.render.resolution_percentage = 100
 
-    pins = project(scene, cam, turns)
+    pins = project(scene, cam, turns + marks)
     pins["crop"] = crop(scene, cam, pts)
     pins["laps"] = track.laps()
     os.makedirs(PINS, exist_ok=True)
