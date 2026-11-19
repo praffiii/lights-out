@@ -256,3 +256,50 @@ test('a 503 keeps the story and hides only the live numbers', async ({ page, err
   await expect(page.locator('.people-empty')).toHaveCount(0)
   expect(errors.filter((e) => !e.includes('503'))).toEqual([])
 })
+
+const runReady = async (page: Page) => {
+  await stubSeason(page)
+  await loaded(page, '/people/antonelli')
+  await monza(page).scrollIntoViewIfNeeded()
+  await expect(monza(page)).toHaveAttribute('data-gl', '', { timeout: 20_000 })
+  await expect(page.locator('.monza-band .run-hud')).toHaveAttribute('data-on', '')
+}
+
+const headAt = (page: Page) => page.locator('.monza-band .run-hud .tip').evaluate((el) => (el instanceof HTMLElement ? el.style.translate : ''))
+
+test('the Monza band drives his lap 1 from Grid 19', async ({ page, errors }) => {
+  await runReady(page)
+
+  const chip = page.locator('.monza-band .run-hud .chip')
+  const before = await headAt(page)
+
+  await page.waitForTimeout(1000)
+
+  await expect(chip).toHaveText(/^ANT · P\d+$/)
+  await expect(page.locator('.monza-band .run-hud .tip')).toBeVisible()
+  expect(await headAt(page)).not.toBe(before)
+
+  const inside = await page.evaluate(() => {
+    const stage = document.querySelector('.monza-band .stage')?.getBoundingClientRect()
+    const box = document.querySelector('.monza-band .run-hud .chip')?.getBoundingClientRect()
+
+    return stage && box ? box.left >= stage.left && box.right <= stage.right && box.top >= stage.top && box.bottom <= stage.bottom : false
+  })
+
+  expect(inside).toBe(true)
+  await expect(page.locator('.monza-band .mark .place b')).toHaveText(['Pole', 'Grid 19 · his start'])
+  expect(errors).toEqual([])
+})
+
+test('with reduced motion the run rests on the line at P14', async ({ page, errors }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await runReady(page)
+
+  const before = await headAt(page)
+
+  await page.waitForTimeout(1000)
+
+  await expect(page.locator('.monza-band .run-hud .chip')).toHaveText('ANT · P14 · after lap 1')
+  expect(await headAt(page)).toBe(before)
+  expect(errors).toEqual([])
+})
