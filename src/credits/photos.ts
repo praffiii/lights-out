@@ -4,6 +4,7 @@ import { CARS } from '#/home/cars.ts'
 import { PHOTOS } from '#/home/content.ts'
 import { LEGENDS } from '#/people/legends.ts'
 import { PEOPLE } from '#/people/people.ts'
+import { STORY_PHOTOS } from '#/people/story.ts'
 import { NEXT_PEOPLE, TRACK_PAGES } from '#/tracks/pages.ts'
 
 export type Credit = { src: string; place: string; by: string; licence: string; source: string | null; usedOn: string }
@@ -68,6 +69,7 @@ const every: ReadonlyArray<Credit> = [
   ...CARS.map((car) => entry({ src: car.src, place: `${car.team} ${car.car} · Shanghai, 2026`, credit: car.credit, source: car.commons }, ['Home', 'This season', ...(UNDERCUT.has(car.code) ? ['Chapter 03'] : []), ...(PORTRAITS[car.code] ? [] : ['Race weekend'])].join(', '))),
   ...PEOPLE.map(({ hero }) => entry(hero, 'The people')),
   entry(LEGENDS.photo, 'The people'),
+  ...STORY_PHOTOS.map((photo) => entry(photo, 'The people')),
 ]
 
 const merged = new Map<string, Credit>()
