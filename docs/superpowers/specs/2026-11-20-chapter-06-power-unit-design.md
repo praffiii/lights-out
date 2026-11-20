@@ -24,9 +24,9 @@ Which lap the band rides:
 2. **The latest pole, wet or dry.** Rejected for that reason.
 3. **One fixed lap baked into the repo.** It freezes, which breaks "data updates itself" (Praffi, 2026-11-10).
 
-How the engine in the band is drawn. **This is my call, and the one I want Praffi to confirm:**
+How the engine in the band is drawn:
 
-1. **Live 3D with the clay baked in Blender** (recommended). This is the Chapter 05 pipeline: the light is baked into vertex colours, the scene is drawn unlit, and `clayMaterial` from `src/car/model.ts` is reused. The engine turns slowly as the lap plays, and the lit part crossfades purple as the phase changes. The engine is simple primitives, so the glb is small. It matches DESIGN.md's 3D-first rule and Praffi's "3D-first" feedback.
+1. **Live 3D with the clay baked in Blender.** **Praffi picked this (2026-11-20).** This is the Chapter 05 pipeline: the light is baked into vertex colours, the scene is drawn unlit, and `clayMaterial` from `src/car/model.ts` is reused. The engine turns slowly as the lap plays, and the lit part crossfades purple as the phase changes. The engine is simple primitives, so the glb is small. It matches DESIGN.md's 3D-first rule and Praffi's "3D-first" feedback.
 2. **Blender stills crossfaded.** Five lit stills × two themes. It needs no WebGL and gives the exact Cycles look, but about 2 MB of images, a fixed camera, and it reads like a slideshow.
 
 How the page finds the lap:
@@ -164,7 +164,7 @@ All phase words and sentences are drafts for Praffi's fact-check.
   - sets time to `end` under reduced motion;
   - steps between `stops` from the keyboard.
 
-  It gains an optional options argument for the pin length, the reduced-motion rest time, and whether scroll settles on stops. The defaults keep Chapters 02, 03 and 05 exactly as they are, and their e2e stays green unchanged. The band passes about `+=500%`, rest = `firstFrame(lap)`, and no settling.
+  It gains an optional options argument for the pin length and the reduced-motion rest time. Scroll only settles on a stop after a seek, so stops already drive only the keyboard and clicks. The defaults keep Chapters 02, 03 and 05 exactly as they are, and their e2e stays green unchanged. The band passes about `+=500%` and rest = `firstFrame(lap)`.
 - **The lap strip is the slider:** `role="slider"`, with `aria-valuenow` as the lap time in seconds and `aria-valuetext` like `0:06.8, 336 km/h`.
   - ←/→ step from turn to turn: the stops are the turns' lap times, from `timeAt(lap, turn.u)`.
   - Clicking the strip seeks.
