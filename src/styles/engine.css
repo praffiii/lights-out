@@ -15,6 +15,7 @@
 .engine-page .five-parts .stems circle { fill: var(--purple); }
 .engine-page .five-parts .pins { position: absolute; inset: 0; }
 .engine-page .five-parts .pin { position: absolute; }
+.engine-page .five-parts .pin:has([aria-expanded='true']) { z-index: 6; }
 .engine-page .five-parts .pin-head { display: flex; align-items: baseline; gap: 8px; }
 .engine-page .five-parts .align-right .pin-head { justify-content: flex-end; }
 .engine-page .five-parts .align-right { text-align: right; }
@@ -95,6 +96,7 @@
 .engine-page .numbers-band .body { margin-top: 20px; }
 .engine-page .figures-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; row-gap: 44px; list-style: none; }
 .engine-page .figures-grid li { padding-top: 18px; border-top: var(--rule); }
+.engine-page .figures-grid li:has([aria-expanded='true']), .engine-page .five-parts .part-rows li:has([aria-expanded='true']) { position: relative; z-index: 6; }
 .engine-page .figures-grid .label { font-size: 11px; }
 .engine-page .figures-grid .num { display: flex; align-items: baseline; gap: 10px; margin-top: 14px; }
 .engine-page .figures-grid .val { font-size: clamp(64px, 1rem + 5vw, 108px); line-height: 0.92; letter-spacing: -0.04em; }

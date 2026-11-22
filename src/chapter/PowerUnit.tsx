@@ -20,7 +20,7 @@ const ERAS = [
 
 const all = (scope: HTMLElement, selector: string) => [...scope.querySelectorAll<HTMLElement>(selector)]
 
-const rise = (el: HTMLElement, y: number, start: string) => gsap.from(el, { y, opacity: 0, duration: 0.8, ease: 'brake', scrollTrigger: { trigger: el, start, ...ONCE } })
+const rise = (el: HTMLElement, y: number, start: string) => gsap.from(el, { y, opacity: 0, duration: 0.8, ease: 'brake', clearProps: 'transform', scrollTrigger: { trigger: el, start, ...ONCE } })
 
 function hero(scope: HTMLElement) {
   for (const [i, el] of all(scope, '.opening .hl, .opening .label').entries()) sweep(el, { scroll: false, delay: 0.1 + i * 0.1 })
