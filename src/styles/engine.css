@@ -1,7 +1,7 @@
 .engine-page { --rule: 1px solid var(--line); --dark: #111214; }
 .engine-page .short { display: none; }
 .engine-page .photo-band .shot { height: 760px; }
-.engine-page .photo-band img { object-position: 50% 55%; }
+.engine-page .photo-band img { object-position: 50% 50%; }
 
 .engine-page .five-parts { margin: 140px var(--m) 0; }
 .engine-page .five-parts .head { display: grid; grid-template-columns: minmax(0, 1fr) 400px; align-items: end; column-gap: 48px; }

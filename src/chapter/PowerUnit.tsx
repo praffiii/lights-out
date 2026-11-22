@@ -209,7 +209,7 @@ export function PowerUnit() {
       </section>
       <figure className="photo-band">
         <div className="shot">
-          <img src={photo.src} alt="Nico Hülkenberg's Audi R26 on track at Melbourne in 2026." />
+          <img src={photo.src} srcSet={photo.srcSet} sizes="100vw" alt="Nico Hülkenberg's Audi R26 on track at Shanghai in 2026." />
         </div>
         <figcaption className="caption">
           <p className="mono">{`01 · ${photo.place}`}</p>
