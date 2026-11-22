@@ -27,7 +27,7 @@ function hero(scope: HTMLElement) {
 }
 
 function motion(scope: HTMLElement) {
-  for (const el of all(scope, '.shot')) reveal(el)
+  for (const el of all(scope, '.shot')) reveal(el, el.closest('.mguh, .history') ? { drift: false } : {})
 
   for (const el of all(scope, '.five-parts .headline .hl, .lap-band .headline .hl, .numbers-band .headline .hl, .mguh .headline .hl, .history .headline .hl, .words h2')) sweep(el)
 
@@ -45,7 +45,8 @@ function Numbers() {
         <div className="head">
           <p className="mono label">By the numbers</p>
           <h2 id="numbers" className="display headline">
-            <span className="hl">What it makes.</span>
+            <span className="hl">What it</span>
+            <span className="hl">makes.</span>
           </h2>
           <p className="body">Peak power from each half. The FIA set out to split it close to 50:50.</p>
         </div>

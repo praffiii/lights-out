@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 
 import { NextRace } from '#/chapter/NextRace.tsx'
 import { Term } from '#/chapter/Term.tsx'
-import { PHOTOS } from '#/home/content.ts'
+import { CHAPTERS, PHOTOS } from '#/home/content.ts'
 import { gsap, ONCE, onEnter, REDUCED, sweep, useGSAP } from '#/motion/motion.ts'
 import { Go } from '#/shell/Go.tsx'
 
@@ -45,7 +45,7 @@ export function Glossary() {
     <div className="chapter-page glossary-page" data-searching={query.trim() ? '' : undefined} ref={root}>
       <section className="opening" aria-labelledby="h1">
         <div className="top">
-          <p className="mono muted label">{`Glossary · ${ENTRIES.length} words · from 5 chapters`}</p>
+          <p className="mono muted label">{`Glossary · ${ENTRIES.length} words · from ${CHAPTERS.length} chapters`}</p>
           <nav className="mono nav" aria-label="Chapters">
             <a href="/#start">All chapters →</a>
           </nav>
