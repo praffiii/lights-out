@@ -1,5 +1,6 @@
 import { expect, it } from 'bun:test'
 import { Schema } from 'effect'
+import sharp from 'sharp'
 
 import { PART_IDS } from '../../src/engine/phase.ts'
 
@@ -16,14 +17,16 @@ it('ships every engine still under 200 KB', async () => {
   }
 })
 
-it('fades band-light cleanly into paper (#F4F3EF) at the corners', () => {
-  const proc = Bun.spawnSync(['python3', '-I', '-c', "import json; from PIL import Image; im = Image.open('public/engine/band-light.webp').convert('RGB'); w, h = im.size; print(json.dumps([list(im.getpixel((0, 0))), list(im.getpixel((w - 1, 0))), list(im.getpixel((0, h - 1))), list(im.getpixel((w - 1, h - 1)))]))"])
+it('fades band-light cleanly into paper (#F4F3EF) at the corners', async () => {
+  const { data, info } = await sharp('public/engine/band-light.webp').removeAlpha().raw().toBuffer({ resolveWithObject: true })
 
-  expect(proc.exitCode).toBe(0)
+  const at = (x: number, y: number) => {
+    const i = (y * info.width + x) * info.channels
 
-  const corners: ReadonlyArray<readonly [number, number, number]> = JSON.parse(proc.stdout.toString())
+    return [data[i] ?? 0, data[i + 1] ?? 0, data[i + 2] ?? 0] as const
+  }
 
-  for (const [r, g, b] of corners) {
+  for (const [r, g, b] of [at(0, 0), at(info.width - 1, 0), at(0, info.height - 1), at(info.width - 1, info.height - 1)]) {
     expect(Math.abs(r - 0xf4)).toBeLessThanOrEqual(2)
     expect(Math.abs(g - 0xf3)).toBeLessThanOrEqual(2)
     expect(Math.abs(b - 0xef)).toBeLessThanOrEqual(2)
