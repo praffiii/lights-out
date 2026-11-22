@@ -15,8 +15,18 @@ type Paint = (scope: HTMLElement) => (t: number) => void
 
 export type Scrub = { time: RefObject<number>; seek: RefObject<(t: number) => void> }
 
-export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops: ReadonlyArray<number>, pace: Pace, paint: Paint): Scrub {
-  const time = useRef(REDUCED ? end : 0)
+export type ScrubOptions = { length?: string; rest?: number }
+
+export const scrubOptions = (end: number, options?: ScrubOptions) => ({
+  length: options?.length ?? '+=300%',
+  rest: options?.rest ?? end,
+  initial: options?.rest ?? 0,
+})
+
+export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops: ReadonlyArray<number>, pace: Pace, paint: Paint, options?: ScrubOptions): Scrub {
+  const { length, rest, initial } = scrubOptions(end, options)
+  const hasRest = options?.rest !== undefined
+  const time = useRef(REDUCED ? rest : initial)
   const seeker = useRef<(t: number) => void>(() => {})
   const lenis = useLenis()
   const scroller = useRef(lenis)
@@ -29,6 +39,8 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
 
   useGSAP(
     () => {
+      if (end <= 0) return
+
       const scope = root.current
       const pin = scope?.querySelector<HTMLElement>('.pin')
       const track = scope?.querySelector<HTMLElement>('[role="slider"]')
@@ -36,7 +48,7 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
       if (!scope || !pin || !track) return
 
       const draw = painter.current(scope)
-      let goal = time.current
+      let goal = REDUCED ? rest : initial
       let target: number | null = null
       let st: ScrollTrigger | null = null
 
@@ -54,6 +66,12 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
       }
 
       const fromScroll = (progress: number) => {
+        if (hasRest && progress === 0 && target === null) {
+          goal = rest
+
+          return
+        }
+
         const t = timeAt(pace, progress)
         const span = st ? st.end - st.start : 0
         const snap = span > 0 ? (SNAP_PX * end) / span : 0
@@ -88,7 +106,7 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
         st = ScrollTrigger.create({
           trigger: pin,
           start: 'top top',
-          end: '+=300%',
+          end: length,
           pin: true,
           onUpdate: (self) => fromScroll(self.progress),
           onRefresh: (self) => fromScroll(self.progress),
@@ -96,7 +114,7 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
         fromScroll(st.progress)
         show(goal)
         gsap.ticker.add(follow)
-      } else show(end)
+      } else show(rest)
 
       const fromX = (x: number) => {
         const r = track.getBoundingClientRect()
@@ -148,7 +166,7 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
         track.removeEventListener('keydown', onKey)
       }
     },
-    { scope: root, dependencies: [end, stops, pace] },
+    { scope: root, dependencies: [end, stops, pace, length, rest] },
   )
 
   return { time, seek: seeker }

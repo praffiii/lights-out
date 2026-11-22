@@ -3,9 +3,9 @@ import { useRef } from 'react'
 import { PHOTOS, type Photo } from '#/home/content.ts'
 import { gsap, ONCE, onEnter, REDUCED, reveal, sweep, useGSAP } from '#/motion/motion.ts'
 import { Go } from '#/shell/Go.tsx'
-import { opposite, useTheme } from '#/shell/theme.ts'
 
 import { FiveParts } from './FiveParts.tsx'
+import { LapBand } from './LapBand.tsx'
 import { NextRace } from './NextRace.tsx'
 import { Term } from './Term.tsx'
 import { Words } from './Words.tsx'
@@ -36,28 +36,6 @@ function motion(scope: HTMLElement) {
   for (const el of all(scope, '.opening .intro, .five-parts .body, .numbers-band .body, .mguh .body, .payoff, .plus')) rise(el, 24, 'top 90%')
 
   for (const el of all(scope, '.figures-grid li, .mguh-rows li, .history figure')) rise(el, 24, 'top 92%')
-}
-
-function BandPlaceholder() {
-  const { theme } = useTheme()
-  const band = theme ? opposite(theme) : 'dark'
-
-  return (
-    <section className="band flip lap-band" data-theme={theme ? band : undefined} aria-labelledby="lap-band">
-      <div className="pin">
-        <div className="head">
-          <p className="mono label">Ride a pole lap</p>
-          <h2 id="lap-band" className="display headline">
-            <span className="hl">Flat out,</span>
-            <span className="hl">and slowing.</span>
-          </h2>
-        </div>
-        <div className="stage">
-          <img src={`/engine/band-${band}.webp`} alt="The assembled 2026 power unit with the V6 engine highlighted in purple." />
-        </div>
-      </div>
-    </section>
-  )
 }
 
 function Numbers() {
@@ -239,7 +217,7 @@ export function PowerUnit() {
         <p className="mono muted credit">{`${photo.credit}, via Wikimedia Commons`}</p>
       </figure>
       <FiveParts />
-      <BandPlaceholder />
+      <LapBand />
       <Numbers />
       <MguH />
       <History />
