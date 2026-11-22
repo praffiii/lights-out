@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 
-import { expect, hiddenText, LOADER_MS, scrollToEnd, stubSeason, test } from './fixtures.ts'
+import { expect, hiddenText, LOADER_MS, NO_WEBGL, scrollToEnd, stubSeason, test } from './fixtures.ts'
 
 const PATH = '/chapters/inside-the-car'
 
@@ -109,8 +109,6 @@ test('chapter 04 leads here', async ({ page }) => {
   await expect(chapter(page, '.opening').getByRole('link', { name: /05 Inside the car/ })).toHaveAttribute('href', PATH)
   await expect(chapter(page, '.next .read')).toHaveAttribute('href', PATH)
 })
-
-const NO_WEBGL = `const get = HTMLCanvasElement.prototype.getContext; HTMLCanvasElement.prototype.getContext = function (type, ...rest) { return String(type).startsWith('webgl') ? null : get.call(this, type, ...rest) }`
 
 const band = (page: Page, selector = '') => page.locator(`.chapter-page .apart ${selector}`.trim())
 

@@ -1,5 +1,6 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { lazy, type RefObject, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
+import { CircuitGuard } from '#/circuits/CircuitGuard.tsx'
 import { circuitFor, type CircuitInfo } from '#/circuits/registry.ts'
 import { INSETS, insetPoint } from '#/engine/inset.ts'
 import { Inset, nextTurn } from '#/engine/Inset.tsx'
@@ -17,12 +18,16 @@ import { opposite, useTheme } from '#/shell/theme.ts'
 import { linearPace } from './pace.ts'
 import { useScrub } from './useScrub.ts'
 
+const EngineScene = lazy(() => import('#/engine/EngineScene.tsx'))
+
 const EMPTY_STOPS: ReadonlyArray<number> = []
 const EMPTY_PACE = linearPace(1)
 
 const sentenceFor = (phase: keyof typeof STATES, gear: number) => STATES[phase].sentence.replace('{gear}', gearWord(gear))
 
-const makePainter = (lap: PoleLap | null, circuit: CircuitInfo | undefined, insetId: keyof typeof INSETS | null) => (scope: HTMLElement) => {
+type LiveRefs = { progress: RefObject<number>; lit: RefObject<PartId>; redraw: RefObject<() => void> }
+
+const makePainter = (lap: PoleLap | null, circuit: CircuitInfo | undefined, insetId: keyof typeof INSETS | null, refs: LiveRefs) => (scope: HTMLElement) => {
   if (!lap || !circuit || !insetId) return () => {}
 
   const inset = INSETS[insetId]
@@ -59,6 +64,10 @@ const makePainter = (lap: PoleLap | null, circuit: CircuitInfo | undefined, inse
     const pct = `${((clamped / lap.time) * 100).toFixed(3)}%`
     const pos = insetPoint(inset.line, sample.u)
     const turn = nextTurn(circuit.laps, sample.u)
+
+    refs.progress.current = clamped / lap.time
+    refs.lit.current = state.lit
+    refs.redraw.current()
 
     if (speedEl) speedEl.textContent = r.speed
 
@@ -115,8 +124,17 @@ export function LapBand() {
   const { theme } = useTheme()
   const band = theme ? opposite(theme) : 'dark'
   const root = useRef<HTMLElement>(null)
+  const progress = useRef(0)
+  const lit = useRef<PartId>('v6')
+  const awake = useRef(false)
+  const redraw = useRef(() => {})
+  const [live, setLive] = useState(false)
   const [near, setNear] = useState(false)
+  const [ready, setReady] = useState(false)
+  const [failed, setFailed] = useState(false)
   const latest = useLatestPole(near)
+
+  useEffect(() => setLive(!REDUCED), [])
 
   useEffect(() => {
     if (REDUCED) {
@@ -129,11 +147,20 @@ export function LapBand() {
 
     if (!el) return
 
-    const observer = new IntersectionObserver((entries) => entries.some((e) => e.isIntersecting) && setNear(true), { rootMargin: '100% 0px' })
+    const nearby = new IntersectionObserver((entries) => entries.some((e) => e.isIntersecting) && setNear(true), { rootMargin: '100% 0px' })
 
-    observer.observe(el)
+    const seen = new IntersectionObserver((entries) => {
+      awake.current = entries.some((e) => e.isIntersecting)
+      redraw.current()
+    })
 
-    return () => observer.disconnect()
+    nearby.observe(el)
+    seen.observe(el)
+
+    return () => {
+      nearby.disconnect()
+      seen.disconnect()
+    }
   }, [])
 
   const loaded = latest !== 'loading' && latest !== null ? latest : null
@@ -143,7 +170,7 @@ export function LapBand() {
   const first = useMemo(() => (lap ? firstFrame(lap) : null), [lap])
   const stops = useMemo(() => (lap && circuit ? circuit.laps.map((l) => timeAt(lap, l.u)) : EMPTY_STOPS), [lap, circuit])
   const pace = useMemo(() => (lap ? linearPace(lap.time) : EMPTY_PACE), [lap])
-  const paint = useMemo(() => makePainter(lap, circuit, loaded ? loaded.circuit : null), [lap, circuit, loaded])
+  const paint = useMemo(() => makePainter(lap, circuit, loaded ? loaded.circuit : null, { progress, lit, redraw }), [lap, circuit, loaded])
   const options = useMemo(() => (first ? { length: '+=500%', rest: first.t } : undefined), [first])
 
   useScrub(root, lap?.time ?? 0, stops, pace, paint, options)
@@ -159,6 +186,14 @@ export function LapBand() {
   const headline = first?.headline ?? 'Flat out, and slowing.'
   const lines = headline.split(', ')
 
+  useLayoutEffect(() => {
+    if (!lap) return
+
+    progress.current = initialT / lap.time
+    lit.current = initialState.lit
+    redraw.current()
+  }, [lap, initialT, initialState.lit])
+
   const footnote =
     lap && circuit
       ? `Power unit modelled by Lights Out, simplified · Pole lap: ${lap.driver}, ${lap.team ?? ''}, ${lap.year} ${circuit.gp} · Telemetry: OpenF1 (unofficial) · MGU-K and battery state estimated from throttle and brake`
@@ -166,7 +201,7 @@ export function LapBand() {
 
   return (
     <>
-      <section className="band flip lap-band" data-theme={theme ? band : undefined} data-live={lap && !REDUCED ? '' : undefined} aria-labelledby="lap-band" ref={root}>
+      <section className="flip lap-band" data-theme={theme ? band : undefined} data-live={lap && !REDUCED ? '' : undefined} aria-labelledby="lap-band" ref={root}>
         <div className="pin">
           <div className="head">
             <p className="mono label">{lap && circuit ? `Ride a pole lap · ${circuit.name}, ${lap.year}` : 'Ride a pole lap'}</p>
@@ -206,8 +241,17 @@ export function LapBand() {
               })}
             </ol>
             <div className="stage-col">
-              <div className="stage">
+              <div className="stage" data-gl={ready ? '' : undefined}>
                 <img src={`/engine/band-${band}.webp`} alt="The assembled 2026 power unit with the active part highlighted." />
+                {live && near && !failed && lap !== null ? (
+                  <div className="gl">
+                    <CircuitGuard onError={() => setFailed(true)}>
+                      <Suspense fallback={null}>
+                        <EngineScene band={band} progress={progress} lit={lit} awake={awake} redraw={redraw} onReady={() => setReady(true)} />
+                      </Suspense>
+                    </CircuitGuard>
+                  </div>
+                ) : null}
               </div>
               {lap && circuit && inset ? <Inset name={circuit.name} src={inset.src} line={inset.line} turns={circuit.laps} initialU={initialSample?.u ?? 0} /> : null}
             </div>

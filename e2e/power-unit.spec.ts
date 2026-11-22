@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import type { Page } from '@playwright/test'
 
 import { CALENDAR } from '../src/circuits/calendar.ts'
-import { expect, hiddenText, LOADER_MS, scrollToEnd, stubLatest, test } from './fixtures.ts'
+import { expect, hiddenText, LOADER_MS, NO_WEBGL, scrollToEnd, stubLatest, test } from './fixtures.ts'
 
 const turnsOf = (tile: string) => Object.keys(JSON.parse(readFileSync(`src/circuits/pins/${tile}.json`, 'utf8')).laps).length
 
@@ -43,12 +43,15 @@ for (const colorScheme of ['light', 'dark'] as const) {
     await page.emulateMedia({ colorScheme })
     await loaded(page)
 
-    const [band, body] = await page.evaluate(() => [
+    await expect(band(page)).toHaveAttribute('data-theme', colorScheme === 'light' ? 'dark' : 'light')
+
+    const [bg, body] = await page.evaluate(() => [
       getComputedStyle(document.querySelector('.lap-band') ?? document.body).backgroundColor,
       getComputedStyle(document.body).backgroundColor,
     ])
 
-    expect(band).not.toBe(body)
+    expect(bg).toBe(colorScheme === 'light' ? 'rgb(14, 15, 17)' : 'rgb(244, 243, 239)')
+    expect(bg).not.toBe(body)
   })
 }
 
@@ -253,6 +256,7 @@ test('reduced motion skips pinning and shows the first frame', async ({ page, er
   await loaded(page, 'monza')
 
   await expect(page.locator('.pin-spacer')).toHaveCount(0)
+  await expect(band(page, 'canvas')).toHaveCount(0)
   await expect(band(page, '[data-speed]')).toHaveText('338 km/h')
   await expect(band(page, '[data-rpm]')).toHaveText('11,595 rpm')
   await expect(band(page, '[data-mguk]')).toHaveText('↓ Fading')
@@ -279,5 +283,83 @@ test('at 360 px wide no element overflows the lap band', async ({ page, errors }
   })
 
   expect(leaked).toEqual([])
+  expect(errors).toEqual([])
+})
+
+const hasPixels = async (page: Page) => {
+  const box = await band(page, '.stage canvas').boundingBox()
+
+  if (!box || box.width < 10 || box.height < 10) return false
+
+  const shot = await page.screenshot({ clip: box })
+
+  return page.evaluate(async (png) => {
+    const bitmap = await createImageBitmap(await (await fetch(`data:image/png;base64,${png}`)).blob())
+    const ctx = new OffscreenCanvas(bitmap.width, bitmap.height).getContext('2d')
+
+    if (!ctx) return false
+
+    ctx.drawImage(bitmap, 0, 0)
+
+    const { data } = ctx.getImageData(0, 0, bitmap.width, bitmap.height)
+    const r0 = data[0] ?? 0
+    const g0 = data[1] ?? 0
+    const b0 = data[2] ?? 0
+    let diff = 0
+
+    for (let i = 0; i < data.length; i += 16) {
+      if (Math.abs((data[i] ?? 0) - r0) + Math.abs((data[i + 1] ?? 0) - g0) + Math.abs((data[i + 2] ?? 0) - b0) > 24) diff++
+    }
+
+    return diff > 100
+  }, shot.toString('base64'))
+}
+
+test('the live engine draws non-blank pixels once the band is near', async ({ page, errors }) => {
+  await loaded(page, 'monza')
+  await band(page).evaluate((el) => window.scrollTo(0, Math.max(0, el.getBoundingClientRect().top + scrollY - 80)))
+
+  await expect(band(page, '.stage')).toHaveAttribute('data-gl', '', { timeout: 20_000 })
+  await expect(band(page, '.stage canvas')).toBeVisible()
+  expect(await hasPixels(page)).toBe(true)
+  expect(errors).toEqual([])
+})
+
+test('without WebGL the still shows and the strip still moves the readouts', async ({ page, errors }) => {
+  await page.addInitScript({ content: NO_WEBGL })
+  await loaded(page, 'monza')
+  await band(page).evaluate((el) => window.scrollTo(0, Math.max(0, el.getBoundingClientRect().top + scrollY - 80)))
+
+  await expect(band(page, '.stage img')).toBeVisible()
+  await expect(band(page, '.stage')).not.toHaveAttribute('data-gl', '')
+  await expect(band(page, '[data-speed]')).toHaveText('338 km/h')
+
+  const slider = band(page, '[role="slider"]')
+
+  await slider.focus()
+
+  for (let i = 0; i < 6; i++) {
+    if ((await band(page, '[data-mguk]').textContent())?.includes('Harvesting')) break
+
+    await page.keyboard.press('ArrowRight')
+    await page.waitForTimeout(250)
+  }
+
+  await expect(band(page, '[data-mguk]')).toContainText('Harvesting')
+  expect(errors.filter((e) => e.startsWith('pageerror'))).toEqual([])
+})
+
+test('toggling the theme with the band on screen flips the band and keeps drawing', async ({ page, errors }) => {
+  await page.emulateMedia({ colorScheme: 'light' })
+  await loaded(page, 'monza')
+  await band(page).evaluate((el) => window.scrollTo(0, Math.max(0, el.getBoundingClientRect().top + scrollY - 80)))
+  await expect(band(page, '.stage')).toHaveAttribute('data-gl', '', { timeout: 20_000 })
+
+  const before = await band(page).evaluate((el) => getComputedStyle(el).backgroundColor)
+
+  await page.emulateMedia({ colorScheme: 'dark' })
+  await expect.poll(() => band(page).evaluate((el) => getComputedStyle(el).backgroundColor)).not.toBe(before)
+  await expect(band(page, '.stage')).toHaveAttribute('data-gl', '', { timeout: 20_000 })
+  expect(await hasPixels(page)).toBe(true)
   expect(errors).toEqual([])
 })

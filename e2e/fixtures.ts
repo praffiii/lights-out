@@ -36,6 +36,8 @@ export const watchErrors = (page: Page) => {
   return errors
 }
 
+export const NO_WEBGL = `const get = HTMLCanvasElement.prototype.getContext; HTMLCanvasElement.prototype.getContext = function (type, ...rest) { return String(type).startsWith('webgl') ? null : get.call(this, type, ...rest) }`
+
 export const LOADER_MS = 10_000
 
 export const hiddenText = (page: Page) =>
