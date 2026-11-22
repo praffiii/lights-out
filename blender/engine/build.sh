@@ -8,6 +8,10 @@ run() {
 run engine.py
 test -f engine.blend
 run render.py -- rig
+run bake.py -- .out/engine.glb
+test -f .out/engine.glb
+bunx --bun @gltf-transform/cli meshopt .out/engine.glb ../../public/engine/engine.glb --quantize-position 16
+rm .out/engine.glb
 run render.py -- shadow
 python3 -I post.py shadow-band
 for theme in light dark; do
