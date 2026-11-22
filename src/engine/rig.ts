@@ -7,9 +7,9 @@ import json from './rig.json'
 
 export const PARTS = [
   { id: 'v6', n: '01', name: 'V6 engine', job: '1.6 litres, six cylinders. Burns fuel for about half the power.', terms: [] },
-  { id: 'turbo', n: '02', name: 'Turbocharger', job: 'Exhaust gas spins it, and it packs more air into the engine.', terms: [] },
-  { id: 'mguK', n: '03', name: 'MGU-K', job: 'An electric motor geared to the crank. Pushes, or brakes and charges.', terms: [] },
-  { id: 'energyStore', n: '04', name: 'Energy store', job: 'The battery. It holds what the MGU-K harvests.', terms: [] },
+  { id: 'turbo', n: '02', name: 'Turbocharger', job: 'Exhaust gas spins it, and it packs more air into the engine.', terms: [{ text: 'Exhaust gas spins it', k: 'turbocharger' }] },
+  { id: 'mguK', n: '03', name: 'MGU-K', job: 'An electric motor geared to the crank. Pushes, or brakes and charges.', terms: [{ text: 'electric motor', k: 'mguK' }] },
+  { id: 'energyStore', n: '04', name: 'Energy store', job: 'The battery. It holds what the MGU-K harvests.', terms: [{ text: 'The battery', k: 'energyStore' }] },
   { id: 'electronics', n: '05', name: 'Control electronics', job: 'Sends the power between battery and motor.', terms: [] },
 ] as const satisfies ReadonlyArray<{ id: PartId; n: string; name: string; job: string; terms: ReadonlyArray<{ text: string; k: WordKey }> }>
 

@@ -170,7 +170,7 @@ test('keeps animated text readable by screen readers', async ({ page, errors }) 
 
   const tree = await page.locator('body').ariaSnapshot()
 
-  for (const text of ['Lights Out is an unofficial fan project. Not affiliated with Formula 1, FOM or any team.', '4.309 km', '305.879 km', 'Five chapters · 30 min'])
+  for (const text of ['Lights Out is an unofficial fan project. Not affiliated with Formula 1, FOM or any team.', '4.309 km', '305.879 km', 'Six chapters · 35 min'])
     expect(tree).toContain(text)
 
   expect(errors).toEqual([])
@@ -275,13 +275,13 @@ test("Home's chapter 05 row leads to chapter 05", async ({ page, errors }) => {
   expect(errors).toEqual([])
 })
 
-test('the menu fits the theme switch on screen with five chapters linked', async ({ page, errors }, testInfo) => {
+test('the menu fits the theme switch on screen with six chapters linked', async ({ page, errors }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop')
   await page.goto('/')
   await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
   await page.getByRole('button', { name: 'Menu' }).click()
 
-  await expect(page.locator('.menu .subs a[href^="/chapters/"]')).toHaveCount(5)
+  await expect(page.locator('.menu .subs a[href^="/chapters/"]')).toHaveCount(6)
   await expect(page.getByRole('group', { name: 'Theme' })).toBeInViewport({ ratio: 1 })
   expect(errors).toEqual([])
 })

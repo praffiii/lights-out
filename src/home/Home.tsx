@@ -22,6 +22,10 @@ const one = (scope: HTMLElement, selector: string) => {
   return el
 }
 
+const COUNT_WORDS = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'] as const
+
+const CHAPTER_SUMMARY = `${COUNT_WORDS[CHAPTERS.length] ?? CHAPTERS.length} chapters · ${CHAPTERS.reduce((sum, c) => sum + c.min, 0)} min`
+
 type Rider = { x: gsap.QuickToFunc; y: gsap.QuickToFunc; at: number; z: number }
 
 export function Home() {
@@ -177,7 +181,7 @@ export function Home() {
           <h2 id="start" className="mono type">
             Start here
           </h2>
-          <p className="mono muted type">Five chapters · 30 min</p>
+          <p className="mono muted type">{CHAPTER_SUMMARY}</p>
         </div>
         <ol className="rows" {...onRows}>
           {CHAPTERS.map((c, i) => {

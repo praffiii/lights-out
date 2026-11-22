@@ -45,6 +45,13 @@ export const WORDS = {
   groundEffect: { term: 'Ground effect', def: 'Grip made by air flowing fast under the car, sucking it onto the track.' },
   powerUnit: { term: 'Power unit', def: 'The engine and its electric motor and battery, working as one.' },
   drs: { term: 'DRS · until 2025', def: 'Drag Reduction System, 2011 to 2025. A flap in the rear wing that only the chasing car could open. Gone in 2026.' },
+  mguK: { term: 'MGU-K', def: 'The electric motor on the crankshaft. It pushes the car, and under braking it turns into a generator.' },
+  mguH: { term: 'MGU-H · until 2025', def: 'A motor on the turbo shaft that turned exhaust heat into electricity. Gone in 2026.' },
+  energyStore: { term: 'Energy store', def: 'The battery. It holds the electricity the MGU-K harvests.' },
+  turbocharger: { term: 'Turbocharger', def: 'A fan spun by exhaust gas that packs more air into the engine.' },
+  harvesting: { term: 'Harvesting', def: 'Turning braking into electricity for the battery.' },
+  deployment: { term: 'Deployment', def: "Spending the battery's energy through the MGU-K to push the car." },
+  sustainableFuel: { term: 'Sustainable fuel', def: 'From 2026, fuel made without new fossil carbon.' },
 } as const
 
 export type WordKey = keyof typeof WORDS
@@ -58,3 +65,5 @@ export const TYRES_WORDS: ReadonlyArray<WordKey> = ['compound', 'stint', 'degrad
 export const FLAGS_WORDS: ReadonlyArray<WordKey> = ['marshal', 'marshalSector', 'yellowFlag', 'blueFlag', 'lappedCar', 'redFlag', 'trackLimits', 'blackWhiteFlag', 'vsc']
 
 export const CAR_WORDS: ReadonlyArray<WordKey> = ['survivalCell', 'halo', 'sidepod', 'floor', 'groundEffect', 'powerUnit', 'activeAero', 'straightMode', 'overtakeMode']
+
+export const POWER_WORDS: ReadonlyArray<WordKey> = ['powerUnit', 'mguK', 'mguH', 'energyStore', 'turbocharger', 'harvesting', 'deployment', 'overtakeMode', 'sustainableFuel']

@@ -23,6 +23,12 @@ export const PHOTOS = {
   ch05History1950: { src: '/img/ch05-1950.jpg', place: 'Zandvoort, 1950', credit: 'Photo Nationaal Archief · CC0', source: 'https://commons.wikimedia.org/wiki/File:START,_autoraces,_Bestanddeelnr_904-0841.jpg' },
   ch05History1978: { src: '/img/ch05-1978.jpg', place: 'Zandvoort, 1978 · Lotus 79', credit: 'Mario Andretti leads Ronnie Peterson · Photo Koen Suyk / Anefo, Nationaal Archief · CC0', source: 'https://commons.wikimedia.org/wiki/File:Grand_Prix_Zandvoort_Mario_Andretti_op_kop_met_daar_achter_Ronnie_Petterson,_Bestanddeelnr_929-8743.jpg' },
   ch05History2026: { src: '/img/ch05-2026.jpg', place: 'Suzuka, 2026 · Mercedes W17', credit: 'Kimi Antonelli · Photo Martin Lee · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Mercedes_W17_-_Kimi_Antonelli_approaches_Spoon_Curve_at_Suzuka_during_the_2026_Japanese_GP_(55194289192).jpg' },
+  ch06: { src: '/img/ch06.jpg', place: 'Nico Hülkenberg · Audi R26 · Melbourne, 2026', credit: 'Photo Yu Chu Chin · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Audi_R26_of_Nico_H%C3%BClkenberg_(028A8505).jpg' },
+  ch06MguH: { src: '/img/ch06-mguh.jpg', place: 'Honda RA621H, 2021 · Honda Racing Gallery, 2025', credit: 'Photo Liauzh · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Honda_Racing_Gallery_-_Honda_RA621H_rear.jpg' },
+  ch06Y1967: { src: '/img/ch06-1967.jpg', place: 'London, 2025', credit: 'Photo Hullian111 · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Ford_Cosworth_DFV_Engine_at_Formula_1_Exhibition,_London.jpg' },
+  ch06Y1986: { src: '/img/ch06-1986.jpg', place: 'Munich, 2014', credit: 'Photo Jiří Sedláček · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Formula_1_racing_engine_M12-13_in_BMW-Museum_in_Munich,_Bayern.JPG' },
+  ch06Y2001: { src: '/img/ch06-2001.jpg', place: 'Maranello, 2013', credit: 'Photo Morio · CC BY-SA 3.0', source: 'https://commons.wikimedia.org/wiki/File:Ferrari_050_engine_front_Museo_Ferrari.jpg' },
+  ch06Y2014: { src: '/img/ch06-2014.jpg', place: 'Silverstone, 2019', credit: 'Photo David Merrett · CC BY 2.0', source: 'https://commons.wikimedia.org/wiki/File:2016_Mercedes_PU106_Hybrid_Power_Unit_(49255122157).jpg' },
   tyres: { src: '/img/tyres.jpg', place: 'Pirelli tyres, slicks to wets', credit: 'Photo Hullian111 · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Pirelli_Tyre_Sets_at_Formula_1_Exhibition,_London_02.jpg' },
   williams: { src: '/img/williams.jpg', place: 'Williams FW48 · Shanghai, 2026', credit: 'Photo Liauzh · CC BY 4.0', source: 'https://commons.wikimedia.org/wiki/File:2026_Chinese_GP_-_Williams_-_Alex_Albon_-_Qualifying.jpg' },
   brm: { src: '/img/y1973.jpg', place: 'BRM mechanics · Anderstorp, 1973', credit: 'Photo Markku Lepola · CC BY 4.0', source: 'https://commons.wikimedia.org/wiki/File:Swedish_Grand_Prix_1973_(JOKAMAL3B08-13).tif' },
@@ -39,6 +45,7 @@ export const CHAPTERS: ReadonlyArray<ChapterEntry> = [
   { n: '03', title: 'Tyres and strategy', min: 7, photo: PHOTOS.ch03, to: '/chapters/tyres-and-strategy' },
   { n: '04', title: 'Flags and what they mean', min: 4, photo: PHOTOS.ch04, to: '/chapters/flags' },
   { n: '05', title: 'Inside the car', min: 8, photo: PHOTOS.ch05, to: '/chapters/inside-the-car' },
+  { n: '06', title: 'The power unit', min: 6, photo: PHOTOS.ch06, to: '/chapters/power-unit' },
 ]
 
 export const HERO = {

@@ -76,7 +76,6 @@ test('with /api/season failing, no number renders and the car still shows', asyn
 
   for (const selector of ['.speed .num', '.speed .line', '.speed .label']) expect((await chapter(page, selector).allTextContents()).join('').trim()).toBe('')
   await expect(chapter(page, '.wings .stage img')).toBeVisible()
-  await expect(chapter(page, '.next h2')).toHaveText('All chapters.')
   expect(errors.filter((e) => !e.includes('500'))).toEqual([])
 })
 
@@ -87,20 +86,20 @@ test('a wing tab switches the mode', async ({ page }) => {
   await expect(chapter(page, '.wings [role="tab"]').first()).toHaveAttribute('aria-selected', 'true')
 })
 
-test('the Next band leads to this weekend', async ({ page, errors }) => {
+test('the Next band leads to chapter 06', async ({ page, errors }) => {
   await loaded(page)
 
-  await expect(chapter(page, '.next .caption > p')).toHaveText('Next · Round 20 · this weekend')
-  await expect(chapter(page, '.next h2')).toHaveText('São Paulo,this weekend.')
-  await expect(chapter(page, '.next .read')).toHaveAttribute('href', '/weekend')
+  await expect(chapter(page, '.next .caption > p')).toHaveText('Next · Chapter 06 · 6 min')
+  await expect(chapter(page, '.next h2')).toHaveText('The power unit.')
+  await expect(chapter(page, '.next .read')).toHaveAttribute('href', '/chapters/power-unit')
   expect(errors).toEqual([])
 })
 
-test('the hero leads back to chapter 04 and to all chapters', async ({ page }) => {
+test('the hero leads back to chapter 04 and on to chapter 06', async ({ page }) => {
   await loaded(page)
 
   await expect(chapter(page, '.opening').getByRole('link', { name: /04 Flags and what they mean/ })).toHaveAttribute('href', '/chapters/flags')
-  await expect(chapter(page, '.opening').getByRole('link', { name: /All chapters/ })).toHaveAttribute('href', '/#start')
+  await expect(chapter(page, '.opening').getByRole('link', { name: /06 The power unit/ })).toHaveAttribute('href', '/chapters/power-unit')
 })
 
 test('chapter 04 leads here', async ({ page }) => {
