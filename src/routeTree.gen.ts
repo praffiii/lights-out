@@ -26,6 +26,7 @@ import { Route as PeopleDriverRouteImport } from './routes/people.$driver'
 import { Route as TracksIndexRouteImport } from './routes/tracks.index'
 import { Route as TracksCircuitRouteImport } from './routes/tracks.$circuit'
 import { Route as ApiPoleCircuitRouteImport } from './routes/api/pole.$circuit'
+import { Route as ApiPoleLatestRouteImport } from './routes/api/pole.latest'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -113,6 +114,11 @@ const ApiPoleCircuitRoute = ApiPoleCircuitRouteImport.update({
   path: '/api/pole/$circuit',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPoleLatestRoute = ApiPoleLatestRouteImport.update({
+  id: '/api/pole/latest',
+  path: '/api/pole/latest',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -132,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/people/': typeof PeopleIndexRoute
   '/tracks/': typeof TracksIndexRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
+  '/api/pole/latest': typeof ApiPoleLatestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -151,6 +158,7 @@ export interface FileRoutesByTo {
   '/people': typeof PeopleIndexRoute
   '/tracks': typeof TracksIndexRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
+  '/api/pole/latest': typeof ApiPoleLatestRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -171,6 +179,7 @@ export interface FileRoutesById {
   '/people/': typeof PeopleIndexRoute
   '/tracks/': typeof TracksIndexRoute
   '/api/pole/$circuit': typeof ApiPoleCircuitRoute
+  '/api/pole/latest': typeof ApiPoleLatestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -192,6 +201,7 @@ export interface FileRouteTypes {
     | '/people/'
     | '/tracks/'
     | '/api/pole/$circuit'
+    | '/api/pole/latest'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
     | '/people'
     | '/tracks'
     | '/api/pole/$circuit'
+    | '/api/pole/latest'
   id:
     | '__root__'
     | '/'
@@ -230,6 +241,7 @@ export interface FileRouteTypes {
     | '/people/'
     | '/tracks/'
     | '/api/pole/$circuit'
+    | '/api/pole/latest'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -250,6 +262,7 @@ export interface RootRouteChildren {
   PeopleIndexRoute: typeof PeopleIndexRoute
   TracksIndexRoute: typeof TracksIndexRoute
   ApiPoleCircuitRoute: typeof ApiPoleCircuitRoute
+  ApiPoleLatestRoute: typeof ApiPoleLatestRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -373,6 +386,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPoleCircuitRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/pole/latest': {
+      id: '/api/pole/latest'
+      path: '/api/pole/latest'
+      fullPath: '/api/pole/latest'
+      preLoaderRoute: typeof ApiPoleLatestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -394,6 +414,7 @@ const rootRouteChildren: RootRouteChildren = {
   PeopleIndexRoute: PeopleIndexRoute,
   TracksIndexRoute: TracksIndexRoute,
   ApiPoleCircuitRoute: ApiPoleCircuitRoute,
+  ApiPoleLatestRoute: ApiPoleLatestRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
