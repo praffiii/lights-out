@@ -5,6 +5,7 @@ import { OpenF1Client } from '#/season/openf1-client.ts'
 import type { OpenF1Session } from '#/season/openf1-schema.ts'
 
 import { latestQualifying, poleLap } from './pole-lap.ts'
+import { isComplete } from './schema.ts'
 import { PoleStore } from './store.ts'
 
 export type PoleOutcome = { id: string; outcome: 'written' | 'unchanged' | 'kept' }
@@ -18,7 +19,7 @@ const refreshOne = (info: CircuitInfo, sessions: ReadonlyArray<OpenF1Session>, n
 
       const previous = yield* store.read(info.id)
 
-      if (previous?.sessionKey === session.session_key) return 'unchanged' as const
+      if (previous?.sessionKey === session.session_key && isComplete(previous)) return 'unchanged' as const
 
       const built = yield* poleLap(info, session)
 

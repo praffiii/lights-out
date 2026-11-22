@@ -9,7 +9,7 @@ export const MENU: ReadonlyArray<MenuEntry> = [
   { label: 'How F1 works', to: null, href: '/#start', photo: PHOTOS.ch01, chapters: CHAPTERS },
   { label: 'This season', to: '/season', photo: PHOTOS.heroDark, weekend: true },
   { label: 'The car', to: '/chapters/inside-the-car', photo: PHOTOS.williams },
-  { label: 'The engine', to: null, photo: PHOTOS.brm },
+  { label: 'The engine', to: '/chapters/power-unit', photo: PHOTOS.brm },
   { label: 'The tracks', to: '/tracks', photo: PHOTOS.ch02 },
   { label: 'The people', to: '/people', photo: PHOTOS.ch05 },
   { label: 'Glossary', to: '/glossary', photo: PHOTOS.ch04 },

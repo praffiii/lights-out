@@ -16,6 +16,15 @@ export const stubPole = (page: Page, id: string | null) =>
       : route.fulfill({ status: 200, contentType: 'application/json', body: readFileSync(`test/fixtures/pole/${id}.json`, 'utf8') }),
   )
 
+const monzaPole = readFileSync('test/fixtures/pole/monza.json', 'utf8')
+
+export const stubLatest = (page: Page, id: string | null) =>
+  page.route('**/api/pole/latest', (route) =>
+    id === null
+      ? route.fulfill({ status: 204 })
+      : route.fulfill({ status: 200, contentType: 'application/json', body: `{"circuit":${JSON.stringify(id)},"lap":${monzaPole}}` }),
+  )
+
 export const watchErrors = (page: Page) => {
   const errors: string[] = []
 
@@ -26,6 +35,8 @@ export const watchErrors = (page: Page) => {
 
   return errors
 }
+
+export const NO_WEBGL = `const get = HTMLCanvasElement.prototype.getContext; HTMLCanvasElement.prototype.getContext = function (type, ...rest) { return String(type).startsWith('webgl') ? null : get.call(this, type, ...rest) }`
 
 export const LOADER_MS = 10_000
 

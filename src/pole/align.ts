@@ -191,6 +191,10 @@ export const alignLap = ({ start, time, splits, car, location, line, cuts, stand
 
   const timed = car.map((s) => ({ ...s, t: (Date.parse(s.date) - start) / 1000 }))
   const carTs = timed.map((s) => s.t)
+  const hasRpm = timed.some((s) => s.t >= 0 && s.t <= time) && timed.every((s) => s.t < 0 || s.t > time || s.rpm !== undefined)
+  const rpmTimed = hasRpm ? timed.filter((s) => s.rpm !== undefined) : []
+  const rpmTs = rpmTimed.map((s) => s.t)
+  const rpmVs = rpmTimed.map((s) => s.rpm ?? 0)
 
   const value = (t: number) => {
     const nearest = timed.reduce((b, s) => (Math.abs(s.t - t) < Math.abs(b.t - t) ? s : b), timed[0] ?? { t, speed: 0, n_gear: 0, throttle: 0, brake: 0 })
@@ -200,19 +204,16 @@ export const alignLap = ({ start, time, splits, car, location, line, cuts, stand
       throttle: at(carTs, timed.map((s) => s.throttle), t),
       gear: nearest.n_gear,
       brake: nearest.brake,
+      rpm: hasRpm ? at(rpmTs, rpmVs, t) : undefined,
     }
   }
 
-  const row = (t: number, v: { speed: number; gear: number; throttle: number; brake: number }): PoleRow => [
-    round(t, 3),
-    round(warp(t), 5),
-    Math.round(v.speed),
-    Math.round(v.gear),
-    Math.round(v.throttle),
-    Math.round(Math.min(100, Math.max(0, v.brake))),
-  ]
+  const row = (t: number, v: { speed: number; gear: number; throttle: number; brake: number; rpm?: number }): PoleRow =>
+    v.rpm === undefined
+      ? [round(t, 3), round(warp(t), 5), Math.round(v.speed), Math.round(v.gear), Math.round(v.throttle), Math.round(Math.min(100, Math.max(0, v.brake)))]
+      : [round(t, 3), round(warp(t), 5), Math.round(v.speed), Math.round(v.gear), Math.round(v.throttle), Math.round(Math.min(100, Math.max(0, v.brake))), Math.round(v.rpm)]
 
-  const inside = timed.filter((s) => s.t > 0 && s.t < time).map((s) => row(s.t, { speed: s.speed, gear: s.n_gear, throttle: s.throttle, brake: s.brake }))
+  const inside = timed.filter((s) => s.t > 0 && s.t < time).map((s) => row(s.t, { speed: s.speed, gear: s.n_gear, throttle: s.throttle, brake: s.brake, rpm: hasRpm ? s.rpm : undefined }))
 
   const marks = times.map((t) => row(t, value(t)))
 

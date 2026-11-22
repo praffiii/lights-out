@@ -53,6 +53,8 @@ export const poleLap = (info: CircuitInfo, session: OpenF1Session): Effect.Effec
           sessionKey: key,
           year: new Date(session.date_start).getUTCFullYear(),
           driver: `${driver.first_name} ${driver.last_name}`,
+          team: driver.team_name,
+          date: session.date_start,
           wet,
           time,
           sectors: [s1, s2, s3],

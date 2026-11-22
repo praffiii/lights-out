@@ -51,7 +51,10 @@ it("stores Monza's 2026 pole lap now Monza is modelled", async () => {
 
   expect(lap?.sessionKey).toBe(11357)
   expect(lap?.driver).toBe('Pierre Gasly')
+  expect(lap?.team).toBe('Alpine')
+  expect(lap?.date).toBe('2026-09-05T14:00:00+00:00')
   expect(lap?.time).toBe(81.786)
+  expect(lap?.rows.every((row) => row.length === 7)).toBe(true)
 })
 
 it("falls back to last year's pole before this year's qualifying", async () => {
@@ -152,4 +155,42 @@ it('stays under 15 KB per circuit', async () => {
 
   expect(entries.size).toBe(7)
   expect([...entries.values()].every((json) => json.length <= 15_000)).toBe(true)
+})
+
+it('rebuilds a stored lap for the same session when it lacks rpm, team or date', async () => {
+  const { kv } = fakeKV()
+
+  await run(kv)
+
+  const full = await stored(kv, 'monza')
+
+  if (!full) throw new Error('Monza should be stored')
+
+  const stale = {
+    sessionKey: full.sessionKey,
+    year: full.year,
+    driver: full.driver,
+    wet: full.wet,
+    time: full.time,
+    sectors: full.sectors,
+    rows: full.rows.map(([t, u, speed, gear, throttle, brake]) => [t, u, speed, gear, throttle, brake] as const),
+  }
+
+  await Effect.runPromise(PoleStore.use((s) => s.write('monza', stale)).pipe(Effect.provide(PoleStore.fromKV(kv))))
+
+  const rebuilt = await run(kv)
+
+  expect(rebuilt.find((o) => o.id === 'monza')?.outcome).toBe('written')
+  expect((await stored(kv, 'monza'))?.rows.every((row) => row.length === 7)).toBe(true)
+
+  const again = await run(kv)
+
+  expect(again.find((o) => o.id === 'monza')?.outcome).toBe('unchanged')
+
+  await Effect.runPromise(PoleStore.use((s) => s.write('monza', stale)).pipe(Effect.provide(PoleStore.fromKV(kv))))
+
+  const kept = await run(kv, { poleResult: (key) => (key === 11357 ? Effect.succeed([]) : fakeOpenF1Service.poleResult(key)) })
+
+  expect(kept.find((o) => o.id === 'monza')?.outcome).toBe('kept')
+  expect(await stored(kv, 'monza')).toEqual(stale)
 })

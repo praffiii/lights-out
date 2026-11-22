@@ -17,3 +17,4 @@ blender/circuits/.out/
 *.tsbuildinfo
 blender/circuits/data/*-osm.json
 blender/car/.out/
+blender/engine/.out/

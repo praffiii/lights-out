@@ -8,7 +8,7 @@ import { useTheme } from '#/shell/theme.ts'
 
 import { CarParts } from './CarParts.tsx'
 import { CarWings } from './CarWings.tsx'
-import { NextRace } from './NextRace.tsx'
+import { Next } from './Next.tsx'
 import { Words } from './Words.tsx'
 import { CAR_WORDS } from './words.ts'
 
@@ -168,7 +168,7 @@ export function Car() {
           <nav className="mono nav" aria-label="Chapters">
             <Go to="/chapters/flags">← 04 Flags and what they mean</Go>
             <span aria-hidden> · </span>
-            <a href="/#start">All chapters →</a>
+            <Go to="/chapters/power-unit">06 The power unit →</Go>
           </nav>
         </div>
         <h1 id="h1" className="display">
@@ -195,7 +195,7 @@ export function Car() {
       <CarWings />
       <History />
       <Words keys={CAR_WORDS} />
-      <NextRace photo={PHOTOS.heroDark} />
+      <Next label="Next · Chapter 06 · 6 min" title="The power unit." line="Half fuel, half battery, one real pole lap" photo={PHOTOS.ch06} to="/chapters/power-unit" />
     </div>
   )
 }

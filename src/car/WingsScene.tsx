@@ -3,8 +3,9 @@ import { type RefObject, useLayoutEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 
 import type { Theme } from '#/shell/theme.ts'
+import { clayMaterial, shadowMaterial } from '#/three/clay.ts'
 
-import { CLAY, clayMaterial, clayOf, SHADOWS, shadowMaterial, useCar } from './model.ts'
+import { CLAY, clayOf, SHADOWS, useCar } from './model.ts'
 import { rig } from './parts.ts'
 
 const HIDDEN = new Set(['rearWing_endplate'])
