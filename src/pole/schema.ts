@@ -26,6 +26,7 @@ export const CarSample = Schema.Struct({
   n_gear: Schema.Number,
   throttle: Schema.Number,
   brake: Schema.Number,
+  rpm: Schema.optionalKey(Schema.Number),
 })
 
 export type CarSample = typeof CarSample.Type
@@ -55,12 +56,17 @@ export const LocationResponse = Schema.Array(LocationSample)
 
 export const StintsResponse = Schema.Array(Stint)
 
-export const TelemetryRow = Schema.Tuple([Schema.Number, Schema.Number, Schema.Number, Schema.Number, Schema.Number, Schema.Number])
+export const TelemetryRow = Schema.Union([
+  Schema.Tuple([Schema.Number, Schema.Number, Schema.Number, Schema.Number, Schema.Number, Schema.Number]),
+  Schema.Tuple([Schema.Number, Schema.Number, Schema.Number, Schema.Number, Schema.Number, Schema.Number, Schema.Number]),
+])
 
 export const PoleLap = Schema.Struct({
   sessionKey: Schema.Number,
   year: Schema.Number,
   driver: Schema.String,
+  team: Schema.optionalKey(Schema.String),
+  date: Schema.optionalKey(Schema.String),
   wet: Schema.Boolean,
   time: Schema.Number,
   sectors: Schema.Tuple([Schema.Number, Schema.Number, Schema.Number]),
@@ -70,5 +76,7 @@ export const PoleLap = Schema.Struct({
 export type PoleLap = typeof PoleLap.Type
 
 export type PoleRow = typeof TelemetryRow.Type
+
+export const isComplete = (lap: PoleLap) => lap.team !== undefined && lap.date !== undefined && lap.rows.length > 0 && lap.rows.every((row) => row[6] !== undefined)
 
 export const PoleLapJson = Schema.fromJsonString(PoleLap)

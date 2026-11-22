@@ -105,3 +105,21 @@ it('lines up a standing start from the grid slot to the line', () => {
   expect(rows.at(-1)?.[1]).toBe(1)
   expect(rows.every((row, i) => i === 0 || row[1] >= (rows[i - 1]?.[1] ?? 0))).toBe(true)
 })
+
+it('carries rpm as a seventh column on Monza within engine limits', () => {
+  const rows = alignLap(inputFor('monza', 11357))?.rows ?? []
+
+  expect(rows.length).toBeGreaterThan(200)
+  expect(rows.every((row) => row.length === 7)).toBe(true)
+  expect(rows.every((row) => (row[6] ?? 0) >= 4000 && (row[6] ?? 0) <= 15000)).toBe(true)
+})
+
+it('writes six-column rows when any in-lap car sample lacks rpm', () => {
+  const input = inputFor('monza', 11357)
+  const mid = Math.floor(input.car.length / 2)
+  const missing = input.car.map((s, i) => (i === mid ? { date: s.date, speed: s.speed, n_gear: s.n_gear, throttle: s.throttle, brake: s.brake } : s))
+  const rows = alignLap({ ...input, car: missing })?.rows ?? []
+
+  expect(rows.length).toBeGreaterThan(200)
+  expect(rows.every((row) => row.length === 6)).toBe(true)
+})

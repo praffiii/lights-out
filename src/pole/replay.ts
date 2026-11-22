@@ -32,12 +32,13 @@ export const sampleRows = (rows: ReadonlyArray<PoleRow>, t: number) => {
   const a = rows[i - 1] ?? rows[0]
   const b = rows[i] ?? a
 
-  if (!a || !b) return { u: 0, speed: 0, gear: 0, throttle: 0, brake: 0 }
+  if (!a || !b) return { u: 0, speed: 0, gear: 0, throttle: 0, brake: 0, rpm: null }
 
   const f = b[0] === a[0] ? 0 : Math.min(1, Math.max(0, (t - a[0]) / (b[0] - a[0])))
   const near = f < 0.5 ? a : b
+  const rpm = a[6] !== undefined && b[6] !== undefined ? mix(a[6], b[6], f) : null
 
-  return { u: mix(a[1], b[1], f), speed: mix(a[2], b[2], f), gear: near[3], throttle: mix(a[4], b[4], f), brake: near[5] }
+  return { u: mix(a[1], b[1], f), speed: mix(a[2], b[2], f), gear: near[3], throttle: mix(a[4], b[4], f), brake: near[5], rpm }
 }
 
 export const sampleAt = (lap: PoleLap, t: number) => {
