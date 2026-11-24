@@ -139,7 +139,9 @@ From here on the pages are planned, not built. Read every "rises", "types on" an
 | How F1 works index | The headline rises. | The chapter rows behave as on Home. | Same as Home. |
 | Chapter hero | The headline sweeps in, then the "Chapter 02 · 5 min" label; the photo arrives behind the bar. | "All chapters ←": the hover roll. | The photo drifts. |
 | Body text | None | Glossary terms: the dotted underline turns solid and the definition pops in under the term (0.24 s). On touch, a tap toggles it. | Paragraph groups fade up 24 px. |
-| Diagram or render per chapter (switchback, grid, tyres) | None | Chips toggle layers. | Pinned and scrubbed through the moments (dive, apex, cross, exit). A mono caption types the current moment. |
+| Diagram or render per chapter (grid, tyres) | None | Chips toggle layers. | Pinned and scrubbed through the moments. A mono caption types the current moment. |
+| Switchback and divebomb (Chapter 07) | None | None | Clay stills. Their chips appear one at a time. |
+| The fight (Chapter 07) | None | The "Who leads" bar is a slider: click, drag, arrow keys. | Pinned. Scroll drives one continuous camera and the lap time, slower around each lead change. The step card wipes in, the leader's row moves to the top of the board. |
 | Timing tower / race log rows | None | The row fills ink. | Rows rise; times count up; the payoff row fills purple last. |
 | Next chapter (footer lead) | None | The photo zooms. | The photo wipes up. Clicking runs the page change. |
 
