@@ -122,9 +122,9 @@ Pure functions in `src/fight/model.ts`:
   | 1 | Russell dives | "298 against 261 km/h on the run to Turn 3. Russell takes the lead." |
   | 2 | Leclerc answers | "320 against 295 km/h on the straight to Turn 9. Leclerc is back in front." |
   | 3 | Too deep | "Turn 1, next lap. Russell dives again, brakes too late and locks up." |
-  | 4 | The cut-back | "Russell is still slowing. Leclerc is on the power first and leads again." |
+  | 4 | The cut-back | "Leclerc is on the power first, carries more speed off the corner and leads again." |
 
-  The speeds in steps 1 and 2 are read from the data at the change, not typed.
+  The speeds in steps 1 and 2 are read from the data at the change, not typed, so they may differ by 1 km/h from the numbers above. The mock's step 4 text says Russell locks up; that moved to step 3, where it happens.
 - `readout(file, t)` per car: speed, gear, throttle cells and brake, and the gap: `Leader` for the car in front; for the car behind `Level` under 5 m, otherwise `+<n> m`. **My call** on 5 m: it is about the error.
 - `stepAt`, `sliderText`, with the same shape as Chapter 02's.
 
