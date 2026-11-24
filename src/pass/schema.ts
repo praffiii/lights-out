@@ -25,7 +25,7 @@ const Lapped = Schema.String.pipe(Schema.decodeTo(Schema.Null, { decode: SchemaG
 
 export const IntervalsResponse = Schema.Array(Schema.Struct({ date: Schema.String, interval: Schema.NullOr(Schema.Union([Schema.Number, Lapped])) }))
 
-const Car = Schema.Struct({ code: Schema.String, name: Schema.String, team: Schema.String, rows: Schema.Array(TelemetryRow) })
+export const Car = Schema.Struct({ code: Schema.String, name: Schema.String, team: Schema.String, rows: Schema.Array(TelemetryRow) })
 
 export const PassFile = Schema.Struct({
   session: Schema.Number,
