@@ -195,4 +195,5 @@ def main():
     print(f"done {CID}: lap {track.lap:.0f} m, camera {dist:.0f} m at {az} deg, lens {cam.data.lens:.1f} mm, crop {pins['crop']}, blocks {count}, labels clear {not intrudes(scene, cam, pts)}, map {(hi.x - lo.x):.0f}x{(hi.y - lo.y):.0f} m")
 
 
-main()
+if __name__ == "__main__":
+    main()

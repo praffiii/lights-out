@@ -120,7 +120,7 @@ History is woven in: a car's evolution, a legend's story, a classic corner's pas
 2. **The intro** (storyboard in DESIGN.md). It plays before Home on the first visit. **[my call]** on its place in the order. **Dropped by Praffi on 2026-11-09, never shipped; see "Intro (dropped)" in DESIGN.md.**
 3. **This season.**
 4. **How F1 works:** the index, then one chapter at a time.
-5. **The car**, **the engine**, **the tracks** (index and circuit page), **the people** (index and driver page). The car shipped as How F1 works Chapter 05 (`docs/superpowers/plans/2026-11-15-chapter-05-inside-the-car.md`). The engine shipped as How F1 works Chapter 06 (`docs/superpowers/plans/2026-11-20-chapter-06-power-unit.md`). The tracks shipped with its index and its first circuit page, Las Vegas (`docs/superpowers/specs/2026-11-17-the-tracks-design.md`); every other circuit follows with one spec each.
+5. **The car**, **the engine**, **the tracks** (index and circuit page), **the people** (index and driver page). The car shipped as How F1 works Chapter 05 (`docs/superpowers/plans/2026-11-15-chapter-05-inside-the-car.md`). The engine shipped as How F1 works Chapter 06 (`docs/superpowers/plans/2026-11-20-chapter-06-power-unit.md`). Defending follows as Chapter 07 (`docs/superpowers/plans/2026-11-24-chapter-07-defending.md`); The two championships is 08 and DRS is 09. The tracks shipped with its index and its first circuit page, Las Vegas (`docs/superpowers/specs/2026-11-17-the-tracks-design.md`); every other circuit follows with one spec each.
 6. **Glossary, credits, 404.**
 
 Praffi can reorder anything after Home. Links to a design that isn't built yet show "Soon".

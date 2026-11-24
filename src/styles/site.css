@@ -123,12 +123,12 @@ main:focus { outline: none; }
 .menu .kicker:hover, .menu .kicker:focus-visible, .menu .kicker[aria-current] { color: var(--ink); }
 .menu .kicker i { width: 8px; height: 8px; border-radius: 50%; background: var(--s2); }
 .menu .subs { display: grid; max-width: 520px; margin: 4px 0 6px 44px; }
-.menu .subs > a, .menu .subs > span { position: relative; display: flex; align-items: baseline; gap: 20px; padding-block: 1px; color: var(--muted); transition: color 0.24s; }
+.menu .subs > a, .menu .subs > span { position: relative; display: flex; align-items: baseline; gap: 20px; padding-block: 0; color: var(--muted); transition: color 0.24s; }
 .menu .subs > a::before { content: ''; position: absolute; left: -16px; top: 3px; bottom: 3px; width: 3px; background: var(--purple); transform: scaleY(0); transition: transform 0.24s var(--brake); }
 .menu .subs > a:hover, .menu .subs > a:focus-visible, .menu .subs > a[aria-current] { color: var(--ink); }
 .menu .subs > a:hover::before, .menu .subs > a:focus-visible::before, .menu .subs > a[aria-current]::before { transform: scaleY(1); }
 .menu .subs .mono { flex: none; }
-.menu .subs .title { font-size: 18px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.15; }
+.menu .subs .title { font-size: 17px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.15; }
 .menu .subs .soon { order: 1; }
 .menu .subs .min { order: 2; margin-left: auto; }
 .menu figure { position: relative; align-self: stretch; display: grid; grid-template-rows: 1fr auto; gap: 10px; min-height: 0; }

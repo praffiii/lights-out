@@ -15,16 +15,17 @@ type Paint = (scope: HTMLElement) => (t: number) => void
 
 export type Scrub = { time: RefObject<number>; seek: RefObject<(t: number) => void> }
 
-export type ScrubOptions = { length?: string; rest?: number }
+export type ScrubOptions = { length?: string; rest?: number; scale?: Pace }
 
-export const scrubOptions = (end: number, options?: ScrubOptions) => ({
+export const scrubOptions = (end: number, pace: Pace, options?: ScrubOptions) => ({
   length: options?.length ?? '+=300%',
   rest: options?.rest ?? end,
   initial: options?.rest ?? 0,
+  scale: options?.scale ?? pace,
 })
 
 export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops: ReadonlyArray<number>, pace: Pace, paint: Paint, options?: ScrubOptions): Scrub {
-  const { length, rest, initial } = scrubOptions(end, options)
+  const { length, rest, initial, scale } = scrubOptions(end, pace, options)
   const hasRest = options?.rest !== undefined
   const time = useRef(REDUCED ? rest : initial)
   const seeker = useRef<(t: number) => void>(() => {})
@@ -119,7 +120,7 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
       const fromX = (x: number) => {
         const r = track.getBoundingClientRect()
 
-        return timeAt(pace, (x - r.left) / r.width)
+        return timeAt(scale, (x - r.left) / r.width)
       }
 
       const onDown = (e: PointerEvent) => {
@@ -166,7 +167,7 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
         track.removeEventListener('keydown', onKey)
       }
     },
-    { scope: root, dependencies: [end, stops, pace, length, rest] },
+    { scope: root, dependencies: [end, stops, pace, length, rest, scale] },
   )
 
   return { time, seek: seeker }

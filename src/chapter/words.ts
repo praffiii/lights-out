@@ -52,6 +52,15 @@ export const WORDS = {
   harvesting: { term: 'Harvesting', def: 'Turning braking into electricity for the battery.' },
   deployment: { term: 'Deployment', def: "Spending the battery's energy through the MGU-K to push the car." },
   sustainableFuel: { term: 'Sustainable fuel', def: 'From 2026, fuel made without new fossil carbon.' },
+  defending: { term: 'Defending', def: 'Placing your car to make a pass harder. One change of direction is allowed.' },
+  racingLine: { term: 'Racing line', def: 'The fastest path through a corner, from the outside, to the inside, to the outside again.' },
+  switchback: { term: 'Switchback', def: 'Letting a late braker slide past, then turning back inside them to lead out of the corner.' },
+  divebomb: { term: 'Divebomb', def: 'A late lunge up the inside from too far back.' },
+  apex: { term: 'Apex', def: 'The innermost point of the line through a corner.' },
+  carsWidth: { term: "Car's width", def: 'The room a defender must leave when moving back toward the racing line.' },
+  stewards: { term: 'Stewards', def: 'The officials who judge incidents and hand out penalties.' },
+  penaltyPoints: { term: 'Penalty points', def: "Marks on a driver's licence for dangerous driving. Twelve in a year means missing a race." },
+  driveThrough: { term: 'Drive-through', def: 'A penalty: drive the length of the pit lane at the speed limit without stopping.' },
 } as const
 
 export type WordKey = keyof typeof WORDS
@@ -67,3 +76,5 @@ export const FLAGS_WORDS: ReadonlyArray<WordKey> = ['marshal', 'marshalSector', 
 export const CAR_WORDS: ReadonlyArray<WordKey> = ['survivalCell', 'halo', 'sidepod', 'floor', 'groundEffect', 'powerUnit', 'activeAero', 'straightMode', 'overtakeMode']
 
 export const POWER_WORDS: ReadonlyArray<WordKey> = ['powerUnit', 'mguK', 'mguH', 'energyStore', 'turbocharger', 'harvesting', 'deployment', 'overtakeMode', 'sustainableFuel']
+
+export const DEFENDING_WORDS: ReadonlyArray<WordKey> = ['defending', 'racingLine', 'switchback', 'divebomb', 'apex', 'brakingZone', 'carsWidth', 'trackLimits', 'blackWhiteFlag', 'stewards', 'penaltyPoints', 'driveThrough']

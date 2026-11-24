@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 
-import { expect, LOADER_MS, test } from './fixtures.ts'
+import { expect, LOADER_MS, pinSpan, scrollTo, test } from './fixtures.ts'
 
 const PATH = '/chapters/overtaking'
 
@@ -64,16 +64,6 @@ const slider = (page: Page) => replay(page, '[role="slider"]')
 
 const now = async (page: Page) => Number(await slider(page).getAttribute('aria-valuenow'))
 
-const pinSpan = (page: Page) =>
-  page.evaluate(() => {
-    const spacer = document.querySelector('.replay .pin-spacer')
-    const top = (spacer?.getBoundingClientRect().top ?? 0) + scrollY
-
-    return { top, range: (spacer?.getBoundingClientRect().height ?? 0) - innerHeight }
-  })
-
-const scrollTo = (page: Page, y: number) => page.evaluate((to) => window.scrollTo(0, to), y)
-
 const reach = (page: Page) =>
   page.evaluate(() => {
     const line = document.querySelector('.replay .pass-hud .line')
@@ -94,7 +84,7 @@ test('scrolling through the pin lights the steps in order', async ({ page, error
   await loaded(page)
   await replay(page).scrollIntoViewIfNeeded()
 
-  const { top, range } = await pinSpan(page)
+  const { top, range } = await pinSpan(page, '.replay')
   const end = Number(await slider(page).getAttribute('aria-valuemax'))
   const chaser = replay(page, '.racer[data-car="chaser"]')
   const lit: number[] = []
@@ -159,7 +149,7 @@ test('after a reload from inside the pin, scroll still maps to time', async ({ p
   await loaded(page)
   await replay(page).scrollIntoViewIfNeeded()
 
-  const before = await pinSpan(page)
+  const before = await pinSpan(page, '.replay')
 
   await scrollTo(page, before.top + before.range * 0.6)
   await expect.poll(() => now(page)).toBeGreaterThan(0)
@@ -167,7 +157,7 @@ test('after a reload from inside the pin, scroll still maps to time', async ({ p
   await expect(page.locator('.loader')).toHaveCount(0, { timeout: LOADER_MS })
   await replay(page).scrollIntoViewIfNeeded()
 
-  const { top, range } = await pinSpan(page)
+  const { top, range } = await pinSpan(page, '.replay')
   const end = Number(await slider(page).getAttribute('aria-valuemax'))
 
   await scrollTo(page, top + range * 0.6)
@@ -278,7 +268,7 @@ test('the pinned replay fits a phone with its toolbars showing', async ({ page }
   await loaded(page)
   await replay(page).scrollIntoViewIfNeeded()
 
-  const { top } = await pinSpan(page)
+  const { top } = await pinSpan(page, '.replay')
 
   await scrollTo(page, top + 10)
   await expect.poll(() => replay(page, '.track').evaluate((el) => el.getBoundingClientRect().bottom <= innerHeight)).toBe(true)

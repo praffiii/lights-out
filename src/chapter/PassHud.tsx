@@ -6,29 +6,17 @@ import { readout } from '#/pass/model.ts'
 import type { PassFile } from '#/pass/schema.ts'
 import { pointAt } from '#/pole/replay.ts'
 
-import { place, runWhileSeen } from './hud.ts'
+import { normalAt, paintTrail, place, runWhileSeen, TANGENT, TRAIL_SEGS } from './hud.ts'
 
 const SIDE_PX = 9
 const SPREAD_M = 40
 const SIDE_M = 3.5
 const SEGMENT_STEP = 0.0015
 const LEAD = 0.03
-const TANGENT = 0.001
-const TRAIL_U = 0.03
-const SEGS = 12
-const TRAIL_W = 11
 const GATE_PX = 26
 const CHIP_PX = 36
 
 type Props = { pass: PassFile; stage: RefObject<HTMLDivElement | null>; replay: Replay; time: RefObject<number>; ready: boolean }
-
-const normalAt = (trace: Float32Array, u: number) => {
-  const a = pointAt(trace, u - TANGENT)
-  const b = pointAt(trace, u + TANGENT)
-  const len = Math.hypot(b.x - a.x, b.y - a.y) || 1
-
-  return { nx: (b.y - a.y) / len, ny: -(b.x - a.x) / len, len }
-}
 
 const gate = (el: Element | null | undefined, trace: Float32Array, u: number) => {
   if (!(el instanceof SVGLineElement)) return
@@ -114,18 +102,7 @@ export function PassHud({ pass, stage, replay, time, ready }: Props) {
 
         if (chip instanceof HTMLElement) chip.style.translate = `${(nx * CHIP_PX * sign).toFixed(1)}px ${(ny * CHIP_PX * sign).toFixed(1)}px`
 
-        for (const [i, seg] of trails[car].entries()) {
-          const a = pointAt(trace, u - ((i + 1) * TRAIL_U) / SEGS)
-          const b = pointAt(trace, u - (i * TRAIL_U) / SEGS)
-          const f = 1 - i / SEGS
-
-          seg.setAttribute('x1', (a.x + nx * side * sign).toFixed(1))
-          seg.setAttribute('y1', (a.y + ny * side * sign).toFixed(1))
-          seg.setAttribute('x2', (b.x + nx * side * sign).toFixed(1))
-          seg.setAttribute('y2', (b.y + ny * side * sign).toFixed(1))
-          seg.setAttribute('stroke-width', (TRAIL_W * f).toFixed(2))
-          seg.setAttribute('stroke-opacity', (f * f).toFixed(3))
-        }
+        paintTrail(trails[car], trace, u, nx * side * sign, ny * side * sign)
       }
 
       const m = pointAt(trace, mid)
@@ -149,7 +126,7 @@ export function PassHud({ pass, stage, replay, time, ready }: Props) {
         <line className="gate finish" data-gate="finish" />
         {(['leader', 'chaser'] as const).map((car) => (
           <g key={car} className="trail" data-trail={car}>
-            {Array.from({ length: SEGS }, (_, i) => (
+            {Array.from({ length: TRAIL_SEGS }, (_, i) => (
               <line key={i} />
             ))}
           </g>

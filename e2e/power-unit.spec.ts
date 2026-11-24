@@ -104,20 +104,21 @@ test('shows the 2026 numbers, payoff, plus row and glossary chips in order', asy
   expect(errors).toEqual([])
 })
 
-test('ends with the weekend band', async ({ page, errors }) => {
+test('the hero and the Next card lead on to chapter 07', async ({ page, errors }) => {
   await loaded(page)
 
-  await expect(chapter(page, '.next .caption > p')).toHaveText('Next · Round 20 · this weekend')
-  await expect(chapter(page, '.next h2')).toHaveText('São Paulo,this weekend.')
-  await expect(chapter(page, '.next .read')).toHaveAttribute('href', '/weekend')
+  await expect(chapter(page, '.next .caption > p')).toHaveText('Next · Chapter 07 · 6 min')
+  await expect(chapter(page, '.next h2')).toHaveText('Defending.')
+  await expect(chapter(page, '.next .read')).toHaveAttribute('href', '/chapters/defending')
+  await expect(chapter(page, '.opening nav').getByRole('link', { name: /07 Defending/ })).toHaveAttribute('href', '/chapters/defending')
   expect(errors).toEqual([])
 })
 
-test('menu, Home and Chapter 05 lead here and Home reads six chapters', async ({ page, errors }) => {
+test('menu, Home and Chapter 05 lead here and Home reads seven chapters', async ({ page, errors }) => {
   await page.goto('/')
   await expect(page.locator('.loader')).toHaveCount(0, { timeout: LOADER_MS })
 
-  await expect(page.locator('.chapters .head')).toContainText('Six chapters · 35 min')
+  await expect(page.locator('.chapters .head')).toContainText('Seven chapters · 41 min')
   await expect(page.locator('.rows li:nth-child(6) a')).toHaveAttribute('href', PATH)
   await page.getByRole('button', { name: 'Menu' }).click()
   await expect(page.locator('.menu nav .line > a', { hasText: 'The engine' })).toHaveAttribute('href', PATH)

@@ -382,13 +382,11 @@ def strips(name, track, idx, us, bands, z, mat):
     verts, faces, uvs = [], [], []
     for off, w in bands:
         base = len(verts)
+        sides = [circuit.offset(S, off + side * w / 2) for side in (1, -1)]
+        assert not any(circuit.folds(S, line) for line in sides), name
         for k, u in zip(idx, us):
-            p = S[k % m]
-            t = circuit.flat(S[(k + 1) % m] - S[k - 1])
-            n = Vector((-t.y, t.x, 0))
-            for side, across in ((1, 1.0), (-1, 0.0)):
-                q = p + n * (off + side * w / 2)
-                verts.append((q.x, q.y, p.z + z))
+            for line, across in zip(sides, (1.0, 0.0)):
+                verts.append((*line[k % m], S[k % m].z + z))
                 uvs.append((u, across))
         for j in range(len(idx) - 1):
             a = base + 2 * j

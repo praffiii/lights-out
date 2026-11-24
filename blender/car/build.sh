@@ -22,5 +22,10 @@ for theme in light dark; do
     run render.py -- "$view" "$theme"
     python3 -I post.py "$view-$theme"
   done
+  for view in switch switch-phone dive dive-phone; do
+    run duel.py -- "$view" "$theme"
+    python3 -I post.py "$view-$theme"
+  done
 done
+run duel.py -- pins
 ls -l ../../public/car ../../src/car/parts.json

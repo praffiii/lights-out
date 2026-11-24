@@ -11,7 +11,7 @@ export type Credit = { src: string; place: string; by: string; licence: string; 
 
 const USED_ON = {
   heroLight: 'Menu',
-  heroDark: 'Chapter 06, Menu',
+  heroDark: 'Menu',
   ch01: 'Home, Chapter 01, Menu',
   ch02: 'Home, Chapters 01 and 02, Race weekend, Glossary, Menu',
   ch02Straight: 'Chapter 02',
@@ -36,6 +36,8 @@ const USED_ON = {
   ch06Y1986: 'Chapter 06',
   ch06Y2001: 'Chapter 06',
   ch06Y2014: 'Chapter 06',
+  ch07: 'Home, Chapters 06 and 07',
+  ch07Podium: 'Chapter 07',
   tyres: 'Home',
   williams: 'Home, Menu',
   brm: 'Home, Menu',
