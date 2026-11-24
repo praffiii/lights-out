@@ -69,7 +69,7 @@ const run = (driver: number) =>
 const study = Effect.gen(function* () {
   const client = yield* OpenF1Client
   const drivers = yield* client.drivers(SESSION)
-  const runs = []
+  const runs: Array<{ d: number; rows: ReadonlyArray<PoleRow> }> = []
 
   for (const d of DRIVERS) runs.push({ d, rows: yield* run(d) })
 

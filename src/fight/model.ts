@@ -101,7 +101,7 @@ export const steps = (file: FightFile): readonly [Step, Step, Step, Step] | null
   ]
 }
 
-export const leaderAt = (all: ReadonlyArray<Lead>, t: number): Which => all.findLast((l) => l.from <= t)?.who ?? 0
+export const leaderAt = (all: ReadonlyArray<Lead>, t: number): Which => all.filter((l) => l.from <= t).at(-1)?.who ?? 0
 
 export { stepAt }
 
