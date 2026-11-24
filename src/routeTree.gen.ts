@@ -15,6 +15,7 @@ import { Route as GlossaryRouteImport } from './routes/glossary'
 import { Route as SeasonRouteImport } from './routes/season'
 import { Route as WeekendRouteImport } from './routes/weekend'
 import { Route as ApiSeasonRouteImport } from './routes/api/season'
+import { Route as ChaptersDefendingRouteImport } from './routes/chapters.defending'
 import { Route as ChaptersFlagsRouteImport } from './routes/chapters.flags'
 import { Route as ChaptersInsideTheCarRouteImport } from './routes/chapters.inside-the-car'
 import { Route as ChaptersOvertakingRouteImport } from './routes/chapters.overtaking'
@@ -57,6 +58,11 @@ const WeekendRoute = WeekendRouteImport.update({
 const ApiSeasonRoute = ApiSeasonRouteImport.update({
   id: '/api/season',
   path: '/api/season',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChaptersDefendingRoute = ChaptersDefendingRouteImport.update({
+  id: '/chapters/defending',
+  path: '/chapters/defending',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChaptersFlagsRoute = ChaptersFlagsRouteImport.update({
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
+  '/chapters/defending': typeof ChaptersDefendingRoute
   '/chapters/flags': typeof ChaptersFlagsRoute
   '/chapters/inside-the-car': typeof ChaptersInsideTheCarRoute
   '/chapters/overtaking': typeof ChaptersOvertakingRoute
@@ -154,6 +161,7 @@ export interface FileRoutesByTo {
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
+  '/chapters/defending': typeof ChaptersDefendingRoute
   '/chapters/flags': typeof ChaptersFlagsRoute
   '/chapters/inside-the-car': typeof ChaptersInsideTheCarRoute
   '/chapters/overtaking': typeof ChaptersOvertakingRoute
@@ -176,6 +184,7 @@ export interface FileRoutesById {
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
+  '/chapters/defending': typeof ChaptersDefendingRoute
   '/chapters/flags': typeof ChaptersFlagsRoute
   '/chapters/inside-the-car': typeof ChaptersInsideTheCarRoute
   '/chapters/overtaking': typeof ChaptersOvertakingRoute
@@ -199,6 +208,7 @@ export interface FileRouteTypes {
     | '/season'
     | '/weekend'
     | '/api/season'
+    | '/chapters/defending'
     | '/chapters/flags'
     | '/chapters/inside-the-car'
     | '/chapters/overtaking'
@@ -220,6 +230,7 @@ export interface FileRouteTypes {
     | '/season'
     | '/weekend'
     | '/api/season'
+    | '/chapters/defending'
     | '/chapters/flags'
     | '/chapters/inside-the-car'
     | '/chapters/overtaking'
@@ -241,6 +252,7 @@ export interface FileRouteTypes {
     | '/season'
     | '/weekend'
     | '/api/season'
+    | '/chapters/defending'
     | '/chapters/flags'
     | '/chapters/inside-the-car'
     | '/chapters/overtaking'
@@ -263,6 +275,7 @@ export interface RootRouteChildren {
   SeasonRoute: typeof SeasonRoute
   WeekendRoute: typeof WeekendRoute
   ApiSeasonRoute: typeof ApiSeasonRoute
+  ChaptersDefendingRoute: typeof ChaptersDefendingRoute
   ChaptersFlagsRoute: typeof ChaptersFlagsRoute
   ChaptersInsideTheCarRoute: typeof ChaptersInsideTheCarRoute
   ChaptersOvertakingRoute: typeof ChaptersOvertakingRoute
@@ -320,6 +333,13 @@ declare module '@tanstack/react-router' {
       path: '/api/season'
       fullPath: '/api/season'
       preLoaderRoute: typeof ApiSeasonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chapters/defending': {
+      id: '/chapters/defending'
+      path: '/chapters/defending'
+      fullPath: '/chapters/defending'
+      preLoaderRoute: typeof ChaptersDefendingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chapters/flags': {
@@ -423,6 +443,7 @@ const rootRouteChildren: RootRouteChildren = {
   SeasonRoute: SeasonRoute,
   WeekendRoute: WeekendRoute,
   ApiSeasonRoute: ApiSeasonRoute,
+  ChaptersDefendingRoute: ChaptersDefendingRoute,
   ChaptersFlagsRoute: ChaptersFlagsRoute,
   ChaptersInsideTheCarRoute: ChaptersInsideTheCarRoute,
   ChaptersOvertakingRoute: ChaptersOvertakingRoute,

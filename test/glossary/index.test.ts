@@ -18,6 +18,9 @@ it('files each word under its first letter', () => {
 it('sends a word to the first chapter that teaches it', () => {
   expect(ENTRIES.find((e) => e.key === 'undercut')?.chapter.n).toBe('03')
   expect(ENTRIES.find((e) => e.key === 'activeAero')?.chapter.n).toBe('02')
+  expect(ENTRIES.find((e) => e.key === 'brakingZone')?.chapter.n).toBe('02')
+  expect(ENTRIES.find((e) => e.key === 'trackLimits')?.chapter.n).toBe('04')
+  expect(ENTRIES.map((e) => [String(e.key), e.chapter.n])).toContainEqual(['switchback', '07'])
 })
 
 it('finds words by term or meaning, ignoring case, accents and stray spaces', () => {

@@ -113,11 +113,11 @@ test('ends with the weekend band', async ({ page, errors }) => {
   expect(errors).toEqual([])
 })
 
-test('menu, Home and Chapter 05 lead here and Home reads six chapters', async ({ page, errors }) => {
+test('menu, Home and Chapter 05 lead here and Home reads seven chapters', async ({ page, errors }) => {
   await page.goto('/')
   await expect(page.locator('.loader')).toHaveCount(0, { timeout: LOADER_MS })
 
-  await expect(page.locator('.chapters .head')).toContainText('Six chapters · 35 min')
+  await expect(page.locator('.chapters .head')).toContainText('Seven chapters · 41 min')
   await expect(page.locator('.rows li:nth-child(6) a')).toHaveAttribute('href', PATH)
   await page.getByRole('button', { name: 'Menu' }).click()
   await expect(page.locator('.menu nav .line > a', { hasText: 'The engine' })).toHaveAttribute('href', PATH)

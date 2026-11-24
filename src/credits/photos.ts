@@ -36,6 +36,8 @@ const USED_ON = {
   ch06Y1986: 'Chapter 06',
   ch06Y2001: 'Chapter 06',
   ch06Y2014: 'Chapter 06',
+  ch07: 'Home, Chapters 06 and 07',
+  ch07Podium: 'Chapter 07',
   tyres: 'Home',
   williams: 'Home, Menu',
   brm: 'Home, Menu',

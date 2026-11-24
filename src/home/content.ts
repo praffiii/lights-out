@@ -29,6 +29,8 @@ export const PHOTOS = {
   ch06Y1986: { src: '/img/ch06-1986.jpg', place: 'Munich, 2014', credit: 'Photo Jiří Sedláček · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Formula_1_racing_engine_M12-13_in_BMW-Museum_in_Munich,_Bayern.JPG' },
   ch06Y2001: { src: '/img/ch06-2001.jpg', place: 'Maranello, 2013', credit: 'Photo Morio · CC BY-SA 3.0', source: 'https://commons.wikimedia.org/wiki/File:Ferrari_050_engine_front_Museo_Ferrari.jpg' },
   ch06Y2014: { src: '/img/ch06-2014.jpg', place: 'Silverstone, 2019', credit: 'Photo David Merrett · CC BY 2.0', source: 'https://commons.wikimedia.org/wiki/File:2016_Mercedes_PU106_Hybrid_Power_Unit_(49255122157).jpg' },
+  ch07: { src: '/img/ch07.jpg', srcSet: '/img/ch07.jpg 1400w, /img/ch07-2800.jpg 2800w', place: 'Pit straight · Silverstone, 2026', credit: 'Photo Jason Puddephatt · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Lewis_Hamilton_George_Russell_F1_Cars_(55382811247).jpg' },
+  ch07Podium: { src: '/img/ch07-podium.jpg', place: 'Russell, Antonelli and Leclerc on the podium · Melbourne, 2026', credit: 'Photo Yu Chu Chin · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Podium_celebration_at_the_2026_Australian_Grand_Prix_(028A8808).jpg' },
   tyres: { src: '/img/tyres.jpg', place: 'Pirelli tyres, slicks to wets', credit: 'Photo Hullian111 · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Pirelli_Tyre_Sets_at_Formula_1_Exhibition,_London_02.jpg' },
   williams: { src: '/img/williams.jpg', place: 'Williams FW48 · Shanghai, 2026', credit: 'Photo Liauzh · CC BY 4.0', source: 'https://commons.wikimedia.org/wiki/File:2026_Chinese_GP_-_Williams_-_Alex_Albon_-_Qualifying.jpg' },
   brm: { src: '/img/y1973.jpg', place: 'BRM mechanics · Anderstorp, 1973', credit: 'Photo Markku Lepola · CC BY 4.0', source: 'https://commons.wikimedia.org/wiki/File:Swedish_Grand_Prix_1973_(JOKAMAL3B08-13).tif' },
@@ -46,6 +48,7 @@ export const CHAPTERS: ReadonlyArray<ChapterEntry> = [
   { n: '04', title: 'Flags and what they mean', min: 4, photo: PHOTOS.ch04, to: '/chapters/flags' },
   { n: '05', title: 'Inside the car', min: 8, photo: PHOTOS.ch05, to: '/chapters/inside-the-car' },
   { n: '06', title: 'The power unit', min: 6, photo: PHOTOS.ch06, to: '/chapters/power-unit' },
+  { n: '07', title: 'Defending', min: 6, photo: PHOTOS.ch07, to: '/chapters/defending' },
 ]
 
 export const HERO = {
