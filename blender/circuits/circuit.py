@@ -132,21 +132,65 @@ def recolour(m, hex_):
     m.node_tree.nodes[m["rgb"]].outputs[0].default_value = (*linear(hex_), 1)
 
 
+LOOP_REACH = 40
+
+
+def crossing(a, b, c, d):
+    r, q = (b[0] - a[0], b[1] - a[1]), (d[0] - c[0], d[1] - c[1])
+    det = r[0] * q[1] - r[1] * q[0]
+    if abs(det) < 1e-9:
+        return None
+    w = (c[0] - a[0], c[1] - a[1])
+    t, u = (w[0] * q[1] - w[1] * q[0]) / det, (w[0] * r[1] - w[1] * r[0]) / det
+    return (a[0] + t * r[0], a[1] + t * r[1]) if 0 <= t <= 1 and 0 <= u <= 1 else None
+
+
+def offset(samples, d):
+    m = len(samples)
+    line = []
+    for k, p in enumerate(samples):
+        t = flat(samples[(k + 1) % m] - samples[k - 1])
+        line.append((p.x - t.y * d, p.y + t.x * d))
+    out = list(line)
+    i = 0
+    while i < m:
+        for j in range(i + LOOP_REACH, i + 1, -1):
+            at = crossing(line[i], line[(i + 1) % m], line[j % m], line[(j + 1) % m])
+            if at:
+                for k in range(i + 1, j + 1):
+                    out[k % m] = at
+                i = j
+                break
+        i += 1
+    for k in range(m):
+        if backward(samples, out, k):
+            out[(k + 1) % m] = out[k]
+    return out
+
+
+def backward(samples, line, k):
+    n = (k + 1) % len(samples)
+    return (line[n][0] - line[k][0]) * (samples[n].x - samples[k].x) + (line[n][1] - line[k][1]) * (samples[n].y - samples[k].y) < -1e-6
+
+
+def folds(samples, line):
+    return sum(backward(samples, line, k) for k in range(len(samples)))
+
+
 def ribbon(name, samples, s, a, b, lap, mat):
     m = len(samples)
     idx = [k for k in range(m) if a <= s[k] <= b]
     if a > 0:
         idx.insert(0, idx[0] - 1)
     idx.append((idx[-1] + 1) % m if b < lap else 0)
+    left, right = offset(samples, WIDTH / 2), offset(samples, -WIDTH / 2)
+    assert not folds(samples, left) and not folds(samples, right), name
     verts, faces, us = [], [], []
     for j, k in enumerate(idx):
         p = samples[k]
-        t = flat(samples[(k + 1) % m] - samples[k - 1])
-        nrm = Vector((-t.y, t.x, 0)) * (WIDTH / 2)
-        up = Vector((0, 0, HEIGHT))
         u = lap if (k == 0 and j > 0) else s[k]
-        for q in (p + nrm + up, p - nrm + up, p + nrm, p - nrm):
-            verts.append(q[:])
+        for q in ((*left[k], p.z + HEIGHT), (*right[k], p.z + HEIGHT), (*left[k], p.z), (*right[k], p.z)):
+            verts.append(q)
             us.append(u / lap)
     for j in range(len(idx) - 1):
         lt, rt, lb, rb = (4 * j + o for o in range(4))
