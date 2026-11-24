@@ -45,3 +45,7 @@ it('credits the photo the Next band on The tracks shows', () => {
 it('credits the three photos of the Antonelli story on The people', () => {
   for (const photo of STORY_PHOTOS) expect(CREDITS.find((c) => c.src === photo.src)?.usedOn.split(', ')).toContain('The people')
 })
+
+it('credits the dark hero photo to the menu alone, now that chapter 06 no longer ends with it', () => {
+  expect(CREDITS.find((c) => c.src === '/img/hero-dark.jpg')?.usedOn).toBe('Menu')
+})

@@ -6,7 +6,7 @@ import { Go } from '#/shell/Go.tsx'
 
 import { FiveParts } from './FiveParts.tsx'
 import { LapBand } from './LapBand.tsx'
-import { NextRace } from './NextRace.tsx'
+import { Next } from './Next.tsx'
 import { Term } from './Term.tsx'
 import { Words } from './Words.tsx'
 import { POWER_WORDS } from './words.ts'
@@ -198,7 +198,7 @@ export function PowerUnit() {
           <nav className="mono nav" aria-label="Chapters">
             <Go to="/chapters/inside-the-car">← 05 Inside the car</Go>
             <span aria-hidden> · </span>
-            <a href="/#start">All chapters →</a>
+            <Go to="/chapters/defending">07 Defending →</Go>
           </nav>
         </div>
         <h1 id="h1" className="display">
@@ -223,7 +223,7 @@ export function PowerUnit() {
       <MguH />
       <History />
       <Words keys={POWER_WORDS} />
-      <NextRace photo={PHOTOS.heroDark} />
+      <Next label="Next · Chapter 07 · 6 min" title="Defending." line="One move, and what it costs to make two" photo={PHOTOS.ch07} to="/chapters/defending" />
     </div>
   )
 }

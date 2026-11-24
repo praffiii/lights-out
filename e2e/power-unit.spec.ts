@@ -104,12 +104,13 @@ test('shows the 2026 numbers, payoff, plus row and glossary chips in order', asy
   expect(errors).toEqual([])
 })
 
-test('ends with the weekend band', async ({ page, errors }) => {
+test('the hero and the Next card lead on to chapter 07', async ({ page, errors }) => {
   await loaded(page)
 
-  await expect(chapter(page, '.next .caption > p')).toHaveText('Next · Round 20 · this weekend')
-  await expect(chapter(page, '.next h2')).toHaveText('São Paulo,this weekend.')
-  await expect(chapter(page, '.next .read')).toHaveAttribute('href', '/weekend')
+  await expect(chapter(page, '.next .caption > p')).toHaveText('Next · Chapter 07 · 6 min')
+  await expect(chapter(page, '.next h2')).toHaveText('Defending.')
+  await expect(chapter(page, '.next .read')).toHaveAttribute('href', '/chapters/defending')
+  await expect(chapter(page, '.opening nav').getByRole('link', { name: /07 Defending/ })).toHaveAttribute('href', '/chapters/defending')
   expect(errors).toEqual([])
 })
 
