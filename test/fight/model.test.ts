@@ -66,6 +66,13 @@ test('steps name who takes the lead and read their speeds from the data', () => 
   expect(all.map((s) => s.text).join(' ')).not.toContain('inside')
 })
 
+test('no step claims a later brake than the telemetry shows', () => {
+  const onset = (who: 0 | 1) => file.cars[who].rows.find((r) => r[0] > 86 && r[5] > 0)?.[0] ?? Infinity
+
+  expect(onset(1)).toBeLessThan(onset(0))
+  expect(all[2].text).toBe('Turn 1, next lap. Russell dives again, carries too much speed in and locks up.')
+})
+
 test('the car behind reads its gap in metres, and Level inside the error', () => {
   const lead = leads(file)
 

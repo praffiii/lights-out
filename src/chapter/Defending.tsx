@@ -253,7 +253,7 @@ function Price() {
           <p className="mono how">5 s · 10 s</p>
         </li>
       </ul>
-      <p className="mono muted credit">FIA F1 Penalty Guidelines 2026 v01 · FIA F1 Sporting Regulations, issue 07, B1.9.5 and B1.9.6</p>
+      <p className="mono muted credit">FIA F1 Penalty Guidelines 2026 v01 · FIA F1 Sporting Regulations, issue 07, B1.9.5 and B1.9.6 · 12-point ban: PlanetF1 penalty points tracker, 2026</p>
     </section>
   )
 }

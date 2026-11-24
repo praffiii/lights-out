@@ -121,7 +121,7 @@ Pure functions in `src/fight/model.ts`:
   |---|---|---|
   | 1 | Russell dives | "298 against 261 km/h on the run to Turn 3. Russell takes the lead." |
   | 2 | Leclerc answers | "320 against 295 km/h on the straight to Turn 9. Leclerc is back in front." |
-  | 3 | Too deep | "Turn 1, next lap. Russell dives again, brakes too late and locks up." |
+  | 3 | Too deep | "Turn 1, next lap. Russell dives again, carries too much speed in and locks up." |
   | 4 | The cut-back | "Leclerc is on the power first, carries more speed off the corner and leads again." |
 
   The speeds in steps 1 and 2 are read from the data at the change, not typed, so they may differ by 1 km/h from the numbers above. The mock's step 4 text says Russell locks up; that moved to step 3, where it happens.

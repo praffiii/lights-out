@@ -96,7 +96,7 @@ export const steps = (file: FightFile): readonly [Step, Step, Step, Step] | null
   return [
     { n: 1, t: a.from, title: `${name(a)} dives`, text: `${speeds(a)} on the run to Turn 3. ${name(a)} takes the lead.`, mark: 'Dive · Turn 3' },
     { n: 2, t: b.from, title: `${name(b)} answers`, text: `${speeds(b)} on the straight to Turn 9. ${name(b)} is back in front.`, mark: 'Straight to Turn 9' },
-    { n: 3, t: c.from, title: 'Too deep', text: `Turn 1, next lap. ${name(c)} dives again, brakes too late and locks up.`, mark: 'Dive · Turn 1 · locks up' },
+    { n: 3, t: c.from, title: 'Too deep', text: `Turn 1, next lap. ${name(c)} dives again, carries too much speed in and locks up.`, mark: 'Dive · Turn 1 · locks up' },
     { n: 4, t: d.from, title: 'The cut-back', text: `${name(d)} is on the power first, carries more speed off the corner and leads again.`, mark: 'Cut-back' },
   ]
 }

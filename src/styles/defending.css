@@ -33,6 +33,11 @@
 .defending-page .fight .chyron { position: relative; left: auto; bottom: auto; display: grid; width: 100%; }
 .defending-page .fight .chyron li { position: relative; grid-area: 1 / 1; }
 .defending-page .fight[data-still] .title, .defending-page .fight[data-still] .title :is(.headline, .intro) { opacity: 1; }
+.defending-page .fight[data-still] .pin { display: flex; flex-direction: column; gap: 24px; height: auto; padding: 56px var(--m) 24px; }
+.defending-page .fight[data-still] :is(.title, .panel, .led) { position: relative; inset: auto; width: 100%; }
+.defending-page .fight[data-still] .title { order: -1; }
+.defending-page .fight[data-still] .stage { position: relative; inset: auto; height: 60svh; margin: 0 calc(-1 * var(--m)); }
+.defending-page .fight[data-still] .chyron { grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); }
 .defending-page .fight[data-still] .chyron { gap: 6px; }
 .defending-page .fight[data-still] .chyron li { grid-area: auto; clip-path: none; opacity: 1; }
 .defending-page .fight .board { width: 100%; }
@@ -106,11 +111,14 @@
 .defending-page .price .costs .what { min-height: 2.4em; max-width: 400px; margin-top: 16px; font-size: 24px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.2; }
 .defending-page .price .text { max-width: 390px; margin-top: 16px; font-size: 16px; color: var(--muted); }
 .defending-page .price .payoff .text { color: inherit; }
+.defending-page .price .costs .term .def { left: 0; right: auto; }
+.defending-page .price .costs .term button { white-space: nowrap; }
 .defending-page .price .served { margin-top: 40px; border-bottom: 1px solid var(--line); list-style: none; }
 .defending-page .price .served li { display: grid; grid-template-columns: 232px minmax(0, 1fr) auto; align-items: baseline; padding: 18px 0 16px; border-top: 1px solid var(--line); }
 .defending-page .price .served .what { font-size: 24px; font-weight: 600; letter-spacing: -0.015em; }
 
 @media (max-width: 1199px) {
+  .defending-page .price .costs .term .def { left: var(--m); right: var(--m); }
   .defending-page .fight .marks span { display: none; }
   .defending-page .fight .marks-line { display: block; }
   .defending-page { --gap: 96px; }
@@ -133,10 +141,6 @@
   .defending-page .fight .stage { top: 17svh; bottom: auto; height: 46svh; }
   .defending-page .fight .pins { clip-path: none; }
   .defending-page .fight[data-live]:not([data-still]) .title { opacity: 0; }
-  .defending-page .fight[data-still] .pin { display: flex; flex-direction: column; gap: 16px; height: auto; padding: 40px var(--m) 24px; }
-  .defending-page .fight[data-still] :is(.title, .panel, .led) { position: relative; inset: auto; width: 100%; }
-  .defending-page .fight[data-still] .title { order: -1; }
-  .defending-page .fight[data-still] .stage { position: relative; inset: auto; margin: 0 calc(-1 * var(--m)); }
   .defending-page .fight .title { top: 128px; }
   .defending-page .fight .title .headline { font-size: clamp(30px, 9.2vw, 36px); }
   .defending-page .fight .title .wide { display: none; }

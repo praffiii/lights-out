@@ -338,7 +338,7 @@ test('reduced motion rests on the last frame, unpinned, with every step listed',
   await expect(fight(page, '.pin-spacer')).toHaveCount(0)
 
   for (const n of [1, 2, 3, 4]) await expect(fight(page, `[data-step="${n}"] .title-line`)).toBeVisible()
-  expect(await fight(page, '.chyron li').evaluateAll((els) => new Set(els.map((el) => Math.round(el.getBoundingClientRect().top))).size)).toBe(4)
+  expect(await fight(page, '.chyron li').evaluateAll((els) => new Set(els.map((el) => `${Math.round(el.getBoundingClientRect().left)},${Math.round(el.getBoundingClientRect().top)}`)).size)).toBe(4)
   expect(errors).toEqual([])
 })
 
@@ -350,4 +350,50 @@ test('without WebGL the fight still steps over its poster', async ({ page, error
   await expect(fight(page, '.poster')).toBeVisible()
   await expect(slider(page)).toHaveAttribute('aria-valuetext', /step 4 of 4/)
   expect(errors.filter((e) => e.startsWith('pageerror'))).toEqual([])
+})
+
+test('the term popovers stay on screen at laptop widths', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+
+  for (const width of [1280, 1440]) {
+    await page.setViewportSize({ width, height: 800 })
+    await loaded(page)
+
+    for (const term of await chapter(page, '.term').all()) {
+      await term.locator('button').evaluate((el) => el.scrollIntoView({ block: 'center' }))
+      await page.waitForTimeout(1000)
+      await term.locator('button').hover()
+
+      const box = await term.locator('.def').boundingBox()
+
+      expect(box?.x ?? -1).toBeGreaterThanOrEqual(0)
+      expect((box?.x ?? 0) + (box?.width ?? Infinity)).toBeLessThanOrEqual(width)
+      await page.mouse.move(2, 2)
+    }
+  }
+})
+
+test('reduced motion never lays the step cards over the headline', async ({ page }, testInfo) => {
+  for (const [width, height] of testInfo.project.name === 'phone' ? ([[390, 844]] as const) : ([[1024, 768], [1280, 620], [1470, 830]] as const)) {
+    await page.setViewportSize({ width, height })
+    await loaded(page, `${PATH}?reduced`)
+
+    const pin = await fight(page, '.pin').boundingBox()
+    const title = await fight(page, '.title').boundingBox()
+    const panel = await fight(page, '.panel').boundingBox()
+    const led = await fight(page, '.led').boundingBox()
+
+    if (!pin || !title || !panel || !led) throw new Error('the fight has no boxes')
+
+    expect(panel.y >= title.y + title.height || panel.x >= title.x + title.width).toBe(true)
+    expect(panel.y).toBeGreaterThanOrEqual(pin.y)
+    expect(panel.y + panel.height).toBeLessThanOrEqual(led.y + 0.5)
+    expect(led.y + led.height).toBeLessThanOrEqual(pin.y + pin.height)
+  }
+})
+
+test('the price names where the twelve-point ban comes from', async ({ page }) => {
+  await loaded(page)
+
+  await expect(chapter(page, '.price .credit')).toContainText(/12-point ban/i)
 })
