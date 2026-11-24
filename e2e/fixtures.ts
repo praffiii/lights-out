@@ -40,15 +40,17 @@ export const NO_WEBGL = `const get = HTMLCanvasElement.prototype.getContext; HTM
 
 export const LOADER_MS = 10_000
 
-export const hiddenText = (page: Page) =>
-  page.evaluate(() =>
-    [...document.querySelectorAll('main *, footer *')].flatMap((el) => {
-      const text = (el.textContent ?? '').trim()
-      const style = getComputedStyle(el)
-      const hidden = el.children.length === 0 && text !== '' && !el.closest('[data-crowd]') && (style.visibility === 'hidden' || style.opacity === '0') && el.getBoundingClientRect().width > 0
+export const hiddenText = (page: Page, except = 'nothing') =>
+  page.evaluate(
+    (skip) =>
+      [...document.querySelectorAll('main *, footer *')].flatMap((el) => {
+        const text = (el.textContent ?? '').trim()
+        const style = getComputedStyle(el)
+        const hidden = el.children.length === 0 && text !== '' && !el.closest('[data-crowd]') && !el.closest(skip) && (style.visibility === 'hidden' || style.opacity === '0') && el.getBoundingClientRect().width > 0
 
-      return hidden ? [`${el.tagName.toLowerCase()}.${el.className}: ${text.slice(0, 40)}`] : []
-    }),
+        return hidden ? [`${el.tagName.toLowerCase()}.${el.className}: ${text.slice(0, 40)}`] : []
+      }),
+    except,
   )
 
 export const visibleBars = (page: Page) =>
@@ -64,6 +66,16 @@ export const crowdedChips = (page: Page, pins: string) =>
       chips.slice(i + 1).flatMap((b) => (a.box && b.box && a.box.left < b.box.right && b.box.left < a.box.right && a.box.top < b.box.bottom && b.box.top < a.box.bottom ? [`${a.name}/${b.name}`] : [])),
     )
   }, pins)
+
+export const pinSpan = (page: Page, section: string) =>
+  page.evaluate((selector) => {
+    const spacer = document.querySelector(`${selector} .pin-spacer`)
+    const top = (spacer?.getBoundingClientRect().top ?? 0) + scrollY
+
+    return { top, range: (spacer?.getBoundingClientRect().height ?? 0) - innerHeight }
+  }, section)
+
+export const scrollTo = (page: Page, y: number) => page.evaluate((to) => window.scrollTo(0, to), y)
 
 export const scrollToEnd = async (page: Page) => {
   for (let i = 0; i < 200; i++) {

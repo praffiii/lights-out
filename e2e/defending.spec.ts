@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 
-import { expect, hiddenText, LOADER_MS, scrollToEnd, test } from './fixtures.ts'
+import { expect, hiddenText, LOADER_MS, NO_WEBGL, pinSpan, scrollTo, scrollToEnd, test } from './fixtures.ts'
 
 const PATH = '/chapters/defending'
 
@@ -57,7 +57,7 @@ test('nothing overflows, nothing stays hidden and every credit is filled', async
   await scrollToEnd(page)
 
   expect(await overflow(page)).toBeLessThanOrEqual(0)
-  expect(await hiddenText(page)).toEqual([])
+  expect(await hiddenText(page, '.fight')).toEqual([])
 
   for (const text of await chapter(page, '.credit').allTextContents()) expect(text.trim()).not.toBe('')
   expect(errors).toEqual([])
@@ -166,6 +166,188 @@ test('it links back to 06 and 08 waits', async ({ page, errors }) => {
 test('reduced motion hides nothing', async ({ page, errors }) => {
   await loaded(page, `${PATH}?reduced`)
 
-  expect(await hiddenText(page)).toEqual([])
+  expect(await hiddenText(page, '.fight .stage')).toEqual([])
   expect(errors).toEqual([])
+})
+
+const fight = (page: Page, selector = '') => page.locator(`.chapter-page .fight ${selector}`.trim())
+
+const slider = (page: Page) => fight(page, '[role="slider"]')
+
+const now = async (page: Page) => Number(await slider(page).getAttribute('aria-valuenow'))
+
+const order = (page: Page) => fight(page, '.board tbody th').allTextContents()
+
+const seekKeys = async (page: Page, key: string) => {
+  await slider(page).focus()
+  await page.keyboard.press(key)
+}
+
+test('the fight names the real laps, the headline and its sources', async ({ page, errors }) => {
+  await loaded(page)
+
+  await expect(fight(page, '.title .label')).toHaveText('Replay · Albert Park · Laps 8 to 9')
+  await expect(fight(page, 'h2')).toHaveText('Four lead changes.Eighty seconds.')
+  await expect(fight(page, '.title .intro')).toContainText('Australia 2026')
+  await expect(fight(page, '.credit')).toContainText('Telemetry: OpenF1 (unofficial)')
+  await expect(fight(page, '.credit')).toContainText('Lock-up: race reports')
+  expect((await fight(page).textContent())?.toLowerCase()).not.toContain('inside')
+  expect(errors).toEqual([])
+})
+
+test('scrolling lights the steps and swaps the board, forward and back', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await loaded(page)
+  await fight(page).scrollIntoViewIfNeeded()
+
+  const { top, range } = await pinSpan(page, '.fight')
+
+  for (const [at, lit, leader] of [
+    [0.1, 0, 'LEC'],
+    [0.205, 1, 'RUS'],
+    [0.405, 2, 'LEC'],
+    [0.605, 3, 'RUS'],
+    [0.805, 4, 'LEC'],
+    [1, 4, 'LEC'],
+    [0.3, 1, 'RUS'],
+    [0, 0, 'LEC'],
+  ] as const) {
+    await scrollTo(page, top + range * at)
+    await expect(fight(page, '[data-step][data-lit]')).toHaveCount(lit)
+    await expect.poll(async () => (await order(page))[0]).toBe(leader)
+    await expect(fight(page, '.board tbody tr').first().locator('[data-gap]')).toHaveText('Leader')
+  }
+
+  expect(errors).toEqual([])
+})
+
+test('the bar keeps true time under the pointer', async ({ page }) => {
+  await loaded(page)
+  await slider(page).scrollIntoViewIfNeeded()
+  await seekKeys(page, 'Home')
+  await expect.poll(() => now(page)).toBeLessThan(0.2)
+
+  for (const f of [0.5, 0.1]) {
+    const box = await slider(page).boundingBox()
+
+    if (!box) throw new Error('the bar has no box')
+
+    await page.mouse.click(box.x + box.width * f, box.y + box.height / 2)
+    await expect.poll(async () => Math.abs((await now(page)) - 96 * f)).toBeLessThan(1)
+  }
+})
+
+test('the keys step through the changes', async ({ page }) => {
+  await loaded(page)
+  await seekKeys(page, 'End')
+  await expect(slider(page)).toHaveAttribute('aria-valuetext', /step 4 of 4, The cut-back, Leclerc leads/)
+  await seekKeys(page, 'Home')
+  await expect(slider(page)).toHaveAttribute('aria-valuetext', /^0\.0 s, before the first change, Leclerc leads/)
+  await seekKeys(page, 'ArrowRight')
+  await expect(slider(page)).toHaveAttribute('aria-valuetext', /step 1 of 4, Russell dives, Russell leads/)
+})
+
+test('the bar draws five stretches to scale and four pins that stay apart', async ({ page }, testInfo) => {
+  for (const width of testInfo.project.name === 'phone' ? [390, 360] : [1470, 1024]) {
+    await page.setViewportSize({ width, height: testInfo.project.name === 'phone' ? 780 : 830 })
+    await loaded(page)
+
+    const bar = await slider(page).boundingBox()
+    const parts = await fight(page, '.stretch-of').evaluateAll((els) => els.map((el) => ({ share: Number(el.getAttribute('data-share')), width: el.getBoundingClientRect().width })))
+
+    expect(parts.length).toBe(5)
+    expect(parts.reduce((s, p) => s + p.share, 0)).toBeCloseTo(1, 5)
+
+    for (const p of parts) expect(Math.abs(p.width / (bar?.width ?? 1) - p.share)).toBeLessThan(0.01)
+
+    const pins = await fight(page, '.marks b').evaluateAll((els) => els.map((el) => ({ n: el.textContent, left: el.getBoundingClientRect().left, right: el.getBoundingClientRect().right })))
+
+    expect(pins.map((p) => p.n)).toEqual(['1', '2', '3', '4'])
+
+    for (const [i, p] of pins.entries()) expect(p.left).toBeGreaterThanOrEqual(pins[i - 1]?.right ?? 0)
+    expect(pins.at(-1)?.right ?? Infinity).toBeLessThanOrEqual(width)
+  }
+})
+
+test('the HUD stays on the stage and inside the screen', async ({ page }, testInfo) => {
+  for (const [width, height] of testInfo.project.name === 'phone' ? ([[390, 844], [360, 740]] as const) : ([[1470, 830], [1024, 768]] as const)) {
+    await page.setViewportSize({ width, height })
+    await loaded(page)
+    await seekKeys(page, 'End')
+    await expect(slider(page)).toHaveAttribute('aria-valuetext', /step 4/)
+
+    const pin = await fight(page, '.pin').boundingBox()
+
+    expect(Math.abs((pin?.height ?? 0) - height)).toBeLessThan(2)
+
+    const boxes = []
+
+    for (const selector of ['.board', '.chyron li[data-current]', '[role="slider"]', '.marks']) {
+      const b = await fight(page, selector).boundingBox()
+
+      if (!b) throw new Error(`${selector} has no box`)
+
+      expect(b.x).toBeGreaterThanOrEqual(0)
+      expect(b.x + b.width).toBeLessThanOrEqual(width + 0.5)
+      expect(b.y).toBeGreaterThanOrEqual((pin?.y ?? 0) - 0.5)
+      expect(b.y + b.height).toBeLessThanOrEqual((pin?.y ?? 0) + height + 0.5)
+      boxes.push(b)
+    }
+
+    const [board, card, bar] = boxes
+
+    expect((card?.y ?? 0) + (card?.height ?? 0)).toBeLessThanOrEqual((board?.y ?? 0) + 0.5)
+    expect((board?.y ?? 0) + (board?.height ?? 0)).toBeLessThanOrEqual((bar?.y ?? 0) + 0.5)
+    expect(await overflow(page)).toBeLessThanOrEqual(0)
+  }
+})
+
+test('crossing the line never makes a car jump', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await loaded(page)
+  await seekKeys(page, 'End')
+  await expect(fight(page, '.stage')).toHaveAttribute('data-gl', '', { timeout: 20_000 })
+
+  const bar = await slider(page).boundingBox()
+
+  if (!bar) throw new Error('the bar has no box')
+
+  const car = fight(page, '.racer[data-car="LEC"]')
+  const at = () => car.evaluate((el) => el.style.translate.split(' ').map(parseFloat))
+  const spots: number[][] = []
+
+  for (let t = 85; t <= 87; t += 0.5) {
+    await page.mouse.click(bar.x + (bar.width * t) / 96, bar.y + bar.height / 2)
+    await expect.poll(async () => Math.abs((await now(page)) - t)).toBeLessThan(0.2)
+    await page.waitForTimeout(700)
+    spots.push(await at())
+  }
+
+  for (const [i, p] of spots.entries()) {
+    const q = spots[i - 1]
+
+    if (q) expect(Math.hypot((p[0] ?? 0) - (q[0] ?? 0), (p[1] ?? 0) - (q[1] ?? 0))).toBeLessThan(200)
+  }
+})
+
+test('reduced motion rests on the last frame, unpinned, with every step listed', async ({ page, errors }) => {
+  await loaded(page, `${PATH}?reduced`)
+
+  await expect(fight(page, '[data-step][data-lit]')).toHaveCount(4)
+  await expect(slider(page)).toHaveAttribute('aria-valuenow', '96.0')
+  await expect(fight(page, '.pin-spacer')).toHaveCount(0)
+
+  for (const n of [1, 2, 3, 4]) await expect(fight(page, `[data-step="${n}"] .title-line`)).toBeVisible()
+  expect(await fight(page, '.chyron li').evaluateAll((els) => new Set(els.map((el) => Math.round(el.getBoundingClientRect().top))).size)).toBe(4)
+  expect(errors).toEqual([])
+})
+
+test('without WebGL the fight still steps over its poster', async ({ page, errors }) => {
+  await page.addInitScript({ content: NO_WEBGL })
+  await loaded(page)
+  await seekKeys(page, 'End')
+
+  await expect(fight(page, '.poster')).toBeVisible()
+  await expect(slider(page)).toHaveAttribute('aria-valuetext', /step 4 of 4/)
+  expect(errors.filter((e) => e.startsWith('pageerror'))).toEqual([])
 })

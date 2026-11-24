@@ -76,8 +76,14 @@ test('the car behind reads its gap in metres, and Level inside the error', () =>
   expect(readout(file, lead, END).rows[1].gap).toMatch(/^\+(1|2)\d m$/)
 })
 
-test('throttle stays within 0 to 100', () => {
-  for (const car of file.cars) for (const r of car.rows) expect(r[4] >= 0 && r[4] <= 100).toBe(true)
+test('no dropped sample is kept: throttle stays in range and no car sits flat out on the brake', () => {
+  const stuck = (r: PoleRow | undefined) => r !== undefined && r[4] > 90 && r[5] > 0
+
+  for (const car of file.cars)
+    for (const [i, r] of car.rows.entries()) {
+      expect(r[4] >= 0 && r[4] <= 100).toBe(true)
+      expect(stuck(r) && stuck(car.rows[i - 1])).toBe(false)
+    }
 })
 
 test('the slider says the time, the step and who leads', () => {

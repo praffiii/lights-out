@@ -30,7 +30,7 @@ if (!info) throw new Error('au-1953 is not in the circuit registry')
 
 const lengthM = Number(info.facts.lengthKm) * 1000
 const iso = (ms: number) => new Date(ms).toISOString()
-const clamp = (x: number) => Math.min(100, Math.max(0, x))
+const FULL = 100
 
 const run = (driver: number) =>
   OpenF1Client.use((client) =>
@@ -58,7 +58,10 @@ const run = (driver: number) =>
         for (const r of fit.rows) {
           const u = r[1] - lift + n - 8
 
-          if (u > (rows.at(-1)?.[1] ?? -Infinity)) rows.push([start / 1000 + r[0], u, r[2], r[3], clamp(r[4]), r[5]])
+          const last = rows.at(-1)
+          const dropped = r[4] > FULL && last !== undefined
+
+          if (u > (last?.[1] ?? -Infinity)) rows.push([start / 1000 + r[0], u, r[2], r[3], dropped ? last[4] : Math.min(FULL, r[4]), dropped ? last[5] : r[5]])
         }
       }
 

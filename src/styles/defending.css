@@ -21,13 +21,50 @@
 .defending-page .rule .rows .payoff { padding-inline: var(--m); }
 .defending-page .rule .rows .payoff .what { font-size: 32px; letter-spacing: -0.02em; }
 
+.defending-page .fight { margin-top: var(--gap); }
+.defending-page .fight [data-car='LEC'], .defending-page .fight [data-trail='LEC'] { --car: var(--c0); }
+.defending-page .fight [data-car='RUS'], .defending-page .fight [data-trail='RUS'] { --car: var(--c1); }
+.defending-page .fight .pins { clip-path: inset(0 0 140px); }
+.defending-page .fight .title { max-width: none; }
+.defending-page .fight .title .headline { font-size: clamp(44px, 5vw, 76px); line-height: 0.95; }
+.defending-page .fight .title .headline .hl { display: block; }
+.defending-page .fight .title .intro { max-width: none; font-size: 10px; letter-spacing: 0.06em; }
+.defending-page .fight .panel { position: absolute; right: var(--m); bottom: 136px; z-index: 4; display: grid; gap: 8px; width: min(552px, calc(100% - 2 * var(--m))); }
+.defending-page .fight .chyron { position: relative; left: auto; bottom: auto; display: grid; width: 100%; }
+.defending-page .fight .chyron li { position: relative; grid-area: 1 / 1; }
+.defending-page .fight[data-still] .title, .defending-page .fight[data-still] .title :is(.headline, .intro) { opacity: 1; }
+.defending-page .fight[data-still] .chyron { gap: 6px; }
+.defending-page .fight[data-still] .chyron li { grid-area: auto; clip-path: none; opacity: 1; }
+.defending-page .fight .board { width: 100%; }
+.defending-page .fight .board [data-car] th { border-left-color: var(--car); }
+.defending-page .fight .board td:nth-child(3) { min-width: 96px; }
+.defending-page .fight .led { position: absolute; left: var(--m); right: var(--m); bottom: 24px; z-index: 4; }
+.defending-page .fight .who-leads { margin-bottom: 8px; font-size: 10px; color: var(--muted); }
+.defending-page .fight .lead-bar { position: relative; height: 34px; cursor: pointer; touch-action: none; }
+.defending-page .fight .lead-bar:focus-visible { outline: 2px solid var(--purple); outline-offset: 3px; }
+.defending-page .fight .stretch-of { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; padding-left: 10px; overflow: clip; border-right: 1px solid #06080e; background: var(--c0); color: #fff; font-size: 11px; font-weight: 500; pointer-events: none; }
+.defending-page .fight .stretch-of[data-who='1'] { background: var(--c1); color: #06080e; }
+.defending-page .fight .stretch-of:empty { padding: 0; }
+.defending-page .fight .playhead { position: absolute; left: 0; top: -8px; bottom: -8px; width: 3px; translate: -50% 0; background: #fff; box-shadow: 0 0 0 2px #06080e; pointer-events: none; }
+.defending-page .fight .marks { position: relative; inset: auto; height: 20px; margin-top: 12px; }
+.defending-page .fight .marks li { top: 0; display: flex; align-items: center; gap: 8px; translate: -10px 0; white-space: nowrap; }
+.defending-page .fight .marks li:nth-child(3) { left: auto; right: calc(100% - var(--at)); flex-direction: row-reverse; translate: 4px 0; }
+.defending-page .fight .marks li:nth-child(4) { translate: -4px 0; }
+.defending-page .fight .marks b { width: 20px; height: 20px; border: 0; background: #24262b; color: #fff; font-size: 10px; }
+.defending-page .fight .marks li[data-lit] b { background: #4a4d54; }
+.defending-page .fight .marks li[data-current] b { background: var(--purple); }
+.defending-page .fight .marks span { font-size: 10px; color: var(--muted); }
+.defending-page .fight .marks li[data-current] span { color: #fff; }
+.defending-page .fight .marks-line { display: none; margin-top: 8px; font-size: 9px; color: var(--muted); }
+.defending-page .fight > .credit { margin-top: 12px; padding: 0; }
+
 .defending-page .reply { position: relative; margin: var(--gap) var(--m) 0; padding-top: 40px; border-top: 1px solid var(--line); }
 .defending-page .reply .headline { margin: 18px 0 0 -6px; font-size: clamp(64px, 8vw, 132px); line-height: 0.95; white-space: nowrap; }
 .defending-page .reply .headline .hl { display: inline-block; white-space: pre; }
 .defending-page .reply .body { position: relative; z-index: 4; margin: 48px 0 0 auto; }
 .defending-page .art { position: relative; }
 .defending-page .art img { display: block; width: 100%; height: auto; }
-.defending-page .marks { position: absolute; inset: 0; list-style: none; }
+.defending-page .art .marks { position: absolute; inset: 0; list-style: none; }
 .defending-page .mark { position: absolute; left: var(--x); top: var(--y); width: 0; height: 0; --chip: var(--ink); --on: var(--bg); }
 .defending-page .mark[data-purple] { --chip: var(--purple); --on: #111214; }
 .defending-page .mark::before { content: ''; position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; border-radius: 50%; background: var(--chip); }
@@ -74,6 +111,8 @@
 .defending-page .price .served .what { font-size: 24px; font-weight: 600; letter-spacing: -0.015em; }
 
 @media (max-width: 1199px) {
+  .defending-page .fight .marks span { display: none; }
+  .defending-page .fight .marks-line { display: block; }
   .defending-page { --gap: 96px; }
   .defending-page .opening .intro { grid-column: 1; margin-top: 24px; }
   .defending-page .photo-band .shot { height: 560px; }
@@ -91,6 +130,33 @@
 }
 
 @media (max-width: 760px) {
+  .defending-page .fight .stage { top: 17svh; bottom: auto; height: 46svh; }
+  .defending-page .fight .pins { clip-path: none; }
+  .defending-page .fight[data-live]:not([data-still]) .title { opacity: 0; }
+  .defending-page .fight[data-still] .pin { display: flex; flex-direction: column; gap: 16px; height: auto; padding: 40px var(--m) 24px; }
+  .defending-page .fight[data-still] :is(.title, .panel, .led) { position: relative; inset: auto; width: 100%; }
+  .defending-page .fight[data-still] .title { order: -1; }
+  .defending-page .fight[data-still] .stage { position: relative; inset: auto; margin: 0 calc(-1 * var(--m)); }
+  .defending-page .fight .title { top: 128px; }
+  .defending-page .fight .title .headline { font-size: clamp(30px, 9.2vw, 36px); }
+  .defending-page .fight .title .wide { display: none; }
+  .defending-page .fight .title .intro { display: block; }
+  .defending-page .fight .panel { bottom: 124px; gap: 6px; }
+  .defending-page .fight .chyron { bottom: auto; }
+  .defending-page .fight .chyron b { min-width: 44px; padding: 0 10px; font-size: 14px; }
+  .defending-page .fight .chyron li > div { padding: 10px 12px 12px; }
+  .defending-page .fight .chyron .title-line { font-size: 17px; }
+  .defending-page .fight .board thead { display: table-header-group; }
+  .defending-page .fight .board td:nth-child(3), .defending-page .fight .board th:nth-child(3) { display: table-cell; }
+  .defending-page .fight .board thead th, .defending-page .fight .board tbody th, .defending-page .fight .board td { padding-right: 8px; }
+  .defending-page .fight .board td:nth-child(3) { min-width: 64px; }
+  .defending-page .fight .board [data-speed] { font-size: 19px; }
+  .defending-page .fight .meter i { width: 9px; }
+  .defending-page .fight .led { bottom: 14px; }
+  .defending-page .fight .lead-bar { height: 28px; }
+  .defending-page .fight .marks { margin-top: 8px; }
+  .defending-page .fight .marks li:nth-child(3) { translate: 2px 0; }
+  .defending-page .fight .marks li:nth-child(4) { translate: 0 0; }
   .defending-page .opening h1, .defending-page .price .headline { white-space: normal; }
   .defending-page { --gap: 72px; }
   .defending-page .photo-band .shot { height: auto; aspect-ratio: 13 / 10; }

@@ -1,15 +1,29 @@
+import { Schema } from 'effect'
 import { type CSSProperties, type ReactNode, useRef } from 'react'
 
+import { circuitFor } from '#/circuits/registry.ts'
+import baked from '#/fight/melbourne.json'
+import { leads, steps } from '#/fight/model.ts'
 import { pins } from '#/fight/pins.ts'
+import { FightFile } from '#/fight/schema.ts'
 import { PHOTOS } from '#/home/content.ts'
 import { block, gsap, ONCE, onEnter, REDUCED, reveal, roll, sweep, useGSAP } from '#/motion/motion.ts'
 import { Go, Soon } from '#/shell/Go.tsx'
 import { useTheme } from '#/shell/theme.ts'
 
+import { Fight } from './Fight.tsx'
 import { Next } from './Next.tsx'
 import { Term } from './Term.tsx'
 import { Words } from './Words.tsx'
 import { DEFENDING_WORDS } from './words.ts'
+
+const FILE = Schema.decodeUnknownSync(FightFile)(baked)
+
+const LEADS = leads(FILE)
+
+const STEPS = steps(FILE)
+
+const INFO = circuitFor('albert_park')
 
 type Vars = CSSProperties & Record<`--${string}`, string>
 
@@ -37,7 +51,7 @@ function hero(scope: HTMLElement) {
 function motion(scope: HTMLElement) {
   for (const el of all(scope, '.shot')) reveal(el, el.closest('.divebomb') ? { drift: false } : {})
 
-  for (const el of all(scope, '.rule .headline .hl, .reply .headline .hl, .divebomb .headline .hl, .price .headline, .words h2')) sweep(el)
+  for (const el of all(scope, '.rule .headline .hl, .fight .headline .hl, .reply .headline .hl, .divebomb .headline .hl, .price .headline, .words h2')) sweep(el)
 
   for (const el of all(scope, '.rule .payoff, .price .payoff')) block(el, { delay: 0.3 })
 
@@ -289,6 +303,7 @@ export function Defending() {
         <p className="mono muted credit">{`${photo.credit}, via Wikimedia Commons`}</p>
       </figure>
       <Rule />
+      {INFO && STEPS ? <Fight file={FILE} all={STEPS} lead={LEADS} info={INFO} /> : null}
       <Reply />
       <Divebomb />
       <Price />

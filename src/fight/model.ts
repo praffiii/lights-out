@@ -15,7 +15,7 @@ const PUSH = 8
 
 const CHASE = 4.2
 
-const CLOSE = 7
+const CLOSE = 6
 
 const TIGHT_FROM = 84
 
