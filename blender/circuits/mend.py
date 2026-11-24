@@ -4,7 +4,6 @@ import sys
 import bpy
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import broadcast as b
 import circuit
 from build import ribbons
 from circuit import CID, HERE, PUBLIC, Track, export
