@@ -8,7 +8,7 @@ import { pins } from '#/fight/pins.ts'
 import { FightFile } from '#/fight/schema.ts'
 import { PHOTOS } from '#/home/content.ts'
 import { block, gsap, ONCE, onEnter, REDUCED, reveal, roll, sweep, useGSAP } from '#/motion/motion.ts'
-import { Go, Soon } from '#/shell/Go.tsx'
+import { Go } from '#/shell/Go.tsx'
 import { useTheme } from '#/shell/theme.ts'
 
 import { Fight } from './Fight.tsx'
@@ -283,7 +283,7 @@ export function Defending() {
           <nav className="mono nav" aria-label="Chapters">
             <Go to="/chapters/power-unit">← 06 The power unit</Go>
             <span aria-hidden> · </span>
-            <Soon>08 The two championships</Soon>
+            <Go to="/chapters/championships">08 The two championships →</Go>
           </nav>
         </div>
         <h1 id="h1" className="display">
@@ -308,7 +308,7 @@ export function Defending() {
       <Divebomb />
       <Price />
       <Words keys={DEFENDING_WORDS} />
-      <Next label="Next · Chapter 08 · 6 min" title="The two championships." line="One for drivers, one for teams" photo={PHOTOS.ch07Podium} to={null} />
+      <Next label="Next · Chapter 08 · 6 min" title="The two championships." line="One for drivers, one for teams" photo={PHOTOS.ch07Podium} to="/chapters/championships" />
     </div>
   )
 }

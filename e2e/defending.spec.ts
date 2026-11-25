@@ -152,14 +152,13 @@ test('every term opens in full above its neighbours', async ({ page }, testInfo)
   }
 })
 
-test('it links back to 06 and 08 waits', async ({ page, errors }) => {
+test('it links back to 06 and on to 08', async ({ page, errors }) => {
   await loaded(page)
 
   await expect(chapter(page, '.opening nav').getByRole('link', { name: /06 The power unit/ })).toHaveAttribute('href', '/chapters/power-unit')
-  await expect(chapter(page, '.opening nav .is-soon')).toContainText('08 The two championships')
+  await expect(chapter(page, '.opening nav').getByRole('link', { name: /08 The two championships/ })).toHaveAttribute('href', '/chapters/championships')
   await expect(chapter(page, '.next .caption > p')).toHaveText('Next · Chapter 08 · 6 min')
-  await expect(chapter(page, '.next .is-soon')).toContainText('Soon')
-  await expect(chapter(page, '.next a')).toHaveCount(0)
+  await expect(chapter(page, '.next .read')).toHaveAttribute('href', '/chapters/championships')
   expect(errors).toEqual([])
 })
 

@@ -3,6 +3,7 @@ import { Effect } from 'effect'
 import { flagTally } from '../flags/build.ts'
 import { buildPeople } from '../people/build.ts'
 import { topSpeed } from '../speed/build.ts'
+import { matches, nextTitles, titlesOf } from '../titles/build.ts'
 
 import { JolpicaClient, type JolpicaError } from './jolpica-client.ts'
 import { seasonHistory, type SeasonRace } from './history.ts'
@@ -42,7 +43,7 @@ const allPages = (page: (offset: number) => Effect.Effect<SeasonResults, Jolpica
     return races
   })
 
-const seasonPages = (jolpica: JolpicaClient['Service'], season: number) =>
+export const seasonPages = (jolpica: JolpicaClient['Service'], season: number) =>
   Effect.gen(function* () {
     const races = yield* allPages((offset) => jolpica.seasonResults(season, offset))
     const sprints = yield* allPages((offset) => jolpica.seasonSprints(season, offset))
@@ -59,7 +60,16 @@ const people = (season: number, pages: { races: ReadonlyArray<SeasonRace>; sprin
     Effect.catch((error) => Effect.logWarning('people kept from the previous snapshot', error).pipe(Effect.as(previous))),
   )
 
-export const buildSnapshot = (now: Date, previous?: Pick<SeasonSnapshot, 'flags' | 'topSpeed' | 'people'>): Effect.Effect<SeasonSnapshot, JolpicaError, JolpicaClient | OpenF1Client> =>
+const titlesFrom = (input: Parameters<typeof nextTitles>[0]) =>
+  Effect.gen(function* () {
+    const fresh = titlesOf(input.season, input.calendar, input.races, input.sprints)
+
+    if (fresh && !matches(fresh, input.drivers, input.teams)) yield* Effect.logWarning('titles kept from the previous snapshot: the points do not add up to the standings', { round: fresh.rounds.at(-1)?.round })
+
+    return nextTitles(input)
+  }).pipe(Effect.catchDefect((defect) => Effect.logWarning('titles kept from the previous snapshot', { cause: String(defect) }).pipe(Effect.as(input.previous))))
+
+export const buildSnapshot = (now: Date, previous?: Pick<SeasonSnapshot, 'flags' | 'topSpeed' | 'people' | 'titles'>): Effect.Effect<SeasonSnapshot, JolpicaError, JolpicaClient | OpenF1Client> =>
   Effect.gen(function* () {
     const jolpica = yield* JolpicaClient
     const { season, races } = yield* jolpica.races('current')
@@ -90,6 +100,13 @@ export const buildSnapshot = (now: Date, previous?: Pick<SeasonSnapshot, 'flags'
     const past = pages && seasonHistory(pages.races, pages.sprints)
     const built = pages && driverStandings ? yield* people(driverStandings.season, pages, previous?.people) : previous?.people
     const grid = built?.season === driverStandings?.season ? built : undefined
+    const standings = { drivers: driverStandings, teams: constructorStandings }
+
+    const titles =
+      pages && driverStandings
+        ? yield* titlesFrom({ season: driverStandings.season, calendar: races, ...pages, ...standings, previous: previous?.titles })
+        : previous?.titles
+
     const session = yield* latestSession(races, season, now)
     const flags = yield* flagTally(season, now, previous?.flags)
     const speed = yield* topSpeed(season, now, previous?.topSpeed)
@@ -105,5 +122,5 @@ export const buildSnapshot = (now: Date, previous?: Pick<SeasonSnapshot, 'flags'
       constructorStandings,
     }
 
-    return { ...snapshot, ...(past && { history: past }), ...(session && { latestSession: session }), ...(flags && { flags }), ...(speed && { topSpeed: speed }), ...(grid && { people: grid }) }
+    return { ...snapshot, ...(past && { history: past }), ...(session && { latestSession: session }), ...(flags && { flags }), ...(speed && { topSpeed: speed }), ...(grid && { people: grid }), ...(titles && { titles }) }
   })

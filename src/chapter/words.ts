@@ -61,6 +61,13 @@ export const WORDS = {
   stewards: { term: 'Stewards', def: 'The officials who judge incidents and hand out penalties.' },
   penaltyPoints: { term: 'Penalty points', def: "Marks on a driver's licence for dangerous driving. Twelve in a year means missing a race." },
   driveThrough: { term: 'Drive-through', def: 'A penalty: drive the length of the pit lane at the speed limit without stopping.' },
+  driversTitle: { term: "Drivers' title", def: 'For the driver with the most points over the season.' },
+  constructorsTitle: { term: "Constructors' title", def: 'For the team whose two cars score the most points together.' },
+  teammate: { term: 'Teammate', def: "The driver in the team's other car. Rivals for one title, partners for the other." },
+  countback: { term: 'Countback', def: 'How ties are broken: most wins, then most second places, and so on.' },
+  budgetCap: { term: 'Budget cap', def: 'The limit on what a team may spend on its cars in a season.' },
+  windTunnel: { term: 'Wind tunnel', def: 'Where teams test scale models in moving air. Time in it is limited.' },
+  fastestLapPoint: { term: 'Fastest lap · until 2024', def: "A bonus point for the race's fastest lap, if the driver finished in the top ten." },
 } as const
 
 export type WordKey = keyof typeof WORDS
@@ -78,3 +85,5 @@ export const CAR_WORDS: ReadonlyArray<WordKey> = ['survivalCell', 'halo', 'sidep
 export const POWER_WORDS: ReadonlyArray<WordKey> = ['powerUnit', 'mguK', 'mguH', 'energyStore', 'turbocharger', 'harvesting', 'deployment', 'overtakeMode', 'sustainableFuel']
 
 export const DEFENDING_WORDS: ReadonlyArray<WordKey> = ['defending', 'racingLine', 'switchback', 'divebomb', 'apex', 'brakingZone', 'carsWidth', 'trackLimits', 'blackWhiteFlag', 'stewards', 'penaltyPoints', 'driveThrough']
+
+export const TITLES_WORDS: ReadonlyArray<WordKey> = ['points', 'sprint', 'driversTitle', 'constructorsTitle', 'constructors', 'teammate', 'countback', 'budgetCap', 'windTunnel', 'fastestLapPoint']
