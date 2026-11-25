@@ -49,3 +49,7 @@ it('credits the three photos of the Antonelli story on The people', () => {
 it('credits the dark hero photo to the menu alone, now that chapter 06 no longer ends with it', () => {
   expect(CREDITS.find((c) => c.src === '/img/hero-dark.jpg')?.usedOn).toBe('Menu')
 })
+
+it('credits the recovery photo to the 404 page', () => {
+  expect(CREDITS.find((c) => c.src === '/img/not-found.jpg')?.usedOn).toBe('404')
+})

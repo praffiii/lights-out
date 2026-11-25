@@ -1,29 +1,38 @@
 import { createRootRoute, HeadContent, Scripts } from '@tanstack/react-router'
 
+import { NotFound } from '#/not-found/NotFound.tsx'
 import { Shell } from '#/shell/Shell.tsx'
 import { THEME_SCRIPT } from '#/shell/theme.ts'
+import notFoundCss from '#/styles/not-found.css?url'
 import siteCss from '#/styles/site.css?url'
 
 const FONTS = 'https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Martian+Mono:wght@400;500&display=swap'
 
 export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'Lights Out' },
-      { name: 'description', content: 'An unofficial guide to Formula 1 for newcomers, following the 2026 season.' },
-    ],
-    links: [
-      { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
-      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-      { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
-      { rel: 'stylesheet', href: FONTS },
-      { rel: 'stylesheet', href: siteCss },
-    ],
-    scripts: [{ children: THEME_SCRIPT }],
-  }),
+  head: ({ matches }) => {
+    const lost = matches.length === 1
+
+    return {
+      meta: [
+        { charSet: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { title: lost ? 'Page not found · Lights Out' : 'Lights Out' },
+        ...(lost ? [{ name: 'robots', content: 'noindex' }] : []),
+        { name: 'description', content: 'An unofficial guide to Formula 1 for newcomers, following the 2026 season.' },
+      ],
+      links: [
+        { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
+        { rel: 'stylesheet', href: FONTS },
+        { rel: 'stylesheet', href: siteCss },
+        ...(lost ? [{ rel: 'stylesheet', href: notFoundCss }] : []),
+      ],
+      scripts: [{ children: THEME_SCRIPT }],
+    }
+  },
   component: Shell,
+  notFoundComponent: NotFound,
   shellComponent: RootDocument,
 })
 

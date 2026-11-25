@@ -42,6 +42,7 @@ const USED_ON = {
   williams: 'Home, Menu',
   brm: 'Home, Menu',
   startLights: 'Footer',
+  recovery: '404',
 } satisfies Record<keyof typeof PHOTOS, string>
 
 const used = new Map(Object.entries(USED_ON))
