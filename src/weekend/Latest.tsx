@@ -1,4 +1,3 @@
-import { Soon } from '#/shell/Go.tsx'
 
 import type { Latest as LatestBlock } from './page-model.ts'
 
@@ -35,7 +34,6 @@ export function Latest({ latest }: { latest: LatestBlock | null }) {
             </li>
           ))}
         </ol>
-        <Soon className="mono more">Full timesheet</Soon>
       </div>
     </section>
   )

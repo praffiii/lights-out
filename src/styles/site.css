@@ -50,8 +50,6 @@ main:focus { outline: none; }
   font-variation-settings: 'wdth' var(--wdth);
   white-space: nowrap;
 }
-.is-soon { cursor: default; }
-.soon { margin-left: 0.8em; font-size: 10px; font-weight: 400; letter-spacing: 0.04em; color: var(--muted); align-self: center; white-space: nowrap; }
 
 .header {
   position: fixed; z-index: 20; inset: 0 0 auto;
@@ -116,7 +114,6 @@ main:focus { outline: none; }
 .menu nav .line > a:hover, .menu nav .line > a:focus-visible, .menu nav .on > .line > a { color: var(--ink); }
 .menu nav .on > .line > a::after { content: ''; width: 10px; height: 10px; margin-left: 4px; background: var(--purple); align-self: center; }
 .menu nav .line .mono { width: 24px; flex: none; letter-spacing: 0.04em; }
-.menu nav .line .soon { width: auto; }
 .menu nav .line { position: relative; display: block; width: fit-content; overflow: clip; }
 .menu nav .line > .bar { inset: 0.06em -0.1em 0; }
 .menu .kicker { display: flex; align-items: center; gap: 8px; width: fit-content; margin: 6px 0 2px 44px; color: var(--muted); transition: color 0.24s; }
@@ -135,7 +132,6 @@ main:focus { outline: none; }
 .menu .subs > a:hover::before, .menu .subs > a:focus-visible::before, .menu .subs > a[aria-current]::before { transform: scaleY(1); }
 .menu .subs .mono { flex: none; }
 .menu .subs .title { font-size: 17px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.15; }
-.menu .subs .soon { order: 1; }
 .menu .subs .min { order: 2; margin-left: auto; }
 .menu figure { position: relative; align-self: stretch; display: grid; grid-template-rows: 1fr auto; gap: 10px; min-height: 0; }
 .menu figure .ph { position: relative; overflow: hidden; min-height: 0; }

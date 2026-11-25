@@ -193,34 +193,18 @@ export function Home() {
         <h2 id="next" className="mono muted type">
           Read next
         </h2>
-        <div className="pair">
-          {READ_NEXT.map((r) => {
-            const body = (
-              <>
-                <div className="photo">
-                  <img src={r.photo.src} alt={r.alt} loading="lazy" />
-                </div>
-                <h3>
-                  {r.title}
-                  {r.to ? <span className="arr"> →</span> : <span className="soon mono">Soon</span>}
-                </h3>
-                <p className="mono muted">
-                  {r.kind} · {r.photo.credit}
-                </p>
-              </>
-            )
-
-            return r.to ? (
-              <Go key={r.title} to={r.to} className="next-item">
-                {body}
-              </Go>
-            ) : (
-              <div key={r.title} className="next-item is-soon">
-                {body}
-              </div>
-            )
-          })}
-        </div>
+        <Go to={READ_NEXT.to} className="next-item">
+          <div className="photo">
+            <img src={READ_NEXT.photo.src} alt={READ_NEXT.alt} loading="lazy" />
+          </div>
+          <h3>
+            {READ_NEXT.title}
+            <span className="arr"> →</span>
+          </h3>
+          <p className="mono muted">
+            {READ_NEXT.kind} · {READ_NEXT.photo.credit}
+          </p>
+        </Go>
       </section>
     </div>
   )

@@ -8,7 +8,7 @@ import type { SeasonSnapshot } from '#/season/snapshot-schema.ts'
 import { useSeason } from '#/season/use-season.ts'
 import { countdown, gpName, nextLightsOut, when } from '#/season/weekend.ts'
 
-import { Go, Soon } from './Go.tsx'
+import { Go } from './Go.tsx'
 import { FOOTER_LINKS, MENU } from './menu.ts'
 
 const LIGHTS = [0, 1, 2, 3, 4]
@@ -100,12 +100,10 @@ export function Footer() {
               <li key={label}>
                 {to ? (
                   <Go to={to}>{label}</Go>
-                ) : href ? (
+                ) : (
                   <a href={href} rel="noreferrer">
                     {label}
                   </a>
-                ) : (
-                  <Soon>{label}</Soon>
                 )}
               </li>
             ))}

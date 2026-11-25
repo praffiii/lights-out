@@ -20,12 +20,3 @@ export function Go({ to, dive, onClick, ...rest }: { to: To; dive?: () => Dive |
     />
   )
 }
-
-export function Soon({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <span className={className ? `${className} is-soon` : 'is-soon'} aria-disabled="true">
-      {children}
-      <span className="soon mono">Soon</span>
-    </span>
-  )
-}

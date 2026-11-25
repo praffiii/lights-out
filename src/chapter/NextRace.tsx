@@ -29,9 +29,9 @@ export function NextRace({ photo }: { photo: Photo }) {
             Times, the track and the pole lap →
           </Go>
         ) : (
-          <a href="/#start" className="read">
+          <Go to="/chapters" className="read">
             Back to the chapter list →
-          </a>
+          </Go>
         )}
       </div>
       <p className="mono muted credit">{`${photo.place} · ${photo.credit}`}</p>

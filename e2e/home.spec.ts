@@ -286,12 +286,16 @@ test('the menu fits the theme switch on screen with nine chapters linked', async
   expect(errors).toEqual([])
 })
 
-test('the pit-stop read leads to chapter 03 and the 1973 story still waits', async ({ page, errors }) => {
+test('the pit-stop read leads to chapter 03 and has the row to itself', async ({ page, errors }) => {
   await page.goto('/')
   await expect(page.locator('.loader')).toHaveCount(0, { timeout: LOADER_MS })
 
   await expect(page.locator('.read-next a.next-item')).toHaveAttribute('href', '/chapters/tyres-and-strategy')
-  await expect(page.locator('.read-next .next-item.is-soon h3')).toHaveText('Swedish Grand Prix, 1973.Soon')
+  await expect(page.locator('.read-next .next-item')).toHaveCount(1)
+
+  const inset = await page.locator('.read-next .photo').evaluate((el) => [el.getBoundingClientRect().left, innerWidth - el.getBoundingClientRect().right].map(Math.round))
+
+  expect(inset[0]).toBe(inset[1])
   expect(errors).toEqual([])
 })
 
@@ -365,5 +369,36 @@ test('the new menu lines leave the theme switch on screen', async ({ page, error
 
   await expect(page.getByRole('group', { name: 'Theme' })).toBeInViewport({ ratio: 1 })
   expect(await page.locator('.menu').evaluate((el) => el.scrollHeight - el.clientHeight)).toBe(0)
+  expect(errors).toEqual([])
+})
+
+const dead = (page: Page) => page.locator('.soon, .is-soon, [aria-disabled]')
+
+for (const path of ['/', '/weekend', '/glossary', '/chapters/drs']) {
+  test(`no dead link on ${path}`, async ({ page, errors }) => {
+    await page.goto(path)
+    await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
+
+    await expect(dead(page)).toHaveCount(0)
+    expect(errors).toEqual([])
+  })
+}
+
+test('no dead link in any tab of the weekend box', async ({ page, errors }) => {
+  await page.goto('/glossary')
+  await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
+  await page.locator('button.weekend').click()
+
+  const tabs = page.locator('.weekend-panel').getByRole('tab')
+
+  await expect(tabs).toHaveCount(4)
+
+  for (const tab of await tabs.all()) {
+    await tab.click()
+    await expect(tab).toHaveAttribute('aria-selected', 'true')
+    await expect(page.locator('.weekend-panel h3')).toBeVisible()
+    await expect(dead(page)).toHaveCount(0)
+  }
+
   expect(errors).toEqual([])
 })

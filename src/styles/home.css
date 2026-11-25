@@ -1,7 +1,6 @@
 .display .hl { display: block; }
 .cta { display: inline-flex; align-items: baseline; gap: 10px; font-weight: 600; font-size: 16px; position: relative; padding-bottom: 6px; width: fit-content; }
 .cta::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--purple); transform-origin: left; transition: scale 0.24s var(--brake); }
-.cta.is-soon::after { background: var(--line); }
 a.cta:hover::after { scale: 1.08 1; }
 .arr { display: inline-block; transition: translate 0.24s var(--brake); }
 a:hover > .arr, a:hover .arr { translate: 4px 0; }
@@ -23,7 +22,6 @@ a:hover > .arr, a:hover .arr { translate: 4px 0; }
 .rows a.row:hover .muted, .rows a.row:focus-visible .muted { color: inherit; opacity: 0.6; }
 .rows h3 { font-size: clamp(26px, 3.9vw, 56px); font-weight: 800; letter-spacing: -0.035em; line-height: 1; }
 .rows .end { display: grid; justify-items: end; gap: 26px; }
-.rows .end .soon { margin-left: 0; }
 .rows .read { font: 600 16px/1 Archivo, sans-serif; opacity: 0; translate: -6px 0; transition: opacity 0.24s, translate 0.24s var(--brake); }
 .rows a.row:hover .read, .rows a.row:focus-visible .read { opacity: 1; translate: 0 0; }
 
@@ -51,8 +49,7 @@ a:hover > .arr, a:hover .arr { translate: 4px 0; }
 
 
 .read-next { padding: 180px var(--m) 0; }
-.read-next .pair { display: grid; grid-template-columns: 792fr 528fr; gap: 24px; padding-top: 28px; }
-.read-next .next-item { display: grid; gap: 14px; align-content: start; }
+.read-next .next-item { display: grid; gap: 14px; align-content: start; padding-top: 28px; }
 .read-next .photo { height: clamp(260px, 36vw, 520px); }
 .read-next h3 { font-size: clamp(22px, 2.2vw, 32px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; padding-top: 10px; }
 
@@ -71,7 +68,6 @@ a:hover > .arr, a:hover .arr { translate: 4px 0; }
   .stats { grid-template-columns: 1fr 1fr; row-gap: 32px; }
   .stats strong { font-size: 20px; }
   .read-next { padding-top: 110px; }
-  .read-next .pair { grid-template-columns: 1fr; gap: 40px; }
 }
 
 .hero { position: relative; container-type: inline-size; overflow-x: clip; }

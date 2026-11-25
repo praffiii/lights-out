@@ -246,7 +246,7 @@ export function Drs() {
           <nav className="mono nav" aria-label="Chapters">
             <Go to="/chapters/championships">← 08 The two championships</Go>
             <span aria-hidden> · </span>
-            <a href="/#start">All nine chapters</a>
+            <Go to="/chapters">All nine chapters</Go>
           </nav>
         </div>
         <h1 id="h1" className="display">

@@ -146,7 +146,7 @@ test('it links back to 08, to every chapter and on to the season', async ({ page
   await loaded(page)
 
   await expect(chapter(page, '.opening nav').getByRole('link', { name: /08 The two championships/ })).toHaveAttribute('href', '/chapters/championships')
-  await expect(chapter(page, '.opening nav').getByRole('link', { name: 'All nine chapters' })).toHaveAttribute('href', '/#start')
+  await expect(chapter(page, '.opening nav').getByRole('link', { name: 'All nine chapters' })).toHaveAttribute('href', '/chapters')
   await expect(chapter(page, '.next .read')).toHaveAttribute('href', '/season')
   expect(errors).toEqual([])
 })

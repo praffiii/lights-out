@@ -47,7 +47,7 @@ export function Glossary() {
         <div className="top">
           <p className="mono muted label">{`Glossary · ${ENTRIES.length} words · from ${CHAPTERS.length} chapters`}</p>
           <nav className="mono nav" aria-label="Chapters">
-            <a href="/#start">All chapters →</a>
+            <Go to="/chapters">All chapters →</Go>
           </nav>
         </div>
         <h1 id="h1" className="display">

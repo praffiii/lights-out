@@ -7,7 +7,6 @@
 .chapter-page .headline { font-size: 60px; line-height: 1.05; letter-spacing: -0.035em; }
 .chapter-page .headline .hl { display: block; }
 .chapter-page .body { max-width: 380px; font-size: 18px; color: var(--muted); }
-.chapter-page .is-soon .soon { margin-left: 0.6em; }
 
 .chapter-page .opening { display: grid; grid-template-columns: minmax(0, 1fr) 352px; align-items: end; column-gap: 48px; padding: 136px var(--m) 64px; }
 .chapter-page .opening .top { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 24px; }
