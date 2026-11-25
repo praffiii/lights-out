@@ -46,7 +46,7 @@ export function Home() {
 
       if (!scope || !safe) return
 
-      for (const el of all(scope, '.type, h2.display, .next h3, .next p, .car .credit')) sweep(el)
+      for (const el of all(scope, '.type, h2.display, .read-next h3, .read-next p, .car .credit')) sweep(el)
 
       const rows = one(scope, '.rows')
 
@@ -55,7 +55,7 @@ export function Home() {
 
       for (const el of all(scope, '.car [data-count]')) roll(el, { from: el.dataset.count === 'year' ? 1950 : undefined })
 
-      for (const el of all(scope, '.next .photo')) reveal(el)
+      for (const el of all(scope, '.read-next .photo')) reveal(el)
 
       block(one(scope, '.car .plate'))
 
@@ -189,7 +189,7 @@ export function Home() {
         </div>
       </section>
 
-      <section className="next" aria-labelledby="next">
+      <section className="read-next" aria-labelledby="next">
         <h2 id="next" className="mono muted type">
           Read next
         </h2>

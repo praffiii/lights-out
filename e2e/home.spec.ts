@@ -290,8 +290,8 @@ test('the pit-stop read leads to chapter 03 and the 1973 story still waits', asy
   await page.goto('/')
   await expect(page.locator('.loader')).toHaveCount(0, { timeout: LOADER_MS })
 
-  await expect(page.locator('.next a.next-item')).toHaveAttribute('href', '/chapters/tyres-and-strategy')
-  await expect(page.locator('.next .next-item.is-soon h3')).toHaveText('Swedish Grand Prix, 1973.Soon')
+  await expect(page.locator('.read-next a.next-item')).toHaveAttribute('href', '/chapters/tyres-and-strategy')
+  await expect(page.locator('.read-next .next-item.is-soon h3')).toHaveText('Swedish Grand Prix, 1973.Soon')
   expect(errors).toEqual([])
 })
 
