@@ -4,6 +4,7 @@ import { type RefObject, useLayoutEffect, useRef } from 'react'
 import { gsap, REDUCED, ScrollTrigger, useGSAP } from '#/motion/motion.ts'
 
 import { nextStop, type Pace, prevStop, progressAt, timeAt } from './pace.ts'
+import { type ScrubOptions, scrubOptions } from './scrub-options.ts'
 
 const FOLLOW = 0.1
 
@@ -16,15 +17,6 @@ const STEP = 1e-6
 type Paint = (scope: HTMLElement) => (t: number) => void
 
 export type Scrub = { time: RefObject<number>; seek: RefObject<(t: number) => void> }
-
-export type ScrubOptions = { length?: string; rest?: number; scale?: Pace; stepped?: true }
-
-export const scrubOptions = (end: number, pace: Pace, options?: ScrubOptions) => ({
-  length: options?.length ?? '+=300%',
-  rest: options?.rest ?? end,
-  initial: options?.rest ?? 0,
-  scale: options?.scale ?? pace,
-})
 
 export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops: ReadonlyArray<number>, pace: Pace, paint: Paint, options?: ScrubOptions): Scrub {
   const inputs = { end, stops, pace, ...scrubOptions(end, pace, options) }

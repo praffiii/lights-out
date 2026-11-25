@@ -1,7 +1,7 @@
 import { expect, it } from 'bun:test'
 
 import { linearPace, stepPace, timeAt } from '../../src/chapter/pace.ts'
-import { scrubOptions } from '../../src/chapter/useScrub.ts'
+import { scrubOptions } from '../../src/chapter/scrub-options.ts'
 
 it('defaults to +=300%, resting at the end, and reading the bar on the pace', () => {
   const pace = linearPace(8)
