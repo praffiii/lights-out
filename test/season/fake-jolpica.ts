@@ -82,6 +82,7 @@ const people = (name: string) => fixture(`people/${name}`)
 export const results2026r20 = Schema.decodeUnknownSync(SeasonResultsResponse)(await people('results-2026'))
 export const sprints2026r20 = Schema.decodeUnknownSync(SeasonSprintsResponse)(await people('sprint-2026'))
 export const qualifying2026r20 = Schema.decodeUnknownSync(SeasonQualifyingResponse)(await people('qualifying-2026'))
+export const constructors2026r20 = Schema.decodeUnknownSync(ConstructorStandingsResponse)(await people('constructorstandings-2026'))
 export const drivers2026r20 = Schema.decodeUnknownSync(DriverStandingsResponse)(await people('driverstandings-2026'))
 
 const PAST_SEASONS = [2016, 2017, 2018, 2020, 2021, 2022, 2023, 2024, 2025]

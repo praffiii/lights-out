@@ -3,6 +3,7 @@ import { Effect } from 'effect'
 import { flagTally } from '../flags/build.ts'
 import { buildPeople } from '../people/build.ts'
 import { topSpeed } from '../speed/build.ts'
+import { matches, nextTitles, titlesOf } from '../titles/build.ts'
 
 import { JolpicaClient, type JolpicaError } from './jolpica-client.ts'
 import { seasonHistory, type SeasonRace } from './history.ts'
@@ -59,7 +60,7 @@ const people = (season: number, pages: { races: ReadonlyArray<SeasonRace>; sprin
     Effect.catch((error) => Effect.logWarning('people kept from the previous snapshot', error).pipe(Effect.as(previous))),
   )
 
-export const buildSnapshot = (now: Date, previous?: Pick<SeasonSnapshot, 'flags' | 'topSpeed' | 'people'>): Effect.Effect<SeasonSnapshot, JolpicaError, JolpicaClient | OpenF1Client> =>
+export const buildSnapshot = (now: Date, previous?: Pick<SeasonSnapshot, 'flags' | 'topSpeed' | 'people' | 'titles'>): Effect.Effect<SeasonSnapshot, JolpicaError, JolpicaClient | OpenF1Client> =>
   Effect.gen(function* () {
     const jolpica = yield* JolpicaClient
     const { season, races } = yield* jolpica.races('current')
@@ -90,6 +91,12 @@ export const buildSnapshot = (now: Date, previous?: Pick<SeasonSnapshot, 'flags'
     const past = pages && seasonHistory(pages.races, pages.sprints)
     const built = pages && driverStandings ? yield* people(driverStandings.season, pages, previous?.people) : previous?.people
     const grid = built?.season === driverStandings?.season ? built : undefined
+    const standings = { drivers: driverStandings, teams: constructorStandings }
+    const fresh = pages && driverStandings && titlesOf(driverStandings.season, races, pages.races, pages.sprints)
+
+    if (fresh && !matches(fresh, driverStandings, constructorStandings)) yield* Effect.logWarning('titles kept from the previous snapshot: the points do not add up to the standings', { round: fresh.rounds.at(-1)?.round })
+
+    const titles = pages && driverStandings ? nextTitles({ season: driverStandings.season, calendar: races, ...pages, ...standings, previous: previous?.titles }) : previous?.titles
     const session = yield* latestSession(races, season, now)
     const flags = yield* flagTally(season, now, previous?.flags)
     const speed = yield* topSpeed(season, now, previous?.topSpeed)
@@ -105,5 +112,5 @@ export const buildSnapshot = (now: Date, previous?: Pick<SeasonSnapshot, 'flags'
       constructorStandings,
     }
 
-    return { ...snapshot, ...(past && { history: past }), ...(session && { latestSession: session }), ...(flags && { flags }), ...(speed && { topSpeed: speed }), ...(grid && { people: grid }) }
+    return { ...snapshot, ...(past && { history: past }), ...(session && { latestSession: session }), ...(flags && { flags }), ...(speed && { topSpeed: speed }), ...(grid && { people: grid }), ...(titles && { titles }) }
   })

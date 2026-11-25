@@ -7,7 +7,8 @@ import { buildSnapshot } from '../../src/season/build-snapshot.ts'
 import { JolpicaClient, JolpicaError } from '../../src/season/jolpica-client.ts'
 import { RacesResponse, SeasonResultsResponse } from '../../src/season/jolpica-schema.ts'
 import { SeasonSnapshotJson } from '../../src/season/snapshot-schema.ts'
-import { calendar2026, calendar2027, fake, fakeJolpica, fixture, noRaces, qualifying } from './fake-jolpica.ts'
+import { input2026, titles2026 } from '../titles/fixture.ts'
+import { calendar2026, calendar2027, fake, fakeJolpica, fixture, missing, noRaces, pageOf, qualifying, results2026r20, sprints2026r20 } from './fake-jolpica.ts'
 import { fakeOpenF1 } from './fake-openf1.ts'
 
 const run = (now: string, overrides: Partial<JolpicaClient['Service']> = {}) =>
@@ -176,4 +177,40 @@ it('a snapshot written before history still decodes', async () => {
 
   expect(snapshot.history).toBeUndefined()
   expect(snapshot.season).toBe(2026)
+})
+
+const titled = (overrides: Partial<JolpicaClient['Service']> = {}, previous?: Parameters<typeof buildSnapshot>[1]) =>
+  Effect.runPromise(
+    buildSnapshot(new Date('2026-11-10T00:00:00Z'), previous).pipe(
+      Effect.provide(
+        Layer.merge(
+          fakeJolpica({
+            driverStandings: () => Effect.succeed(input2026.drivers),
+            constructorStandings: () => Effect.succeed(input2026.teams),
+            seasonResults: (_, offset) => Effect.succeed(pageOf(results2026r20, offset)),
+            seasonSprints: (_, offset) => Effect.succeed(pageOf(sprints2026r20, offset)),
+            ...overrides,
+          }),
+          fakeOpenF1(),
+        ),
+      ),
+    ),
+  )
+
+it('carries the titles of the season, through JSON and back', async () => {
+  const snapshot = await titled()
+
+  expect(snapshot.titles).toEqual(titles2026())
+  expect(Schema.decodeSync(SeasonSnapshotJson)(Schema.encodeSync(SeasonSnapshotJson)(snapshot)).titles).toEqual(titles2026())
+})
+
+it('keeps the previous titles when the season pages fail', async () => {
+  const titles = titles2026()
+  const snapshot = await titled({ seasonResults: () => missing('/results') }, { titles })
+
+  expect(snapshot.titles).toEqual(titles)
+})
+
+it('still reads a snapshot written before titles existed', async () => {
+  expect(Schema.decodeUnknownSync(SeasonSnapshotJson)(await Bun.file('test/fixtures/season-snapshot-v1.json').text()).titles).toBeUndefined()
 })
