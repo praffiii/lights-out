@@ -54,7 +54,7 @@ export function Shell() {
   const busy = useRef(false)
   const veil = useRef<HTMLDivElement>(null)
   const left = useRef<{ path: string; y: number; dive: Dive | undefined } | null>(null)
-  const bare = path.startsWith('/lap/')
+  const bare = /^\/lap\/[^/]+\/?$/.test(path)
 
   useEffect(() => {
     if (theme) document.documentElement.dataset.theme = theme

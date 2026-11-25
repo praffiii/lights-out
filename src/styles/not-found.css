@@ -1,0 +1,32 @@
+.not-found { display: grid; grid-template-columns: minmax(0, 744fr) minmax(0, 696fr); min-height: max(100svh, 720px); padding-top: 88px; }
+.not-found .copy { display: flex; flex-direction: column; min-width: 0; padding: 48px var(--m) 24px; }
+.not-found h1 { margin: 26px 0 0 -0.064em; font-size: clamp(150px, 19.4vw, 340px); font-weight: 800; line-height: 0.74; letter-spacing: -0.05em; white-space: nowrap; }
+.not-found .meaning { margin-top: 34px; }
+.not-found h2 { margin: 37px 0 0 -2px; font-size: clamp(32px, 2.78vw, 48px); font-weight: 800; line-height: 1.05; letter-spacing: -0.04em; }
+.not-found .body { max-width: 560px; margin-top: 14px; font-size: 18px; }
+.not-found nav { display: flex; flex-wrap: wrap; gap: 8px 32px; margin: 30px 0 48px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+.not-found nav a { transition: color 0.24s; }
+.not-found nav a:hover, .not-found nav a:focus-visible { color: var(--purple); }
+.not-found .race-control { margin: auto 0 81px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.not-found figure { position: relative; }
+.not-found .shot { position: absolute; inset: 0; overflow: clip; background: var(--line); }
+.not-found .shot > .bar { inset: 0; }
+.not-found .shot img { width: 100%; height: 100%; object-fit: cover; object-position: 51.6% 50%; }
+.not-found figcaption { position: absolute; left: 0; bottom: 54px; width: 520px; max-width: 100%; padding: 20px 24px; border-top: 3px solid var(--purple); background: var(--ink); color: var(--bg); }
+.not-found figcaption .mono { color: color-mix(in srgb, var(--bg) 62%, var(--ink)); }
+.not-found .what { margin-top: 10px; font-size: 22px; font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; }
+.not-found .credit { margin-top: 18px; font-size: 10px; text-transform: none; }
+
+@media (max-width: 760px) {
+  .not-found { display: block; min-height: 0; padding-top: 128px; }
+  .not-found .copy { padding: 0 var(--m) 24px; }
+  .not-found h1 { margin-top: 16px; font-size: clamp(120px, 38.5vw, 300px); }
+  .not-found .meaning, .not-found .race-control { display: none; }
+  .not-found h2 { margin-top: 36px; font-size: 26px; }
+  .not-found .body { margin-top: 8px; font-size: 16px; }
+  .not-found nav { gap: 10px 22px; margin: 14px 0 0; padding: 0; border: 0; font-size: 16px; }
+  .not-found .shot { position: relative; inset: auto; height: 382px; }
+  .not-found .shot img { object-position: 95.7% 50%; }
+  .not-found figcaption { position: relative; bottom: auto; width: auto; margin: -131px var(--m) 0; padding: 20px; }
+  .not-found .what { font-size: 15px; }
+}

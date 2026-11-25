@@ -35,6 +35,7 @@ export const PHOTOS = {
   williams: { src: '/img/williams.jpg', place: 'Williams FW48 · Shanghai, 2026', credit: 'Photo Liauzh · CC BY 4.0', source: 'https://commons.wikimedia.org/wiki/File:2026_Chinese_GP_-_Williams_-_Alex_Albon_-_Qualifying.jpg' },
   brm: { src: '/img/y1973.jpg', place: 'BRM mechanics · Anderstorp, 1973', credit: 'Photo Markku Lepola · CC BY 4.0', source: 'https://commons.wikimedia.org/wiki/File:Swedish_Grand_Prix_1973_(JOKAMAL3B08-13).tif' },
   startLights: { src: '/img/start-lights.jpg', place: 'Start lights · Melbourne, 2026 · cropped', credit: 'Photo Yu Chu Chin · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Track_Walk_at_the_2026_Australian_Grand_Prix_(028A8882).jpg' },
+  recovery: { src: '/img/not-found.jpg', place: 'Recovery · Zandvoort, 2024', credit: 'Photo Steffen Prößdorf · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:2024-08-24_Motorsport,_Formel_1,_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3280_by_Stepro.jpg' },
 } satisfies Record<string, Photo>
 
 export type ChapterPath = Extract<To, `/chapters/${string}`>
