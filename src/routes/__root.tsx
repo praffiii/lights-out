@@ -10,7 +10,7 @@ const FONTS = 'https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..12
 
 export const Route = createRootRoute({
   head: ({ matches }) => {
-    const lost = matches.length === 1
+    const lost = matches.some((match) => match._notFound)
 
     return {
       meta: [

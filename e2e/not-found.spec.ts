@@ -66,12 +66,25 @@ test('a malformed address never breaks the server', async ({ request }) => {
   expect((await request.get('/%E0%A4%A')).status()).toBeLessThan(500)
 })
 
-test('a bad address under the lap explorer keeps the header and footer', async ({ page }) => {
-  expect(await visit(page, '/lap/a/b')).toBe(404)
+for (const path of ['/lap/a/b', '/season/xyz', '/tracks/a/b', '/api/season/x', `/season/${'gossip'.repeat(70)}`]) {
+  test(`a bad address below a real one is the same page: ${path.slice(0, 20)}`, async ({ page }) => {
+    expect(await visit(page, path)).toBe(404)
 
-  await expect(page.locator('.not-found h1')).toHaveText('DNF')
-  await expect(page.locator('.header')).toBeVisible()
-  await expect(page.locator('.footer')).toBeAttached()
+    await expect(page.locator('.not-found h1')).toHaveText('DNF')
+    await expect(page).toHaveTitle('Page not found · Lights Out')
+    await expect(robots(page)).toHaveAttribute('content', 'noindex')
+    await expect(page.locator('.not-found .shot img')).toHaveCSS('object-fit', 'cover')
+    await expect(page.locator('.header')).toBeVisible()
+    await expect(page.locator('.footer')).toBeAttached()
+    expect(await overflow(page)).toBeLessThanOrEqual(0)
+  })
+}
+
+test('real pages stay open to search engines', async ({ page }) => {
+  for (const path of ['/', '/season', '/people/antonelli', '/lap/monza']) {
+    await page.goto(path)
+    await expect(robots(page)).toHaveCount(0)
+  }
 })
 
 test('leaving the page takes its title and robots tag with it', async ({ page, errors }) => {
