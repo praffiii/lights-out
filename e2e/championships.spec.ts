@@ -526,3 +526,49 @@ test('data that lands while the reader is below the stage does not move the page
   expect(Math.abs(((await chapter(page, '.cap').boundingBox())?.y ?? 0) - before)).toBeLessThan(120)
   expect(errors).toEqual([])
 })
+
+test('a step forward answers as fast as a step back', async ({ page }) => {
+  await loaded(page)
+  await toRound(page, 10)
+  await page.waitForTimeout(1500)
+  await slider(page).focus()
+
+  const answer = (key: string) =>
+    page.evaluate(
+      (pressed) =>
+        new Promise<number>((resolve) => {
+          const round = document.querySelector('.season-race [data-round]')
+          const track = document.querySelector('.season-race [role="slider"]')
+          const before = round?.textContent
+          let frames = 0
+
+          const look = () => {
+            frames += 1
+
+            if (round?.textContent !== before || frames > 200) resolve(frames)
+            else requestAnimationFrame(look)
+          }
+
+          track?.dispatchEvent(new KeyboardEvent('keydown', { key: pressed, bubbles: true }))
+          requestAnimationFrame(look)
+        }),
+      key,
+    )
+
+  for (const key of ['ArrowLeft', 'ArrowRight', 'End']) {
+    expect(await answer(key)).toBeLessThan(12)
+    await page.waitForTimeout(1500)
+  }
+})
+
+test.describe('with reduced motion asked for by the system', () => {
+  test.use({ contextOptions: { reducedMotion: 'reduce' } })
+
+  test('the purple never wipes', async ({ page }) => {
+    await loaded(page)
+
+    const times = await stage(page, '.hero-box').evaluateAll((els) => els.map((el) => getComputedStyle(el, '::before').transitionDuration))
+
+    expect(times).toEqual(['0s', '0s'])
+  })
+})

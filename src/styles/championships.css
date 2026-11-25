@@ -229,3 +229,7 @@
   .championships-page .season-race .law { margin-top: 4px; line-height: 1.25; }
   .championships-page .season-race .pin { --u: min(1.08svh, 2.3vw); }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .championships-page .season-race :is(.hero-box, .tag), .championships-page .season-race .hero-box::before { transition: none; }
+}

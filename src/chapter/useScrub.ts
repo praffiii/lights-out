@@ -124,18 +124,25 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
         show(goal)
       }
 
+      const trackScroll = (progress: number) => {
+        fromScroll(progress)
+
+        if (stepped) show(goal)
+      }
+
       if (!REDUCED) {
         st = ScrollTrigger.create({
           trigger: pin,
           start: 'top top',
           end: length,
           pin: true,
-          onUpdate: (self) => fromScroll(self.progress),
-          onRefresh: (self) => fromScroll(self.progress),
+          onUpdate: (self) => trackScroll(self.progress),
+          onRefresh: (self) => trackScroll(self.progress),
         })
         fromScroll(st.progress)
         show(goal)
-        gsap.ticker.add(follow)
+
+        if (!stepped) gsap.ticker.add(follow)
       } else show(rest)
 
       const fromX = (x: number) => {
