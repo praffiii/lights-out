@@ -167,7 +167,7 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
         track.removeEventListener('keydown', onKey)
       }
     },
-    { scope: root, dependencies: [end, stops, pace, length, rest, scale] },
+    { scope: root, dependencies: [end, stops, pace, length, rest, scale], revertOnUpdate: true },
   )
 
   return { time, seek: seeker }

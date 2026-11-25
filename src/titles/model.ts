@@ -143,3 +143,10 @@ export const stripScale = (titles: Titles): Pace => {
     [1, last],
   ]
 }
+
+export const teamAt = (titles: Titles, driver: string, index: number): string | null =>
+  titles.rounds
+    .slice(0, index + 1)
+    .flatMap((round) => [...round.rows, ...round.finishes])
+    .filter(([id]) => id === driver)
+    .at(-1)?.[1] ?? null

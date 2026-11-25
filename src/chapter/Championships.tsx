@@ -10,6 +10,7 @@ import { FALLBACK, pickTitles } from '#/titles/titles.ts'
 
 import { POINTS } from './content.ts'
 import { Next } from './Next.tsx'
+import { SeasonRace } from './SeasonRace.tsx'
 import { Term } from './Term.tsx'
 import { Words } from './Words.tsx'
 import { TITLES_WORDS } from './words.ts'
@@ -25,7 +26,7 @@ function hero(scope: HTMLElement) {
 function motion(scope: HTMLElement) {
   for (const el of all(scope, '.shot')) reveal(el)
 
-  for (const el of all(scope, '.scores .headline, .sum .headline .hl, .words h2')) sweep(el)
+  for (const el of all(scope, '.scores .headline, .season-race .headline .hl, .sum .headline .hl, .words h2')) sweep(el)
 
   for (const el of all(scope, '.cap .payoff')) block(el, { delay: 0.3 })
 
@@ -205,6 +206,7 @@ export function Championships() {
         <p className="mono muted credit">{`${photo.credit}, via Wikimedia Commons`}</p>
       </figure>
       <Scores titles={titles} />
+      <SeasonRace titles={titles} />
       <Sum titles={titles} />
       <Cap />
       <Words keys={TITLES_WORDS} />

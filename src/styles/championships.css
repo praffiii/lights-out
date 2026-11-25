@@ -30,6 +30,66 @@
 .championships-page .scores .extra .what { font-size: 28px; font-weight: 600; line-height: 1.2; letter-spacing: -0.015em; }
 .championships-page .scores .credit { grid-column: 1 / -1; }
 
+.championships-page .season-race { --panel: #e6e4de; --cell: #e6e4de; --later: #eeece7; --plus: #12803a; margin-top: var(--gap); }
+.championships-page .season-race[data-theme='dark'] { --bg: #111214; --panel: #1a1b1f; --cell: #1f2126; --later: #16171a; --plus: #2bd45e; --line: #2a2d33; }
+.championships-page .season-race .pin { --u: min(1svh, 0.72vw); display: flex; flex-direction: column; gap: calc(var(--u) * 2.2); width: 100%; height: 100svh; padding: calc(var(--u) * 4.4) var(--m) calc(var(--u) * 3); overflow: clip; background: var(--bg); color: var(--ink); }
+.championships-page .season-race .head { display: grid; grid-template-columns: minmax(0, 1fr) 380px; }
+.championships-page .season-race .headline { margin: calc(var(--u) * 1.6) 0 0 -4px; font-size: calc(var(--u) * 8); line-height: 0.97; }
+.championships-page .season-race .when { display: grid; grid-template-columns: max-content minmax(0, 1fr); grid-template-rows: auto auto auto auto 1fr; column-gap: 32px; align-content: start; }
+.championships-page .season-race .when .rd { grid-column: 1; grid-row: 1; }
+.championships-page .season-race .when .number { grid-column: 1; grid-row: 2 / -1; min-width: 1.12em; margin: calc(var(--u) * 1.2) 0 0 -0.05em; font-size: calc(var(--u) * 16); line-height: 0.82; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; font-variation-settings: 'wdth' 100; }
+.championships-page .season-race .when > :not(.rd, .number) { grid-column: 2; }
+.championships-page .season-race .when .of { grid-row: 1; }
+.championships-page .season-race .when .small { display: none; }
+.championships-page .season-race .place { margin-top: calc(var(--u) * 4.6); font-size: calc(var(--u) * 3.1); font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; white-space: nowrap; }
+.championships-page .season-race .day { margin-top: 10px; }
+.championships-page .season-race .winner { margin-top: 8px; }
+
+.championships-page .season-race .sides { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; }
+.championships-page .season-race .hero-box { position: relative; isolation: isolate; display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: calc(var(--u) * 3.6); align-items: center; padding: calc(var(--u) * 2.1) calc(var(--u) * 2.2) calc(var(--u) * 1.9); overflow: clip; background: var(--panel); transition: color 0.3s; }
+.championships-page .season-race .hero-box::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--purple); transform: scaleX(0); transform-origin: left; transition: transform 0.6s var(--launch); }
+.championships-page .season-race .side[data-won] .hero-box { color: #111214; }
+.championships-page .season-race .side[data-won] .hero-box::before { transform: none; }
+.championships-page .season-race h3, .championships-page .season-race .state { font-weight: 500; }
+.championships-page .season-race h3 { grid-column: 1 / -1; grid-row: 1; padding-right: 160px; }
+.championships-page .season-race .state { grid-column: 1 / -1; grid-row: 1; justify-self: end; }
+.championships-page .season-race .side:not([data-won]) :is(h3, .state, .left) { color: var(--muted); }
+.championships-page .season-race .lead { min-width: 1.62em; margin: calc(var(--u) * 1.3) 0 0 -0.04em; font-size: calc(var(--u) * 13.4); line-height: 0.8; letter-spacing: -0.05em; font-variation-settings: 'wdth' 100; }
+.championships-page .season-race .against { display: grid; font-size: calc(var(--u) * 2.9); font-weight: 600; line-height: 1.38; letter-spacing: -0.01em; }
+
+.championships-page .season-race .tower { margin-top: calc(var(--u) * 1.4); list-style: none; }
+.championships-page .season-race .tower li { display: grid; grid-template-columns: 24px auto minmax(0, 1fr) auto 52px 84px; align-items: center; column-gap: 16px; height: calc(var(--u) * 6.2); border-bottom: 1px solid var(--line); }
+.championships-page .season-race .tower li:last-child { border-bottom: 0; }
+.championships-page .season-race .picture { display: block; height: calc(var(--u) * 5.3); aspect-ratio: 1; overflow: clip; border-left: 3px solid var(--team); background: var(--panel); }
+.championships-page .season-race .picture[data-kind='car'] { aspect-ratio: 2; }
+.championships-page .season-race .picture img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; }
+.championships-page .season-race .picture[data-kind='car'] img { object-position: 50% 50%; }
+.championships-page .season-race .name { overflow: clip; font-size: calc(var(--u) * 2.9); font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; text-overflow: ellipsis; }
+.championships-page .season-race .split { letter-spacing: 0; white-space: nowrap; }
+.championships-page .season-race .gain { justify-self: end; grid-column: 5; color: var(--plus); }
+.championships-page .season-race .pts { justify-self: end; grid-column: 6; font-size: calc(var(--u) * 3.3); font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+
+.championships-page .season-race .strip { margin-top: auto; }
+.championships-page .season-race .strip-label { display: flex; justify-content: space-between; }
+.championships-page .season-race .track { margin-top: 10px; cursor: pointer; touch-action: pan-y; }
+.championships-page .season-race .track:focus-visible { outline: 2px solid var(--purple); outline-offset: 4px; }
+.championships-page .season-race .cells { display: grid; grid-auto-columns: minmax(0, 1fr); grid-auto-flow: column; list-style: none; }
+.championships-page .season-race .cells li { position: relative; display: grid; align-content: center; justify-items: center; row-gap: 4px; height: calc(var(--u) * 5.4); margin-right: 3px; background: var(--later); color: var(--muted); }
+.championships-page .season-race .cells li[data-past] { background: var(--cell); color: var(--ink); box-shadow: inset 0 4px 0 var(--team); }
+.championships-page .season-race .cells li[data-now] { background: var(--ink); color: var(--bg); }
+.championships-page .season-race .cells li[data-lock][data-past]::before { content: ''; position: absolute; left: 0; right: 0; bottom: -7px; height: 4px; background: var(--purple); }
+.championships-page .season-race .cells .n { font-size: 9px; opacity: 0.7; }
+.championships-page .season-race .cells .code { min-height: 1.2em; font-weight: 500; }
+.championships-page .season-race .cells li[data-sprint]::after { content: 'S'; position: absolute; top: calc(100% + 4px); font: 400 9px/1 'Martian Mono', monospace; color: var(--muted); }
+.championships-page .season-race .tags { --w: 148px; position: relative; height: 48px; margin-top: 0; }
+.championships-page .season-race .tag { position: absolute; top: 20px; width: var(--w); padding: 9px 0 8px; background: var(--purple); color: #111214; font-weight: 500; text-align: center; opacity: 0; transition: opacity 0.3s; }
+.championships-page .season-race .tag[data-on] { opacity: 1; }
+.championships-page .season-race .tag b { font-weight: inherit; }
+.championships-page .season-race .tag[data-place='last'] { left: min(var(--from), 100% - var(--w)); }
+.championships-page .season-race .tag[data-place='first'] { left: max(0px, min(var(--to) - 3px - var(--w), min(var(--next), 100% - var(--w)) - 8px - var(--w))); }
+.championships-page .season-race .law { margin-top: 12px; text-transform: none; font-weight: 500; }
+.championships-page .season-race > .credit { margin: 16px var(--m) 0; line-height: 1.5; }
+
 .championships-page .sum { margin: var(--gap) var(--m) 0; }
 .championships-page .sum .terms { display: flex; align-items: flex-start; justify-content: space-between; margin: 24px 0 0 -0.4vw; list-style: none; }
 .championships-page .sum .terms li { position: relative; display: grid; grid-template-columns: auto auto; column-gap: 1.8vw; }
@@ -66,6 +126,7 @@
 .championships-page .cap > .credit { grid-column: 1 / -1; }
 
 @media (max-width: 1199px) {
+  .championships-page .season-race .split { display: none; }
   .championships-page .term .def { left: var(--m); right: var(--m); }
   .championships-page { --gap: 96px; }
   .championships-page .photo-band .shot { height: 560px; }
@@ -107,4 +168,40 @@
   .championships-page .cap figure .credit { margin-inline: var(--m); }
   .championships-page .cap .payoff { grid-template-columns: minmax(0, 1fr) auto; row-gap: 10px; margin: 0; padding: 20px 16px; }
   .championships-page .cap .payoff .what { grid-column: 1 / -1; grid-row: 2; font-size: 20px; }
+}
+
+@media (max-width: 760px) {
+  .championships-page .season-race .pin { --u: min(1svh, 2.3vw); gap: calc(var(--u) * 1.3); padding: calc(var(--u) * 3) var(--m) calc(var(--u) * 2); }
+  .championships-page .season-race .head { grid-template-columns: minmax(0, 1fr); row-gap: calc(var(--u) * 1); }
+  .championships-page .season-race .headline { margin-top: calc(var(--u) * 0.9); font-size: calc(var(--u) * 4.5); line-height: 1; }
+  .championships-page .season-race .when { grid-template-rows: auto auto; column-gap: 14px; align-items: center; }
+  .championships-page .season-race .when :is(.rd, .day) { display: none; }
+  .championships-page .season-race .when .small { display: inline; }
+  .championships-page .season-race .when .number { grid-row: 1 / -1; margin-top: 0; font-size: calc(var(--u) * 7.2); }
+  .championships-page .season-race .place { grid-row: 1; margin: 0; font-size: calc(var(--u) * 2.4); }
+  .championships-page .season-race .when .of { grid-row: 2; }
+  .championships-page .season-race .winner { grid-row: 2; justify-self: end; margin: 0; }
+  .championships-page .season-race .when .mono { font-size: 10px; letter-spacing: 0; }
+  .championships-page .season-race .sides { grid-template-columns: minmax(0, 1fr); row-gap: calc(var(--u) * 1.4); }
+  .championships-page .season-race .hero-box { column-gap: 14px; padding: calc(var(--u) * 1.3) 12px calc(var(--u) * 1.2); }
+  .championships-page .season-race :is(h3, .state) { font-size: 10px; }
+  .championships-page .season-race .lead { margin-top: calc(var(--u) * 0.8); font-size: calc(var(--u) * 6.8); }
+  .championships-page .season-race .against { font-size: calc(var(--u) * 2.1); line-height: 1.25; }
+  .championships-page .season-race .tower { margin-top: calc(var(--u) * 0.5); }
+  .championships-page .season-race .tower li { grid-template-columns: 16px auto minmax(0, 1fr) 40px 44px; column-gap: 10px; height: calc(var(--u) * 5.5); }
+  .championships-page .season-race .tower li:nth-child(n + 4) { display: none; }
+  .championships-page .season-race .tower li:nth-child(3) { border-bottom: 0; }
+  .championships-page .season-race .picture { height: calc(var(--u) * 4.6); }
+  .championships-page .season-race .name { font-size: calc(var(--u) * 2.1); }
+  .championships-page .season-race .split { display: none; }
+  .championships-page .season-race .gain { grid-column: 4; font-size: 10px; }
+  .championships-page .season-race .pts { grid-column: 5; font-size: calc(var(--u) * 2.4); }
+  .championships-page .season-race .strip-label { font-size: 10px; }
+  .championships-page .season-race .strip-label .key { display: none; }
+  .championships-page .season-race .track { margin-top: 6px; }
+  .championships-page .season-race .cells li { height: calc(var(--u) * 3.6); margin-right: 2px; }
+  .championships-page .season-race .cells :is(.n, .code), .championships-page .season-race .cells li[data-sprint]::after { display: none; }
+  .championships-page .season-race .tags { --w: 112px; height: 34px; }
+  .championships-page .season-race .tag { top: 11px; padding: 6px 0 5px; font-size: 10px; letter-spacing: 0; }
+  .championships-page .season-race .law { margin-top: 8px; font-size: 10px; letter-spacing: 0; line-height: 1.4; }
 }
