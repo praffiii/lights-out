@@ -125,7 +125,7 @@ export type Team = { id: string; name: string; colour: string }
 
 const MUTED = 'var(--muted)'
 
-const TEAM_IDS = new Map<string, keyof typeof TEAMS>([
+export const TEAM_IDS = new Map<string, keyof typeof TEAMS>([
   ['mercedes', 'Mercedes'],
   ['ferrari', 'Ferrari'],
   ['red_bull', 'Red Bull'],
