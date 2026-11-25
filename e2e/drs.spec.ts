@@ -264,3 +264,57 @@ test.describe('without JavaScript', () => {
     await expect(ghost(page, '.wing img')).toHaveAttribute('src', '/wing/open.webp')
   })
 })
+
+const FRAME = /\/wing\/\d\d\.webp/
+
+const picture = (page: Page) => ghost(page, '.wing canvas').evaluate((el) => (el instanceof HTMLCanvasElement ? el.toDataURL() : ''))
+
+const isBlank = (page: Page) => ghost(page, '.wing canvas').evaluate((el) => el instanceof HTMLCanvasElement && !el.getContext('2d')?.getImageData(0, 0, el.width, el.height).data.some((v) => v > 0))
+
+test('the wing opens at the line and shuts on the way back', async ({ page, errors }) => {
+  await loaded(page)
+  await toTime(page, -1)
+  await expect(ghost(page, '.wing canvas')).toHaveAttribute('data-frame', '0')
+
+  const shut = await picture(page)
+
+  await toTime(page, GHOST.end)
+  await expect(ghost(page, '.wing canvas')).toHaveAttribute('data-frame', '23')
+  expect(await picture(page)).not.toBe(shut)
+
+  await toTime(page, -1)
+  await expect(ghost(page, '.wing canvas')).toHaveAttribute('data-frame', '0')
+  expect(await picture(page)).toBe(shut)
+  expect(errors).toEqual([])
+})
+
+test('halfway through the opening the wing is between shut and open', async ({ page }) => {
+  await loaded(page)
+  await toTime(page, 0.15)
+
+  const frame = Number(await ghost(page, '.wing canvas').getAttribute('data-frame'))
+
+  expect(frame).toBeGreaterThan(3)
+  expect(frame).toBeLessThan(20)
+})
+
+test('the wing frames wait until the stage is near', async ({ page }) => {
+  const asked: string[] = []
+
+  page.on('request', (r) => FRAME.test(r.url()) && asked.push(r.url()))
+  await loaded(page)
+  await page.waitForTimeout(1000)
+  expect(asked).toEqual([])
+
+  await toTime(page, 1)
+  await expect.poll(() => asked.length).toBe(24)
+})
+
+test('with no frames the open wing stays', async ({ page }) => {
+  await page.route(FRAME, (route) => route.abort())
+  await loaded(page)
+  await toTime(page, 2)
+
+  await expect(ghost(page, '.wing img')).toBeVisible()
+  expect(await isBlank(page)).toBe(true)
+})

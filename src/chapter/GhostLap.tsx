@@ -1,8 +1,9 @@
 import { type CSSProperties, useCallback, useMemo, useRef, useState } from 'react'
 
 import type { CircuitInfo } from '#/circuits/registry.ts'
-import { at, barScale, camAt, END, gapText, ghostPace, isLevel, lengthOf, sliderText, START, stops } from '#/drs/model.ts'
+import { at, barScale, camAt, END, flapFrame, gapText, ghostPace, isLevel, lengthOf, sliderText, START, stops } from '#/drs/model.ts'
 import type { GhostFile } from '#/drs/schema.ts'
+import { WING_FRAMES } from '#/drs/wing.ts'
 import { TEAMS } from '#/home/cars.ts'
 import { REDUCED } from '#/motion/motion.ts'
 import type { Focus } from '#/pass/model.ts'
@@ -10,6 +11,7 @@ import { CircuitStage } from '#/weekend/CircuitStage.tsx'
 
 import { GhostHud } from './GhostHud.tsx'
 import { useScrub } from './useScrub.ts'
+import { useWing } from './useWing.ts'
 
 type Vars = CSSProperties & Record<`--${string}`, string>
 
@@ -31,6 +33,7 @@ export function GhostLap({ file, info }: { file: GhostFile; info: CircuitInfo })
   const focus = useRef<Focus | null>(camAt(file, REDUCED ? file.end : START))
   const [near, setNear] = useState(false)
   const onNear = useCallback(() => setNear(true), [])
+  const wing = useWing(near, flapFrame(REDUCED ? 1 : 0, WING_FRAMES))
   const steps = useMemo(() => stops(file), [file])
   const pace = useMemo(() => ghostPace(file), [file])
   const options = useMemo(() => ({ length: '+=400%', scale: barScale(file) }), [file])
@@ -52,6 +55,7 @@ export function GhostLap({ file, info }: { file: GhostFile; info: CircuitInfo })
       const now = at(file, t + START)
 
       focus.current = camAt(file, t + START)
+      wing.show(flapFrame(now.flap, WING_FRAMES))
       scope.toggleAttribute('data-open', now.open)
       scope.toggleAttribute('data-level', isLevel(now))
       end?.toggleAttribute('data-lit', t >= END(file) - 0.02)
@@ -92,7 +96,8 @@ export function GhostLap({ file, info }: { file: GhostFile; info: CircuitInfo })
           </p>
         </div>
         <figure className="wing">
-          <img src="/wing/open.webp" width={1568} height={904} alt="A drawing of a rear wing with its purple flap open." />
+          <img src="/wing/open.webp" width={1568} height={904} alt="A drawing of a rear wing with a purple flap between two end plates." />
+          <canvas ref={wing.canvas} width={784} height={452} aria-hidden />
           <figcaption className="mono">
             <b className="state">
               Flap · <span data-flap>open</span>
