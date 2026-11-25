@@ -328,7 +328,7 @@ const clashes = (page: Page) =>
     const boxes = parts.flatMap((el) => {
       const r = el.getBoundingClientRect()
 
-      return r.width > 0 ? [{ name: el.className || el.parentElement?.className || '', car: el.parentElement?.getAttribute('data-car') ?? '', r }] : []
+      return r.width > 0 && getComputedStyle(el).visibility === 'visible' ? [{ name: el.className || el.parentElement?.className || '', car: el.parentElement?.getAttribute('data-car') ?? '', r }] : []
     })
 
     const label = (b: { name: string; car: string }) => `${b.name}${b.car}`
@@ -428,3 +428,23 @@ test('the bar label is bright enough over the road', async ({ page }) => {
   await loaded(page)
   await expect(ghost(page, '.straight .label')).toHaveCSS('color', 'rgb(255, 255, 255)')
 })
+
+for (const [project, width, height] of [
+  ['desktop', 1366, 640],
+  ['desktop', 1280, 700],
+  ['desktop', 1000, 720],
+  ['phone', 844, 390],
+  ['phone', 390, 844],
+  ['phone', 320, 568],
+] as const) {
+  test(`with no WebGL nothing in the stage clips or overlaps at ${width}×${height}`, async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== project)
+    await page.addInitScript(NO_WEBGL)
+    await page.setViewportSize({ width, height })
+    await loaded(page)
+    await toTime(page, GHOST.end)
+
+    await expect(ghost(page, '.ahead')).toBeVisible()
+    expect(await clashes(page)).toEqual([])
+  })
+}

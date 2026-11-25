@@ -62,8 +62,6 @@ export const flapFrame = (flap: number, count: number) => Math.round(flap * (cou
 
 const state = (now: Now) => (now.open ? 'open' : 'shut')
 
-export const labels = (now: Now) => ({ on: `Lap ${now.lap[0]} · flap ${state(now)}`, state: `Flap · ${state(now)}` })
-
 const metresText = (m: number) => Math.round(m).toLocaleString('en-GB')
 
 export const sliderText = (now: Now) =>

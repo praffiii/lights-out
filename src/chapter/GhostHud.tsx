@@ -5,7 +5,7 @@ import { at, START } from '#/drs/model.ts'
 import type { GhostFile } from '#/drs/schema.ts'
 import { pointAt } from '#/pole/replay.ts'
 
-import { normalAt, paintTrail, place, runWhileSeen, TRAIL_SEGS } from './hud.ts'
+import { paintTrail, place, runWhileSeen, TRAIL_SEGS } from './hud.ts'
 
 const TRAIL = 0.006
 
@@ -46,10 +46,8 @@ export function GhostHud({ file, gap, stage, replay, time, ready }: Props) {
 
       const u = (laps[0].u + laps[1].u) / 2
       const m = pointAt(trace, u)
-      const { nx, ny } = normalAt(trace, u)
-      const below = ny < 0 ? -1 : 1
 
-      place(chip, m.x + nx * below, m.y + ny * below)
+      place(chip, m.x, m.y)
     }
 
     return runWhileSeen(el, replay, draw)

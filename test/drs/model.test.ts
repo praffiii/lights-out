@@ -2,7 +2,7 @@ import { expect, it } from 'bun:test'
 
 import { progressAt, timeAt } from '../../src/chapter/pace.ts'
 import { GHOST } from '../../src/drs/miami.ts'
-import { at, barScale, camAt, END, flapFrame, gapText, ghostPace, labels, sliderText, START, stops, timeOfMetres } from '../../src/drs/model.ts'
+import { at, barScale, camAt, END, flapFrame, gapText, ghostPace, sliderText, START, stops, timeOfMetres } from '../../src/drs/model.ts'
 
 const end = at(GHOST, GHOST.end)
 
@@ -14,14 +14,12 @@ it('is level at the line with the flap shut', () => {
   expect(Math.abs(now.laps[1].speed - 300)).toBeLessThan(1.5)
   expect(now.flap).toBe(0)
   expect(gapText(now)).toBe('Level')
-  expect(labels(now)).toEqual({ on: 'Lap 53 · flap shut', state: 'Flap · shut' })
 })
 
 it('opens the flap in a third of a second', () => {
   expect(at(GHOST, 0.15).flap).toBeGreaterThan(0)
   expect(at(GHOST, 0.15).flap).toBeLessThan(1)
   expect(at(GHOST, 0.3).flap).toBe(1)
-  expect(labels(at(GHOST, 0.3))).toEqual({ on: 'Lap 53 · flap open', state: 'Flap · open' })
 })
 
 it('runs level before the line', () => {

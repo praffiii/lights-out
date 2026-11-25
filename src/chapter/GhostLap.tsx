@@ -106,10 +106,6 @@ export function GhostLap({ file, info }: { file: GhostFile; info: CircuitInfo })
           </figcaption>
         </figure>
         <div className="speeds">
-          <p className="ahead">
-            <span className="mono label">Ahead by</span>
-            <b>{gap}</b>
-          </p>
           <div data-speed="on">
             <p className="mono label">
               {`Lap ${on.lap} · `}
@@ -128,7 +124,13 @@ export function GhostLap({ file, info }: { file: GhostFile; info: CircuitInfo })
           <p className="mono unit">km/h</p>
         </div>
         <div className="straight">
-          <p className="mono label">{`The straight · ${(lengthOf(file) / 1000).toFixed(1)} km`}</p>
+          <div className="top">
+            <p className="mono label">{`The straight · ${(lengthOf(file) / 1000).toFixed(1)} km`}</p>
+            <p className="mono ahead">
+              <span>Ahead by </span>
+              <b>{gap}</b>
+            </p>
+          </div>
           <div className="lane" role="slider" tabIndex={0} aria-label="Place on the straight" aria-valuemin={Math.round(at(file, START).along)} aria-valuemax={Math.round(last.along)} aria-valuenow={Math.round(last.along)} aria-valuetext={sliderText(last)}>
             <i className="zone" />
             <i className="playhead" style={{ left: pct(last.along) }} />
