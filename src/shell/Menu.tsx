@@ -39,8 +39,8 @@ export function Menu({ open, onClose, path }: { open: boolean; onClose: () => vo
       const t = gsap
         .timeline()
         .fromTo(el, { clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.6, ease: 'launch' })
-        .from(el.querySelectorAll('.subs > *, nav .kicker, nav .sum, nav li > .here'), { autoAlpha: 0, x: -8, duration: 0.5, stagger: 0.02 }, 0.7)
-        .from(el.querySelector('.foot'), { autoAlpha: 0, duration: 0.4 }, 0.8)
+        .fromTo(el.querySelectorAll('.subs > *, nav .kicker, nav .sum, nav li > .here'), { autoAlpha: 0, x: -8 }, { autoAlpha: 1, x: 0, duration: 0.5, stagger: 0.02 }, 0.7)
+        .fromTo(el.querySelector('.foot'), { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, 0.8)
 
       tl.current = t
       el.querySelectorAll<HTMLElement>('nav .line').forEach((line, i) => {

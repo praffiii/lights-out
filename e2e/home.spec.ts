@@ -402,3 +402,65 @@ test('no dead link in any tab of the weekend box', async ({ page, errors }) => {
 
   expect(errors).toEqual([])
 })
+
+for (const path of ['/chapters', '/glossary', '/chapters/inside-the-car']) {
+  test(`the menu fits narrow phones on ${path}`, async ({ page, errors }, testInfo) => {
+    test.skip(testInfo.project.name !== 'phone')
+    await openMenu(page, path)
+    await page.waitForTimeout(1800)
+
+    for (const width of [320, 360, 390]) {
+      await page.setViewportSize({ width, height: 844 })
+      expect(await page.locator('.menu').evaluate((el) => el.scrollWidth - el.clientWidth), `${width}`).toBe(0)
+
+      const left = await page.locator('.menu .here').evaluate((el) => el.getBoundingClientRect().left)
+
+      expect(left, `${width}`).toBeGreaterThanOrEqual(60)
+    }
+
+    expect(errors).toEqual([])
+  })
+}
+
+for (const [path, name] of [
+  ['/glossary', 'Glossary'],
+  ['/glossary/', 'Glossary'],
+  ['/chapters', 'How F1 works'],
+] as const) {
+  test(`choosing ${name} on ${path} goes back to the top`, async ({ page, errors }) => {
+    await page.goto(path)
+    await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
+    await page.evaluate(() => window.scrollTo(0, 1300))
+    await page.waitForFunction(() => scrollY > 1200)
+    await page.locator('.menu-btn').evaluate((el) => el.click())
+    await page.locator('.menu nav .line > a', { hasText: name }).click()
+
+    await expect(page.locator('.menu')).toBeHidden()
+    await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThan(2)
+    expect(errors).toEqual([])
+  })
+}
+
+test('a menu closed early comes back whole', async ({ page, errors }) => {
+  await page.goto('/glossary')
+  await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
+
+  const button = page.locator('.menu-btn')
+
+  for (const wait of [100, 900]) {
+    await button.click()
+    await page.waitForTimeout(wait)
+    await page.keyboard.press('Escape')
+    await expect(page.locator('.menu')).toBeHidden()
+  }
+
+  await button.click()
+  await page.waitForTimeout(2500)
+
+  const faded = await page.locator('.menu .subs > *, .menu .sum, .menu .kicker, .menu .here, .menu .foot, .menu nav .line > a').evaluateAll((els) =>
+    els.flatMap((el) => (getComputedStyle(el).opacity === '1' && getComputedStyle(el).visibility === 'visible' ? [] : [el.textContent])),
+  )
+
+  expect(faded).toEqual([])
+  expect(errors).toEqual([])
+})

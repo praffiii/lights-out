@@ -114,6 +114,7 @@ export function Shell() {
 
       if (to === path) {
         setMenuOpen(false)
+        lenis?.start()
         scrollTop(lenis, false)
 
         return
