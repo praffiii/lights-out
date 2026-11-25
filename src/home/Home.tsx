@@ -1,14 +1,18 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { type PointerEvent, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
-import { block, draw, gsap, HOVER, ONCE, REDUCED, reveal, roll, ScrollTrigger, sweep, useGSAP } from '#/motion/motion.ts'
+import { block, draw, gsap, ONCE, REDUCED, reveal, roll, ScrollTrigger, sweep, useGSAP } from '#/motion/motion.ts'
 import { Go } from '#/shell/Go.tsx'
 import { waitFor } from '#/shell/Loader.tsx'
 import { opposite, useTheme } from '#/shell/theme.ts'
 import { seasonQueryOptions } from '#/season/use-season.ts'
 
+import { CHAPTER_SUMMARY } from './summary.ts'
+import { usePreview } from './usePreview.tsx'
 import { CALLOUT_FRAME, CALLOUTS, CAR_STATS, CHAPTERS, CHIP_H, PHOTOS, READ_NEXT } from './content.ts'
 import { Hero, heroShown } from './Hero.tsx'
+
+const PHOTO_LIST = CHAPTERS.map((c) => c.photo)
 
 const pct = (v: number, of: number) => `${(v / of) * 100}%`
 
@@ -22,17 +26,10 @@ const one = (scope: HTMLElement, selector: string) => {
   return el
 }
 
-const COUNT_WORDS = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'] as const
-
-const CHAPTER_SUMMARY = `${COUNT_WORDS[CHAPTERS.length] ?? CHAPTERS.length} chapters · ${CHAPTERS.reduce((sum, c) => sum + c.min, 0)} min`
-
-type Rider = { x: gsap.QuickToFunc; y: gsap.QuickToFunc; at: number; z: number }
-
 export function Home() {
   const { theme } = useTheme()
   const root = useRef<HTMLDivElement>(null)
-  const preview = useRef<HTMLDivElement>(null)
-  const ride = useRef<Rider | null>(null)
+  const { onRows, show, card } = usePreview(root, PHOTO_LIST)
   const client = useQueryClient()
 
   useEffect(() => {
@@ -43,13 +40,13 @@ export function Home() {
     if (img instanceof HTMLImageElement) waitFor(img.decode())
   }, [client])
 
-  const { contextSafe } = useGSAP(
+  useGSAP(
     (_, safe) => {
       const scope = root.current
 
       if (!scope || !safe) return
 
-      for (const el of all(scope, '.type, h2.display, .next h3, .next p, .car .credit')) sweep(el)
+      for (const el of all(scope, '.type, h2.display, .read-next h3, .read-next p, .car .credit')) sweep(el)
 
       const rows = one(scope, '.rows')
 
@@ -58,7 +55,7 @@ export function Home() {
 
       for (const el of all(scope, '.car [data-count]')) roll(el, { from: el.dataset.count === 'year' ? 1950 : undefined })
 
-      for (const el of all(scope, '.next .photo')) reveal(el)
+      for (const el of all(scope, '.read-next .photo')) reveal(el)
 
       block(one(scope, '.car .plate'))
 
@@ -96,81 +93,10 @@ export function Home() {
         if (chip) block(chip, { trigger: stage, start: 'top 55%', delay: at + 0.25 })
       })
 
-      const card = preview.current
-      let last = 0
-      const lean = card ? gsap.quickTo(card, 'rotation', { duration: 0.5, ease: 'power3.out' }) : null
-
-      const tick = () => {
-        if (!card || !lean) return
-
-        const x = Number(gsap.getProperty(card, 'x'))
-
-        if (x !== last || Number(gsap.getProperty(card, 'rotation')) !== 0) lean(gsap.utils.clamp(-12, 12, (x - last) * 0.4))
-
-        last = x
-      }
-
-      if (HOVER) gsap.ticker.add(tick)
-
-      return () => {
-        gsap.ticker.remove(tick)
-        document.documentElement.classList.remove('flip')
-      }
+      return () => document.documentElement.classList.remove('flip')
     },
     { scope: root },
   )
-
-  const rider = () => {
-    const card = preview.current
-
-    if (!HOVER || REDUCED || !card) return null
-
-    ride.current ??= {
-      x: gsap.quickTo(card, 'x', { duration: 0.45, ease: 'power3.out' }),
-      y: gsap.quickTo(card, 'y', { duration: 0.45, ease: 'power3.out' }),
-      at: -1,
-      z: 1,
-    }
-
-    return ride.current
-  }
-
-  const onRows = {
-    onPointerMove: contextSafe((e: PointerEvent) => {
-      const r = rider()
-
-      r?.x(e.clientX)
-      r?.y(e.clientY)
-    }),
-    onPointerLeave: contextSafe(() => {
-      const r = rider()
-
-      if (!r) return
-
-      r.at = -1
-      gsap.to('.preview .card', { scale: 0, duration: 0.35, ease: 'power2.in', overwrite: true })
-    }),
-  }
-
-  const show = contextSafe((i: number, e: PointerEvent) => {
-    const r = rider()
-    const imgs = preview.current?.querySelectorAll('img')
-
-    if (!r || !imgs || r.at === i) return
-
-    if (r.at === -1) {
-      gsap.set(preview.current, { x: e.clientX, y: e.clientY })
-      gsap.set(imgs[i] ?? [], { yPercent: 0, scale: 1, zIndex: ++r.z, visibility: 'inherit' })
-      gsap.fromTo('.preview .card', { visibility: 'inherit', scale: 0 }, { scale: 1, duration: 0.5, overwrite: true })
-    } else {
-      const dir = i > r.at ? 1 : -1
-
-      gsap.fromTo(imgs[i] ?? [], { yPercent: 100 * dir, scale: 1.25, zIndex: ++r.z, visibility: 'inherit' }, { yPercent: 0, scale: 1, duration: 0.6, overwrite: true })
-      gsap.to(imgs[r.at] ?? [], { yPercent: -30 * dir, duration: 0.6, overwrite: true })
-    }
-
-    r.at = i
-  })
 
   return (
     <div ref={root}>
@@ -191,13 +117,9 @@ export function Home() {
                 <h3>{c.title}</h3>
                 <span className="end">
                   <span className="mono muted">{c.min} min</span>
-                  {c.to ? (
-                    <span className="read">
-                      Read <span className="arr">→</span>
-                    </span>
-                  ) : (
-                    <span className="soon mono">Soon</span>
-                  )}
+                  <span className="read">
+                    Read <span className="arr">→</span>
+                  </span>
                 </span>
               </>
             )
@@ -205,24 +127,14 @@ export function Home() {
             return (
               <li key={c.n} onPointerEnter={(e) => show(i, e)}>
                 <i className="hair" />
-                {c.to ? (
-                  <Go to={c.to} className="row">
-                    {body}
-                  </Go>
-                ) : (
-                  <div className="row is-soon">{body}</div>
-                )}
+                <Go to={c.to} className="row">
+                  {body}
+                </Go>
               </li>
             )
           })}
         </ol>
-        <div className="preview" ref={preview} aria-hidden>
-          <div className="card">
-            {CHAPTERS.map((c) => (
-              <img key={c.n} src={c.photo.src} alt="" loading="lazy" />
-            ))}
-          </div>
-        </div>
+        {card}
       </section>
 
       <section className="car" data-theme={theme ? opposite(theme) : undefined} aria-labelledby="car">
@@ -277,38 +189,22 @@ export function Home() {
         </div>
       </section>
 
-      <section className="next" aria-labelledby="next">
+      <section className="read-next" aria-labelledby="next">
         <h2 id="next" className="mono muted type">
           Read next
         </h2>
-        <div className="pair">
-          {READ_NEXT.map((r) => {
-            const body = (
-              <>
-                <div className="photo">
-                  <img src={r.photo.src} alt={r.alt} loading="lazy" />
-                </div>
-                <h3>
-                  {r.title}
-                  {r.to ? <span className="arr"> →</span> : <span className="soon mono">Soon</span>}
-                </h3>
-                <p className="mono muted">
-                  {r.kind} · {r.photo.credit}
-                </p>
-              </>
-            )
-
-            return r.to ? (
-              <Go key={r.title} to={r.to} className="next-item">
-                {body}
-              </Go>
-            ) : (
-              <div key={r.title} className="next-item is-soon">
-                {body}
-              </div>
-            )
-          })}
-        </div>
+        <Go to={READ_NEXT.to} className="next-item">
+          <div className="photo">
+            <img src={READ_NEXT.photo.src} alt={READ_NEXT.alt} loading="lazy" />
+          </div>
+          <h3>
+            {READ_NEXT.title}
+            <span className="arr"> →</span>
+          </h3>
+          <p className="mono muted">
+            {READ_NEXT.kind} · {READ_NEXT.photo.credit}
+          </p>
+        </Go>
       </section>
     </div>
   )

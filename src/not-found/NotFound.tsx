@@ -48,7 +48,7 @@ export function NotFound() {
         <p className="muted body">The link may be old, or the page was never built. Rejoin the track from here:</p>
         <nav aria-label="Rejoin the track">
           <Go to="/">Home →</Go>
-          <a href="/#start">How F1 works →</a>
+          <Go to="/chapters">How F1 works →</Go>
           <Go to="/season">This season →</Go>
           <Go to="/glossary">Glossary →</Go>
         </nav>

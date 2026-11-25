@@ -62,6 +62,13 @@ test('a link to a word that does not exist shows the plain list', async ({ page,
   expect(errors).toEqual([])
 })
 
+test('it leads to every chapter', async ({ page, errors }) => {
+  await loaded(page)
+
+  await expect(page.locator('.glossary-page .opening nav a')).toHaveAttribute('href', '/chapters')
+  expect(errors).toEqual([])
+})
+
 test('a letter jumps to its first word', async ({ page, errors }) => {
   await loaded(page)
   await page.locator('.glossary-page .letters a', { hasText: 'U' }).click()

@@ -8,7 +8,7 @@ import type { SeasonSnapshot } from '#/season/snapshot-schema.ts'
 import { useSeason } from '#/season/use-season.ts'
 import { boxCopy, boxState, countdown, gpName, latestStart, pickRace, SESSION_LABEL, sessionDay, when, zoneName } from '#/season/weekend.ts'
 
-import { Go, Soon } from './Go.tsx'
+import { Go } from './Go.tsx'
 import { opposite, useTheme } from './theme.ts'
 
 const TABS = ['Now', 'Next', 'Latest', 'Standings'] as const
@@ -260,7 +260,6 @@ function LatestTab({ snapshot }: { snapshot: SeasonSnapshot }) {
           <Row key={row.driver.driverId} label={`P${row.position}`} value={fullName(row.driver)} end={row.constructor.name} lead={row.position === 1} />
         ))}
       </div>
-      <Soon className="mono more">Full result</Soon>
     </>
   )
 }

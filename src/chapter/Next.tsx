@@ -1,8 +1,10 @@
+import type { ReactNode } from 'react'
+
 import type { Photo } from '#/home/content.ts'
 import type { To } from '#/shell/context.ts'
-import { Go, Soon } from '#/shell/Go.tsx'
+import { Go } from '#/shell/Go.tsx'
 
-type Props = { label: string; title: string; line: string; photo: Photo; to: To | null }
+type Props = { label: string; title: ReactNode; line: string; photo: Photo; to: To }
 
 export function Next({ label, title, line, photo, to }: Props) {
   return (
@@ -15,13 +17,9 @@ export function Next({ label, title, line, photo, to }: Props) {
         <h2 id="next" className="display">
           {title}
         </h2>
-        {to ? (
-          <Go to={to} className="read">
-            {`${line} →`}
-          </Go>
-        ) : (
-          <Soon className="read">{line}</Soon>
-        )}
+        <Go to={to} className="read">
+          {`${line} →`}
+        </Go>
       </div>
       <p className="mono muted credit">{`${photo.place} · ${photo.credit}`}</p>
     </section>

@@ -29,7 +29,7 @@ for (const colorScheme of ['light', 'dark'] as const) {
     await expect(page.locator('.not-found h2')).toHaveText('This page did not finish.')
     await expect(page).toHaveTitle('Page not found · Lights Out')
     await expect(robots(page)).toHaveAttribute('content', 'noindex')
-    expect(await page.locator('.not-found nav a').evaluateAll((els) => els.map((el) => el.getAttribute('href')))).toEqual(['/', '/#start', '/season', '/glossary'])
+    expect(await page.locator('.not-found nav a').evaluateAll((els) => els.map((el) => el.getAttribute('href')))).toEqual(['/', '/chapters', '/season', '/glossary'])
     await expect(page.locator('.header')).toBeVisible()
     await expect(page.locator('.footer')).toBeAttached()
     expect(await overflow(page)).toBeLessThanOrEqual(0)
@@ -98,12 +98,12 @@ test('leaving the page takes its title and robots tag with it', async ({ page, e
   expect(real(errors)).toEqual([])
 })
 
-test('the How F1 works link lands on the chapters', async ({ page }) => {
+test('the How F1 works link opens the guide', async ({ page }) => {
   await visit(page)
   await page.locator('.not-found nav a', { hasText: 'How F1 works' }).click()
 
-  await expect(page).toHaveURL(/\/#start$/)
-  await expect(page.locator('#start')).toBeInViewport()
+  await expect(page).toHaveURL(/\/chapters\/?$/)
+  await expect(page.locator('.guide-page h1')).toBeVisible()
 })
 
 test('reduced motion shows everything still', async ({ page }) => {

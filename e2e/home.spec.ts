@@ -286,16 +286,20 @@ test('the menu fits the theme switch on screen with nine chapters linked', async
   expect(errors).toEqual([])
 })
 
-test('the pit-stop read leads to chapter 03 and the 1973 story still waits', async ({ page, errors }) => {
+test('the pit-stop read leads to chapter 03 and has the row to itself', async ({ page, errors }) => {
   await page.goto('/')
   await expect(page.locator('.loader')).toHaveCount(0, { timeout: LOADER_MS })
 
-  await expect(page.locator('.next a.next-item')).toHaveAttribute('href', '/chapters/tyres-and-strategy')
-  await expect(page.locator('.next .next-item.is-soon h3')).toHaveText('Swedish Grand Prix, 1973.Soon')
+  await expect(page.locator('.read-next a.next-item')).toHaveAttribute('href', '/chapters/tyres-and-strategy')
+  await expect(page.locator('.read-next .next-item')).toHaveCount(1)
+
+  const inset = await page.locator('.read-next .photo').evaluate((el) => [el.getBoundingClientRect().left, innerWidth - el.getBoundingClientRect().right].map(Math.round))
+
+  expect(inset[0]).toBe(inset[1])
   expect(errors).toEqual([])
 })
 
-test('the menu sends How F1 works to the chapter list and The car to chapter 05', async ({ page, errors }) => {
+test('the menu sends How F1 works to its page and The car to chapter 05', async ({ page, errors }) => {
   await page.goto('/')
   await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
   await page.getByRole('button', { name: 'Menu' }).click()
@@ -303,7 +307,179 @@ test('the menu sends How F1 works to the chapter list and The car to chapter 05'
   await expect(page.locator('.menu nav .line > a', { hasText: 'The car' })).toHaveAttribute('href', '/chapters/inside-the-car')
   await page.locator('.menu nav .line > a', { hasText: 'How F1 works' }).click()
 
-  await expect(page.locator('#start')).toBeInViewport()
+  await expect(page.locator('.guide-page h1')).toBeVisible()
   await expect(page.locator('.menu')).toBeHidden()
   expect(errors).toEqual([])
 })
+
+const openMenu = async (page: Page, path: string) => {
+  await page.goto(path)
+  await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
+  await page.getByRole('button', { name: 'Menu' }).click()
+  await expect(page.locator('.menu .foot')).toBeVisible()
+}
+
+for (const [path, entry, photo] of [
+  ['/glossary', 'Glossary', 'ch04'],
+  ['/glossary/', 'Glossary', 'ch04'],
+  ['/chapters', 'How F1 works', 'ch01'],
+  ['/chapters/tyres-and-strategy', 'How F1 works', 'ch01'],
+  ['/chapters/inside-the-car', 'The car', 'williams'],
+] as const) {
+  test(`the menu opens on ${entry} from ${path}`, async ({ page, errors }, testInfo) => {
+    if (testInfo.project.name === 'desktop') await page.setViewportSize({ width: 1280, height: 720 })
+
+    await openMenu(page, path)
+
+    await expect(page.locator('.menu nav .line > a', { hasText: entry })).toBeFocused()
+    await page.waitForTimeout(300)
+    await expect(page.locator(`.menu figure img[src="/img/${photo}.jpg"]`)).toHaveCSS('z-index', '1')
+    await expect(page.locator('.menu nav .line > a', { hasText: entry })).toBeInViewport({ ratio: 0.9 })
+    await expect(page.locator('.menu .here')).toHaveCount(1)
+    expect(errors).toEqual([])
+  })
+}
+
+test('the menu counts the chapters and says where you are', async ({ page, errors }) => {
+  await openMenu(page, '/chapters/inside-the-car')
+
+  const sum = page.locator('.menu .sum')
+
+  await expect(sum).toContainText('Nine chapters · 52 min')
+  await expect(sum.getByRole('link', { name: 'All chapters →' })).toHaveAttribute('href', '/chapters')
+  await expect(page.locator('.menu .subs a', { hasText: 'Inside the car' })).toContainText('You are here')
+
+  const tops = await sum.locator('> *').evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)))
+
+  expect(new Set(tops).size).toBe(1)
+  expect(errors).toEqual([])
+})
+
+test('the menu is nowhere on a page it does not list', async ({ page, errors }) => {
+  await openMenu(page, '/tracks/vegas')
+
+  await expect(page.locator('.menu .here')).toHaveCount(0)
+  expect(errors).toEqual([])
+})
+
+test('the new menu lines leave the theme switch on screen', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await openMenu(page, '/glossary')
+
+  await expect(page.getByRole('group', { name: 'Theme' })).toBeInViewport({ ratio: 1 })
+  expect(await page.locator('.menu').evaluate((el) => el.scrollHeight - el.clientHeight)).toBe(0)
+  expect(errors).toEqual([])
+})
+
+const dead = (page: Page) => page.locator('.soon, .is-soon, [aria-disabled]')
+
+for (const path of ['/', '/weekend', '/glossary', '/chapters/drs']) {
+  test(`no dead link on ${path}`, async ({ page, errors }) => {
+    await page.goto(path)
+    await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
+
+    await expect(dead(page)).toHaveCount(0)
+    expect(errors).toEqual([])
+  })
+}
+
+test('no dead link in any tab of the weekend box', async ({ page, errors }) => {
+  await page.goto('/glossary')
+  await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
+  await page.locator('button.weekend').click()
+
+  const tabs = page.locator('.weekend-panel').getByRole('tab')
+
+  await expect(tabs).toHaveCount(4)
+
+  for (const tab of await tabs.all()) {
+    await tab.click()
+    await expect(tab).toHaveAttribute('aria-selected', 'true')
+    await expect(page.locator('.weekend-panel h3')).toBeVisible()
+    await expect(dead(page)).toHaveCount(0)
+  }
+
+  expect(errors).toEqual([])
+})
+
+for (const path of ['/chapters', '/glossary', '/chapters/inside-the-car']) {
+  test(`the menu fits narrow phones on ${path}`, async ({ page, errors }, testInfo) => {
+    test.skip(testInfo.project.name !== 'phone')
+    await openMenu(page, path)
+    await page.waitForTimeout(1800)
+
+    for (const width of [320, 360, 390]) {
+      await page.setViewportSize({ width, height: 844 })
+      expect(await page.locator('.menu').evaluate((el) => el.scrollWidth - el.clientWidth), `${width}`).toBe(0)
+
+      const left = await page.locator('.menu .here').evaluate((el) => el.getBoundingClientRect().left)
+
+      expect(left, `${width}`).toBeGreaterThanOrEqual(60)
+    }
+
+    expect(errors).toEqual([])
+  })
+}
+
+for (const [path, name] of [
+  ['/glossary', 'Glossary'],
+  ['/glossary/', 'Glossary'],
+  ['/chapters', 'How F1 works'],
+] as const) {
+  test(`choosing ${name} on ${path} goes back to the top`, async ({ page, errors }) => {
+    await page.goto(path)
+    await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
+    await page.evaluate(() => window.scrollTo(0, 1300))
+    await page.waitForFunction(() => scrollY > 1200)
+    await page.locator('.menu-btn').dispatchEvent('click')
+    await page.locator('.menu nav .line > a', { hasText: name }).click()
+
+    await expect(page.locator('.menu')).toBeHidden()
+    await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThan(2)
+    expect(errors).toEqual([])
+  })
+}
+
+test('a menu closed early comes back whole', async ({ page, errors }) => {
+  await page.goto('/glossary')
+  await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
+
+  const button = page.locator('.menu-btn')
+
+  for (const wait of [100, 900]) {
+    await button.click()
+    await page.waitForTimeout(wait)
+    await page.keyboard.press('Escape')
+    await expect(page.locator('.menu')).toBeHidden()
+  }
+
+  await button.click()
+  await page.waitForTimeout(2500)
+
+  const faded = await page.locator('.menu .subs > *, .menu .sum, .menu .kicker, .menu .here, .menu .foot, .menu nav .line > a').evaluateAll((els) =>
+    els.flatMap((el) => (getComputedStyle(el).opacity === '1' && getComputedStyle(el).visibility === 'visible' ? [] : [el.textContent])),
+  )
+
+  expect(faded).toEqual([])
+  expect(errors).toEqual([])
+})
+
+for (const path of ['/chapters', '/season']) {
+  test(`you are here lines up with its entry on a tablet, ${path}`, async ({ page, errors }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop')
+    await page.setViewportSize({ width: 1180, height: 1000 })
+    await openMenu(page, path)
+    await page.waitForTimeout(1800)
+
+    for (const width of [768, 834, 900, 960, 961, 1024, 1180]) {
+      await page.setViewportSize({ width, height: 1000 })
+
+      const lefts = await page.locator('.menu li.on').evaluate((li) => [li.querySelector('.here'), li.querySelector('.line .roll')].map((el) => el?.getBoundingClientRect().left ?? 0))
+
+      expect(lefts[0] ?? 0, `${width}`).toBeGreaterThanOrEqual((lefts[1] ?? 0) - 1)
+    }
+
+    expect(errors).toEqual([])
+  })
+}

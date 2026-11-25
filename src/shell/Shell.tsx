@@ -7,6 +7,7 @@ import { useMounted } from '#/motion/client.ts'
 import { enter, gsap, leave, REDUCED, ScrollTrigger } from '#/motion/motion.ts'
 
 import { type Dive, ShellContext, type To } from './context.ts'
+import { unslashed } from './current.ts'
 import { Footer } from './Footer.tsx'
 import { Header } from './Header.tsx'
 import { Loader } from './Loader.tsx'
@@ -44,7 +45,7 @@ const spread = ({ width, height }: Dive['image']) => {
 
 export function Shell() {
   const router = useRouter()
-  const path = useRouterState({ select: (s) => s.location.pathname })
+  const path = useRouterState({ select: (s) => unslashed(s.location.pathname) })
   const mounted = useMounted()
   const { theme } = useTheme()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -113,6 +114,7 @@ export function Shell() {
 
       if (to === path) {
         setMenuOpen(false)
+        lenis?.start()
         scrollTop(lenis, false)
 
         return
