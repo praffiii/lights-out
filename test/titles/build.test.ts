@@ -1,7 +1,7 @@
 import { expect, it } from 'bun:test'
 
 import { matches, nextTitles, titlesOf } from '../../src/titles/build.ts'
-import { pointsLeft, won } from '../../src/titles/model.ts'
+import { pointsLeft, totals, won } from '../../src/titles/model.ts'
 import { calendar2027 } from '../season/fake-jolpica.ts'
 import { input2026, titles2026 } from './fixture.ts'
 
@@ -76,7 +76,9 @@ it('keeps the previous titles whenever the new ones cannot be trusted', () => {
 
   const docked = { ...drivers, rows: drivers.rows.map((row, i) => (i === 0 ? { ...row, points: row.points - 1 } : row)) }
 
-  for (const change of [{ drivers: docked }, { drivers: { ...drivers, round: 21 } }, { calendar: calendar2027.races }, { races: [] }, { races: input2026.races.slice(0, 18) }])
+  const dockedTeam = input2026.teams && { ...input2026.teams, rows: input2026.teams.rows.map((row, i) => (i === 0 ? { ...row, points: row.points - 1 } : row)) }
+
+  for (const change of [{ drivers: docked }, { drivers: { ...drivers, round: 21 } }, { calendar: calendar2027.races }, { races: [] }, { races: input2026.races.slice(0, 18) }, { teams: dockedTeam }])
     expect(nextTitles({ ...input2026, ...change, previous })).toBe(previous)
 })
 
@@ -101,4 +103,35 @@ it('keeps last season until a title of the new one is won', () => {
   expect(matches(t, drivers, constructors)).toBe(true)
   expect(nextTitles({ ...input2026, races: early, drivers, teams: constructors, previous: last })).toBe(last)
   expect(nextTitles({ ...input2026, races: early, drivers, teams: constructors, previous: undefined })).toBeUndefined()
+})
+
+const agreeing = (races: typeof input2026.races, round: number) => {
+  const t = titlesOf(2026, input2026.calendar, races, input2026.sprints)
+
+  if (!t || !input2026.drivers || !input2026.teams) throw new Error('no season')
+
+  const drivers = totals(t, t.rounds.length, 'drivers')
+  const teams = totals(t, t.rounds.length, 'teams')
+
+  return {
+    drivers: { ...input2026.drivers, round, rows: input2026.drivers.rows.map((row) => ({ ...row, points: drivers.get(row.driver.driverId) ?? 0 })) },
+    teams: { ...input2026.teams, round, rows: input2026.teams.rows.map((row) => ({ ...row, points: teams.get(row.constructor.constructorId) ?? 0 })) },
+  }
+}
+
+it('never goes back to fewer rounds', () => {
+  const previous = titles2026()
+  const races = input2026.races.filter((race) => race.round <= 19)
+
+  expect(nextTitles({ ...input2026, races, ...agreeing(races, 19), previous })).toBe(previous)
+})
+
+it('keeps the previous titles when a correction reopens the only one won', () => {
+  const races = input2026.races.filter((race) => race.round <= 18)
+  const previous = short(18)
+
+  if (!previous) throw new Error('no short season')
+
+  expect(won(previous)).toEqual({ drivers: null, teams: null })
+  expect(nextTitles({ ...input2026, races, ...agreeing(races, 18), previous })).toBe(previous)
 })

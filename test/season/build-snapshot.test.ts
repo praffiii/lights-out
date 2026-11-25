@@ -214,3 +214,13 @@ it('keeps the previous titles when the season pages fail', async () => {
 it('still reads a snapshot written before titles existed', async () => {
   expect(Schema.decodeUnknownSync(SeasonSnapshotJson)(await Bun.file('test/fixtures/season-snapshot-v1.json').text()).titles).toBeUndefined()
 })
+
+it('writes everything else when the titles cannot be built', async () => {
+  const titles = titles2026()
+
+  const races = calendar2026.races.map((race) => (race.round === 1 ? { ...race, sessions: race.sessions.map((session) => ({ ...session, startsAt: 'soon' })) } : race))
+  const snapshot = await titled({ races: () => Effect.succeed({ season: 2026, races }) }, { titles })
+
+  expect(snapshot.titles).toEqual(titles)
+  expect(snapshot.driverStandings?.rows.length).toBeGreaterThan(0)
+})

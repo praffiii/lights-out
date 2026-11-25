@@ -11,11 +11,13 @@ const SETTLE = 0.002
 
 const SNAP_PX = 2
 
+const STEP = 1e-6
+
 type Paint = (scope: HTMLElement) => (t: number) => void
 
 export type Scrub = { time: RefObject<number>; seek: RefObject<(t: number) => void> }
 
-export type ScrubOptions = { length?: string; rest?: number; scale?: Pace }
+export type ScrubOptions = { length?: string; rest?: number; scale?: Pace; stepped?: true }
 
 export const scrubOptions = (end: number, pace: Pace, options?: ScrubOptions) => ({
   length: options?.length ?? '+=300%',
@@ -25,22 +27,34 @@ export const scrubOptions = (end: number, pace: Pace, options?: ScrubOptions) =>
 })
 
 export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops: ReadonlyArray<number>, pace: Pace, paint: Paint, options?: ScrubOptions): Scrub {
-  const { length, rest, initial, scale } = scrubOptions(end, pace, options)
+  const inputs = { end, stops, pace, ...scrubOptions(end, pace, options) }
+  const { length, rest, initial } = inputs
+  const stepped = options?.stepped === true
+  const ready = end > 0
   const hasRest = options?.rest !== undefined
   const time = useRef(REDUCED ? rest : initial)
   const seeker = useRef<(t: number) => void>(() => {})
   const lenis = useLenis()
   const scroller = useRef(lenis)
   const painter = useRef(paint)
+  const latest = useRef(inputs)
+  const refresher = useRef<(before: number) => void>(() => {})
 
   useLayoutEffect(() => {
     scroller.current = lenis
     painter.current = paint
   })
 
+  useLayoutEffect(() => {
+    const before = latest.current.end
+
+    latest.current = inputs
+    refresher.current(before)
+  }, [end, stops, pace, rest, inputs.scale])
+
   useGSAP(
     () => {
-      if (end <= 0) return
+      if (!ready) return
 
       const scope = root.current
       const pin = scope?.querySelector<HTMLElement>('.pin')
@@ -68,14 +82,14 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
 
       const fromScroll = (progress: number) => {
         if (hasRest && progress === 0 && target === null) {
-          goal = rest
+          goal = latest.current.rest
 
           return
         }
 
-        const t = timeAt(pace, progress)
+        const t = timeAt(latest.current.pace, progress)
         const span = st ? st.end - st.start : 0
-        const snap = span > 0 ? (SNAP_PX * end) / span : 0
+        const snap = span > 0 ? (SNAP_PX * latest.current.end) / span : 0
 
         if (target !== null && Math.abs(t - target) <= snap) {
           goal = target
@@ -88,13 +102,13 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
       }
 
       const seek = (t: number) => {
-        goal = Math.min(end, Math.max(0, t))
+        goal = Math.min(latest.current.end, Math.max(0, t))
 
         if (!st) return show(goal)
 
         target = goal
 
-        const y = st.start + progressAt(pace, goal) * (st.end - st.start)
+        const y = st.start + progressAt(latest.current.pace, goal) * (st.end - st.start)
         const lenisNow = scroller.current
 
         if (lenisNow) lenisNow.scrollTo(y, { immediate: true, force: true })
@@ -102,6 +116,13 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
       }
 
       seeker.current = seek
+
+      refresher.current = (before) => {
+        if (st) fromScroll(st.progress)
+        else goal = goal === before ? latest.current.rest : Math.min(goal, latest.current.end)
+
+        show(goal)
+      }
 
       if (!REDUCED) {
         st = ScrollTrigger.create({
@@ -120,7 +141,7 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
       const fromX = (x: number) => {
         const r = track.getBoundingClientRect()
 
-        return timeAt(scale, (x - r.left) / r.width)
+        return timeAt(latest.current.scale, (x - r.left) / r.width)
       }
 
       const onDown = (e: PointerEvent) => {
@@ -133,8 +154,9 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
         if (track.hasPointerCapture(e.pointerId)) seek(fromX(e.clientX))
       }
 
-      const back = () => prevStop(stops, goal)
-      const on = () => nextStop(stops, goal, end)
+      const here = () => (stepped ? Math.floor(goal + STEP) : goal)
+      const back = () => prevStop(latest.current.stops, here())
+      const on = () => nextStop(latest.current.stops, here(), latest.current.end)
 
       const keys = new Map([
         ['ArrowLeft', back],
@@ -142,7 +164,7 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
         ['ArrowRight', on],
         ['ArrowUp', on],
         ['Home', () => 0],
-        ['End', () => end],
+        ['End', () => latest.current.end],
       ])
 
       const onKey = (e: KeyboardEvent) => {
@@ -161,13 +183,15 @@ export function useScrub(root: RefObject<HTMLElement | null>, end: number, stops
       return () => {
         seeker.current = () => {}
 
+        refresher.current = () => {}
+
         gsap.ticker.remove(follow)
         track.removeEventListener('pointerdown', onDown)
         track.removeEventListener('pointermove', onMove)
         track.removeEventListener('keydown', onKey)
       }
     },
-    { scope: root, dependencies: [end, stops, pace, length, rest, scale], revertOnUpdate: true },
+    { scope: root, dependencies: [ready, length, stepped] },
   )
 
   return { time, seek: seeker }

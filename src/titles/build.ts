@@ -117,7 +117,7 @@ export const nextTitles = ({ season, calendar, races, sprints, drivers, teams, p
 
   if (!built || !matches(built, drivers, teams)) return previous
 
-  if (previous?.season === season) return built.rounds.length >= previous.rounds.length ? built : previous
+  if (previous?.season === season && built.rounds.length < previous.rounds.length) return previous
 
   const { drivers: first, teams: second } = won(built)
 

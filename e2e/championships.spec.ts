@@ -458,3 +458,71 @@ test.describe('without JavaScript', () => {
     await expect(stage(page, '.hero-box').first()).toBeVisible()
   })
 })
+
+test('an arrow always moves a round, wherever the scroll stopped', async ({ page }) => {
+  await loaded(page)
+
+  const { top, range } = await pinSpan(page, '.season-race')
+  const at = progressAt(pace, 5)
+  const after = progressAt(pace, 6)
+
+  await scrollTo(page, top + range * (at + (after - at) * 0.6))
+  await expect(stage(page, '[data-round]')).toHaveText('6')
+  await page.waitForTimeout(1500)
+  await slider(page).focus()
+  await page.keyboard.press('ArrowLeft')
+  await expect(stage(page, '[data-round]')).toHaveText('5')
+})
+
+test('a row that comes out of hiding never flies in from the top', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'phone')
+  await loaded(page)
+  await toRound(page, 20)
+  await page.waitForTimeout(1200)
+
+  const highest = page.evaluate(
+    () =>
+      new Promise<number>((resolve) => {
+        const tower = document.querySelector('.season-race [data-side="drivers"] .tower')
+        const floor = tower?.getBoundingClientRect().top ?? 0
+        const until = performance.now() + 2500
+        let best = 0
+
+        const look = () => {
+          for (const row of tower?.querySelectorAll('li') ?? []) if (row.getClientRects().length > 0) best = Math.min(best, row.getBoundingClientRect().top - floor)
+
+          if (performance.now() < until) requestAnimationFrame(look)
+          else resolve(best)
+        }
+
+        look()
+      }),
+  )
+
+  await toRoundLast(page)
+  expect(await highest).toBeGreaterThan(-60)
+})
+
+test('data that lands while the reader is below the stage does not move the page', async ({ page, errors }) => {
+  let release = () => {}
+
+  const gate = new Promise<void>((resolve) => {
+    release = resolve
+  })
+
+  await page.route('**/api/season', async (route) => {
+    await gate
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ...snapshot, titles: live }) })
+  })
+  await loaded(page)
+  await page.evaluate(() => document.querySelector('.championships-page .cap')?.scrollIntoView({ block: 'center', behavior: 'instant' }))
+  await page.waitForTimeout(1500)
+
+  const before = (await chapter(page, '.cap').boundingBox())?.y ?? 0
+
+  release()
+  await expect(stage(page, '.cells li[data-done]')).toHaveCount(22)
+  await page.waitForTimeout(1500)
+  expect(Math.abs(((await chapter(page, '.cap').boundingBox())?.y ?? 0) - before)).toBeLessThan(120)
+  expect(errors).toEqual([])
+})

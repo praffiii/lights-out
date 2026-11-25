@@ -37,7 +37,7 @@ function useGlide(ids: string) {
   const tops = useRef(new Map<string, number>())
 
   useLayoutEffect(() => {
-    const rows = [...(list.current?.querySelectorAll<HTMLElement>('li') ?? [])]
+    const rows = [...(list.current?.querySelectorAll<HTMLElement>('li') ?? [])].filter((row) => row.offsetParent !== null)
     const before = tops.current
 
     tops.current = new Map(rows.map((row) => [row.dataset.id ?? '', row.offsetTop]))
@@ -135,7 +135,7 @@ export function SeasonRace({ titles }: { titles: Titles }) {
   const [index, setIndex] = useState(last)
   const stops = useMemo(() => titles.rounds.map((_, i) => i), [titles])
   const pace = useMemo(() => seasonPace(titles), [titles])
-  const options = useMemo(() => ({ length: '+=500%', scale: stripScale(titles) }), [titles])
+  const options = useMemo(() => ({ length: '+=500%', scale: stripScale(titles), stepped: true as const }), [titles])
   const f = useMemo(() => frame(titles, index), [titles, index])
   const all = total(titles)
   const at = won(titles)

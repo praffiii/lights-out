@@ -60,6 +60,15 @@ const people = (season: number, pages: { races: ReadonlyArray<SeasonRace>; sprin
     Effect.catch((error) => Effect.logWarning('people kept from the previous snapshot', error).pipe(Effect.as(previous))),
   )
 
+const titlesFrom = (input: Parameters<typeof nextTitles>[0]) =>
+  Effect.gen(function* () {
+    const fresh = titlesOf(input.season, input.calendar, input.races, input.sprints)
+
+    if (fresh && !matches(fresh, input.drivers, input.teams)) yield* Effect.logWarning('titles kept from the previous snapshot: the points do not add up to the standings', { round: fresh.rounds.at(-1)?.round })
+
+    return nextTitles(input)
+  }).pipe(Effect.catchDefect((defect) => Effect.logWarning('titles kept from the previous snapshot', { cause: String(defect) }).pipe(Effect.as(input.previous))))
+
 export const buildSnapshot = (now: Date, previous?: Pick<SeasonSnapshot, 'flags' | 'topSpeed' | 'people' | 'titles'>): Effect.Effect<SeasonSnapshot, JolpicaError, JolpicaClient | OpenF1Client> =>
   Effect.gen(function* () {
     const jolpica = yield* JolpicaClient
@@ -92,11 +101,12 @@ export const buildSnapshot = (now: Date, previous?: Pick<SeasonSnapshot, 'flags'
     const built = pages && driverStandings ? yield* people(driverStandings.season, pages, previous?.people) : previous?.people
     const grid = built?.season === driverStandings?.season ? built : undefined
     const standings = { drivers: driverStandings, teams: constructorStandings }
-    const fresh = pages && driverStandings && titlesOf(driverStandings.season, races, pages.races, pages.sprints)
 
-    if (fresh && !matches(fresh, driverStandings, constructorStandings)) yield* Effect.logWarning('titles kept from the previous snapshot: the points do not add up to the standings', { round: fresh.rounds.at(-1)?.round })
+    const titles =
+      pages && driverStandings
+        ? yield* titlesFrom({ season: driverStandings.season, calendar: races, ...pages, ...standings, previous: previous?.titles })
+        : previous?.titles
 
-    const titles = pages && driverStandings ? nextTitles({ season: driverStandings.season, calendar: races, ...pages, ...standings, previous: previous?.titles }) : previous?.titles
     const session = yield* latestSession(races, season, now)
     const flags = yield* flagTally(season, now, previous?.flags)
     const speed = yield* topSpeed(season, now, previous?.topSpeed)
