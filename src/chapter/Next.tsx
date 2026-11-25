@@ -1,8 +1,10 @@
+import type { ReactNode } from 'react'
+
 import type { Photo } from '#/home/content.ts'
 import type { To } from '#/shell/context.ts'
 import { Go } from '#/shell/Go.tsx'
 
-type Props = { label: string; title: string; line: string; photo: Photo; to: To }
+type Props = { label: string; title: ReactNode; line: string; photo: Photo; to: To }
 
 export function Next({ label, title, line, photo, to }: Props) {
   return (

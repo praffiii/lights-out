@@ -50,7 +50,8 @@
 
 .guide-page .next .caption { left: var(--m); right: auto; bottom: 76px; background: var(--ink); color: var(--bg); }
 .guide-page .next .caption > p { color: color-mix(in srgb, var(--bg) 62%, var(--ink)); }
-.guide-page .next h2 { font-size: 52px; line-height: 1.08; letter-spacing: -0.03em; white-space: pre-line; font-variation-settings: 'wdth' 100; }
+.guide-page .next h2 { font-size: 52px; line-height: 1.08; letter-spacing: -0.03em; font-variation-settings: 'wdth' 100; }
+.guide-page .next h2 .hl { display: block; }
 
 @media (min-width: 1200px) and (max-width: 1399px) {
   .guide-page .race .when { font-size: 10px; letter-spacing: 0; }

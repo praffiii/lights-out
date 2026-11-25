@@ -274,3 +274,28 @@ test('the ruler draws once and every moment arrives', async ({ page, errors }) =
   expect(await guide(page, '.race li a, .race .tick').evaluateAll((els) => els.filter((el) => getComputedStyle(el).opacity !== '1').length)).toBe(0)
   expect(errors).toEqual([])
 })
+
+test('the closing headline keeps its two lines after it sweeps in', async ({ page, errors }) => {
+  await loaded(page)
+  await scrollToEnd(page)
+
+  const lines = await guide(page, '.next h2').evaluate((el) => {
+    const words = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+    const tops = new Map<number, string>()
+
+    while (words.nextNode()) {
+      const range = document.createRange()
+
+      range.selectNodeContents(words.currentNode)
+
+      const box = range.getBoundingClientRect()
+
+      if (box.width > 0) tops.set(Math.round(box.top), `${tops.get(Math.round(box.top)) ?? ''} ${words.currentNode.textContent ?? ''}`.trim())
+    }
+
+    return [...tops.values()]
+  })
+
+  expect(lines).toEqual(['Three days.', 'One race.'])
+  expect(errors).toEqual([])
+})

@@ -464,3 +464,22 @@ test('a menu closed early comes back whole', async ({ page, errors }) => {
   expect(faded).toEqual([])
   expect(errors).toEqual([])
 })
+
+for (const path of ['/chapters', '/season']) {
+  test(`you are here lines up with its entry on a tablet, ${path}`, async ({ page, errors }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop')
+    await page.setViewportSize({ width: 1180, height: 1000 })
+    await openMenu(page, path)
+    await page.waitForTimeout(1800)
+
+    for (const width of [768, 834, 900, 960, 961, 1024, 1180]) {
+      await page.setViewportSize({ width, height: 1000 })
+
+      const lefts = await page.locator('.menu li.on').evaluate((li) => [li.querySelector('.here'), li.querySelector('.line .roll')].map((el) => el?.getBoundingClientRect().left ?? 0))
+
+      expect(lefts[0] ?? 0, `${width}`).toBeGreaterThanOrEqual((lefts[1] ?? 0) - 1)
+    }
+
+    expect(errors).toEqual([])
+  })
+}

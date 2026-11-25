@@ -28,7 +28,7 @@ function hero(scope: HTMLElement) {
 function motion(scope: HTMLElement) {
   const list = scope.querySelector('.list')
 
-  for (const el of all(scope, '.race h2 .hl, .next h2')) sweep(el)
+  for (const el of all(scope, '.race h2 .hl, .next h2 .hl')) sweep(el)
 
   for (const el of all(scope, '.figures .num')) roll(el, { from: el.textContent === '2026' ? 1950 : undefined })
 
@@ -138,7 +138,18 @@ export function Guide() {
         {card}
       </section>
       <Race />
-      <Next label="Start · Chapter 01 · 5 min" title={'Three days.\nOne race.'} line="Read chapter 01" photo={PHOTOS.ch01} to="/chapters/race-weekend" />
+      <Next
+        label="Start · Chapter 01 · 5 min"
+        title={
+          <>
+            <span className="hl">Three days.</span>
+            <span className="hl">One race.</span>
+          </>
+        }
+        line="Read chapter 01"
+        photo={PHOTOS.ch01}
+        to="/chapters/race-weekend"
+      />
     </div>
   )
 }
