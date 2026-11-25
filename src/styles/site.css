@@ -103,7 +103,7 @@ main:focus { outline: none; }
 
 .menu {
   position: fixed; inset: 0; z-index: 15; display: grid;
-  grid-template-columns: 1fr 1fr; gap: 24px; padding: 120px var(--m) 40px;
+  grid-template-columns: 1fr 1fr; gap: 24px; padding: 96px var(--m) 24px;
   background: var(--bg); color: var(--ink); overflow-y: auto;
 }
 .menu[hidden] { display: none; }

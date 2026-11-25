@@ -38,6 +38,9 @@ export const PHOTOS = {
   recovery: { src: '/img/not-found.jpg', place: 'Recovery · Zandvoort, 2024', credit: 'Photo Steffen Prößdorf · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:2024-08-24_Motorsport,_Formel_1,_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3280_by_Stepro.jpg' },
   ch08Cadillac: { src: '/img/ch08-cadillac.jpg', place: 'Practice · Melbourne, 2026', credit: 'Photo Yu Chu Chin · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Cadillac_MAC-26_of_Sergio_P%C3%A9rez_(028A8062).jpg' },
   ch08Drs: { src: '/img/ch08-drs.jpg', place: 'DRS board · Silverstone, 2018', credit: 'Photo flickr.com/photos/69527563@N05 · CC BY 2.0', source: 'https://commons.wikimedia.org/wiki/File:2018_British_Grand_Prix_DRS_(42837386495).jpg' },
+  ch09Antonelli: { src: '/img/ch09-antonelli.jpg', place: 'Qualifying · Monza, 2025', credit: 'Photo Eustace Bagge · CC BY 4.0', source: 'https://commons.wikimedia.org/wiki/File:Andrea_Kimi_Antonelli_2025_Italian_Grand_Prix_qualifying3.jpg' },
+  ch09Wing: { src: '/img/ch09-wing.jpg', place: 'Exhibition · London, 2025', credit: 'Photo Hullian111 · CC BY-SA 4.0', source: 'https://commons.wikimedia.org/wiki/File:Mercedes_AMG_F1_W09_EQ_Power%2B_DRS_Rear_Wing_at_Formula_1_Exhibition,_London.jpg' },
+  ch09F3: { src: '/img/ch09-f3.jpg', place: 'Formula 3 · Spa-Francorchamps, 2026', credit: 'Photo Der Alf · CC BY 4.0', source: 'https://commons.wikimedia.org/wiki/File:F3_2026,_AIX_Racing,_DAMS,_Prema_Racing,_Spa_Francorchamps_(55425571691).jpg' },
 } satisfies Record<string, Photo>
 
 export type ChapterPath = Extract<To, `/chapters/${string}`>
@@ -53,6 +56,7 @@ export const CHAPTERS: ReadonlyArray<ChapterEntry> = [
   { n: '06', title: 'The power unit', min: 6, photo: PHOTOS.ch06, to: '/chapters/power-unit' },
   { n: '07', title: 'Defending', min: 6, photo: PHOTOS.ch07, to: '/chapters/defending' },
   { n: '08', title: 'The two championships', min: 6, photo: PHOTOS.ch07Podium, to: '/chapters/championships' },
+  { n: '09', title: 'DRS, 2011 to 2025', min: 5, photo: PHOTOS.ch08Drs, to: '/chapters/drs' },
 ]
 
 export const HERO = {

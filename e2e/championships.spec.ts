@@ -126,20 +126,20 @@ test('every term opens in full above its neighbours', async ({ page }, testInfo)
   }
 })
 
-test('it links back to 07 and 09 waits', async ({ page, errors }) => {
+test('it links back to 07 and on to 09', async ({ page, errors }) => {
   await loaded(page)
 
   await expect(chapter(page, '.opening nav').getByRole('link', { name: /07 Defending/ })).toHaveAttribute('href', '/chapters/defending')
-  await expect(chapter(page, '.opening nav .is-soon')).toContainText('09 DRS, 2011 to 2025')
+  await expect(chapter(page, '.opening nav').getByRole('link', { name: /09 DRS, 2011 to 2025/ })).toHaveAttribute('href', '/chapters/drs')
   await expect(chapter(page, '.next .caption > p')).toHaveText('Next · Chapter 09 · 5 min')
-  await expect(chapter(page, '.next a')).toHaveCount(0)
+  await expect(chapter(page, '.next .read')).toHaveAttribute('href', '/chapters/drs')
   expect(errors).toEqual([])
 })
 
 test('Home and Chapter 07 lead here', async ({ page, errors }) => {
   await page.goto('/')
   await expect(page.locator('.loader')).toHaveCount(0, { timeout: LOADER_MS })
-  await expect(page.locator('.chapters .head')).toContainText('Eight chapters · 47 min')
+  await expect(page.locator('.chapters .head')).toContainText('Nine chapters · 52 min')
   await expect(page.locator('.rows li:nth-child(8) a')).toHaveAttribute('href', PATH)
 
   await loaded(page, '/chapters/defending')

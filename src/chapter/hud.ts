@@ -22,10 +22,10 @@ export const normalAt = (trace: Float32Array, u: number) => {
   return { nx: (b.y - a.y) / len, ny: -(b.x - a.x) / len, len }
 }
 
-export function paintTrail(segs: ReadonlyArray<Element>, trace: Float32Array, u: number, dx: number, dy: number) {
+export function paintTrail(segs: ReadonlyArray<Element>, trace: Float32Array, u: number, dx: number, dy: number, length = TRAIL_U) {
   for (const [i, seg] of segs.entries()) {
-    const a = pointAt(trace, u - ((i + 1) * TRAIL_U) / TRAIL_SEGS)
-    const b = pointAt(trace, u - (i * TRAIL_U) / TRAIL_SEGS)
+    const a = pointAt(trace, u - ((i + 1) * length) / TRAIL_SEGS)
+    const b = pointAt(trace, u - (i * length) / TRAIL_SEGS)
     const f = 1 - i / TRAIL_SEGS
 
     seg.setAttribute('x1', (a.x + dx).toFixed(1))

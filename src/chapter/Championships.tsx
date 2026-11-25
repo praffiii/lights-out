@@ -3,7 +3,7 @@ import { useMemo, useRef } from 'react'
 import { PHOTOS } from '#/home/content.ts'
 import { block, gsap, ONCE, onEnter, REDUCED, reveal, roll, sweep, useGSAP } from '#/motion/motion.ts'
 import { useSeason } from '#/season/use-season.ts'
-import { Go, Soon } from '#/shell/Go.tsx'
+import { Go } from '#/shell/Go.tsx'
 import { sum } from '#/titles/copy.ts'
 import type { Titles } from '#/titles/schema.ts'
 import { FALLBACK, pickTitles } from '#/titles/titles.ts'
@@ -186,7 +186,7 @@ export function Championships() {
           <nav className="mono nav" aria-label="Chapters">
             <Go to="/chapters/defending">← 07 Defending</Go>
             <span aria-hidden> · </span>
-            <Soon>09 DRS, 2011 to 2025</Soon>
+            <Go to="/chapters/drs">09 DRS, 2011 to 2025 →</Go>
           </nav>
         </div>
         <h1 id="h1" className="display">
@@ -210,7 +210,7 @@ export function Championships() {
       <Sum titles={titles} />
       <Cap />
       <Words keys={TITLES_WORDS} />
-      <Next label="Next · Chapter 09 · 5 min" title="DRS, 2011 to 2025." line="The flap that made passing easy" photo={PHOTOS.ch08Drs} to={null} />
+      <Next label="Next · Chapter 09 · 5 min" title="DRS, 2011 to 2025." line="The flap that made passing easy" photo={PHOTOS.ch08Drs} to="/chapters/drs" />
     </div>
   )
 }

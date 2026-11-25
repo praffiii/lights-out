@@ -1,9 +1,9 @@
-import { CAR_WORDS, DEFENDING_WORDS, FLAGS_WORDS, OVERTAKING_WORDS, POWER_WORDS, RACE_WEEKEND_WORDS, TITLES_WORDS, TYRES_WORDS, type WordKey, WORDS } from '#/chapter/words.ts'
+import { CAR_WORDS, DEFENDING_WORDS, DRS_WORDS, FLAGS_WORDS, OVERTAKING_WORDS, POWER_WORDS, RACE_WEEKEND_WORDS, TITLES_WORDS, TYRES_WORDS, type WordKey, WORDS } from '#/chapter/words.ts'
 import { type ChapterEntry, CHAPTERS } from '#/home/content.ts'
 
 export type Entry = { key: WordKey; term: string; def: string; letter: string; chapter: ChapterEntry }
 
-const LISTS = [RACE_WEEKEND_WORDS, OVERTAKING_WORDS, TYRES_WORDS, FLAGS_WORDS, CAR_WORDS, POWER_WORDS, DEFENDING_WORDS, TITLES_WORDS]
+const LISTS = [RACE_WEEKEND_WORDS, OVERTAKING_WORDS, TYRES_WORDS, FLAGS_WORDS, CAR_WORDS, POWER_WORDS, DEFENDING_WORDS, TITLES_WORDS, DRS_WORDS]
 
 const plain = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
 
