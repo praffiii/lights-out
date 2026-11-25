@@ -241,7 +241,9 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay, bare }: Props)
         sample(focus.u * n + LOOK * n, ahead)
         heading.subVectors(ahead, back).setY(0).normalize()
         side.crossVectors(heading, UP).normalize()
-        chase.copy(heading).multiplyScalar(-Math.cos(YAW)).addScaledVector(side, Math.sin(YAW)).multiplyScalar(Math.cos(PITCH)).addScaledVector(UP, Math.sin(PITCH)).normalize()
+        const { yaw = YAW, pitch = PITCH } = focus
+
+        chase.copy(heading).multiplyScalar(-Math.cos(yaw)).addScaledVector(side, Math.sin(yaw)).multiplyScalar(Math.cos(pitch)).addScaledVector(UP, Math.sin(pitch)).normalize()
         view.subVectors(rest.at, rest.aim).normalize().lerp(chase, focus.w).normalize()
         target.copy(rest.aim).lerp(spot, focus.w)
 
@@ -348,7 +350,7 @@ function Scene({ model, layout, fill, pins, onReady, lap, replay, bare }: Props)
       if (!compiled || (replay && !replay.running.current)) return
 
       const focus = replay?.focus?.current
-      const focusKey = focus ? `${focus.u} ${focus.k} ${focus.w}` : ''
+      const focusKey = focus ? `${focus.u} ${focus.k} ${focus.w} ${focus.yaw ?? YAW} ${focus.pitch ?? PITCH}` : ''
 
       if (focusKey !== framedFocus) stale.current = true
 

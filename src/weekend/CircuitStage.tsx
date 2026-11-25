@@ -57,12 +57,13 @@ type Props = {
   places?: ReadonlyArray<Place>
   bare?: true
   controls?: true
+  limit?: number
 }
 
-export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus, pit, places, bare, controls }: Props) {
+export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus, pit, places, bare, controls, limit = 1 }: Props) {
   const box = useRef<HTMLDivElement>(null)
   const pins = useRef<HTMLDivElement>(null)
-  const fill = useRef(1)
+  const fill = useRef(limit)
   const replay = useRef<Replay>({ running: { current: false }, trace: { current: null }, turns: { current: [] }, focus, pit: pit ? { points: pit, trace: { current: null } } : undefined }).current
   const [ready, setReady] = useState(false)
   const [failed, setFailed] = useState(false)
@@ -116,8 +117,8 @@ export function CircuitStage({ info, near, lap, onNear, hud, turns: only, focus,
 
     setSectors(on)
 
-    if (REDUCED) fill.current = on ? 1 : 0
-    else gsap.to(fill, { current: on ? 1 : 0, duration: 0.6, ease: 'power2.inOut', overwrite: true })
+    if (REDUCED) fill.current = on ? limit : 0
+    else gsap.to(fill, { current: on ? limit : 0, duration: 0.6, ease: 'power2.inOut', overwrite: true })
   }
 
   return (
