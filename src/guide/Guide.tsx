@@ -7,6 +7,8 @@ import { usePreview } from '#/home/usePreview.tsx'
 import { draw, gsap, ONCE, onEnter, REDUCED, reveal, roll, sweep, useGSAP } from '#/motion/motion.ts'
 import { Go } from '#/shell/Go.tsx'
 
+import { Race } from './Race.tsx'
+
 const PHOTO_LIST = CHAPTERS.map((c) => c.photo)
 
 const FIGURES = [
@@ -14,6 +16,8 @@ const FIGURES = [
   { k: 'Minutes', more: ' to read', v: MINUTES },
   { k: 'Rulebook', v: 2026 },
 ]
+
+const LAP_S = 1.8
 
 const all = (scope: HTMLElement, selector: string) => [...scope.querySelectorAll<HTMLElement>(selector)]
 
@@ -24,7 +28,7 @@ function hero(scope: HTMLElement) {
 function motion(scope: HTMLElement) {
   const list = scope.querySelector('.list')
 
-  for (const el of all(scope, '.next h2')) sweep(el)
+  for (const el of all(scope, '.race h2 .hl, .next h2')) sweep(el)
 
   for (const el of all(scope, '.figures .num')) roll(el, { from: el.textContent === '2026' ? 1950 : undefined })
 
@@ -37,7 +41,31 @@ function motion(scope: HTMLElement) {
 
   if (REDUCED) return
 
-  for (const el of all(scope, '.figures p')) gsap.from(el, { y: 24, opacity: 0, duration: 0.8, ease: 'brake', clearProps: 'transform', scrollTrigger: { trigger: el, start: 'top 95%', ...ONCE } })
+  lap(scope)
+
+  for (const el of all(scope, '.figures p, .race .body')) gsap.from(el, { y: 24, opacity: 0, duration: 0.8, ease: 'brake', clearProps: 'transform', scrollTrigger: { trigger: el, start: 'top 95%', ...ONCE } })
+}
+
+function lap(scope: HTMLElement) {
+  const ruler = scope.querySelector('.race .ruler')
+
+  if (!ruler) return
+
+  const media = gsap.matchMedia(scope)
+
+  const run = (axis: 'scaleX' | 'scaleY', when: (li: HTMLElement, i: number, n: number) => number) => {
+    const items = all(scope, '.race li')
+    const tl = gsap.timeline({ scrollTrigger: { trigger: ruler, start: 'top 80%', ...ONCE } }).from(ruler, { [axis]: 0, duration: LAP_S, ease: 'none' })
+
+    items.forEach((li, i) => {
+      const from = when(li, i, items.length) * LAP_S
+
+      tl.from(li.querySelector('.tick'), { opacity: 0, duration: 0.2 }, from).from(li.querySelector('a'), { opacity: 0, y: 14, duration: 0.6, clearProps: 'transform' }, from)
+    })
+  }
+
+  media.add('(min-width: 1200px)', () => run('scaleX', (li) => Number(li.style.getPropertyValue('--at'))))
+  media.add('(max-width: 1199.98px)', () => run('scaleY', (_, i, n) => i / (n - 1)))
 }
 
 export function Guide() {
@@ -109,6 +137,7 @@ export function Guide() {
         </ol>
         {card}
       </section>
+      <Race />
       <Next label="Start · Chapter 01 · 5 min" title={'Three days.\nOne race.'} line="Read chapter 01" photo={PHOTOS.ch01} to="/chapters/race-weekend" />
     </div>
   )
