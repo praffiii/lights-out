@@ -43,7 +43,7 @@ const allPages = (page: (offset: number) => Effect.Effect<SeasonResults, Jolpica
     return races
   })
 
-const seasonPages = (jolpica: JolpicaClient['Service'], season: number) =>
+export const seasonPages = (jolpica: JolpicaClient['Service'], season: number) =>
   Effect.gen(function* () {
     const races = yield* allPages((offset) => jolpica.seasonResults(season, offset))
     const sprints = yield* allPages((offset) => jolpica.seasonSprints(season, offset))
