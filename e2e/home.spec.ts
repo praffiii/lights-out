@@ -295,7 +295,7 @@ test('the pit-stop read leads to chapter 03 and the 1973 story still waits', asy
   expect(errors).toEqual([])
 })
 
-test('the menu sends How F1 works to the chapter list and The car to chapter 05', async ({ page, errors }) => {
+test('the menu sends How F1 works to its page and The car to chapter 05', async ({ page, errors }) => {
   await page.goto('/')
   await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
   await page.getByRole('button', { name: 'Menu' }).click()
@@ -303,7 +303,67 @@ test('the menu sends How F1 works to the chapter list and The car to chapter 05'
   await expect(page.locator('.menu nav .line > a', { hasText: 'The car' })).toHaveAttribute('href', '/chapters/inside-the-car')
   await page.locator('.menu nav .line > a', { hasText: 'How F1 works' }).click()
 
-  await expect(page.locator('#start')).toBeInViewport()
+  await expect(page.locator('.guide-page h1')).toBeVisible()
   await expect(page.locator('.menu')).toBeHidden()
+  expect(errors).toEqual([])
+})
+
+const openMenu = async (page: Page, path: string) => {
+  await page.goto(path)
+  await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
+  await page.getByRole('button', { name: 'Menu' }).click()
+  await expect(page.locator('.menu .foot')).toBeVisible()
+}
+
+for (const [path, entry, photo] of [
+  ['/glossary', 'Glossary', 'ch04'],
+  ['/glossary/', 'Glossary', 'ch04'],
+  ['/chapters', 'How F1 works', 'ch01'],
+  ['/chapters/tyres-and-strategy', 'How F1 works', 'ch01'],
+  ['/chapters/inside-the-car', 'The car', 'williams'],
+] as const) {
+  test(`the menu opens on ${entry} from ${path}`, async ({ page, errors }, testInfo) => {
+    if (testInfo.project.name === 'desktop') await page.setViewportSize({ width: 1280, height: 720 })
+
+    await openMenu(page, path)
+
+    await expect(page.locator('.menu nav .line > a', { hasText: entry })).toBeFocused()
+    await page.waitForTimeout(300)
+    await expect(page.locator(`.menu figure img[src="/img/${photo}.jpg"]`)).toHaveCSS('z-index', '1')
+    await expect(page.locator('.menu nav .line > a', { hasText: entry })).toBeInViewport({ ratio: 0.9 })
+    await expect(page.locator('.menu .here')).toHaveCount(1)
+    expect(errors).toEqual([])
+  })
+}
+
+test('the menu counts the chapters and says where you are', async ({ page, errors }) => {
+  await openMenu(page, '/chapters/inside-the-car')
+
+  const sum = page.locator('.menu .sum')
+
+  await expect(sum).toContainText('Nine chapters · 52 min')
+  await expect(sum.getByRole('link', { name: 'All chapters →' })).toHaveAttribute('href', '/chapters')
+  await expect(page.locator('.menu .subs a', { hasText: 'Inside the car' })).toContainText('You are here')
+
+  const tops = await sum.locator('> *').evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)))
+
+  expect(new Set(tops).size).toBe(1)
+  expect(errors).toEqual([])
+})
+
+test('the menu is nowhere on a page it does not list', async ({ page, errors }) => {
+  await openMenu(page, '/tracks/vegas')
+
+  await expect(page.locator('.menu .here')).toHaveCount(0)
+  expect(errors).toEqual([])
+})
+
+test('the new menu lines leave the theme switch on screen', async ({ page, errors }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop')
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await openMenu(page, '/glossary')
+
+  await expect(page.getByRole('group', { name: 'Theme' })).toBeInViewport({ ratio: 1 })
+  expect(await page.locator('.menu').evaluate((el) => el.scrollHeight - el.clientHeight)).toBe(0)
   expect(errors).toEqual([])
 })

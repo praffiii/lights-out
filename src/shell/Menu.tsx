@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 
+import { CHAPTERS } from '#/home/content.ts'
+import { CHAPTER_SUMMARY } from '#/home/summary.ts'
 import { bar, ensureBar, gsap, REDUCED } from '#/motion/motion.ts'
 import { Roll } from '#/motion/Roll.tsx'
 import { gpName, pickRace, RACE_WHEN } from '#/season/weekend.ts'
 import { useSeason } from '#/season/use-season.ts'
 
-import { Go, Soon } from './Go.tsx'
+import { currentEntry } from './current.ts'
+import { Go } from './Go.tsx'
 import { MENU } from './menu.ts'
 import { type Mode, useTheme } from './theme.ts'
 
@@ -27,8 +30,7 @@ export function Menu({ open, onClose, path }: { open: boolean; onClose: () => vo
 
     if (open) {
       setHidden(false)
-      setActive(Math.max(0, MENU.findIndex((m) => m.to === path)))
-      gsap.delayedCall(0, () => el.querySelector<HTMLElement>('nav a')?.focus({ preventScroll: true }))
+      setActive(currentEntry(path))
 
       if (REDUCED) return
 
@@ -37,7 +39,7 @@ export function Menu({ open, onClose, path }: { open: boolean; onClose: () => vo
       const t = gsap
         .timeline()
         .fromTo(el, { clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.6, ease: 'launch' })
-        .from(el.querySelectorAll('.subs > *, nav .kicker'), { autoAlpha: 0, x: -8, duration: 0.5, stagger: 0.02 }, 0.7)
+        .from(el.querySelectorAll('.subs > *, nav .kicker, nav .sum, nav li > .here'), { autoAlpha: 0, x: -8, duration: 0.5, stagger: 0.02 }, 0.7)
         .from(el.querySelector('.foot'), { autoAlpha: 0, duration: 0.4 }, 0.8)
 
       tl.current = t
@@ -46,7 +48,7 @@ export function Menu({ open, onClose, path }: { open: boolean; onClose: () => vo
 
         if (!link) return
 
-        gsap.set(link, { visibility: 'hidden' })
+        gsap.set(link, { opacity: 0 })
         bar(t, ensureBar(line), link, 0.3 + i * 0.07, 0.32)
       })
 
@@ -78,6 +80,10 @@ export function Menu({ open, onClose, path }: { open: boolean; onClose: () => vo
   }, [open])
 
   useEffect(() => {
+    if (open && !hidden) [...(root.current?.querySelectorAll<HTMLElement>('nav .line > a') ?? [])][currentEntry(path)]?.focus()
+  }, [open, hidden])
+
+  useEffect(() => {
     if (!open) return
 
     const onKey = (e: KeyboardEvent) => {
@@ -101,6 +107,7 @@ export function Menu({ open, onClose, path }: { open: boolean; onClose: () => vo
     if (!REDUCED) gsap.fromTo(el, { clipPath: 'inset(0% 100% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.5, ease: 'launch' })
   }, [active])
 
+  const inChapter = CHAPTERS.some((c) => c.to === path)
   const photo = (MENU[active] ?? MENU[0])?.photo
 
   return (
@@ -110,43 +117,38 @@ export function Menu({ open, onClose, path }: { open: boolean; onClose: () => vo
           {MENU.map((m, i) => (
             <li key={m.label} className={m.to === path ? 'on' : undefined} onPointerEnter={() => setActive(i)}>
               {m.weekend && <WeekendLine path={path} />}
+              {m.chapters && (
+                <p className="mono sum">
+                  <span>{CHAPTER_SUMMARY}</span>
+                  <Go to={m.to}>All chapters →</Go>
+                </p>
+              )}
               <span className="line">
-                {m.to ? (
-                  <Go to={m.to} onFocus={() => setActive(i)} aria-current={m.to === path ? 'page' : undefined}>
-                    <span className="mono">{number(i)}</span>
-                    <Roll text={m.label} />
-                  </Go>
-                ) : m.href ? (
-                  <a href={m.href} onFocus={() => setActive(i)} onClick={onClose}>
-                    <span className="mono">{number(i)}</span>
-                    <Roll text={m.label} />
-                  </a>
-                ) : (
-                  <Soon className="off">
-                    <span className="mono">{number(i)}</span>
-                    {m.label}
-                  </Soon>
-                )}
+                <Go to={m.to} onFocus={() => setActive(i)} aria-current={m.to === path ? 'page' : undefined}>
+                  <span className="mono">{number(i)}</span>
+                  <Roll text={m.label} />
+                </Go>
               </span>
+              {m.to === path && !inChapter && (
+                <span className="mono here" aria-hidden>
+                  You are here
+                </span>
+              )}
               {m.chapters && (
                 <div className="subs">
-                  {m.chapters.map((c) => {
-                    const row = (
-                      <>
-                        <span className="mono">{c.n}</span>
-                        <span className="title">{c.title.replace(/,.*/, '')}</span>
+                  {m.chapters.map((c) => (
+                    <Go key={c.n} to={c.to} aria-current={c.to === path ? 'page' : undefined}>
+                      <span className="mono">{c.n}</span>
+                      <span className="title">{c.title.replace(/,.*/, '')}</span>
+                      {c.to === path ? (
+                        <span className="mono min here" aria-hidden>
+                          You are here
+                        </span>
+                      ) : (
                         <span className="mono min">{c.min} min</span>
-                      </>
-                    )
-
-                    return c.to ? (
-                      <Go key={c.n} to={c.to} aria-current={c.to === path ? 'page' : undefined}>
-                        {row}
-                      </Go>
-                    ) : (
-                      <Soon key={c.n}>{row}</Soon>
-                    )
-                  })}
+                      )}
+                    </Go>
+                  ))}
                 </div>
               )}
             </li>

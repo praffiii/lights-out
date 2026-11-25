@@ -107,7 +107,7 @@ main:focus { outline: none; }
   background: var(--bg); color: var(--ink); overflow-y: auto;
 }
 .menu[hidden] { display: none; }
-.menu nav ol { list-style: none; display: grid; gap: 4px; }
+.menu nav ol { list-style: none; display: grid; gap: 0; }
 .menu nav .line > a, .menu nav span.off {
   display: flex; align-items: baseline; gap: 20px;
   font-size: clamp(32px, 3.6vw, 52px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.02;
@@ -120,9 +120,15 @@ main:focus { outline: none; }
 .menu nav .line { position: relative; display: block; width: fit-content; overflow: clip; }
 .menu nav .line > .bar { inset: 0.06em -0.1em 0; }
 .menu .kicker { display: flex; align-items: center; gap: 8px; width: fit-content; margin: 6px 0 2px 44px; color: var(--muted); transition: color 0.24s; }
+.menu .sum { display: flex; justify-content: space-between; gap: 16px; max-width: 520px; margin: 4px 0 2px 44px; color: var(--muted); white-space: nowrap; }
+.menu .sum a { color: var(--ink); font-weight: 500; }
+.menu .sum a:hover { color: var(--purple); }
+.menu nav li:has(> .here) { display: flex; flex-wrap: wrap; align-items: center; column-gap: 14px; }
+.menu nav li:has(> .here) > :is(.kicker, .sum, .subs) { flex: 0 0 100%; }
+.menu nav li:has(> .here) > .sum { box-sizing: border-box; }
 .menu .kicker:hover, .menu .kicker:focus-visible, .menu .kicker[aria-current] { color: var(--ink); }
 .menu .kicker i { width: 8px; height: 8px; border-radius: 50%; background: var(--s2); }
-.menu .subs { display: grid; max-width: 520px; margin: 4px 0 6px 44px; }
+.menu .subs { display: grid; max-width: 520px; margin: 4px 0 4px 44px; }
 .menu .subs > a, .menu .subs > span { position: relative; display: flex; align-items: baseline; gap: 20px; padding-block: 0; color: var(--muted); transition: color 0.24s; }
 .menu .subs > a::before { content: ''; position: absolute; left: -16px; top: 3px; bottom: 3px; width: 3px; background: var(--purple); transform: scaleY(0); transition: transform 0.24s var(--brake); }
 .menu .subs > a:hover, .menu .subs > a:focus-visible, .menu .subs > a[aria-current] { color: var(--ink); }

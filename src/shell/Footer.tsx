@@ -88,7 +88,7 @@ export function Footer() {
             {MENU.map((entry, i) => (
               <li key={entry.label}>
                 <span className="mono muted">{pad(i + 1)}</span>
-                {entry.to ? <Go to={entry.to}>{entry.label}</Go> : entry.href ? <a href={entry.href}>{entry.label}</a> : <Soon>{entry.label}</Soon>}
+                <Go to={entry.to}>{entry.label}</Go>
               </li>
             ))}
           </ol>
