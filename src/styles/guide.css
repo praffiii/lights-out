@@ -1,0 +1,57 @@
+.guide-page .opening { grid-template-columns: minmax(0, 1fr); padding-bottom: 80px; }
+.guide-page .opening .label { color: var(--ink); }
+
+.guide-page .figures { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 24px; margin: 0 var(--m); padding-top: 32px; border-top: 1px solid var(--line); }
+.guide-page .figures dl { display: grid; grid-template-columns: 336fr 336fr 268fr; }
+.guide-page .figures .num { margin: 18px 0 0 -4px; font-size: clamp(64px, 6.7vw, 96px); line-height: 1; letter-spacing: -0.02em; font-variation-settings: 'wdth' 100; }
+.guide-page .figures p { font-size: 18px; line-height: 1.5; color: var(--muted); }
+
+.guide-page .index { margin-top: 110px; }
+.guide-page .heads { display: grid; grid-template-columns: 120px minmax(0, 1fr) auto; margin: 0 var(--m); padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+.guide-page .list { list-style: none; }
+.guide-page .list li { position: relative; margin: 0 var(--m); }
+.guide-page .list .hair { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--line); }
+.guide-page .list a { position: relative; display: grid; grid-template-columns: 102px minmax(0, 1fr) auto; align-items: baseline; isolation: isolate; padding: 24px 18px 14px; transition: color 0.24s; }
+.guide-page .list a::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--ink); scale: 0 1; transform-origin: left; transition: scale 0.24s var(--brake); }
+.guide-page .list a:hover::before, .guide-page .list a:focus-visible::before { scale: 1 1; }
+.guide-page .list a:hover, .guide-page .list a:focus-visible { color: var(--bg); }
+.guide-page .list .n, .guide-page .list h2 { font-size: clamp(40px, 3.9vw, 56px); line-height: 1; letter-spacing: -0.035em; font-variation-settings: 'wdth' 100; }
+.guide-page .list h2 { white-space: normal; }
+.guide-page .list p { grid-column: 2; margin-top: 18px; font-size: 18px; line-height: 1.5; color: var(--muted); transition: color 0.24s; }
+.guide-page .list a:hover p, .guide-page .list a:focus-visible p { color: inherit; }
+.guide-page .list .time { grid-column: 3; grid-row: 1; }
+.guide-page .list li:first-child a { background: var(--purple); }
+.guide-page .list li:first-child a, .guide-page .list li:first-child p { color: #111214; }
+.guide-page .list li:first-child a::before { display: none; }
+.guide-page .list li:first-child .hair { display: none; }
+
+.guide-page .next .caption { left: var(--m); right: auto; bottom: 76px; background: var(--ink); color: var(--bg); }
+.guide-page .next .caption > p { color: color-mix(in srgb, var(--bg) 62%, var(--ink)); }
+.guide-page .next h2 { font-size: 52px; line-height: 1.08; letter-spacing: -0.03em; white-space: pre-line; font-variation-settings: 'wdth' 100; }
+
+@media (max-width: 1199px) {
+  .guide-page .figures { grid-template-columns: minmax(0, 1fr); }
+  .guide-page .figures p { max-width: 560px; margin-top: 8px; }
+  .guide-page .index { margin-top: 80px; }
+}
+
+@media (max-width: 760px) {
+  .guide-page .opening { padding-bottom: 32px; }
+  .guide-page .opening h1 { font-size: clamp(40px, 12.8vw, 64px); }
+  .guide-page .figures { padding-top: 20px; }
+  .guide-page .figures dl { grid-template-columns: 110fr 120fr 120fr; }
+  .guide-page .figures .more { display: none; }
+  .guide-page .figures .num { margin-top: 10px; font-size: 44px; }
+  .guide-page .figures p { margin-top: 0; font-size: 16px; }
+  .guide-page .index { margin-top: 40px; }
+  .guide-page .heads { display: none; }
+  .guide-page .list li { margin: 0; }
+  .guide-page .list .hair { left: var(--m); right: var(--m); }
+  .guide-page .list a { grid-template-columns: 52px minmax(0, 1fr); padding: 20px var(--m); }
+  .guide-page .list .n, .guide-page .list h2 { font-size: 28px; }
+  .guide-page .list p { margin-top: 6px; font-size: 15px; line-height: 1.45; }
+  .guide-page .list .time { grid-column: 2; grid-row: 3; margin-top: 8px; }
+  .guide-page .next .shot { aspect-ratio: 13 / 10; }
+  .guide-page .next .caption { left: 0; bottom: 0; margin-top: -60px; }
+  .guide-page .next h2 { font-size: 36px; }
+}
