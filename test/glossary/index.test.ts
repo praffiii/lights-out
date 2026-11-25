@@ -22,6 +22,7 @@ it('sends a word to the first chapter that teaches it', () => {
   expect(ENTRIES.find((e) => e.key === 'trackLimits')?.chapter.n).toBe('04')
   expect(ENTRIES.map((e) => [String(e.key), e.chapter.n])).toContainEqual(['switchback', '07'])
   expect(ENTRIES.map((e) => [String(e.key), e.chapter.n])).toContainEqual(['budgetCap', '08'])
+  expect(ENTRIES.map((e) => [String(e.key), e.chapter.n])).toContainEqual(['mainPlane', '09'])
 })
 
 it('finds words by term or meaning, ignoring case, accents and stray spaces', () => {
@@ -34,4 +35,8 @@ it('finds words by term or meaning, ignoring case, accents and stray spaces', ()
 it('treats the query as plain text', () => {
   expect(find('.*')).toEqual([])
   expect(() => find('(')).not.toThrow()
+})
+
+it('explains the flap without the word before it', () => {
+  expect(WORDS.flap.def).toContain('main plane')
 })

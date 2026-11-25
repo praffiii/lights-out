@@ -17,6 +17,7 @@ import { Route as WeekendRouteImport } from './routes/weekend'
 import { Route as ApiSeasonRouteImport } from './routes/api/season'
 import { Route as ChaptersChampionshipsRouteImport } from './routes/chapters.championships'
 import { Route as ChaptersDefendingRouteImport } from './routes/chapters.defending'
+import { Route as ChaptersDrsRouteImport } from './routes/chapters.drs'
 import { Route as ChaptersFlagsRouteImport } from './routes/chapters.flags'
 import { Route as ChaptersInsideTheCarRouteImport } from './routes/chapters.inside-the-car'
 import { Route as ChaptersOvertakingRouteImport } from './routes/chapters.overtaking'
@@ -69,6 +70,11 @@ const ChaptersChampionshipsRoute = ChaptersChampionshipsRouteImport.update({
 const ChaptersDefendingRoute = ChaptersDefendingRouteImport.update({
   id: '/chapters/defending',
   path: '/chapters/defending',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChaptersDrsRoute = ChaptersDrsRouteImport.update({
+  id: '/chapters/drs',
+  path: '/chapters/drs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChaptersFlagsRoute = ChaptersFlagsRouteImport.update({
@@ -147,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/api/season': typeof ApiSeasonRoute
   '/chapters/championships': typeof ChaptersChampionshipsRoute
   '/chapters/defending': typeof ChaptersDefendingRoute
+  '/chapters/drs': typeof ChaptersDrsRoute
   '/chapters/flags': typeof ChaptersFlagsRoute
   '/chapters/inside-the-car': typeof ChaptersInsideTheCarRoute
   '/chapters/overtaking': typeof ChaptersOvertakingRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/api/season': typeof ApiSeasonRoute
   '/chapters/championships': typeof ChaptersChampionshipsRoute
   '/chapters/defending': typeof ChaptersDefendingRoute
+  '/chapters/drs': typeof ChaptersDrsRoute
   '/chapters/flags': typeof ChaptersFlagsRoute
   '/chapters/inside-the-car': typeof ChaptersInsideTheCarRoute
   '/chapters/overtaking': typeof ChaptersOvertakingRoute
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   '/api/season': typeof ApiSeasonRoute
   '/chapters/championships': typeof ChaptersChampionshipsRoute
   '/chapters/defending': typeof ChaptersDefendingRoute
+  '/chapters/drs': typeof ChaptersDrsRoute
   '/chapters/flags': typeof ChaptersFlagsRoute
   '/chapters/inside-the-car': typeof ChaptersInsideTheCarRoute
   '/chapters/overtaking': typeof ChaptersOvertakingRoute
@@ -219,6 +228,7 @@ export interface FileRouteTypes {
     | '/api/season'
     | '/chapters/championships'
     | '/chapters/defending'
+    | '/chapters/drs'
     | '/chapters/flags'
     | '/chapters/inside-the-car'
     | '/chapters/overtaking'
@@ -242,6 +252,7 @@ export interface FileRouteTypes {
     | '/api/season'
     | '/chapters/championships'
     | '/chapters/defending'
+    | '/chapters/drs'
     | '/chapters/flags'
     | '/chapters/inside-the-car'
     | '/chapters/overtaking'
@@ -265,6 +276,7 @@ export interface FileRouteTypes {
     | '/api/season'
     | '/chapters/championships'
     | '/chapters/defending'
+    | '/chapters/drs'
     | '/chapters/flags'
     | '/chapters/inside-the-car'
     | '/chapters/overtaking'
@@ -289,6 +301,7 @@ export interface RootRouteChildren {
   ApiSeasonRoute: typeof ApiSeasonRoute
   ChaptersChampionshipsRoute: typeof ChaptersChampionshipsRoute
   ChaptersDefendingRoute: typeof ChaptersDefendingRoute
+  ChaptersDrsRoute: typeof ChaptersDrsRoute
   ChaptersFlagsRoute: typeof ChaptersFlagsRoute
   ChaptersInsideTheCarRoute: typeof ChaptersInsideTheCarRoute
   ChaptersOvertakingRoute: typeof ChaptersOvertakingRoute
@@ -360,6 +373,13 @@ declare module '@tanstack/react-router' {
       path: '/chapters/defending'
       fullPath: '/chapters/defending'
       preLoaderRoute: typeof ChaptersDefendingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chapters/drs': {
+      id: '/chapters/drs'
+      path: '/chapters/drs'
+      fullPath: '/chapters/drs'
+      preLoaderRoute: typeof ChaptersDrsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chapters/flags': {
@@ -465,6 +485,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiSeasonRoute: ApiSeasonRoute,
   ChaptersChampionshipsRoute: ChaptersChampionshipsRoute,
   ChaptersDefendingRoute: ChaptersDefendingRoute,
+  ChaptersDrsRoute: ChaptersDrsRoute,
   ChaptersFlagsRoute: ChaptersFlagsRoute,
   ChaptersInsideTheCarRoute: ChaptersInsideTheCarRoute,
   ChaptersOvertakingRoute: ChaptersOvertakingRoute,

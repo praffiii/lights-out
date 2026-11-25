@@ -13,7 +13,7 @@ export const WORDS = {
   tow: { term: 'Tow', def: 'Running close behind another car on a straight, inside the low-drag pocket of air it leaves.' },
   slipstream: { term: 'Slipstream', def: 'The pocket of slower air behind a car. Follow inside it and drag drops, so the car behind gains speed.' },
   dirtyAir: { term: 'Dirty air', def: 'The turbulent wake behind a car. In a corner it robs the car behind of grip, so it slides and its tyres overheat.' },
-  detection: { term: 'Detection point', def: 'A line near the end of the lap. Cross it within a second of the car ahead and Overtake Mode unlocks.' },
+  detection: { term: 'Detection point', def: 'A timing line. Cross it within a second of the car ahead and the passing help unlocks: Overtake Mode now, DRS until 2025.' },
   overtakeMode: { term: 'Overtake Mode', def: 'New in 2026. Extra electric energy for a car within a second of the one ahead, so it keeps full power for longer.' },
   straightMode: { term: 'Straight mode', def: 'On marked straights every car opens its front and rear wings to cut drag, then closes them for the corner.' },
   activeAero: { term: 'Active aero', def: 'Wings that move. From 2026 every car switches between a low-drag straight mode and a high-grip corner mode.' },
@@ -68,6 +68,10 @@ export const WORDS = {
   budgetCap: { term: 'Budget cap', def: 'The limit on what a team may spend on its cars in a season.' },
   windTunnel: { term: 'Wind tunnel', def: 'Where teams test scale models in moving air. Time in it is limited.' },
   fastestLapPoint: { term: 'Fastest lap · until 2024', def: "A bonus point for the race's fastest lap, if the driver finished in the top ten." },
+  activationPoint: { term: 'Activation point', def: 'Where a DRS zone started and the flap could open.' },
+  mainPlane: { term: 'Main plane', def: 'The big lower element of a wing.' },
+  flap: { term: 'Flap', def: 'The smaller wing element behind and above the main plane.' },
+  drag: { term: 'Drag', def: "The air's push against the car. Less of it means more top speed." },
 } as const
 
 export type WordKey = keyof typeof WORDS
@@ -87,3 +91,5 @@ export const POWER_WORDS: ReadonlyArray<WordKey> = ['powerUnit', 'mguK', 'mguH',
 export const DEFENDING_WORDS: ReadonlyArray<WordKey> = ['defending', 'racingLine', 'switchback', 'divebomb', 'apex', 'brakingZone', 'carsWidth', 'trackLimits', 'blackWhiteFlag', 'stewards', 'penaltyPoints', 'driveThrough']
 
 export const TITLES_WORDS: ReadonlyArray<WordKey> = ['points', 'sprint', 'driversTitle', 'constructorsTitle', 'constructors', 'teammate', 'countback', 'budgetCap', 'windTunnel', 'fastestLapPoint']
+
+export const DRS_WORDS: ReadonlyArray<WordKey> = ['drs', 'detection', 'activationPoint', 'mainPlane', 'flap', 'drag', 'safetyCar', 'overtakeMode']

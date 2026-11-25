@@ -40,7 +40,7 @@ export type Step = { n: 1 | 2 | 3 | 4; t: number; title: string; text: string }
 
 export type Readout = { speed: number; gear: number; gap: string; mode: 'Straight' | 'Corner' | 'Overtake'; cells: number; brake: boolean }
 
-export type Focus = { u: number; k: number; w: number }
+export type Focus = { u: number; k: number; w: number; yaw?: number; pitch?: number }
 
 const UNLOCK = 1
 
