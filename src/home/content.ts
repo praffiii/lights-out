@@ -45,18 +45,18 @@ export const PHOTOS = {
 
 export type ChapterPath = Extract<To, `/chapters/${string}`>
 
-export type ChapterEntry = { n: string; title: string; min: number; photo: Photo; to: ChapterPath | null }
+export type ChapterEntry = { n: string; title: string; min: number; photo: Photo; to: ChapterPath; line: string }
 
 export const CHAPTERS: ReadonlyArray<ChapterEntry> = [
-  { n: '01', title: 'A race weekend, Friday to Sunday', min: 5, photo: PHOTOS.ch01, to: '/chapters/race-weekend' },
-  { n: '02', title: 'How overtaking works', min: 5, photo: PHOTOS.ch02, to: '/chapters/overtaking' },
-  { n: '03', title: 'Tyres and strategy', min: 7, photo: PHOTOS.ch03, to: '/chapters/tyres-and-strategy' },
-  { n: '04', title: 'Flags and what they mean', min: 4, photo: PHOTOS.ch04, to: '/chapters/flags' },
-  { n: '05', title: 'Inside the car', min: 8, photo: PHOTOS.ch05, to: '/chapters/inside-the-car' },
-  { n: '06', title: 'The power unit', min: 6, photo: PHOTOS.ch06, to: '/chapters/power-unit' },
-  { n: '07', title: 'Defending', min: 6, photo: PHOTOS.ch07, to: '/chapters/defending' },
-  { n: '08', title: 'The two championships', min: 6, photo: PHOTOS.ch07Podium, to: '/chapters/championships' },
-  { n: '09', title: 'DRS, 2011 to 2025', min: 5, photo: PHOTOS.ch08Drs, to: '/chapters/drs' },
+  { n: '01', title: 'A race weekend, Friday to Sunday', min: 5, photo: PHOTOS.ch01, to: '/chapters/race-weekend', line: 'Practice, qualifying, the race, and how the points are paid.' },
+  { n: '02', title: 'How overtaking works', min: 5, photo: PHOTOS.ch02, to: '/chapters/overtaking', line: 'Get within a second, use the battery, brake later.' },
+  { n: '03', title: 'Tyres and strategy', min: 7, photo: PHOTOS.ch03, to: '/chapters/tyres-and-strategy', line: 'The compounds, the pit stop, and the undercut.' },
+  { n: '04', title: 'Flags and what they mean', min: 4, photo: PHOTOS.ch04, to: '/chapters/flags', line: 'Every flag and light panel, and what it asks a driver to do.' },
+  { n: '05', title: 'Inside the car', min: 8, photo: PHOTOS.ch05, to: '/chapters/inside-the-car', line: 'Eight parts, and the one job each part has.' },
+  { n: '06', title: 'The power unit', min: 6, photo: PHOTOS.ch06, to: '/chapters/power-unit', line: 'A V6 and an electric motor, close to 50:50.' },
+  { n: '07', title: 'Defending', min: 6, photo: PHOTOS.ch07, to: '/chapters/defending', line: 'One move, the switchback, and what it costs to cheat.' },
+  { n: '08', title: 'The two championships', min: 6, photo: PHOTOS.ch07Podium, to: '/chapters/championships', line: 'Every point counts twice, for a driver and a team.' },
+  { n: '09', title: 'DRS, 2011 to 2025', min: 5, photo: PHOTOS.ch08Drs, to: '/chapters/drs', line: 'The flap that made passing easier, until it was gone.' },
 ]
 
 export const HERO = {
