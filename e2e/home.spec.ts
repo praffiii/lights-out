@@ -432,7 +432,7 @@ for (const [path, name] of [
     await page.waitForSelector('.loader', { state: 'detached', timeout: LOADER_MS })
     await page.evaluate(() => window.scrollTo(0, 1300))
     await page.waitForFunction(() => scrollY > 1200)
-    await page.locator('.menu-btn').evaluate((el) => el.click())
+    await page.locator('.menu-btn').dispatchEvent('click')
     await page.locator('.menu nav .line > a', { hasText: name }).click()
 
     await expect(page.locator('.menu')).toBeHidden()
