@@ -19,8 +19,8 @@ for (const colorScheme of ['light', 'dark'] as const) {
 
     await expect(page.locator('.glossary-page h1')).toHaveText('Every word,in plain English.')
     await expect(page).toHaveTitle('Glossary · Lights Out')
-    await expect(page.locator('.glossary-page .opening .label')).toHaveText('Glossary · 62 words · from 7 chapters')
-    await expect(rows(page)).toHaveCount(62)
+    await expect(page.locator('.glossary-page .opening .label')).toHaveText('Glossary · 69 words · from 8 chapters')
+    await expect(rows(page)).toHaveCount(69)
     await expect(page.locator('.glossary-page .next .hl').first()).toHaveCSS('display', 'block')
     await expect(page.locator('.glossary-page .next img')).toHaveAttribute('srcset', /3543w/)
     expect(errors).toEqual([])
@@ -41,7 +41,7 @@ test('search narrows the list, says when nothing matches, and comes back', async
   await expect(page.locator('.glossary-page .none')).toHaveText('No word matches “zzz”.')
 
   await search.fill('')
-  await expect(rows(page)).toHaveCount(62)
+  await expect(rows(page)).toHaveCount(69)
   expect(errors).toEqual([])
 })
 
@@ -57,7 +57,7 @@ test('a link to a word lands on its highlighted row', async ({ page, errors }) =
 test('a link to a word that does not exist shows the plain list', async ({ page, errors }) => {
   await loaded(page, '/glossary#nope')
 
-  await expect(rows(page)).toHaveCount(62)
+  await expect(rows(page)).toHaveCount(69)
   expect(await rows(page).evaluateAll((els) => els.filter((el) => el.matches(':target')).length)).toBe(0)
   expect(errors).toEqual([])
 })

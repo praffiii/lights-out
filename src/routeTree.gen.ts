@@ -15,6 +15,7 @@ import { Route as GlossaryRouteImport } from './routes/glossary'
 import { Route as SeasonRouteImport } from './routes/season'
 import { Route as WeekendRouteImport } from './routes/weekend'
 import { Route as ApiSeasonRouteImport } from './routes/api/season'
+import { Route as ChaptersChampionshipsRouteImport } from './routes/chapters.championships'
 import { Route as ChaptersDefendingRouteImport } from './routes/chapters.defending'
 import { Route as ChaptersFlagsRouteImport } from './routes/chapters.flags'
 import { Route as ChaptersInsideTheCarRouteImport } from './routes/chapters.inside-the-car'
@@ -58,6 +59,11 @@ const WeekendRoute = WeekendRouteImport.update({
 const ApiSeasonRoute = ApiSeasonRouteImport.update({
   id: '/api/season',
   path: '/api/season',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChaptersChampionshipsRoute = ChaptersChampionshipsRouteImport.update({
+  id: '/chapters/championships',
+  path: '/chapters/championships',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChaptersDefendingRoute = ChaptersDefendingRouteImport.update({
@@ -139,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
+  '/chapters/championships': typeof ChaptersChampionshipsRoute
   '/chapters/defending': typeof ChaptersDefendingRoute
   '/chapters/flags': typeof ChaptersFlagsRoute
   '/chapters/inside-the-car': typeof ChaptersInsideTheCarRoute
@@ -161,6 +168,7 @@ export interface FileRoutesByTo {
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
+  '/chapters/championships': typeof ChaptersChampionshipsRoute
   '/chapters/defending': typeof ChaptersDefendingRoute
   '/chapters/flags': typeof ChaptersFlagsRoute
   '/chapters/inside-the-car': typeof ChaptersInsideTheCarRoute
@@ -184,6 +192,7 @@ export interface FileRoutesById {
   '/season': typeof SeasonRoute
   '/weekend': typeof WeekendRoute
   '/api/season': typeof ApiSeasonRoute
+  '/chapters/championships': typeof ChaptersChampionshipsRoute
   '/chapters/defending': typeof ChaptersDefendingRoute
   '/chapters/flags': typeof ChaptersFlagsRoute
   '/chapters/inside-the-car': typeof ChaptersInsideTheCarRoute
@@ -208,6 +217,7 @@ export interface FileRouteTypes {
     | '/season'
     | '/weekend'
     | '/api/season'
+    | '/chapters/championships'
     | '/chapters/defending'
     | '/chapters/flags'
     | '/chapters/inside-the-car'
@@ -230,6 +240,7 @@ export interface FileRouteTypes {
     | '/season'
     | '/weekend'
     | '/api/season'
+    | '/chapters/championships'
     | '/chapters/defending'
     | '/chapters/flags'
     | '/chapters/inside-the-car'
@@ -252,6 +263,7 @@ export interface FileRouteTypes {
     | '/season'
     | '/weekend'
     | '/api/season'
+    | '/chapters/championships'
     | '/chapters/defending'
     | '/chapters/flags'
     | '/chapters/inside-the-car'
@@ -275,6 +287,7 @@ export interface RootRouteChildren {
   SeasonRoute: typeof SeasonRoute
   WeekendRoute: typeof WeekendRoute
   ApiSeasonRoute: typeof ApiSeasonRoute
+  ChaptersChampionshipsRoute: typeof ChaptersChampionshipsRoute
   ChaptersDefendingRoute: typeof ChaptersDefendingRoute
   ChaptersFlagsRoute: typeof ChaptersFlagsRoute
   ChaptersInsideTheCarRoute: typeof ChaptersInsideTheCarRoute
@@ -333,6 +346,13 @@ declare module '@tanstack/react-router' {
       path: '/api/season'
       fullPath: '/api/season'
       preLoaderRoute: typeof ApiSeasonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chapters/championships': {
+      id: '/chapters/championships'
+      path: '/chapters/championships'
+      fullPath: '/chapters/championships'
+      preLoaderRoute: typeof ChaptersChampionshipsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chapters/defending': {
@@ -443,6 +463,7 @@ const rootRouteChildren: RootRouteChildren = {
   SeasonRoute: SeasonRoute,
   WeekendRoute: WeekendRoute,
   ApiSeasonRoute: ApiSeasonRoute,
+  ChaptersChampionshipsRoute: ChaptersChampionshipsRoute,
   ChaptersDefendingRoute: ChaptersDefendingRoute,
   ChaptersFlagsRoute: ChaptersFlagsRoute,
   ChaptersInsideTheCarRoute: ChaptersInsideTheCarRoute,

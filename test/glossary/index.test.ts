@@ -21,6 +21,7 @@ it('sends a word to the first chapter that teaches it', () => {
   expect(ENTRIES.find((e) => e.key === 'brakingZone')?.chapter.n).toBe('02')
   expect(ENTRIES.find((e) => e.key === 'trackLimits')?.chapter.n).toBe('04')
   expect(ENTRIES.map((e) => [String(e.key), e.chapter.n])).toContainEqual(['switchback', '07'])
+  expect(ENTRIES.map((e) => [String(e.key), e.chapter.n])).toContainEqual(['budgetCap', '08'])
 })
 
 it('finds words by term or meaning, ignoring case, accents and stray spaces', () => {
