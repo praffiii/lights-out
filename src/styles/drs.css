@@ -38,19 +38,19 @@
 .drs-page .ghost .title .headline .hl { display: block; }
 .drs-page .ghost .title .intro { max-width: none; font-size: 11px; letter-spacing: 0.06em; }
 .drs-page .ghost .stage::after { background: radial-gradient(120% 90% at 50% 55%, transparent 55%, rgb(6 8 14 / 0.85)), radial-gradient(60% 46% at 12% 20%, rgb(6 8 14 / 0.94) 35%, transparent), linear-gradient(to bottom, rgb(6 8 14 / 0.8), transparent 26%, transparent 70%, rgb(6 8 14 / 0.95)); }
-.drs-page .ghost .wing { position: absolute; right: var(--m); top: 104px; z-index: 4; width: clamp(260px, 27vw, 392px); background: #0b0d12; }
+.drs-page .ghost .wing { position: absolute; right: var(--m); top: 104px; z-index: 4; width: clamp(200px, min(27vw, 46svh), 392px); background: #0b0d12; }
 .drs-page .ghost .wing img { display: block; width: 100%; height: auto; }
 .drs-page .ghost .wing canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .drs-page .ghost .wing figcaption { position: absolute; inset: auto 0 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-right: 12px; font-size: 10px; color: var(--muted); }
-.drs-page .ghost .state { padding: 7px 12px 6px; background: #24262b; color: #fff; font-size: 11px; font-weight: 500; transition: background 0.2s, color 0.2s; }
+.drs-page .ghost .state { white-space: nowrap; padding: 7px 12px 6px; background: #24262b; color: #fff; font-size: 11px; font-weight: 500; }
 .drs-page .ghost[data-open] .state { background: var(--purple); color: #111214; }
 .drs-page .ghost .speeds { position: absolute; right: var(--m); bottom: 92px; z-index: 4; display: grid; justify-items: end; text-align: right; }
 .drs-page .ghost .speeds .label { font-size: 11px; color: var(--muted); }
 .drs-page .ghost .speeds .num { margin-right: -0.03em; letter-spacing: -0.05em; line-height: 0.9; font-variant-numeric: tabular-nums lining-nums; }
-.drs-page .ghost [data-speed='on'] .num { margin-top: 8px; font-size: clamp(90px, 10.4vw, 160px); transition: color 0.2s; }
+.drs-page .ghost [data-speed='on'] .num { margin-top: 8px; font-size: clamp(64px, min(10.4vw, 17svh), 160px); }
 .drs-page .ghost[data-open] [data-speed='on'] .num { color: var(--purple); }
 .drs-page .ghost [data-speed='off'] { margin-top: 20px; }
-.drs-page .ghost [data-speed='off'] .num { margin-top: 8px; font-size: clamp(60px, 6.7vw, 100px); }
+.drs-page .ghost [data-speed='off'] .num { margin-top: 8px; font-size: clamp(44px, min(6.7vw, 11svh), 100px); }
 .drs-page .ghost .unit { margin-top: 10px; color: var(--muted); }
 .drs-page .ghost .ahead { display: grid; margin-bottom: 24px; }
 .drs-page .ghost .ahead b { font-size: 32px; font-weight: 700; letter-spacing: -0.03em; }
@@ -59,12 +59,12 @@
 .drs-page .ghost .straight .label { font-size: 11px; color: var(--muted); }
 .drs-page .ghost .lane { position: relative; height: 34px; margin-top: 4px; cursor: pointer; touch-action: none; }
 .drs-page .ghost .lane::before { content: ''; position: absolute; inset: 12px 0; background: #24262b; }
-.drs-page .ghost .lane:focus-visible { outline: 2px solid var(--purple); outline-offset: 3px; }
+.drs-page .ghost .lane:focus-visible { outline: 2px solid var(--purple); outline-offset: 0; }
 .drs-page .ghost .zone { position: absolute; left: var(--open); right: calc(100% - var(--end)); top: 12px; bottom: 12px; background: var(--purple); }
 .drs-page .ghost .playhead { position: absolute; top: 2px; bottom: 2px; width: 4px; translate: -50% 0; background: #fff; box-shadow: 0 0 0 2px #06080e; pointer-events: none; }
 .drs-page .ghost .marks { position: relative; inset: auto; height: 16px; margin-top: 6px; }
 .drs-page .ghost .marks li { position: absolute; top: 0; left: var(--open); translate: none; font-size: 10px; color: var(--muted); white-space: nowrap; }
-.drs-page .ghost .marks [data-mark='end'] { left: auto; right: calc(100% - var(--end)); opacity: 0; transition: opacity 0.2s; }
+.drs-page .ghost .marks [data-mark='end'] { left: auto; right: calc(100% - var(--end)); opacity: 0; }
 .drs-page .ghost .marks [data-mark='end'][data-lit] { opacity: 1; }
 .drs-page .ghost [data-car='on'], .drs-page .ghost [data-trail='on'] { --car: var(--ham); }
 .drs-page .ghost [data-car='off'], .drs-page .ghost [data-trail='off'] { --car: #fff; }
@@ -200,6 +200,47 @@
   .drs-page .ghost .gap b { font-size: 24px; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .drs-page .ghost :is(.state, .num, .marks li) { transition: none; }
+@media (max-width: 1199px), (max-height: 799px) {
+  .drs-page .ghost .wing .rule { display: none; }
+}
+
+@media (max-width: 1000px) {
+  .drs-page .ghost .straight { right: var(--m); width: auto; }
+  .drs-page .ghost .speeds { bottom: 170px; }
+  .drs-page .ghost .marks { height: 32px; }
+  .drs-page .ghost .marks [data-mark='end'] { top: 16px; }
+}
+
+@media (max-width: 760px) {
+  .drs-page .ghost .speeds { bottom: 122px; }
+  .drs-page .ghost .wing { bottom: 140px; }
+}
+
+@media (max-width: 760px) and (max-height: 719px) {
+  .drs-page .ghost :is(.wing, .title .intro) { display: none; }
+  .drs-page .ghost .stage { top: 16svh; height: 58svh; }
+  .drs-page .ghost .speeds { left: var(--m); grid-template-columns: 1fr auto auto; align-items: end; justify-items: start; text-align: left; bottom: 118px; }
+  .drs-page .ghost [data-speed='off'] { grid-column: 2; margin-top: 0; }
+  .drs-page .ghost .unit { margin: 0 0 4px 8px; }
+  .drs-page .ghost .ahead { grid-column: 1 / -1; margin-bottom: 8px; }
+}
+
+@media (min-width: 761px) and (max-height: 499px) {
+  .drs-page .ghost :is(.wing, .title .intro, .racer > span) { display: none; }
+  .drs-page .ghost .title { top: 72px; }
+  .drs-page .ghost .title .headline { margin-top: 8px; font-size: 32px; }
+  .drs-page .ghost .marks { height: 16px; }
+  .drs-page .ghost .marks [data-mark='end'] { top: 0; }
+  .drs-page .ghost .speeds { top: 72px; bottom: auto; padding: 8px 12px; background: rgb(6 8 14 / 0.8); grid-auto-flow: column; column-gap: 20px; align-items: end; }
+  .drs-page .ghost [data-speed='off'] { margin-top: 0; }
+  .drs-page .ghost .straight { bottom: 14px; }
+  .drs-page .ghost .gap { min-width: 0; margin: 10px 0 0 14px; padding: 5px 10px 4px; }
+  .drs-page .ghost .gap b { font-size: 20px; }
+  .drs-page .ghost .ahead { margin-bottom: 0; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .drs-page .ghost .state { transition: background 0.2s, color 0.2s; }
+  .drs-page .ghost [data-speed='on'] .num { transition: color 0.2s; }
+  .drs-page .ghost .marks li { transition: opacity 0.2s; }
 }

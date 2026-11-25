@@ -318,3 +318,80 @@ test('with no frames the open wing stays', async ({ page }) => {
   await expect(ghost(page, '.wing img')).toBeVisible()
   expect(await isBlank(page)).toBe(true)
 })
+
+const clashes = (page: Page) =>
+  ghost(page).evaluate((scope) => {
+    const parts = [...scope.querySelectorAll('.title .label, .title .headline, .title .intro, .wing, .speeds, .straight, .racer > span, .gap')]
+
+    const boxes = parts.flatMap((el) => {
+      const r = el.getBoundingClientRect()
+
+      return r.width > 0 ? [{ name: el.className || el.parentElement?.className || '', car: el.parentElement?.getAttribute('data-car') ?? '', r }] : []
+    })
+
+    const label = (b: { name: string; car: string }) => `${b.name}${b.car}`
+    const out = boxes.flatMap((b) => (b.r.left < -0.5 || b.r.top < -0.5 || b.r.right > innerWidth + 0.5 || b.r.bottom > innerHeight + 0.5 ? [`${label(b)} off screen`] : []))
+
+    const hits = boxes.flatMap((a, i) =>
+      boxes.slice(i + 1).flatMap((b) => (a.r.left < b.r.right - 1 && b.r.left < a.r.right - 1 && a.r.top < b.r.bottom - 1 && b.r.top < a.r.bottom - 1 ? [`${label(a)} on ${label(b)}`] : [])),
+    )
+
+    const wide = [...scope.querySelectorAll('.marks li')].flatMap((li) => (li.getBoundingClientRect().right > innerWidth + 0.5 ? ['mark off screen'] : []))
+    const marks = [...scope.querySelectorAll('.marks li')].map((li) => li.getBoundingClientRect())
+    const [first, second] = marks
+    const crowd = first && second && first.right > second.left && first.bottom > second.top + 1 && second.bottom > first.top + 1 ? ['marks overlap'] : []
+
+    return [...out, ...hits, ...wide, ...crowd]
+  })
+
+for (const [project, width, height] of [
+  ['desktop', 1440, 900],
+  ['desktop', 1366, 768],
+  ['desktop', 1366, 640],
+  ['desktop', 1280, 700],
+  ['desktop', 1024, 768],
+  ['desktop', 820, 1180],
+  ['desktop', 768, 1024],
+  ['phone', 844, 390],
+  ['phone', 390, 844],
+  ['phone', 390, 664],
+  ['phone', 360, 640],
+  ['phone', 320, 568],
+] as const) {
+  test(`nothing in the stage clips or overlaps at ${width}×${height}`, async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== project)
+    await page.setViewportSize({ width, height })
+    await loaded(page)
+
+    for (const t of [START, 0, GHOST.end]) {
+      await toTime(page, t)
+      await expect(ghost(page, '.pass-hud')).toHaveAttribute('data-on', '')
+      expect(await clashes(page)).toEqual([])
+    }
+  })
+}
+
+test.describe('with reduced motion asked for by the system', () => {
+  test.use({ contextOptions: { reducedMotion: 'reduce' } })
+
+  test('nothing in the stage fades or blinks', async ({ page }) => {
+    await loaded(page)
+
+    const moving = await ghost(page, ':is(.state, .num, .marks li, .gap, .title, .headline, .rec)').evaluateAll((els) => els.flatMap((el) => (getComputedStyle(el).transitionDuration === '0s' && getComputedStyle(el).animationName === 'none' ? [] : [el.className])))
+
+    expect(moving).toEqual([])
+  })
+})
+
+test('a lost WebGL context leaves the numbers working', async ({ page }) => {
+  await loaded(page)
+  await toTime(page, -1)
+  await expect(ghost(page, '.pass-hud')).toHaveAttribute('data-on', '')
+  await ghost(page, '.gl canvas').evaluate((el) => {
+    if (el instanceof HTMLCanvasElement) el.getContext('webgl2')?.getExtension('WEBGL_lose_context')?.loseContext()
+  })
+  await toTime(page, GHOST.end)
+  await expect(ghost(page, '[data-speed="on"] .num')).toHaveText(/^33[4-6]$/)
+  await expect(ghost(page, '.wing .state')).toHaveText('Flap · open')
+  await expect(ghost(page, '.gap b')).toHaveText(/^1[78] m$/)
+})
