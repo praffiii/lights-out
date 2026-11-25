@@ -36,3 +36,7 @@ it('treats the query as plain text', () => {
   expect(find('.*')).toEqual([])
   expect(() => find('(')).not.toThrow()
 })
+
+it('explains the flap without the word before it', () => {
+  expect(WORDS.flap.def).toContain('main plane')
+})

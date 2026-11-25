@@ -70,7 +70,7 @@ export const WORDS = {
   fastestLapPoint: { term: 'Fastest lap · until 2024', def: "A bonus point for the race's fastest lap, if the driver finished in the top ten." },
   activationPoint: { term: 'Activation point', def: 'Where a DRS zone started and the flap could open.' },
   mainPlane: { term: 'Main plane', def: 'The big lower element of a wing.' },
-  flap: { term: 'Flap', def: 'The smaller element behind and above it.' },
+  flap: { term: 'Flap', def: 'The smaller wing element behind and above the main plane.' },
   drag: { term: 'Drag', def: "The air's push against the car. Less of it means more top speed." },
 } as const
 

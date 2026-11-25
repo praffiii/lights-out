@@ -313,6 +313,8 @@ test('the wing frames wait until the stage is near', async ({ page }) => {
 test('with no frames the open wing stays', async ({ page }) => {
   await page.route(FRAME, (route) => route.abort())
   await loaded(page)
+  await toTime(page, -1)
+  await expect(ghost(page, '.wing img')).toBeHidden()
   await toTime(page, 2)
 
   await expect(ghost(page, '.wing img')).toBeVisible()
@@ -349,6 +351,12 @@ for (const [project, width, height] of [
   ['desktop', 1366, 768],
   ['desktop', 1366, 640],
   ['desktop', 1280, 700],
+  ['desktop', 1280, 520],
+  ['desktop', 1280, 560],
+  ['desktop', 1000, 600],
+  ['desktop', 1000, 660],
+  ['desktop', 800, 520],
+  ['desktop', 900, 600],
   ['desktop', 1024, 768],
   ['desktop', 820, 1180],
   ['desktop', 768, 1024],
@@ -394,4 +402,29 @@ test('a lost WebGL context leaves the numbers working', async ({ page }) => {
   await expect(ghost(page, '[data-speed="on"] .num')).toHaveText(/^33[4-6]$/)
   await expect(ghost(page, '.wing .state')).toHaveText('Flap · open')
   await expect(ghost(page, '.gap b')).toHaveText(/^1[78] m$/)
+})
+
+test('the frame the stage needs is asked for before the rest', async ({ page }) => {
+  const asked: string[] = []
+  let release = () => {}
+
+  const held = new Promise<void>((resolve) => {
+    release = resolve
+  })
+
+  await page.route(FRAME, async (route) => {
+    asked.push(route.request().url())
+    await held
+    await route.continue()
+  })
+  await loaded(page)
+  await toTime(page, -1)
+  expect(asked.map((url) => url.slice(-7))).toEqual(['00.webp'])
+  release()
+  await expect.poll(() => asked.length).toBe(24)
+})
+
+test('the bar label is bright enough over the road', async ({ page }) => {
+  await loaded(page)
+  await expect(ghost(page, '.straight .label')).toHaveCSS('color', 'rgb(255, 255, 255)')
 })

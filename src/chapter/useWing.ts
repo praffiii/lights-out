@@ -32,21 +32,33 @@ export function useWing(near: boolean, first: number) {
   useEffect(() => {
     if (!near) return
 
-    const loading = Array.from({ length: WING_FRAMES }, (_, i) => {
+    const loading: HTMLImageElement[] = []
+
+    const load = (i: number, done?: () => void) => {
       const image = new Image()
 
       image.onload = () => {
         images.current.set(i, image)
         draw()
+        done?.()
       }
 
+      image.onerror = () => done?.()
       image.src = frameSrc(i)
+      loading.push(image)
+    }
 
-      return image
+    const needed = want.current
+
+    load(needed, () => {
+      for (let i = 0; i < WING_FRAMES; i++) if (i !== needed) load(i)
     })
 
     return () => {
-      for (const image of loading) image.onload = null
+      for (const image of loading) {
+        image.onload = null
+        image.onerror = null
+      }
     }
   }, [near, draw])
 
