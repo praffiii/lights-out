@@ -347,3 +347,114 @@ test('data that lands while the stage is pinned keeps it in step', async ({ page
   await expect(stage(page, '[data-round]')).toHaveText('22')
   expect(errors).toEqual([])
 })
+
+const clashes = (page: Page) =>
+  page.evaluate(() => {
+    const pin = document.querySelector('.season-race .pin')
+
+    if (!pin) return ['no pin']
+
+    const bounds = pin.getBoundingClientRect()
+
+    const shown = (el: Element) => {
+      const r = el.getBoundingClientRect()
+
+      return r.width > 0 && r.height > 0 && getComputedStyle(el).opacity !== '0' && getComputedStyle(el).visibility === 'visible'
+    }
+
+    const boxes = [...pin.querySelectorAll('h2, .when .number, .place, .winner, .hero-box, .tower li, .strip-label, .cells, .tag, .law')].flatMap((el) => (shown(el) ? [{ name: `${el.className || el.tagName} ${el.textContent?.slice(0, 16)}`, el, r: el.getBoundingClientRect() }] : []))
+
+    const out = boxes.flatMap(({ name, r }) => (r.top < bounds.top - 1 || r.bottom > Math.min(bounds.bottom, innerHeight) + 1 || r.left < -6 || r.right > innerWidth + 1 ? [`out: ${name} ${Math.round(r.top)}–${Math.round(r.bottom)}`] : []))
+
+    const over = boxes.flatMap((a, i) =>
+      boxes.slice(i + 1).flatMap((b) => {
+        const x = Math.min(a.r.right, b.r.right) - Math.max(a.r.left, b.r.left)
+        const y = Math.min(a.r.bottom, b.r.bottom) - Math.max(a.r.top, b.r.top)
+
+        return x > 2 && y > 2 && !a.el.contains(b.el) && !b.el.contains(a.el) ? [`over: ${a.name} / ${b.name}`] : []
+      }),
+    )
+
+    const text = [...pin.querySelectorAll<HTMLElement>('.hero-box :is(h3, .state, .lead, .against span), .name, .place, .tag b, .cells .code, .cells .n, .law, .winner')].filter(shown)
+    const cut = text.flatMap((el) => (el.scrollWidth > el.clientWidth + 1 && getComputedStyle(el).overflowX !== 'visible' ? [`cut: ${el.textContent}`] : []))
+
+    const inside = [...pin.querySelectorAll('.hero-box')].flatMap((box) => {
+      const b = box.getBoundingClientRect()
+      const parts = [...box.querySelectorAll('h3, .state, .lead, .against span')].map((el) => ({ el, r: rangeOf(el) }))
+
+      const spilled = parts.flatMap(({ el, r }) => (r.right > b.right + 1 || r.bottom > b.bottom + 1 || r.top < b.top - 1 ? [`spill: ${el.textContent}`] : []))
+
+      const crossed = parts.flatMap((p, i) => parts.slice(i + 1).flatMap((q) => (Math.min(p.r.right, q.r.right) - Math.max(p.r.left, q.r.left) > 2 && Math.min(p.r.bottom, q.r.bottom) - Math.max(p.r.top, q.r.top) > 6 ? [`cross: ${p.el.textContent} / ${q.el.textContent}`] : [])))
+
+      return [...spilled, ...crossed]
+    })
+
+    function rangeOf(el: Element) {
+      const range = document.createRange()
+
+      range.selectNodeContents(el)
+
+      const r = range.getBoundingClientRect()
+      const air = el.matches('.lead') ? r.height * 0.16 : 0
+
+      return { left: r.left, right: r.right, top: r.top + air, bottom: r.bottom - air }
+    }
+
+    return [...out, ...over, ...cut, ...inside]
+  })
+
+for (const [project, width, height, rows] of [
+  ['desktop', 1440, 900, 5],
+  ['desktop', 1366, 768, 4],
+  ['desktop', 1366, 640, 3],
+  ['desktop', 1280, 700, 4],
+  ['desktop', 1024, 768, 4],
+  ['desktop', 768, 1024, 3],
+  ['desktop', 1920, 1080, 5],
+  ['phone', 390, 844, 3],
+  ['phone', 390, 664, 2],
+  ['phone', 360, 640, 2],
+  ['phone', 320, 568, 2],
+  ['desktop', 820, 1180, 3],
+] as const) {
+  test(`the stage fits ${width}×${height}`, async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== project)
+    await page.setViewportSize({ width, height })
+    await loaded(page)
+
+    for (const round of [1, 20]) {
+      await toRound(page, round)
+      await page.waitForTimeout(1200)
+      expect(await clashes(page)).toEqual([])
+    }
+
+    for (const side of ['drivers', 'teams']) await expect(stage(page, `[data-side="${side}"] .tower li`).filter({ visible: true })).toHaveCount(rows)
+  })
+}
+
+test('reduced motion rests on the last round, pins nothing and still answers', async ({ page, errors }) => {
+  await loaded(page, `${PATH}?reduced`)
+
+  expect(await page.locator('.pin-spacer').count()).toBe(0)
+  expect(await hiddenText(page)).toEqual([])
+  await expect(stage(page, '[data-round]')).toHaveText('21')
+  expect(await wonSides(page)).toEqual(['drivers', 'teams'])
+  await slider(page).focus()
+  await page.keyboard.press('Home')
+  await expect(stage(page, '[data-round]')).toHaveText('1')
+  expect(errors).toEqual([])
+})
+
+test.describe('without JavaScript', () => {
+  test.use({ javaScriptEnabled: false })
+
+  test('both titles, the tables and the sum are in the page', async ({ page }) => {
+    await page.goto(PATH)
+
+    await expect(stage(page, '[data-round]')).toHaveText('21')
+    expect(await stage(page, '.state').allTextContents()).toEqual(['Won · round 19', 'Won · round 20'])
+    await expect(stage(page, '[data-side="teams"] .tower li').first()).toContainText('666')
+    await expect(chapter(page, '.sum .total .num')).toHaveText('666')
+    await expect(stage(page, '.hero-box').first()).toBeVisible()
+  })
+})
